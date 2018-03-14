@@ -1,0 +1,5 @@
+- name: Create Ansible Host file
+  template:
+    src: "{{ role_path }}/templates/cloud.inventory.j2"
+    dest: ../inventory/cloud_host
+

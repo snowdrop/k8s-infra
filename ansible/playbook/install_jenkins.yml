@@ -1,0 +1,23 @@
+---
+- hosts: "{{ openshift_node }}"
+  gather_facts: False
+  vars:
+    config_file: /etc/origin/master/master-config.yaml
+
+  tasks:
+    - name: Update configuration file
+      shell: |
+        echo "jenkinsPipelineConfig:" >> {{ config_file }}
+        echo "  autoProvisionEnabled: false" >> {{ config_file }}
+
+    - name: Restart master
+      command: systemctl restart origin-master-api origin-master-controllers
+
+    - name: Wait for master to become ready
+      pause:
+        seconds: 30
+
+    - name: Install Jenkins using template
+      shell: |
+        oc project infra
+        oc new-app jenkins-persistent -p MEMORY_LIMIT=1Gi

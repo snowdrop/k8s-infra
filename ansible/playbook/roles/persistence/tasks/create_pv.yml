@@ -1,0 +1,11 @@
+# Deletes a persistent volume and creates it again
+# Expects to be passed an argument named
+# pv_name
+
+- name: Delete pv {{ pv_name }}
+  shell: "oc delete pv/{{ pv_name }}"
+  ignore_errors: true
+
+
+- name: Create pv {{ pv_name }}
+  shell: "oc create -f /tmp/{{ pv_name }}.yml"

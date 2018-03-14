@@ -1,0 +1,69 @@
+- name: Set namespace property
+  set_fact:
+    infra_project: "infra"
+
+- name: Use Infra namespace/project
+  command: oc new-project {{ infra_project }}
+
+- name: Install Nexus App
+  shell: |
+    oc new-app sonatype/nexus
+    oc expose svc/nexus
+    oc set probe dc/nexus \
+    	--liveness \
+    	--failure-threshold 3 \
+    	--initial-delay-seconds 30 \
+    	-- echo ok
+    oc set probe dc/nexus \
+    	--readiness \
+    	--failure-threshold 3 \
+    	--initial-delay-seconds 30 \
+    	--get-url=http://:8081/nexus/content/groups/public
+
+- name: Enable persistence
+  shell: |
+      oc volumes dc/nexus --add \
+          --name 'nexus-volume-1' \
+          --type 'pvc' \
+          --mount-path '/sonatype-work/' \
+          --claim-name 'nexus-pv' \
+          --claim-size '5G' \
+          --overwrite
+  when: persistence
+
+- name: Get Nexus Route
+  shell: oc get route nexus -n infra -o jsonpath='http://{.spec.host}/nexus'
+  register: nexus_address
+
+- name: Wait till Nexus is Up
+  uri:
+    url: "{{ nexus_address.stdout }}/content/repositories/central/archetype-catalog.xml"
+    status_code: 200
+  register: result
+  until: result.status == 200
+  retries: 5
+  delay: 30
+
+- name: Create JBoss Repos
+  uri:
+    url: "{{ nexus_address.stdout }}/{{ item.value.path }}"
+    method: POST
+    return_content: no
+    status_code: 201
+    user: "admin"
+    password: "admin123"
+    body: "{{ lookup('file', role_path ~ '/files/' ~ item.value.file) }}"
+    body_format: json
+  with_dict: "{{ repos }}"
+
+- name: Create Groups for the Nexus repos
+  uri:
+    url: "{{ nexus_address.stdout }}/{{ item.value.path }}"
+    method: POST
+    return_content: no
+    status_code: 201
+    user: "admin"
+    password: "admin123"
+    body: "{{ lookup('file', role_path ~ '/files/' ~ item.value.file) }}"
+    body_format: json
+  with_dict: "{{ group_repos }}"
