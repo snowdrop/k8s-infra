@@ -21,4 +21,4 @@ The root password is supplied via email when the Hetzner machine is initially cr
 
 ## Install Openshift
 
-Follow the instructions in the `../ansible/README.md`
+Follow the instructions in `../ansible/README.md`
