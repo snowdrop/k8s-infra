@@ -36,8 +36,7 @@ It will create a :
 
 and will :
 
-- Git clone the minishift `ansible-service-broker` addon for the ansible service broker
-- Enable/disable minishift cache
+- Enable/disable minishift cache (according to boolean parameter)
 - Install the docker images within the OpenShift registry according to the ocp version defined
 - Start Minishift using the experimental features and will use the `boot2docker` iso image
 
@@ -45,8 +44,6 @@ and will :
 cd minishift    
 ./bootstrap_vm.sh true 3.7.1
 ```
-
-**NOTE** : The minishift `ansible-service-broker` addon is based on this project `https://github.com/eriknelson/minishift-addons` and branch `asb-updates`
 
 **NOTE** : When the vm has been created, then it can be stopped/started using the commands `minishift stop|start --profile demo`
 
