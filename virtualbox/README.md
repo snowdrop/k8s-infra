@@ -10,7 +10,6 @@ Table of Contents
       * [Common steps](#common-steps)
    * [Create CentOS vm on Virtualbox](#create-centos-vm-on-virtualbox)
 
-
 ## Instructions to create a CentOS ISO Image
 
 ### MacOS's users only
