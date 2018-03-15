@@ -6,10 +6,10 @@ This project details how to provision a vm with OpenShift Origin and to to insta
 - Ansible Service Broker
 - Launcher with customized catalog
 
-Different provisioning mode are proposed as :
+Different provisioning mode are proposed as by example with :
 
-- `minishift`: We can't use ansible Playbooks to provision it and Openshift is installed as docker images and doesn;'t run as services
-- Centos vm (running on virtualbox, hetzner cloud, ....) : They can be provisioned using Ansible playbooks and ocp is installed with different services, master, node, etcd, ....
+- `minishift`, we can't use ansible Playbooks to provision it and Openshift is installed as docker images and doesn;'t run as services
+- and for Centos vm (running on virtualbox, hetzner cloud, ....), we provision them using OpenShift Ansible playbooks and ocp is installed with different services, master, node, etcd, ....
 
 Table of Contents
 =================
