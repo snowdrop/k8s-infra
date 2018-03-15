@@ -11,8 +11,6 @@ sshpass -f pwd.txt ssh-copy-id -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa.pub 
 
 ## Local vm (virtualbox)
 
-
-
 - Git clone `openshihift-ansible` project using version `3.7`
 ```bash
 git clone -b release-3.7 https://github.com/openshift/openshift-ansible.git

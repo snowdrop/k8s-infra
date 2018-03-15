@@ -35,8 +35,13 @@ docker_images=(
 )
 IMAGES=$(printf "%s " "${docker_images[@]}")
 
+if [ ! -d "minishift-addons" ]; then
+  git clone https://github.com/minishift/minishift-addons.git
+fi
+
 if [ ! -d "$demo_PROFILE_DIR" ]; then
   minishift profile set demo
+  minishift --profile demo addons install minishift-addons/add-ons/ansible-service-broker
   minishift --profile demo config set memory 6GB
   minishift --profile demo config set cpus 4
   minishift --profile demo config set openshift-version v$OCP_VERSION
