@@ -41,27 +41,15 @@ ansible-playbook -i inventory/cloud_host playbook/install_package.yml -e openshi
 ansible-playbook -i inventory/cloud_host openshift-ansible/playbooks/byo/config.yml
 ```
 
-- Add cluster admin role
-
-```bash
-ansible-playbook -i inventory/cloud_host playbook/enable_cluster_admin.yml -e openshift_node=masters
-```
-
 - Execute post tasks such as setup persistence, install nexus, jenkins, jaeger
 
 ```bash
-ansible-playbook -i inventory/cloud_host playbook/setup_ocp.yml -e openshift_node=masters
+ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e openshift_node=masters
 ```
 
-```bash
-ansible-playbook -i inventory/cloud_host playbook/install_jenkins.yml -e openshift_node=masters
-```
-
-Remark : This playbook will change the master config of the OpenShift cluster in order to avoid that Jenkins is provisioned automatically if a jenkins instance doesn't exist within the namespace
-
-```bash
-ansible-playbook -i inventory/cloud_host playbook/install_jaeger.yml -e openshift_node=masters
-```
+You can also select to only install specific parts by using Ansible's `tags` support like so: `--tags install_nexus,install_jaeger`
+If you would like to execute all roles except some, you can use Ansible's `--skip-tags` in the same fashion. 
+The tags can be found in ` playbook/post_installation.yml`
 
 - Create users and projects
 
@@ -73,24 +61,6 @@ ansible-playbook -i inventory/cloud_host playbook/add_users.yml -e openshift_nod
 
 This step will create 5 users with credentials like `user1/pwd1` while also creating a project for like `user1` for each user
 
-## Tricks
-
-- To uninstall/reinstall the ASB Service broker, use the following parameters within the inventory file
-
-```yaml
-ansible_service_broker_remove=true
-ansible_service_broker_install=false
-
-ansible_service_broker_remove=false
-ansible_service_broker_install=true
-```
-
-- Then execute this ansible-playbook command
-
-```bash
-ansible-playbook -i inventory/cloud_host openshift-ansible/playbooks/byo/openshift-cluster/service-catalog.yml
-```
-
 ## Issues
 
 - Due to a bug with the ASB Service catalog, then the following command must be applied before to create a service instance
@@ -100,7 +70,7 @@ oc project openshift-ansible-service-broker
 oc patch clusterrole/asb-auth --type json --patch '[ { "op": "add", "path": "/rules/5", "value":  { "apiGroups": [ "networking.k8s.io", ""], "attributeRestrictions": null, "resources": [ "networkpolicies" ], "verbs": [ "create", "delete" ] }  } ]'
 ```
 
-## Clean up existing machine
+## Soft clean up of an existing machine
 
 If all you care to do is reset openshift back to zero then stop the API, Controllers, and etcd. Then follow these instructions
 

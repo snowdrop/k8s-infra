@@ -3,7 +3,10 @@
     infra_project: "infra"
 
 - name: Use Infra namespace/project
-  command: oc new-project {{ infra_project }}
+  command: oc project {{ infra_project }}
+
+- name: Use Infra namespace/project
+  command: oc project {{ infra_project }}
 
 - name: Install Nexus App
   shell: |

@@ -1,7 +1,0 @@
----
-- hosts: "{{ openshift_node }}"
-  gather_facts: False
-  
-  roles:
-    - { role: 'persistence', tags: 'persistence'}
-    - { role: 'install_nexus', tags: 'install_nexus'}

@@ -1,0 +1,11 @@
+- name: Set namespace
+  set_fact:
+    namespace: infra
+
+- name: Use Infra namespace/project
+  command: oc project {{ namespace }}
+
+- name: Install Jager
+  shell: |
+    oc process -f https://raw.githubusercontent.com/jaegertracing/jaeger-openshift/master/all-in-one/jaeger-all-in-one-template.yml | oc create -f -
+    oc expose service jaeger-collector --port=14268 -n infra
