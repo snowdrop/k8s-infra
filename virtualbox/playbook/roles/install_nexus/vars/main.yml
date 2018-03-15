@@ -1,0 +1,22 @@
+---
+debug: false
+persistence: true
+
+repos:
+  jboss_ea:
+    path: service/local/repositories
+    file: "jboss-ea.json"
+  jboss_ga:
+    path: service/local/repositories
+    file: "jboss-ga.json"
+  jboss_public:
+    path: service/local/repositories
+    file: "jboss-public.json"
+  jenkins_ci:
+    path: service/local/repositories
+    file: "jenkins-ci.json"
+
+group_repos:
+  redhat_public:
+    path: service/local/repo_groups
+    file: "redhat-public-group.json"

@@ -1,0 +1,2 @@
+Warning: Permanently added '[127.0.0.1]:2222' (ECDSA) to the list of known hosts.
+Connection to 127.0.0.1 closed by remote host.

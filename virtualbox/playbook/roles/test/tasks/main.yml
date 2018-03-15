@@ -1,0 +1,5 @@
+- name: Test ping
+  ping:
+- name: Display IP address
+  debug:
+    msg: "IP Address: {{ ip_address }}"

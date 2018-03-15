@@ -1,0 +1,34 @@
+- name: Set namespace
+  set_fact:
+    namespace: infra
+
+- name: Set Jenkins app name
+  set_fact:
+    jenkins_app: jenkins-persistent
+
+- name: Delete Jenkins Application, ServiceAccount, RoleBinding, PersistentVolumeClaim
+  shell: |
+    oc delete all -l app={{ jenkins_app }} -n {{ namespace }}
+    oc delete sa jenkins --ignore-not-found=true -n {{ namespace }}
+    oc delete rolebindings jenkins_edit --ignore-not-found=true -n {{ namespace }}
+    oc delete persistentvolumeclaim jenkins --ignore-not-found=true -n {{ namespace }}
+
+- name: Change scc permission to allow jenkins pod to run within the docker container using its userid
+  shell: "oc adm policy add-scc-to-group anyuid system:authenticated -n {{ namespace }}"
+
+- name: Install {{ jenkins_app }}
+  shell: "oc new-app JENKINS_PASSWORD=admin123 {{ jenkins_app }} -n {{ namespace }}"
+
+- name: Add role cluster admin to the jenkins service account
+  shell: "oc policy add-role-to-user admin system:serviceaccount:{{ namespace }}:jenkins"
+
+- name: Get Jenkins Service Account Token
+  shell: |
+    oc get sa/jenkins -n {{ namespace }} {% raw %}--template='{{range .secrets}}{{ .name }} {{end}}' | xargs -n 1 oc get secret --template='{{ if .data.token }}{{ .data.token }}{{end}}' {% endraw %} | head -n 1 | base64 -d -
+  register: sa_jenkins_token
+
+- name: Print token
+  debug:
+    msg:
+      - "Jenkins ServiceAccount token is"
+      - "{{sa_jenkins_token.stdout}}"

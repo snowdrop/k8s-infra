@@ -1,0 +1,7 @@
+instance-id: cloud
+local-hostname: cloud
+network-interfaces: |
+  auto enp0s3
+  iface enp0s3 inet dhcp
+  auto enp0s8
+  iface enp0s8 inet dhcp
