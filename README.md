@@ -6,6 +6,16 @@ This project details how to provision a vm with OpenShift Origin and to to insta
 - Ansible Service Broker
 - Launcher with customized catalog
 
+Table of Contents
+=================
+
+   * [Minishift](#minishift)
+      * [Post installation tasks](#post-installation-tasks)
+      * [Test Launcher](#test-launcher)
+   * [Virtualbox](#virtualbox)
+   * [Cloud - Hetzner](#cloud---hetzner)
+
+
 ## Minishift
 
 To provision MiniShift with OpenShift Origin 3.7.1 and install the Ansible Service Broker, then use the 
