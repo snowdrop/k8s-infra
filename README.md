@@ -57,7 +57,7 @@ As MacOS users can't execute natively all the linux commands, part of the differ
 
 - Create and start a vm on virtualbox
 ```bash
-cd build-centos-iso
+cd virtualbox/build-centos-iso
 vagrant plugin install vagrant-vbguest
 vagrant plugin install sshd
 vagrant up
@@ -96,7 +96,7 @@ Execute this bash script to repackage the CentOS ISO image and pass as parameter
 from `http://cloud.centos.org/centos/7/images/`
 
 ```bash
-cd cloud-init
+cd virtualbox/build-centos-iso/cloud-init
 ./new-iso.sh </LOCAL/HOME/DIR> <QCOW2_IMAGE_NAME> <BOOLEAN_RESIZE_QCOQ_IMAGE>
 
 e.g
@@ -152,7 +152,7 @@ following script `create_vm.sh` on the machine running virtualbox. This script w
 - Start vm and configure SSH Port forward
 
 ```bash
-cd build-centos-iso/cloud-init 
+cd virtualbox/build-centos-iso/cloud-init 
 ./create-vm.sh </LOCAL/HOME/DIR>
 
 e.g
