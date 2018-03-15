@@ -1,56 +1,58 @@
-# Create an OSEv3 group that contains the masters and nodes groups
 [OSEv3:children]
 masters
 nodes
 etcd
 
-# Set variables common for all OSEv3 hosts
 [OSEv3:vars]
 ansible_user=root
 
+public_ip_address = {{ ip_address }}
+host_key_checking = False
+
 # For Atomic VM
-containerized=false
+containerized = false
 
 openshift_release=v3.7
 openshift_image_tag=v3.7.0
 openshift_pkg_version="-3.7.0"
+
 openshift_deployment_type=origin
-openshift_enable_service_catalog=true
 
 openshift_hostname={{ ip_address }}
 openshift_master_cluster_public_hostname={{ ip_address }}
 openshift_master_default_subdomain={{ ip_address }}.nip.io
-openshift_disable_check=memory_availability,disk_availability,docker_image_availability
 openshift_master_unsupported_embedded_etcd=true
+
+# To avoid message
+# - Available disk space in "/var" (9.5 GB) is below minimum recommended (40.0 GB)
+# - Docker storage drivers 'overlay' and 'overlay2' are only supported with 'xfs' as the backing storage, but this host's storage is type 'extfs'
+# - Available memory (2.0 GiB) is too far below recommended value (16.0 GiB)
+# - Docker version is higher than expected
+openshift_disable_check = docker_storage,memory_availability,disk_availability,docker_image_availability,package_version
 
 # we need to increase the pods per core because we might temporarily have multiple build pods running at the same time
 openshift_node_kubelet_args={'pods-per-core': ['20']}
 
-public_ip_address={{ ip_address }}
+openshift_enable_service_catalog=true
 
-ansible_python_interpreter = /usr/bin/python3.6
-
-#ansible_ssh_private_key_file=~/.ssh/id_openstack.rsa
+ansible_python_interpreter=/usr/bin/python
 
 ansible_service_broker_registry_whitelist=['.*-apb$']
 ansible_service_broker_image_tag=v3.7
 ansible_service_broker_registry_tag=v3.7
+ansible_service_broker_remove=false
+ansible_service_broker_install=true
 
 # enable htpasswd auth
 openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider', 'filename': '/etc/origin/master/htpasswd'}]
 # htpasswd -nb admin admin
 openshift_master_htpasswd_users={'admin': '$apr1$DloeoaY3$nqbN9fQBkyXgbj58buqEM.'}
 
-# host group for masters
 [masters]
-{{ ip_address }} openshift_public_hostname={{ ip_address }}
+{{ ip_address }} openshift_public_hostname={{ ip_address }} openshift_ip={{ ip_address }}
 
-# host group for etcd, should run on a node that is not schedulable
 [etcd]
-{{ ip_address }}
+{{ ip_address }} openshift_ip={{ ip_address }}
 
-# host group for worker nodes, we list master node here so that
-# openshift-sdn gets installed. We mark the master node as not
-# schedulable.
 [nodes]
-{{ ip_address }} openshift_node_labels="{'region':'infra','zone':'default'}" openshift_public_hostname={{ ip_address }} openshift_schedulable=true
+{{ ip_address }} openshift_node_labels="{'region':'infra','zone':'default'}" openshift_ip={{ ip_address }} openshift_public_hostname={{ ip_address }} openshift_schedulable=true
