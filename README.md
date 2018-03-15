@@ -31,7 +31,7 @@ and will :
 - Git clone the minishift `ansible-service-broker` addon for the ansible service broker
 - Enable/disable minishift cache
 - Install the docker images within the OpenShift registry according to the ocp version defined
-- Start Minishift using the experimental features
+- Start Minishift using the experimental features and will use the `boot2docker` iso image
 
 ```bash
 cd minishift    
