@@ -1,4 +1,4 @@
-# Install all in one Openshift Origin 3.7 on cloud machine
+# Install all in one Openshift Origin 3.7 on machine
 
 ## Prerequisites
 

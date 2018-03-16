@@ -43,11 +43,21 @@ openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 
 # htpasswd -nb admin admin
 openshift_master_htpasswd_users={'admin': '$apr1$DloeoaY3$nqbN9fQBkyXgbj58buqEM.'}
 
+
+
+
+{% set host_info = 'localhost ansible_connection=local' if ((use_local is defined) and (use_local | bool)) else ip_address %}
+
+# host group for masters
 [masters]
-{{ ip_address }} openshift_public_hostname={{ ip_address }} openshift_ip={{ ip_address }}
+{{ host_info }} openshift_public_hostname={{ ip_address }}
 
+# host group for etcd, should run on a node that is not schedulable
 [etcd]
-{{ ip_address }} openshift_ip={{ ip_address }}
+{{ host_info }}
 
+# host group for worker nodes, we list master node here so that
+# openshift-sdn gets installed. We mark the master node as not
+# schedulable.
 [nodes]
-{{ ip_address }} openshift_node_labels="{'region':'infra','zone':'default'}" openshift_ip={{ ip_address }} openshift_public_hostname={{ ip_address }} openshift_schedulable=true
+{{ host_info }} openshift_node_labels="{'region':'infra','zone':'default'}" openshift_public_hostname={{ ip_address }} openshift_schedulable=true
