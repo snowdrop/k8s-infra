@@ -1,3 +1,4 @@
 .idea/
 virtualbox/openshift-ansible/
-
+*/.vagrant/
+user-data
