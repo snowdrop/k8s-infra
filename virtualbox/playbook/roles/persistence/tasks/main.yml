@@ -1,8 +1,0 @@
-- name: Create files to mount
-  include: create_files.yml
-
-- name: Setup security
-  include: config_role_sa.yml
-
-- include: create_pv.yml pv_name={{ item.key }}
-  with_dict: "{{ volumes }}"

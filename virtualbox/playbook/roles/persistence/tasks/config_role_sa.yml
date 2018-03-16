@@ -1,9 +1,0 @@
-- name: Copy sa pv recycler controller file to master
-  copy:
-    src: "{{ role_path }}/files/sa-pv-recyler-controller.yml"
-    dest: /tmp/sa-pv-recyler-controller.yml
-
-- name: Define scc security for the pv-recycler-controller
-  shell: |
-    oc adm policy add-scc-to-user hostmount-anyuid system:serviceaccount:openshift-infra:pv-recycler-controller
-    oc create -f /tmp/sa-pv-recyler-controller.yml
