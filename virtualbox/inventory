@@ -9,6 +9,9 @@ ansible_user=root
 public_ip_address = 192.168.99.50
 host_key_checking = False
 
+# To include rpms repos from http://buildlogs.centos.org/centos/7/paas/x86_64/openshift-origin/
+openshift_repos_enable_testing = true
+
 # For Atomic VM
 containerized = false
 
