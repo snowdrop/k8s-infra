@@ -198,7 +198,32 @@ Warning: Permanently added '192.168.99.50' (ECDSA) to the list of known hosts.
 [root@cloud ~]# 
 ```
 
-TODO : Test Atomic Centos and Ansible -> http://www.projectatomic.io/docs/quickstart/
+### Experimental : Atomic Centos and Ansible
+
+See : http://www.projectatomic.io/docs/quickstart/
+
+- Create the vm as we did before but use this qcow file instead `CentOS-Atomic-Host-7-GenericCloud.qcow2`
+- Execute these commands to resize the atomic partition, import your private key, inventory file and install the service `ose-ansible`
+
+```bash
+./create-vm.sh /Users/dabou
+ssh-keygen -R "192.168.99.50"
+
+echo "##### Resize atomic-root partition = +8G"
+ssh root@192.168.99.50 "lvresize --size=+8g --resizefs atomicos/root"
+
+echo "#### Secure copy the inventory file to the host machine"
+scp /Users/dabou/Code/rhoar/cloud-native/infra/virtualbox/inventory-atomic root@192.168.99.50:/root/inventory
+# scp /Users/dabou/.ssh/id_rsa root@192.168.99.50:/root/my_key.rsa
+
+echo "#### Install ose ansible installer"
+ssh root@192.168.99.50 "atomic install --system --storage=ostree --set INVENTORY_FILE=/root/inventory registry.access.redhat.com/openshift3/ose-ansible"   
+
+echo "#### Restart service and check status"
+ssh root@192.168.99.50 "systemctl start ose-ansible"
+ssh root@192.168.99.50 "systemctl status ose-ansible"
+ssh root@192.168.99.50 "cat /var/log/ansible.log"
+```
 
 ## Cloud - Hetzner
 
