@@ -6,15 +6,15 @@
 
 ```bash
 echo "## Add yum repo needed to download rpms"
-ssh root@root@192.168.99.50 "yum-config-manager --enable rhel-7-server-ose-3.7-rpms"
-ssh root@root@192.168.99.50 "yum-config-manager --enable rhel-7-server-rh-common-rpms"
+ssh root@192.168.99.50 "yum-config-manager --enable rhel-7-server-ose-3.7-rpms"
+ssh root@192.168.99.50 "yum-config-manager --enable rhel-7-server-rh-common-rpms"
 
 echo "#### Copy project -> TODO : Should be converted into a git clone command"
 scp -r /Users/dabou/Code/rhoar/cloud-native/infra/virtualbox/playbook root@192.168.99.50:/root/install
 scp /Users/dabou/Code/rhoar/cloud-native/infra/virtualbox/inventory-local root@192.168.99.50:/root/install/inventory
 
 ssh root@192.168.99.50 "cd install && git clone -b release-3.7 https://github.com/openshift/openshift-ansible.git"
-ssh root@192.168.99.50 "ANSIBLE_LOG_PATH=/var/log/ansible.log ansible-playbook -i inventory openshift-ansible/playbooks/byo/config.yml"
+ssh root@192.168.99.50 "cd install && ANSIBLE_LOG_PATH=/var/log/ansible.log ansible-playbook -i inventory openshift-ansible/playbooks/byo/config.yml"
 ssh root@192.168.99.50 "tail -f /var/log/ansible.log"
 ```
 
