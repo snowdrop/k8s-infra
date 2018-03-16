@@ -8,9 +8,10 @@ ansible_user=root
 
 public_ip_address = 192.168.99.50
 host_key_checking = False
+# ansible_ssh_private_key_file = /root/my_key.rsa
 
 # For Atomic VM
-containerized = false
+containerized = true
 
 openshift_release = v3.7
 openshift_image_tag = v3.7.0
@@ -30,21 +31,21 @@ openshift_master_unsupported_embedded_etcd = true
 # - Docker version is higher than expected
 openshift_disable_check = docker_storage,memory_availability,disk_availability,docker_image_availability,package_version
 
-openshift_enable_service_catalog = true
+openshift_enable_service_catalog = false
 
 ansible_python_interpreter = /usr/bin/python
 
-ansible_service_broker_registry_whitelist = ['.*-apb$']
-ansible_service_broker_image_tag = v3.7
-ansible_service_broker_registry_tag = v3.7
-ansible_service_broker_remove = false
-ansible_service_broker_install = true
+ansible_service_broker_registry_whitelist=['.*-apb$']
+ansible_service_broker_image_tag=v3.7
+ansible_service_broker_registry_tag=v3.7
+ansible_service_broker_remove=false
+ansible_service_broker_install=true
 
 [masters]
-192.168.99.50 openshift_public_hostname=192.168.99.50 openshift_ip=192.168.99.50
+localhost ansible_connection=local openshift_public_hostname=192.168.99.50 openshift_ip=192.168.99.50
 
 [etcd]
-192.168.99.50 openshift_ip=192.168.99.50
+localhost ansible_connection=local openshift_ip=192.168.99.50
 
 [nodes]
-192.168.99.50 openshift_node_labels="{'region':'infra','zone':'default'}" openshift_ip=192.168.99.50 openshift_public_hostname=192.168.99.50 openshift_schedulable=true
+localhost ansible_connection=local openshift_node_labels="{'region':'infra','zone':'default'}" openshift_ip=192.168.99.50 openshift_public_hostname=192.168.99.50 openshift_schedulable=true
