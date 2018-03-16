@@ -10,6 +10,8 @@ package_upgrade: false
 
 packages:
   - docker
+  - git
+  - ansible
   - net-tools
   - NetworkManager
 
