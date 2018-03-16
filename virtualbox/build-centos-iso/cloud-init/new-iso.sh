@@ -39,8 +39,8 @@ wget_centos_qcow() {
 ## Resize qcow2 with +20G
 ##
 resize(){
-    echo "#### Optional - Resizing qcow2 Image - +20G"
-    qemu-img resize ${IMAGE_DIR}/${CENTOS_QCOW2} +20G
+    echo "#### Optional - Resizing qcow2 Image - +15G"
+    qemu-img resize ${IMAGE_DIR}/${CENTOS_QCOW2} +15G
 }
 
 ##
