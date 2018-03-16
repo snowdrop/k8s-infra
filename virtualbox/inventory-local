@@ -7,9 +7,7 @@ etcd
 ansible_user=root
 
 public_ip_address = 192.168.99.50
-host_key_checking = False
 
-# For Atomic VM
 containerized = false
 
 openshift_release = v3.7
