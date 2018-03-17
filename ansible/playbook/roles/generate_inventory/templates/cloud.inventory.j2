@@ -50,14 +50,14 @@ openshift_master_htpasswd_users={'admin': '$apr1$DloeoaY3$nqbN9fQBkyXgbj58buqEM.
 
 # host group for masters
 [masters]
-{{ host_info }} openshift_public_hostname={{ ip_address }}
+{{ host_info }} openshift_public_hostname={{ ip_address }} openshift_ip={{ ip_address }}
 
 # host group for etcd, should run on a node that is not schedulable
 [etcd]
-{{ host_info }}
+{{ host_info }} openshift_ip={{ ip_address }}
 
 # host group for worker nodes, we list master node here so that
 # openshift-sdn gets installed. We mark the master node as not
 # schedulable.
 [nodes]
-{{ host_info }} openshift_node_labels="{'region':'infra','zone':'default'}" openshift_public_hostname={{ ip_address }} openshift_schedulable=true
+{{ host_info }} openshift_node_labels="{'region':'infra','zone':'default'}" openshift_public_hostname={{ ip_address }} openshift_schedulable=true openshift_ip={{ ip_address }}
