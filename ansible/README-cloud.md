@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-You need to have installed Fedora 26 on a machine provisioned on the cloud of your choice.
+You need to have installed CentOS 7.4 on a machine provisioned on the cloud of your choice.
 Furthermore you need to be able to perform password-less login to the machine using the root user.
 
 ## Installation steps

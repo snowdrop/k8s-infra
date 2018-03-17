@@ -3,22 +3,25 @@
 You first need to login to Hetzner robot
 at https://robot.your-server.de/server
 
-### Install Fedora on Machine
+### Install CentOS 7.4 Minimal
 
-* Initiate VNC connection from VNC tab
-    - Select Fedora OS
-    - Note the address and password on the console
-* Reset machine
-* Login to machine via a VNC client using the address and password for one of the previous steps
-* In order to install the Fedora, space need to be reclaimed on Disk(s)
-    - The only way I got this to work, was to delete the largest the partition on disk(s), while leaving the other ones intact
-* Select Fedora Cloud in Software
+* Select CentOS 7.4 in Linux tab and accept initiate installation. Take care to note the root password supplied.
+* Initiate a reset from the Reset tab.
+* Wait a few minutes for the installation to complete
 
 ### Copy ssh key to machine
 
 You need to perform ssh-copy-id root@ipaddress in order to later perform password-less login
 The root password is supplied via email when the Hetzner machine is initially created
 
+### Install NetworkManager
+
+```bash
+yum install -y NetworkManager
+systemctl enable NetworkManager
+systemct start NetworkManager
+```
+
 ## Install Openshift
 
-Follow the instructions in `../ansible/README.md`
+Follow the instructions in `../ansible/README-cloud.md`
