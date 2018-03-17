@@ -1,0 +1,11 @@
+---
+- hosts: "{{ openshift_node }}"
+  gather_facts: False
+
+  tasks:
+
+    - name: Enable usage of RPMs
+      shell: |
+        yum-config-manager --enable rhel-7-server-ose-3.7-rpms
+        yum-config-manager --enable rhel-7-server-rh-common-rpms
+      become: true

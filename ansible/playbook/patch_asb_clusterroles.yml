@@ -1,9 +1,0 @@
----
-
-- hosts: "{{ openshift_node }}"
-  gather_facts: False
-
-  tasks:
-
-    - name: Execute appropriate oc patch
-      command: oc patch clusterrole/asb-auth --type json --patch '[ { "op": "add", "path": "/rules/5", "value":  { "apiGroups": [ "networking.k8s.io", ""], "attributeRestrictions": null, "resources": [ "networkpolicies" ], "verbs": [ "create", "delete" ] }  } ]'

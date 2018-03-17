@@ -1,7 +1,5 @@
 - hosts: localhost
   gather_facts: False
-  vars_files:
-    # Load vars of the node such as ip_address
-    - ../inventory/{{ node_info_file }}
+
   roles:
     - { role: generate_inventory }

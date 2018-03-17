@@ -6,8 +6,9 @@
     - set_fact:
         rpm_repo_url: https://storage.googleapis.com/origin-ci-test/branch-logs/origin/v3.7.0/builds/test_branch_origin_extended_conformance_gce/2001/artifacts/rpms
 
-    - name: Install OpenShift rpms
-      command: dnf -y localinstall {{ rpm_repo_url }}/{{ item }}
+    - name: Install Openshift RPM packages
+      shell: |
+        yum -y localinstall {{ rpm_repo_url }}/{{ item }}
       become: true
       register: result
       retries: 5
@@ -27,8 +28,3 @@
         - origin-docker-excluder-3.7.0-1.0.7ed6862.noarch.rpm
         - origin-cluster-capacity-3.7.0-1.0.7ed6862.x86_64.rpm
         - origin-excluder-3.7.0-1.0.7ed6862.noarch.rpm
-
-
-    - name: Install and Enable Network Manager
-      shell: dnf -y install NetworkManager && sudo systemctl start NetworkManager && sudo systemctl enable NetworkManager
-      become: true

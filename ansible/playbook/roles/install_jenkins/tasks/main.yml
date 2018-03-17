@@ -1,3 +1,19 @@
+- name: Set config file
+  set_fact:
+    config_file: /etc/origin/master/master-config.yaml
+
+- name: Update configuration file
+  shell: |
+    echo "jenkinsPipelineConfig:" >> {{ config_file }}
+    echo "  autoProvisionEnabled: false" >> {{ config_file }}
+
+- name: Restart master
+  command: systemctl restart origin-master-api origin-master-controllers
+
+- name: Wait for master to become ready
+  pause:
+    seconds: 30
+
 - name: Set namespace
   set_fact:
     namespace: infra
