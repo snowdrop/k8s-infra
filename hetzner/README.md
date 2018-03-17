@@ -22,6 +22,8 @@ systemctl enable NetworkManager
 systemct start NetworkManager
 ```
 
+Execute a hardware reset from the Hetzner console
+
 ## Install Openshift
 
 Follow the instructions in `../ansible/README-cloud.md`
