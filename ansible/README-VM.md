@@ -16,8 +16,7 @@ To install Openshift on the VM, follow one of the following methods
 
 ```bash
 echo "## Add yum repo needed to download rpms"
-ssh root@192.168.99.50 "yum-config-manager --enable rhel-7-server-ose-3.7-rpms"
-ssh root@192.168.99.50 "yum-config-manager --enable rhel-7-server-rh-common-rpms"
+ssh root@192.168.99.50 "mkdir -p /root/install"
 
 echo "#### Copy project -> TODO : Should be converted into a git clone command"
 scp -r playbook inventory root@192.168.99.50:/root/install
