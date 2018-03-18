@@ -34,7 +34,7 @@ ssh root@192.168.99.50 "tail -f /var/log/ansible.log"
 git clone -b release-3.7 https://github.com/openshift/openshift-ansible.git
 ```
 
-** NOTE ** : Install RPMs packages if your OS is not CentOS7 
+**NOTE** : Install RPMs packages if your OS is not CentOS7 
 ```bash
 ansible-playbook -i inventory/cloud_host playbook/enable_rpm_packages.yaml -e openshift_node=masters
 ```
