@@ -3,8 +3,7 @@
 # pv_name
 
 - name: Delete pv {{ pv_name }}
-  shell: "oc delete pv/{{ pv_name }}"
-  ignore_errors: true
+  shell: "oc delete pv/{{ pv_name }} --ignore-not-found=true"
 
 
 - name: Create pv {{ pv_name }}
