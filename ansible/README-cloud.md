@@ -41,6 +41,11 @@ ansible-playbook -i inventory/cloud_host playbook/install_package.yml -e openshi
 ansible-playbook -i inventory/cloud_host openshift-ansible/playbooks/byo/config.yml
 ```
 
+Customization of the installation is possible by changing the variables found in `inventory/cloud_host` from the command line using Ansible's `-e` syntax.
+For example in order to enable installation of the service broker the following command could be executed
+
+`ansible-playbook -i inventory/cloud_host openshift-ansible/playbooks/byo/config.yml -e openshift_enable_service_catalog=true` 
+
 - Execute post tasks such as setup persistence, install nexus, jenkins, jaeger
 
 ```bash
