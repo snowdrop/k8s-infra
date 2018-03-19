@@ -60,7 +60,7 @@ For example in order to enable installation of the service broker the following 
 
 - Create OpenShift cluster
 ```bash
-ANSIBLE_LOG_PATH=/var/log/ansible.log ansible-playbook -i inventory openshift-ansible/playbooks/byo/config.yml
+ansible-playbook -i inventory openshift-ansible/playbooks/byo/config.yml
 ```
 
 ** NOTES **
