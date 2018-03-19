@@ -1,5 +1,5 @@
 .idea/
-virtualbox/openshift-ansible/
-*/.vagrant/
-user-data
-*/inventory/cloud_host
+**/openshift-ansible/
+**/.vagrant/
+**/inventory/cloud_host
+**/user-data
