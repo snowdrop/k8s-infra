@@ -18,13 +18,12 @@ To install Openshift on the VM, follow one of the following methods
 echo "## Add yum repo needed to download rpms"
 ssh root@192.168.99.50 "mkdir -p /root/install"
 
-echo "#### Copy project -> TODO : Should be converted into a git clone command"
-scp -r playbook inventory root@192.168.99.50:/root/install
+echo "#### Clone project"
+ssh root@192.168.99.50 "git clone https://github.com/snowdrop/cloud-native-infra.git install"
 
-ssh root@192.168.99.50 "cd install && git clone -b release-3.7 https://github.com/openshift/openshift-ansible.git"
-ssh root@192.168.99.50 "cd install && ansible-playbook playbook/generate_inventory.yml -e ip_address=192.168.99.50 -e use_local=true"
-ssh root@192.168.99.50 "cd install && ANSIBLE_LOG_PATH=/var/log/ansible.log ansible-playbook -i inventory/cloud_host openshift-ansible/playbooks/byo/config.yml"
-ssh root@192.168.99.50 "tail -f /var/log/ansible.log"
+ssh root@192.168.99.50 "cd install/ansible && git clone -b release-3.7 https://github.com/openshift/openshift-ansible.git"
+ssh root@192.168.99.50 "cd install/ansible && ansible-playbook playbook/generate_inventory.yml -e ip_address=192.168.99.50 -e use_local=true"
+ssh root@192.168.99.50 "cd install/ansible && ansible-playbook -i inventory/cloud_host openshift-ansible/playbooks/byo/config.yml"
 ```
 
 ## Ansible started locally
@@ -34,7 +33,7 @@ ssh root@192.168.99.50 "tail -f /var/log/ansible.log"
 git clone -b release-3.7 https://github.com/openshift/openshift-ansible.git
 ```
 
-**NOTE** : Install RPMs packages if your OS is not CentOS7 
+**NOTE** : Install RPMs packages if your OS is not CentOS7
 ```bash
 ansible-playbook -i inventory/cloud_host playbook/enable_rpm_packages.yaml -e openshift_node=masters
 ```
@@ -74,13 +73,13 @@ ansible-playbook -i inventory openshift-ansible/playbooks/byo/openshift-cluster/
 ```
 - As the `APB` pods could not be deployed correctly, then relaunch the `APB` and `APB etcd` deployments from the console or terminal
 
-- Post installation steps 
+- Post installation steps
 
   - Enable cluster admin role for `admin` user
-  - Setup persistence using `HostPath` mounted volumes `/tmp/pv001 ...`, 
+  - Setup persistence using `HostPath` mounted volumes `/tmp/pv001 ...`,
   - Create `infra` project
   - Install Nexus, Jenkins  
-  
+
 ```bash
 ansible-playbook -i inventory playbook/post_installation.yml -e openshift_node=masters
 ```
