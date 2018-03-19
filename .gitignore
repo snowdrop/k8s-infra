@@ -2,4 +2,4 @@
 virtualbox/openshift-ansible/
 */.vagrant/
 user-data
-inventory/cloud_host
+*/inventory/cloud_host
