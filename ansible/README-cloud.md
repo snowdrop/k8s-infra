@@ -29,7 +29,7 @@ The inventory is later user by the [official](https://github.com/openshift/opens
 If you would like to customize some of the options, then first change the template file at `roles/generate_inventory/templates/cloud.inventory.j2`
 before running the `playbook/generate_inventory.yml` role
 
-- Install ocp 3.7 rpms
+**NOTE** : Install RPMs packages if your OS is not CentOS7 s
 
 ```bash
 ansible-playbook -i inventory/cloud_host playbook/install_package.yml -e openshift_node=masters
