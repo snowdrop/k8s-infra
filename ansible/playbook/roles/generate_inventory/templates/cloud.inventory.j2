@@ -33,10 +33,9 @@ openshift_disable_check = docker_storage,memory_availability,disk_availability,d
 # we need to increase the pods per core because we might temporarily have multiple build pods running at the same time
 openshift_node_kubelet_args={'pods-per-core': ['20']}
 
-openshift_enable_service_catalog=true
+openshift_enable_service_catalog=false
 
 ansible_python_interpreter=/usr/bin/python
-ansible_service_broker_install=false
 
 # enable htpasswd auth
 openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider', 'filename': '/etc/origin/master/htpasswd'}]
