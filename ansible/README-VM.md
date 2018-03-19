@@ -39,6 +39,12 @@ git clone -b release-3.7 https://github.com/openshift/openshift-ansible.git
 ansible-playbook -i inventory/cloud_host playbook/enable_rpm_packages.yaml -e openshift_node=masters
 ```
 
+- Generate inventory host file containing the definition about the OpenShift instance to be provisioned from a j2 template
+
+```bash
+ansible-playbook playbook/generate_inventory.yml -e ip_address=192.168.99.50
+```
+
 - Install the OpenShift All in One Cluster
 
 ```bash
