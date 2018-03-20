@@ -109,7 +109,17 @@ fatal: [192.168.99.50]: FAILED! => {"changed": true, "cmd": "oc adm policy add-s
 
 ```bash
 systemctl stop openshift.service
+systemctl stop docker
 rm -rf /var/lib/openshift/config/
 rm -rf /var/lib/openshift/data/member/
+systemctl start docker
 systemctl start openshift.service
+```
+
+- If tmpfs partitions aren't deleted, then stop tmnp.mount service and reboot
+```bash
+systemctl stop tmp.mount
+Warning: tmp.mount changed on disk. Run 'systemctl daemon-reload' to reload units.
+systemctl daemon-reload
+reboot
 ```
