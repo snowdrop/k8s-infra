@@ -12,7 +12,7 @@ systemctl daemon-reload
 systemctl enable docker
 systemctl restart docker
 
-echo "## Create origin folder where we will download the oc binary and next install locally"
+echo "## Create origin folder where we will download the oc binary and next install it under /usr/local/bin"
 mkdir -p origin && cd origin
 RELEASE="v3.7.0"
 VERSION="v3.7.0-7ed6862"
@@ -27,10 +27,10 @@ echo "#### Copy oc, kubectl binaries under /usr/local/bin"
 cp oc /usr/local/bin
 cp kubectl /usr/local/bin
 
-echo "### Create a symbolic between folders of openshift and /etc/orgin as this one is used by the ansible playbook to access master.yml config file"
+echo "### Create a symbolic link between folders of Openshift and /etc/origin as this one is used by the ansible playbook to access master.yml config file"
 ln -s /var/lib/openshift/config/ /etc/origin
 
-echo "### Create Systemctl Openshift service."
+echo "### Create Systemctl OpenShift service."
 echo "### Parameters defined are :"
 echo "### --host-config-dir=/var/lib/openshift/config"
 echo "### --host-data-dir=/var/lib/openshift/data"
@@ -71,6 +71,6 @@ ln -s /var/lib/openshift/config/ /etc/origin
 echo "### Disable selinux - required for persistent pod"
 setenforce 0
 
-echo "### Register OpenShift as a Systemctl service and start it."
+echo "### Register OpenShift as a Systemctl service and start it !!!!!!"
 systemctl enable openshift.service
 systemctl start openshift.service
