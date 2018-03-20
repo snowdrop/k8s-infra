@@ -9,4 +9,4 @@
     - { role: 'install_nexus', tags: 'install_nexus'}
     - { role: 'install_jenkins', tags: 'install_jenkins'}
     - { role: 'install_jaeger', tags: 'install_jaeger'}
-    - { role: 'install_asb', tags: 'install_asb'}
+    # - { role: 'install_asb', tags: 'install_asb'}

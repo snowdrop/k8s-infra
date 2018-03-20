@@ -16,7 +16,7 @@ systemctl restart docker
 
 # Install OCP cluster on vm using `oc cluaster up`
 
-- Interestings links :
+- Interesting links :
   - https://github.com/openshift/origin/blob/master/docs/cluster_up_down.md
   - https://stefanopicozzi.blog/2016/12/18/getting-started-with-oc-cluster-updown/
 
@@ -112,4 +112,13 @@ failed: [192.168.99.50] (item=infra) => {"changed": true, "cmd": "oc delete proj
 ```bash
 TASK [persistence : Define scc security for the pv-recycler-controller] ******************************************************************************************************************************************************************************
 fatal: [192.168.99.50]: FAILED! => {"changed": true, "cmd": "oc adm policy add-scc-to-user hostmount-anyuid system:serviceaccount:openshift-infra:pv-recycler-controller\n oc create -f /tmp/sa-pv-recyler-controller.yml", "delta": "0:00:00.507241", "end": "2018-03-20 10:50:04.263525", "msg": "non-zero return code", "rc": 1, "start": "2018-03-20 10:50:03.756284", "stderr": "Error from server (Forbidden): error when creating \"/tmp/sa-pv-recyler-controller.yml\": serviceaccounts \"pv-recycler-controller\" is forbidden: unable to create new content in namespace infra because it is being terminated.", "stderr_lines": ["Error from server (Forbidden): error when creating \"/tmp/sa-pv-recyler-controller.yml\": serviceaccounts \"pv-recycler-controller\" is forbidden: unable to create new content in namespace infra because it is being terminated."], "stdout": "scc \"hostmount-anyuid\" added to: [\"system:serviceaccount:openshift-infra:pv-recycler-controller\"]", "stdout_lines": ["scc \"hostmount-anyuid\" added to: [\"system:serviceaccount:openshift-infra:pv-recycler-controller\"]"]}
+```
+
+# To clean the cluster
+
+```bash
+systemctl stop openshift.service
+rm -rf /var/lib/openshift/config/
+rm -rf /var/lib/openshift/data/member/
+systemctl start openshift.service
 ```
