@@ -87,15 +87,6 @@ TODO : We should disable permanently selinux - http://sharadchhetri.com/2013/02/
 
 ## Install nexus, jaeger, ...
 
-A playbook modification is required otherwise the process will fail
-
-- Add a parameter to install_jenkins playbook to restart a different service
-```bash
-- name: Restart master
-  #systemctl restart origin-master-api origin-master-controllers
-  command: systemctl restart openshift.service
-```
-
 - Next run the playbook as usual
 ```bash
 ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e openshift_node=masters 
