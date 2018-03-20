@@ -20,11 +20,8 @@
       with_sequence: start={{ first_user_offset }} count={{ number_of_users }} format=%d
 
     - name: Restart master
-      command: systemctl restart origin-master-api origin-master-controllers
-
-    - name: Wait for master to stand up
-      pause:
-        seconds: 10
+      include_role:
+          name: restart_master
 
     - name: Create project for each user
       shell: |

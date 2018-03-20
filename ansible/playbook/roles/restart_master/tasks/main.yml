@@ -1,0 +1,20 @@
+- set_fact:
+    custom_service_name: "{{ custom_service_name | default('openshift') }}"
+
+- name: Check and see a manual service entry has been added
+  command: systemctl status {{ custom_service_name }}
+  register: sout
+  ignore_errors: true
+
+- set_fact:
+    services_to_restart: "{{ custom_service_name if sout.rc == 0 else 'origin-master-api origin-master-controllers' }}"
+
+- debug:
+    msg: "Will restart {{ services_to_restart }}"
+
+- name: Restart master
+  command: systemctl restart {{ services_to_restart }}
+
+- name: Wait for master to stand up
+  pause:
+    seconds: 10

@@ -8,7 +8,8 @@
     echo "  autoProvisionEnabled: false" >> {{ config_file }}
 
 - name: Restart master
-  command: systemctl restart origin-master-api origin-master-controllers
+  include_role:
+      name: restart_master
 
 - name: Wait for master to become ready
   pause:
