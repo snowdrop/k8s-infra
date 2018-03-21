@@ -33,6 +33,7 @@ ln -s /var/lib/openshift/config/ /etc/origin
 echo "### Create Systemctl OpenShift service."
 echo "### Parameters defined are :"
 echo "### --version=v3.7.0"
+echo "### --service-catalog=true"
 echo "### --host-config-dir=/var/lib/openshift/config"
 echo "### --host-data-dir=/var/lib/openshift/data"
 echo "### --host-pv-dir=/tmp"
@@ -49,7 +50,7 @@ After=docker.service
 Requires=docker.service
 
 [Service]
-ExecStart=/usr/local/bin/oc cluster up --version=v3.7.0 --host-config-dir=/var/lib/openshift/config --host-data-dir=/var/lib/openshift/data --host-pv-dir=/tmp --host-volumes-dir=/var/lib/openshift/volumes --use-existing-config=true --public-hostname=192.168.99.50 --routing-suffix=192.168.99.50.nip.io --loglevel=1
+ExecStart=/usr/local/bin/oc cluster up --service-catalog=true --version=v3.7.0 --host-config-dir=/var/lib/openshift/config --host-data-dir=/var/lib/openshift/data --host-pv-dir=/tmp --host-volumes-dir=/var/lib/openshift/volumes --use-existing-config=true --public-hostname=192.168.99.50 --routing-suffix=192.168.99.50.nip.io --loglevel=1
 ExecStop=/usr/local/bin/oc cluster down
 WorkingDirectory=/var/lib/openshift
 Restart=no
