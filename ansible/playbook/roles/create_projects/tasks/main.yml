@@ -1,7 +1,7 @@
 - name: Delete Project {{ item }} if it exists
   shell: oc delete project {{ item }} --ignore-not-found=true --force --now
   with_items:
-    - infra
+    - "{{ infra_project }}"
 
 - pause:
     seconds: 20
@@ -9,4 +9,4 @@
 - name: Create projects
   shell: oc new-project {{ item }}
   with_items:
-    - infra
+    - "{{ infra_project }}"

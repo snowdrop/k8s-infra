@@ -1,7 +1,3 @@
-- name: Set namespace property
-  set_fact:
-    infra_project: "infra"
-
 - name: Use Infra namespace/project
   command: oc project {{ infra_project }}
 
@@ -35,7 +31,7 @@
   when: persistence
 
 - name: Get Nexus Route
-  shell: oc get route nexus -n infra -o jsonpath='http://{.spec.host}/nexus'
+  shell: oc get route nexus -n {{ infra_project }} -o jsonpath='http://{.spec.host}/nexus'
   register: nexus_address
 
 - name: Wait till Nexus is Up

@@ -17,7 +17,7 @@
 
 - name: Set namespace
   set_fact:
-    namespace: infra
+    namespace: "{{ infra_project }}"
 
 - name: Set Jenkins app name
   set_fact:

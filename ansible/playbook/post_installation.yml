@@ -1,6 +1,8 @@
 ---
 - hosts: "{{ openshift_node }}"
   gather_facts: False
+  vars:
+    infra_project: infra1
 
   roles:
     - { role: 'enable_cluster_admin', tags: 'enable_cluster_admin'}
