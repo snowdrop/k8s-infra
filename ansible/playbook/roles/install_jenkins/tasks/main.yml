@@ -7,6 +7,7 @@
     echo "jenkinsPipelineConfig:" >> {{ config_file }}
     echo "  autoProvisionEnabled: false" >> {{ config_file }}
 
+# TODO : Investigate why openshift.service isn't restarted properly using this role while it works whe nwe do that manually -> https://gist.github.com/cmoulliard/cc6f37504e39dc5e1edabdf891b9a0e7
 - name: Restart master
   include_role:
       name: restart_master
