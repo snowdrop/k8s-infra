@@ -67,7 +67,6 @@ EOF
 
 echo "### Create /var/lib/openshift/ folders"
 mkdir -p /var/lib/openshift/{config,pv,data,volumes}
-ln -s /var/lib/openshift/config/ /etc/origin
 
 echo "### Disable selinux - required for persistent pod"
 setenforce 0
