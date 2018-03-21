@@ -1,5 +1,5 @@
 - set_fact:
-    custom_service_name: "{{ custom_service_name | default('openshift') }}"
+    custom_service_name: "{{ custom_service_name | default('openshift.service') }}"
 
 - name: Check and see a manual service entry has been added
   command: systemctl status {{ custom_service_name }}
