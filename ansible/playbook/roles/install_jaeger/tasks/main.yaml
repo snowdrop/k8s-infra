@@ -1,6 +1,6 @@
 - name: Set namespace
   set_fact:
-    namespace: {{ infra_project }}
+    namespace: "{{ infra_project }}"
 
 - name: Use Infra namespace/project
   command: oc project {{ namespace }}
