@@ -13,4 +13,4 @@
     - { role: 'install_nexus', tags: 'nexus'}
     - { role: 'install_jenkins', tags: 'jenkins'}
     - { role: 'install_jaeger', tags: 'jaeger'}
-    - { role: 'install_asb', tags: 'install_asb', when: experimental_features == ''enable' }
+    - { role: 'install_asb', tags: 'install_asb', when: experimental_features == 'enable' }
