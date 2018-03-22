@@ -1,0 +1,8 @@
+- block:
+  - debug:
+      var: output.stdout_lines
+  - debug:
+      msg: "`oc cluster down` failed to stop. Once you are able to resolve the issue, then re-run this playbook."
+  - assert:
+      that: true == false
+  when: clusterupout.failed is defined and clusterupout.failed

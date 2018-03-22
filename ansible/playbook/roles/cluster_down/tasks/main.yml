@@ -1,0 +1,10 @@
+- name: Stop cluster
+  command: oc cluster down
+  register: clusterupout
+
+- name: Cluster down
+  include: cluster_down.yml
+
+- name: Show cluster up output
+  debug:
+    var: clusterupout.stdout_lines
