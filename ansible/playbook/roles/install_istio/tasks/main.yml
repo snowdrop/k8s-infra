@@ -4,6 +4,21 @@
     dest: /home/playbooks/istio
     version: "{{ istio_git_branch }}"
 
+- name: Config used to install Istio
+  debug:
+    msg:
+    - "Git istio branch: {{ istio_git_branch }}"
+    - "Version: {{ istio_playbook_release_tag }}"
+    - "Using TLS: {{ istio_playbook_auth }}"
+    - "With Distributed Jaeger Tracing: {{ istio_playbook_jaeger }}"
+    - "Delete resources for new deployment: {{ istio_playbook_delete_resources }}"
+    - "Target cloud platform: {{ istio_playbook_cluster_flavour }}"
+    - "Destination to install istio cliens, examples,...: {{ istio_playbook_dest }}"
+    - "Namespace where istio will be installed: {{ istio_playbook_namespace }}"
+    - "Addons: {{istio_playbook_addon }}"
+    - "Install samples: {{ istio_playbook_samples }}"
+
+
 - name: Execute the Istio Playbook
   shell: ansible-playbook main.yml
   args:
