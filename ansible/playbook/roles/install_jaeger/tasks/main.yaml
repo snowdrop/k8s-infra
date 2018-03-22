@@ -5,7 +5,7 @@
 - name: Use Infra namespace/project
   command: oc project {{ namespace }}
 
-- name: Install Jager
+- name: Install Jaeger
   shell: |
     oc process -f https://raw.githubusercontent.com/jaegertracing/jaeger-openshift/master/all-in-one/jaeger-all-in-one-template.yml | oc create -f -
     oc expose service jaeger-collector --port=14268 -n {{ namespace }}
