@@ -2,10 +2,10 @@
   command: oc login -u system:admin
 
 - name: Grant cluster-admin to developer 
-  command: oc adm policy add-cluster-role-to-user cluster-admin developer
+  command: oc adm policy add-cluster-role-to-user cluster-admin {{ openshift_user }}
 
 - name: Log in as developer
-  command: oc login -u developer -p developer
+  command: oc login -u {{ openshift_user }}  -p {{ openshift_user }}
  
 - name: Set the namespace to 'default'
   command: oc project default 
