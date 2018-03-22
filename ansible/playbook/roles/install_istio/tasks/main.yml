@@ -23,8 +23,7 @@
     - "Install samples: {{ istio.samples }}"
 
 # TODO: How to reuse the istio role coming from the istio ansible playbooks ??
-
-# We can;t use meta/main.yml and dependencies otherwise the content of the role is executed before this task
-# - name: Execute the Istio Role
-#   include_role:
-#     name: istio
+# We can't use meta/main.yml and dependencies otherwise the content of the role is executed before this task
+- name: Execute the Istio Role
+  include_role:
+    name: istio

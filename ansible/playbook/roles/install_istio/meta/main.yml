@@ -1,3 +1,0 @@
-# ---
-# dependencies:
-#    - { role: '/Users/dabou/.istio/playbooks/install/ansible/istio' }
