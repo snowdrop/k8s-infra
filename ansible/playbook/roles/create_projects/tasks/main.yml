@@ -1,4 +1,4 @@
-- name: Delete Project {{ item }} if it exists
+- name: Delete Project if it exists
   shell: oc delete project {{ item }} --ignore-not-found=true --force --now
   with_items:
     - "{{ infra_project }}"
