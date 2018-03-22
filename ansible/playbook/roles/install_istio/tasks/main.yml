@@ -8,7 +8,7 @@
   debug:
     msg:
     - "Git istio branch: {{ istio_git_branch }}"
-    - "Version: {{ istio_playbook_release_tag }}"
+    - "Istio version to be installed: {{ istio_playbook_release_tag }}"
     - "Using TLS: {{ istio_playbook_auth }}"
     - "With Distributed Jaeger Tracing: {{ istio_playbook_jaeger }}"
     - "Delete resources for new deployment: {{ istio_playbook_delete_resources }}"
