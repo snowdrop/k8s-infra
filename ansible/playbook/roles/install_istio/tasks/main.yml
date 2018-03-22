@@ -3,6 +3,7 @@
     repo: "{{ istio_git_repo }}"
     dest: "{{ istio_repo_dest }}"
     version: "{{ istio_git_branch }}"
+  connection: local
 
 - debug:
     msg: "Istio git project {{ istio_git_repo }}/{{ istio_git_branch }} cloned to {{ istio_repo_dest }}"
@@ -22,6 +23,6 @@
     - "Install samples: {{ istio.samples }}"
 
 - name: Execute the Istio Playbook
-  shell: ansible-playbook main.yml
-  args:
-    chdir: "{{ istio_repo_dest }}/install/ansible"
+  shell: |
+    ansible-playbook -i inventory/cloud_host {{ istio_repo_dest }}/install/ansible/main.yml
+  delegate_to: localhost
