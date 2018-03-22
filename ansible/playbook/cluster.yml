@@ -4,3 +4,4 @@
   roles:
     - { role: 'cluster_up', tags: 'up'}
     - { role: 'cluster_down', tags: 'down'}
+    - { role: 'cluster_cleanup', tags: 'clean'}

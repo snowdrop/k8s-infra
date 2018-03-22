@@ -1,0 +1,37 @@
+- name: Shutdown oc cluster
+  import_role:
+         name: cluster_down
+
+- name: Stop docker
+  command: systemctl stop docker
+
+- name: Remover folders
+  file:
+    state: absent
+    path: "{{ item }}"
+  with_items:
+      - /var/lib/openshift/config/
+      - /var/lib/openshift/data/member/
+
+- name: Restart docker
+  command: systemctl start docker
+
+- name: Mask tmp.mount (to remove tmpfs partitions)
+  command: systemctl mask tmp.mount
+  become: yes
+  become_user: root
+
+- name: Reboot machine to clean the tmpfs partitions
+  shell: sleep 2 && shutdown -r now "Ansible shutdown triggered"
+  async: 1
+  poll: 0
+  become: true
+  ignore_errors: true
+
+- name: Waiting for server to come back
+  local_action:
+    module: wait_for
+      host="{{ cluster_ip_address }}"
+      port=22
+      delay=1
+      timeout=300
