@@ -1,0 +1,20 @@
+- name: Check if cluster is running
+  shell: docker ps | grep k8s | wc -l | awk {'print $1 '}
+  register: k8s
+
+- debug:
+    msg: "A cluster is already running. Use openshift_recreate to continue."
+  when: k8s.stdout != '0' and not openshift_recreate
+
+- name: Stop playbook, if running and not recreate
+  assert:
+    that: true == false
+  when: k8s.stdout != '0' and not openshift_recreate
+
+- debug:
+    msg: "Shutting down the existing cluster..."
+  when: k8s.stdout != '0'
+
+- name: Recreate
+  command: oc cluster down
+  when: k8s.stdout != '0'

@@ -1,0 +1,42 @@
+- name: Show the URL
+  debug: msg="Accessing release at {{ openshift_github_url }}/{{ openshift_github_user }}/{{ openshift_github_name }}/releases/tags/{{ openshift_release_tag_name }}"
+  when: openshift_release_tag_name != "" 
+
+- name: Get the tagged release
+  uri:
+    url: "{{ openshift_github_url }}/{{ openshift_github_user }}/{{ openshift_github_name }}/releases/tags/{{ openshift_release_tag_name }}"
+  register: release
+  when: openshift_release_tag_name != "" 
+
+- name: Set release
+  set_fact:
+    assets_url: "{{ release.json.assets_url }}"
+  when: openshift_release_tag_name != "" 
+
+- name: Show the URL
+  debug: msg="Accessing release at {{ openshift_github_url }}/{{ openshift_github_user }}/{{ openshift_github_name }}/releases/latest" 
+  when: openshift_release_tag_name == "" 
+
+- name: Get the latest release
+  uri:
+    url: "{{ openshift_github_url }}/{{ openshift_github_user }}/{{ openshift_github_name }}/releases/latest"
+  register: release
+  when: openshift_release_tag_name == "" 
+
+- name: Set release
+  set_fact:
+    assets_url: "{{ release.json.assets_url }}"
+  when: openshift_release_tag_name == "" 
+
+- name: Should have an assets_url
+  assert:
+    that: assets_url is defined
+
+- name: debug
+  debug:
+    var: assets_url
+
+- name: Get the list of assets
+  uri:
+    url: "{{ assets_url }}"
+  register: assets

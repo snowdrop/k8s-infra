@@ -1,0 +1,34 @@
+---
+- name: Check if oc binary exists
+  stat:
+    path: "{{ openshift_client_dest }}/oc" 
+  register: oc_client
+
+- name: Get the client assets 
+  include: get_client_assets.yml
+
+- name: Install the oc binary client
+  include: install_oc_client.yml
+  when: not oc_client.stat.exists or openshift_force_client_install
+  
+- name: Check if running
+  include: isrunning.yml
+
+- name: Config to start the all in one Openshift cluster using command 'oc cluster up'
+  debug:
+    msg: "Parameters : {{ openshift_up_options }}"
+
+- name: Run oc cluster up
+  command: "oc cluster up {{ openshift_up_options }}"
+  register: clusterupout
+  ignore_errors: yes
+
+- name: Cluster up
+  include: cluster_up.yml
+
+- name: Give cluster-admin to developer
+  include: grant_admin.yml
+
+- name: Show cluster up output
+  debug:
+    var: clusterupout.stdout_lines

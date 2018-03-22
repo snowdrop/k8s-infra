@@ -1,0 +1,18 @@
+---
+# Origin git hub Repo
+openshift_github_user: openshift
+openshift_github_name: origin
+openshift_github_url: https://api.github.com/repos
+
+# Openshift parameters
+openshift_release_tag_name: "v3.7.2"
+openshift_ip_address: 192.168.99.50
+
+openshift_client_dest: /usr/local/bin
+openshift_force_client_install: false
+
+# openshift_volume_name: project-data
+# openshift_volume_path: "{{ lookup('env','HOME') }}/volumes/project/data"
+
+openshift_recreate: yes
+openshift_up_options: '--version={{ openshift_release_tag_name }} --host-config-dir=/var/lib/openshift/config --host-data-dir=/var/lib/openshift/data --host-pv-dir=/tmp --host-volumes-dir=/var/lib/openshift/volumes --use-existing-config=true --public-hostname={{ openshift_ip_address }} --routing-suffix={{ openshift_ip_address }}.nip.io --loglevel=1 --service-catalog=false'
