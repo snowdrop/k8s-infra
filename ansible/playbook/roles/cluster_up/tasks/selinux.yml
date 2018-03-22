@@ -1,0 +1,2 @@
+- name: Disable selinux - required for persistent pod
+  command: setenforce 0

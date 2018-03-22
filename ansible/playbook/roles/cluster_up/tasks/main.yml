@@ -1,18 +1,24 @@
 ---
+- name: Update docker config
+  include: docker_config.yml
+
+- name: Disable selinux
+  include_tasks: selinux.yml
+
 - name: Check if oc binary exists
   stat:
     path: "{{ openshift_client_dest }}/oc" 
   register: oc_client
 
 - name: Get the client assets 
-  include: get_client_assets.yml
+  include_tasks: get_client_assets.yml
 
 - name: Install the oc binary client
-  include: install_oc_client.yml
+  include_tasks: install_oc_client.yml
   when: not oc_client.stat.exists or openshift_force_client_install
   
 - name: Check if running
-  include: isrunning.yml
+  include_tasks: isrunning.yml
 
 - name: Config to start the all in one Openshift cluster using command 'oc cluster up'
   debug:
@@ -24,10 +30,13 @@
   ignore_errors: yes
 
 - name: Cluster up
-  include: cluster_up.yml
+  include_tasks: cluster_up.yml
 
 - name: Give cluster-admin to developer
-  include: grant_admin.yml
+  include_tasks: grant_admin.yml
+
+- name: Create a symbolic link between folders of OpenShift and /etc/origin as this one is used by the openshift ansible playbook to access master.yml config file
+  command: ln -s /var/lib/openshift/config/ /etc/origin
 
 - name: Show cluster up output
   debug:
