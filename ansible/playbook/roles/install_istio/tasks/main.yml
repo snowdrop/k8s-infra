@@ -22,7 +22,9 @@
     - "Addons: {{ istio.addon }}"
     - "Install samples: {{ istio.samples }}"
 
-- name: Execute the Istio Playbook
-  shell: |
-    ansible-playbook -i inventory/cloud_host {{ istio_repo_dest }}/install/ansible/main.yml
-  delegate_to: localhost
+# TODO: How to reuse the istio role coming from the istio ansible playbooks ??
+
+# We can;t use meta/main.yml and dependencies otherwise the content of the role is executed before this task
+# - name: Execute the Istio Role
+#   include_role:
+#     name: istio
