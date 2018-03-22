@@ -8,9 +8,9 @@
 
   roles:
     - { role: 'enable_cluster_admin', tags: 'enable_cluster_admin', when: target_platform == 'cloud' }
-    - { role: 'create_projects', tags: 'create_projects'}
-    - { role: 'persistence', tags: 'persistence', when: target_platform == 'cloud' }
-    - { role: 'install_nexus', tags: 'nexus'}
-    - { role: 'install_jenkins', tags: 'jenkins'}
-    - { role: 'install_jaeger', tags: 'jaeger'}
-    - { role: 'install_asb', tags: 'install_asb', when: experimental_features == 'enable' }
+    - { role: 'create_projects',      tags: 'create_projects'}
+    - { role: 'persistence',          tags: 'persistence',          when: target_platform == 'cloud' }
+    - { role: 'install_nexus',        tags: 'nexus'}
+    - { role: 'install_jenkins',      tags: 'jenkins'}
+    - { role: 'install_jaeger',       tags: 'jaeger'}
+    - { role: 'install_asb',          tags: 'install_asb',          when: experimental_features == 'enable' }
