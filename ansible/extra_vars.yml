@@ -1,0 +1,49 @@
+---
+# Global vars used to :
+# - Specify the node to be used from the inventory file
+# - Define a condition when a role should be executed
+openshift_node: masters
+
+# Namespace where nexus, jaeger, jenkins, ... will be installed
+infra_project: infra
+
+# Platform where the playbook will be executed :
+# - local : correspodns to linux vm that we access locally and where
+# - cloud : linux machine provisioned on amazon, Hetzner and where additional steps are required if persistence is nto there, admin user is not granted with cluster-admin role
+target_platform: local
+
+# Variable used to by example install ASB Service Broker
+experimental_features: disable
+
+# Variable used to tell to the playbook if we will install or not istio
+service_mesh: true
+
+# Variables used to override or configure the Istio playbook
+
+# Istio github branch to be used to install the istio playbook
+istio_git_branch: master
+
+# Istio playbooks variables - see Istio Ansible README file for more info
+cluster_flavour: ocp
+
+# The GitHub token to use when calling GitHub's API
+# The token is needed in order to avoid getting Rate Limited by GitHub's API
+# Rate Limiting can easily occur in large corporate environments
+# that make outgoing calls through a small range of IPs
+# If the token is not set, then no API Token will be used
+github_api_token: ""
+
+istio:
+  release_tag_name: "0.6.0"
+  dest: "/home/istio"
+  auth: false
+  namespace: istio-system
+  addon: "{{ istio_all_addons }}"
+  jaeger: true
+  samples: [helloworld]
+  delete_resources: true
+
+istio_all_addons:
+  - "grafana"
+  - "prometheus"
+  - "servicegraph"

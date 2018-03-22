@@ -1,11 +1,6 @@
 ---
 - hosts: "{{ openshift_node }}"
   gather_facts: False
-  vars:
-    infra_project: infra
-    target_platform: local
-    experimental_features: disable
-    service_mesh: false
 
   roles:
     - { role: 'enable_cluster_admin', tags: 'enable_cluster_admin', when: target_platform == 'cloud' }

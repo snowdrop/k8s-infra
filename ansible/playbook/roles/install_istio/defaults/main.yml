@@ -1,12 +1,2 @@
 istio_git_repo: https://github.com/istio/istio.git
 istio_git_branch: 0.6.0
-
-istio_playbook_release_tag: 0.6.0
-istio_playbook_auth: false
-istio_playbook_jaeger: false
-istio_playbook_delete_resources: false
-istio_playbook_cluster_flavour: ocp
-istio_playbook_dest: /home/istio
-istio_playbook_namespace: istio-system
-istio_playbook_addon: grafana,prometheus,servicegraph
-istio_playbook_samples:
