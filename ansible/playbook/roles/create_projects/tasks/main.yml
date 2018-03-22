@@ -4,7 +4,7 @@
     - "{{ infra_project }}"
 
 - pause:
-    seconds: 20
+    seconds: 30
 
 - name: Create projects
   shell: oc new-project {{ item }}
