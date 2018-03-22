@@ -5,6 +5,7 @@
     infra_project: infra
     target_platform: local
     experimental_features: disable
+    service_mesh: false
 
   roles:
     - { role: 'enable_cluster_admin', tags: 'enable_cluster_admin', when: target_platform == 'cloud' }
@@ -13,4 +14,5 @@
     - { role: 'install_nexus',        tags: 'nexus'}
     - { role: 'install_jenkins',      tags: 'jenkins'}
     - { role: 'install_jaeger',       tags: 'jaeger'}
+    - { role: 'install_istio',        tags: 'istio',                when: service_mesh == 'true' }
     - { role: 'install_asb',          tags: 'install_asb',          when: experimental_features == 'enable' }

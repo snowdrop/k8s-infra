@@ -1,0 +1,10 @@
+- name: Clone Istio project
+  git:
+    repo: "{{ istio_git_repo }}"
+    dest: /home/playbooks/istio
+    version: "{{ istio_git_branch }}"
+
+- name: Execute the Istio Playbook
+  shell: ansible-playbook main.yml
+  args:
+    chdir: /home/playbooks/istio/install/ansible
