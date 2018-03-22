@@ -54,6 +54,7 @@
     body: "{{ lookup('file', role_path ~ '/files/' ~ item.value.file) }}"
     body_format: json
   with_dict: "{{ repos }}"
+  ignore_errors: true
 
 - name: Create Groups for the Nexus repos
   uri:
@@ -66,3 +67,4 @@
     body: "{{ lookup('file', role_path ~ '/files/' ~ item.value.file) }}"
     body_format: json
   with_dict: "{{ group_repos }}"
+  ignore_errors: true
