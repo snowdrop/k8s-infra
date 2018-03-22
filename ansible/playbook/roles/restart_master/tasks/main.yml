@@ -1,6 +1,5 @@
 - set_fact:
-    custom_service_name: "{{ custom_service_name }}"
-  ignore_errors: true
+    custom_service_name: "{{ custom_service_name | default('') }}"
 
 - set_fact:
     origin_services: origin-master-api origin-master-controllers
@@ -16,15 +15,17 @@
   ignore_errors: true
 
 - set_fact:
-    services_to_restart: "{{ custom_service_name }} if csout.rc == 0 else {{ origin_services }} if csout.rc == 0 else '' }}"
+    services_to_restart: "{{ custom_service_name if csout.rc == 0 else origin_services if osout.rc == 0 else ''}}"
 
 - debug:
     msg: "Will restart {{ services_to_restart }}"
+  when: "not services_to_restart == ''"
 
 - name: Restart master
   command: systemctl restart {{ services_to_restart }}
-  when: "not {{ services_to_restart }} == ''"
+  when: "not services_to_restart == ''"
 
 - name: Wait for master to stand up
   pause:
     seconds: 10
+  when: "not services_to_restart == ''"
