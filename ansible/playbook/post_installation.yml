@@ -3,12 +3,14 @@
   gather_facts: False
   vars:
     infra_project: infra
+    target_platform: local
+    experimental_features: disable
 
   roles:
     - { role: 'enable_cluster_admin', tags: 'enable_cluster_admin'}
     - { role: 'create_projects', tags: 'create_projects'}
-    - { role: 'persistence', tags: 'persistence'}
+    - { role: 'persistence', tags: 'persistence', when: target_platform == 'cloud'}
     - { role: 'install_nexus', tags: 'install_nexus'}
     - { role: 'install_jenkins', tags: 'install_jenkins'}
     - { role: 'install_jaeger', tags: 'install_jaeger'}
-    - { role: 'install_asb', tags: 'install_asb'}
+    - { role: 'install_asb', tags: 'install_asb', when: experimental_features == ''enable'git }
