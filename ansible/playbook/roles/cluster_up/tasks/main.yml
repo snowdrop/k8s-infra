@@ -32,11 +32,12 @@
 - name: Cluster up
   include_tasks: cluster_up.yml
 
-- name: Give cluster-admin to developer
+- name: Give cluster-admin to {{ openshift_user }}
   include_tasks: grant_admin.yml
 
 - name: Create a symbolic link between folders of OpenShift and /etc/origin as this one is used by the openshift ansible playbook to access master.yml config file
   command: ln -s /var/lib/openshift/config/ /etc/origin
+  ignore_errors: yes
 
 - name: Show cluster up output
   debug:
