@@ -1,25 +1,27 @@
 - name: Clone Istio project
   git:
     repo: "{{ istio_git_repo }}"
-    dest: /home/playbooks/istio
+    dest: "{{ istio_repo_dest }}"
     version: "{{ istio_git_branch }}"
+
+- debug:
+    msg: "Istio git project {{ istio_git_repo }}/{{ istio_git_branch }} cloned to {{ istio_repo_dest }}"
 
 - name: Config used to install Istio
   debug:
     msg:
     - "Git istio branch: {{ istio_git_branch }}"
-    - "Istio version to be installed: {{ istio_playbook_release_tag }}"
-    - "Using TLS: {{ istio_playbook_auth }}"
-    - "With Distributed Jaeger Tracing: {{ istio_playbook_jaeger }}"
-    - "Delete resources for new deployment: {{ istio_playbook_delete_resources }}"
-    - "Target cloud platform: {{ istio_playbook_cluster_flavour }}"
-    - "Destination to install istio cliens, examples,...: {{ istio_playbook_dest }}"
-    - "Namespace where istio will be installed: {{ istio_playbook_namespace }}"
-    - "Addons: {{istio_playbook_addon }}"
-    - "Install samples: {{ istio_playbook_samples }}"
-
+    - "Istio version to be installed: {{ istio.release_tag_name }}"
+    - "Using TLS: {{ istio.auth }}"
+    - "With Distributed Jaeger Tracing: {{ istio.jaeger }}"
+    - "Delete resources for new deployment: {{ istio.delete_resources }}"
+    - "Target cloud platform: {{ cluster_flavour }}"
+    - "Destination to install istio client, examples,...: {{ istio.dest }}"
+    - "Namespace where istio will be installed: {{ istio.namespace }}"
+    - "Addons: {{ istio.addon }}"
+    - "Install samples: {{ istio.samples }}"
 
 - name: Execute the Istio Playbook
   shell: ansible-playbook main.yml
   args:
-    chdir: /home/playbooks/istio/install/ansible
+    chdir: "{{ istio_repo_dest }}/install/ansible"

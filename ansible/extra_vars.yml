@@ -23,6 +23,9 @@ service_mesh: true
 # Istio github branch to be used to install the istio playbook
 istio_git_branch: master
 
+# Folder where the project will be cloned
+istio_repo_dest: /home/playbooks/istio
+
 # Istio playbooks variables - see Istio Ansible README file for more info
 cluster_flavour: ocp
 

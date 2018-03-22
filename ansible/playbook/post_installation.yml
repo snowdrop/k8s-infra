@@ -9,5 +9,5 @@
     - { role: 'install_nexus',        tags: 'nexus'}
     - { role: 'install_jenkins',      tags: 'jenkins'}
     - { role: 'install_jaeger',       tags: 'jaeger'}
-    - { role: 'install_istio',        tags: 'istio',                when: service_mesh == 'true' }
+    - { role: 'install_istio',        tags: 'istio',                when: service_mesh | bool == true }
     - { role: 'install_asb',          tags: 'install_asb',          when: experimental_features == 'enable' }
