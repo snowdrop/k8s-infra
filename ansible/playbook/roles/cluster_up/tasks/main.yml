@@ -1,4 +1,9 @@
 ---
+- name: Wait till yum has finished to install/update packages
+  wait_for:
+    path: /var/run/yum.pid
+    state: absent
+
 - name: Update docker config
   include: docker_config.yml
 
