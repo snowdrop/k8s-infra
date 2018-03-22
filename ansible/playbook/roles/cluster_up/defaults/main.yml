@@ -18,7 +18,7 @@ cluster_use_existing_config: true
 cluster_host_config_dir: /var/lib/openshift/config
 cluster_host_data_dir: /var/lib/openshift/data
 cluster_host_volumes_dir: /var/lib/openshift/volumes
-cluster_host_pv_dir: /var/lib/openshift/volumes/pv
+cluster_host_pv_dir: /var/lib/openshift/pv
 cluster_service_catalog: true
 
 openshift_up_options: '
