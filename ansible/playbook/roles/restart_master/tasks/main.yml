@@ -1,19 +1,29 @@
 - set_fact:
-    custom_service_name: "{{ custom_service_name | default('openshift.service') }}"
-
-- name: Check and see a manual service entry has been added
-  command: systemctl status {{ custom_service_name }}
-  register: sout
+    custom_service_name: "{{ custom_service_name }}"
   ignore_errors: true
 
 - set_fact:
-    services_to_restart: "{{ custom_service_name if sout.rc == 0 else 'origin-master-api origin-master-controllers' }}"
+    origin_services: origin-master-api origin-master-controllers
+
+- name: Check and see if a custom service exists
+  command: systemctl status {{ custom_service_name }}
+  register: csout
+  ignore_errors: true
+
+- name: Check and see if origin-master-api, origin-master-controllers services exist
+  command: systemctl status {{ origin_services }}
+  register: osout
+  ignore_errors: true
+
+- set_fact:
+    services_to_restart: "{{ custom_service_name }} if csout.rc == 0 else {{ origin_services }} if csout.rc == 0 else '' }}"
 
 - debug:
     msg: "Will restart {{ services_to_restart }}"
 
 - name: Restart master
   command: systemctl restart {{ services_to_restart }}
+  when: "not {{ services_to_restart }} == ''"
 
 - name: Wait for master to stand up
   pause:
