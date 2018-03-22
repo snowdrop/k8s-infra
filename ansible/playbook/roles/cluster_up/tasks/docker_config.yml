@@ -1,10 +1,10 @@
 - name: Create daemon.json file to define extra docker parameters such as insecure-registries
-  blockinfile:
-    path: /etc/docker/daemon.json
-    block: |
+  copy:
+    content: |
       {
         "insecure-registries" : [ "172.30.0.0/16" ]
       }
+    dest:  /etc/docker/daemon.json
 
 - name: Reload systemctl daemon and restart docker service
   shell: |
