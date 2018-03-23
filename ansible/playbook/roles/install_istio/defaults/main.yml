@@ -1,1 +1,36 @@
+# Repository where the project will be cloned from
 istio_git_repo: https://github.com/istio/istio.git
+
+# Istio github branch to be used to install the istio playbook
+istio_git_branch: master
+
+# Folder where the project will be cloned on your machine
+istio_repo_dest: ~/.istio/playbooks
+
+
+# Variables used to override or configure the Istio playbook
+
+# Istio playbooks variables - see Istio Ansible README file for more info
+cluster_flavour: ocp
+
+# The GitHub token to use when calling GitHub's API
+# The token is needed in order to avoid getting Rate Limited by GitHub's API
+# Rate Limiting can easily occur in large corporate environments
+# that make outgoing calls through a small range of IPs
+# If the token is not set, then no API Token will be used
+github_api_token: ""
+
+istio:
+  release_tag_name: "0.6.0"
+  dest: "/home/istio"
+  auth: false
+  namespace: istio-system
+  addon: "{{ istio_all_addons }}"
+  jaeger: true
+  samples: [helloworld]
+  delete_resources: true
+
+istio_all_addons:
+  - "grafana"
+  - "prometheus"
+  - "servicegraph"
