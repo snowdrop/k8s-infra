@@ -1,0 +1,32 @@
+# Variables used to override or configure the Istio playbook
+
+# Istio playbooks variables - see Istio Ansible README file for more info
+cluster_flavour: ocp
+
+istio:
+  release_tag_name: "0.6.0"
+  addon:
+    - "grafana"
+    - "prometheus"
+    - "servicegraph"
+  jaeger: true
+  delete_resources: true
+
+istio_all_addons:
+  - "grafana"
+  - "prometheus"
+  - "servicegraph"
+
+istio:
+  release_tag_name: "0.6.0"
+  dest: "~/.istio"
+  auth: false
+  namespace: istio-system
+  addon:
+    - "grafana"
+    - "prometheus"
+    - "servicegraph"
+    - "jaeger"
+  samples:
+    - "helloworld"
+  delete_resources: true
