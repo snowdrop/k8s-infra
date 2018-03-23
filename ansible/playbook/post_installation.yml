@@ -1,6 +1,6 @@
 ---
-- hosts: "{{ openshift_node }}"
-  gather_facts: "{{ gathering_host_info | bool == true }}"
+- hosts: "{{ openshift_node | default('masters') }}"
+  gather_facts: "{{ gathering_host_info | default('true') | bool == true }}"
 
   roles:
     - { role: 'enable_cluster_admin', tags: 'enable_cluster_admin', when: target_platform == 'cloud' }
@@ -9,5 +9,5 @@
     - { role: 'install_nexus',        tags: 'nexus'}
     - { role: 'install_jenkins',      tags: 'jenkins'}
     - { role: 'install_jaeger',       tags: 'jaeger'}
-    - { role: 'install_istio',        tags: 'istio',                when: service_mesh | bool == true }
+    - { role: 'install_istio',        tags: 'istio',                when: service_mesh | default('false') | bool == true }
     - { role: 'install_asb',          tags: 'install_asb',          when: experimental_features == 'enable' }
