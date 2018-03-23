@@ -11,6 +11,7 @@ ansible-playbook -i inventory/cloud_host playbook/cluster.yml -e openshift_node=
 - To override the default parameters of the `oc cluster up` command, then pass extra vars within the command 
 ```bash
 ansible-playbook -i inventory/cloud_host playbook/cluster.yml -e openshift_node=masters -e openshift_release_tag_name=v3.9.0-alpha.3 --tags "up" 
+-e "@extra_vars.yml"
 ```
 
 # Post installation

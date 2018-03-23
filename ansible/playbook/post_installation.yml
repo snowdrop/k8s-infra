@@ -1,6 +1,6 @@
 ---
 - hosts: "{{ openshift_node }}"
-  gather_facts: False
+  gather_facts: "{{ gathering_host_info | bool == true }}"
 
   roles:
     - { role: 'enable_cluster_admin', tags: 'enable_cluster_admin', when: target_platform == 'cloud' }
