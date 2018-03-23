@@ -28,8 +28,6 @@
     state: link
   connection: local
 
-# TODO: How to reuse the istio role coming from the istio ansible playbook ?
-# For this commit, it is assumed to be copy/paste under our list of local roles
 - name: Execute the Istio Role
   include_role:
     name: istio_playbook_src/istio
