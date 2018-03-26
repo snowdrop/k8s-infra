@@ -30,15 +30,13 @@
   register: patch
 
 - name: Patch master-config file to use HTPasswdPasswordIdentityProvider
-  command: "oc ex config patch {{ cluster_host_config_dir }}/master/master-config.yaml -p '{{ patch.stdout }}'"
+  command: "oc ex config patch {{ cluster_host_config_dir }}/master/master-config.yaml --patch '{{ patch.stdout }}'"
+  register: r
 
-# TODO: check what is needed to -> No module named docker. Try `pip install docker-py`
-# - name: Restart origin container
-#   docker_container:
-#     name: origin
-#     state: started
-#     restart: yes
+- name: Copy patch to new master config file
+  copy: content="{{ r.stdout }}" dest={{ cluster_host_config_dir }}/master/master-config.yaml
 
-- name: Stop origin docker container
-  command: "docker stop origin '> /dev/null'"
+- name: Restart origin container
+  shell: "docker restart origin"
+
 
