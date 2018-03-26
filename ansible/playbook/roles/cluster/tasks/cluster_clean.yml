@@ -1,6 +1,7 @@
 - name: Shutdown oc cluster
   import_role:
-         name: cluster_down
+    name: cluster
+    tasks_from: cluster_down.yml
 
 - name: Stop docker
   command: systemctl stop docker

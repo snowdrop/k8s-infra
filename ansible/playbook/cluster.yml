@@ -1,7 +1,49 @@
 ---
 - hosts: "{{ openshift_node }}"
   gather_facts: False
-  roles:
-    - { role: 'cluster_up', tags: 'up'}
-    - { role: 'cluster_down', tags: 'down'}
-    - { role: 'cluster_cleanup', tags: 'clean'}
+#  roles:
+#    - { role: 'cluster_up', tags: 'up'}
+#    - { role: 'cluster_down', tags: 'down'}
+#    - { role: 'cluster_cleanup', tags: 'clean'}
+  tasks:
+    # - name: Stop docker process used by origin
+    #   import_role:
+    #     name: cluster
+    #     tasks_from: stop_docker.yml
+    #   tags: stop
+
+    # - name: Start docker process used by origin
+    #   import_role:
+    #     name: cluster
+    #     tasks_from: start_docker.yml
+    #   tags: start
+
+    - name: Shutdown Openshift cluster - oc cluster down
+      import_role:
+        name: cluster
+        tasks_from: cluster_down.yml
+      tags: down
+
+    - name: Start Openshift cluster
+      import_role:
+        name: cluster
+        tasks_from: cluster_start.yml
+      tags: start
+
+    - name: Create Openshift cluster - oc cluster up
+      import_role:
+        name: cluster
+        tasks_from: main.yml
+      tags: up
+
+    - name: Openshift cluster status
+      import_role:
+        name: cluster
+        tasks_from: cluster_status.yml
+      tags: status
+
+    - name: Clean Openshift configs
+      import_role:
+        name: cluster
+        tasks_from: cluster_clean.yml
+      tags: clean

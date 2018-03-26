@@ -1,3 +1,7 @@
+- name: Stop cluster
+  command: oc cluster down
+  register: clusterupout
+
 - block:
   - debug:
       var: output.stdout_lines
@@ -6,3 +10,7 @@
   - assert:
       that: true == false
   when: clusterupout.failed is defined and clusterupout.failed
+
+- name: Show cluster up output
+  debug:
+    var: clusterupout.stdout_lines
