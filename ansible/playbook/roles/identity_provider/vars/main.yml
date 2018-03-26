@@ -1,0 +1,7 @@
+users:
+  admin:
+    user: admin
+    pwd: admin
+  guest:
+    user: developer
+    pwd: developer

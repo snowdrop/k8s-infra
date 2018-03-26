@@ -15,7 +15,8 @@ openshift_user: admin
 
 cluster_ip_address: 192.168.99.50
 cluster_use_existing_config: true
-cluster_host_config_dir: /var/lib/openshift/config
+# Switch to docker folder config dir as it uses a different path and not the onde defined for oc cluster up
+cluster_host_config_dir: /var/lib/origin/openshift.local.config
 cluster_host_data_dir: /var/lib/openshift/data
 cluster_host_volumes_dir: /var/lib/openshift/volumes
 cluster_host_pv_dir: /var/lib/openshift/pv

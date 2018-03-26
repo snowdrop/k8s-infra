@@ -1,0 +1,42 @@
+- set_fact:
+    path_users_pwd: "{{ cluster_host_config_dir }}/{{ users_pwd_file }}"
+
+- name: Install httpd-tools package if not there
+  yum:
+    name: httpd-tools
+    state: present
+
+- stat:
+    path: "{{ path_users_pwd }}"
+  register: p
+
+- name: Create users.htpasswd file
+  file:
+    path: "{{ path_users_pwd }}"
+    state: touch
+  when: not p.stat.exists
+
+- name: Create user/pwd
+  command: "htpasswd -b {{ path_users_pwd }} {{ item.value.user }} {{ item.value.pwd }}"
+  with_dict: "{{ users }}"
+
+- name: Generate patch using template
+  template:
+    src: "{{ role_path }}/templates/htpwd_ip_patch.json.j2"
+    dest: /tmp/htpwd_ip_patch.json
+
+- name: Get patch file
+  command: cat /tmp/htpwd_ip_patch.json
+  register: patch
+
+- name: Patch master-config file to use HTPasswdPasswordIdentityProvider
+  command: "oc ex config patch {{ cluster_host_config_dir }}/master/master-config.yaml --patch '{{ patch.stdout }}'"
+  register: r
+
+- name: Copy patch to new master config file
+  copy: content="{{ r.stdout }}" dest={{ cluster_host_config_dir }}/master/master-config.yaml
+
+- name: Restart origin container
+  shell: "docker restart origin"
+
+

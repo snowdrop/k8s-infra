@@ -1,0 +1,17 @@
+{
+  "oauthConfig": {
+    "identityProviders": [
+      {
+        "challenge": true,
+        "login": true,
+        "mappingMethod": "add",
+        "name": "htpassword",
+        "provider": {
+          "apiVersion": "v1",
+          "kind": "HTPasswdPasswordIdentityProvider",
+          "file": "{{ cluster_host_config_dir }}/{{ users_pwd_file }}"
+        }
+      }
+    ]
+  }
+}
