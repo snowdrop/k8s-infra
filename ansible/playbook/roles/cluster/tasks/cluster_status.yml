@@ -1,0 +1,7 @@
+- name: Get cluster status
+  command: "oc cluster status"
+  register: clusterstatus
+
+- name: Show cluster status - output
+  debug:
+    var: clusterstatus.stdout_lines
