@@ -1,0 +1,25 @@
+-set_fact:
+    path_users_pwd: "{{ cluster_host_config_dir }}/{{ users_pwd_file }}"
+
+- name: Install httpd-tools package if not there
+  yum:
+    name: httpd-tools
+    state: present
+
+- stat: "{{ path_users_pwd }}"
+  register: p
+
+- name: Create users.htpasswd file
+  file: "{{ path_users_pwd }}"
+  when: p.stat.exists is defined and not p.stat.exists
+
+- name: Create user/pwd
+  command: "htpasswd -b {{ path_users_pwd }} {{ item.user }} {{ item.pwd }}"
+  with_dict: with_dict: "{{ users }}"
+
+- name: Patch master-config file to use HTPasswdPasswordIdentityProvider
+  command: oc ex config patch /var/lib/openshift/config/master/master-config.yaml -p '{"oauthConfig":{"identityProviders":[{"challenge":true,"login":true,"mappingMethod":"add","name":"htpassword","provider":{"apiVersion":"v1","kind":"HTPasswdPasswordIdentityProvider","file":"/var/lib/openshift/config/master/users.htpasswd"}}]}}'
+
+- name: Stop/Start docker daemon to reload master-config.yaml
+  command: docker stop origin &> /dev/null && docker start origin &> /dev/null
+
