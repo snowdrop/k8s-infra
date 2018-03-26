@@ -10,7 +10,7 @@
     - { role: 'install_jenkins',      tags: 'jenkins'}
     - { role: 'install_jaeger',       tags: 'jaeger'}
     - { role: 'install_istio',        tags: 'istio',                when: service_mesh | default('false') | bool == true }
-    - { role: 'identity_provider',    tags: 'identity-provider'}
+    - { role: 'identity_provider',    tags: 'identity_provider'}
     
 
 # Unfortunately this can't be a separate role, because the path where the various playbooks are looked up get's messed-up
