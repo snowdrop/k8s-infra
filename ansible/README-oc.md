@@ -1,6 +1,6 @@
 # Instructions to install OpenShift using oc cluster command
 
-- To create a all in one cluster using oc cluster command, then it is required to have a CentOS vm that you can access using ssh
+- To create an all in one cluster using oc cluster command, then it is required to have a CentOS vm that you can access using ssh
 - Next you can execute one of the role created to `up`, `down` or `clean` the cluster created
 
 ```bash
