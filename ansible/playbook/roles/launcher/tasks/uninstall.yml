@@ -1,0 +1,15 @@
+- name: Check if launcher project/namespace exists
+  command: oc get project/{{ launcher_project_name }}
+  register: r_get_project
+  ignore_errors: true
+
+- name: Delete resources of the project if it exists
+  shell: |
+    oc delete all -l app={{ launcher_template_name }} -n {{ launcher_project_name }}
+    oc delete {{ item }}  -l app={{ launcher_template_name }} -n {{ launcher_project_name }}
+  when: r_get_project.stdout != ""
+  with_items:
+    - configmap
+    - serviceaccount
+    - rolebinding.authorization.openshift.io
+

@@ -11,7 +11,22 @@
     - { role: 'install_jaeger',       tags: 'jaeger'}
     - { role: 'install_istio',        tags: 'istio',                when: service_mesh | default('false') | bool == true }
     - { role: 'identity_provider',    tags: 'identity_provider'}
-    
+
+  tasks:
+    - name: Install launcher
+      import_role:
+        name: launcher
+        tasks_from: install.yml
+      tags:
+        - install-launcher
+
+    - name: Unnstall launcher
+      import_role:
+        name: launcher
+        tasks_from: uninstall.yml
+      tags:
+        - uninstall-launcher
+
 
 # Unfortunately this can't be a separate role, because the path where the various playbooks are looked up get's messed-up
 - include: '../openshift-ansible/playbooks/byo/openshift-cluster/service-catalog.yml'

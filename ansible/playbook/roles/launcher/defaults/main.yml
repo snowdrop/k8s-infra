@@ -1,0 +1,11 @@
+launcher_project_name: devex
+launcher_github_username: dummy
+launcher_github_token: dummy
+launcher_version: v15
+launcher_catalog_git_repo: https://github.com/snowdrop/cloud-native-catalog.git
+launcher_catalog_git_branch: master
+
+launcher_openshift_console_url: https://192.168.99.50:8443
+launcher_openshift_user: admin
+launcher_openshift_pwd: admin
+launcher_template_name: fabric8-launcher
