@@ -1,0 +1,3 @@
+- name: Patch configmap to use the local cluster
+  shell: |
+    oc patch configmap launcher-clusters -n {{ launcher_project_name }} -p '{"data":{"openshift-clusters.yaml":"- id: starter-local\n  apiUrl: {{ launcher_openshift_consoleUrl }}\n  consoleUrl: {{ launcher_openshift_consoleUrl }}\n  type: online-internal"}}'

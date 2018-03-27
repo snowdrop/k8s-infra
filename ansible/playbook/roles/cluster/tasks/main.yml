@@ -4,6 +4,11 @@
     path: /var/run/yum.pid
     state: absent
 
+- name: Install python-rhsm-certificates package if not there to get Red Hat CA Certs required to doanload docker images
+  yum:
+    name: python-rhsm-certificates
+    state: present
+
 - name: Update docker config
   include: docker_config.yml
 
