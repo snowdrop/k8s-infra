@@ -9,7 +9,7 @@
     - { role: 'install_nexus',        tags: 'nexus'}
     - { role: 'install_jenkins',      tags: 'jenkins'}
     - { role: 'install_jaeger',       tags: 'jaeger'}
-    - { role: 'install_istio',        tags: 'istio',                when: service_mesh | default('false') | bool == true }
+    - { role: 'install_istio',        tags: 'istio'}
     - { role: 'identity_provider',    tags: 'identity_provider'}
 
   tasks:

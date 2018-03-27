@@ -16,6 +16,3 @@ target_platform: local
 
 # Variable used to by example install ASB Service Broker
 experimental_features: disable
-
-# Variable used to tell to the playbook if we will install or not istio
-service_mesh: true
