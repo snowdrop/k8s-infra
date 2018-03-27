@@ -13,6 +13,7 @@
     - { role: 'identity_provider',    tags: 'identity_provider'}
 
   tasks:
+    # Launcher Role
     - name: Install launcher
       import_role:
         name: launcher
@@ -20,12 +21,19 @@
       tags:
         - install-launcher
 
-    - name: Unnstall launcher
+    - name: Uninstall launcher
       import_role:
         name: launcher
         tasks_from: uninstall.yml
       tags:
         - uninstall-launcher
+
+    - name: Patch launcher-clusters configmap
+      import_role:
+        name: launcher
+        tasks_from: patch_configmap.yml
+      tags:
+        - patch-launcher
 
 
 # Unfortunately this can't be a separate role, because the path where the various playbooks are looked up get's messed-up
