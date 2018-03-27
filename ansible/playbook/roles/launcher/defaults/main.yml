@@ -9,8 +9,8 @@ launcher_keycloak_realm: launch
 launcher_openshift_user: admin
 launcher_openshift_pwd: admin
 
-launcher_version: v15
-launcher_catalog_git_repo: https://github.com/snowdrop/cloud-native-catalog.git
+launcher_version: master
+launcher_catalog_git_repo: https://github.com/fabric8-launcher/launcher-booster-catalog.git
 launcher_catalog_git_branch: master
 
 launcher_openshift_console_url:
