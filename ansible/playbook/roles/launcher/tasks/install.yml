@@ -44,6 +44,3 @@
         -p LAUNCHER_MISSIONCONTROL_OPENSHIFT_API_URL={{ launcher_openshift_console_url }} \
         -p LAUNCHER_MISSIONCONTROL_GITHUB_USERNAME={{ launcher_github_username }} \
         -p LAUNCHER_MISSIONCONTROL_GITHUB_TOKEN={{ launcher_github_token }}
-
-- name: Crate Keycloak launcher
-  include_tasks: keycloak.yml

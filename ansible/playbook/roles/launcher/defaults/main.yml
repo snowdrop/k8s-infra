@@ -1,9 +1,13 @@
 launcher_project_name: devex
 
+# Please provide your username/token as openshift parameter
 launcher_github_username:
 launcher_github_token:
-launcher_keycloak_url: http://launcher-keycloak:8080/auth
-launcher_keycloak_realm: launch
+
+# For local usage, you can use this address : http://launcher-keycloak:8080/auth
+launcher_keycloak_url:
+# For local usage, you can use this realm : launch
+launcher_keycloak_realm:
 
 # Check these values as they could be different for your cluster
 launcher_openshift_user: admin
@@ -16,7 +20,7 @@ launcher_template_url: https://raw.githubusercontent.com/fabric8-launcher/launch
 launcher_catalog_git_repo: https://github.com/fabric8-launcher/launcher-booster-catalog.git
 launcher_catalog_git_branch: master
 
-launcher_openshift_console_url:
+launcher_openshift_console_url: https://192.168.99.50:8443/
 
 # Address used to configure the endpoint of the launcher-cluster configMAps
 launcher_openshift_consoleUrl: https://192.168.99.50:8443/

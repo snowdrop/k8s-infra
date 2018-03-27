@@ -13,14 +13,4 @@
     - serviceaccount
     - rolebinding.authorization.openshift.io
 
-- name: Delete resources of the keycloak launcher
-  shell: |
-    oc delete all -l app={{ launcher_keycloak_template_name }} -n {{ launcher_project_name }}
-  #   oc delete {{ item }}/{{ launcher_keycloak_template_name }} -n {{ launcher_project_name }}
-  # with_items:
-  #   - svc
-  #   - route
-  #   - dc
-  # ignore_errors: true
-
 
