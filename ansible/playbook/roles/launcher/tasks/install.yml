@@ -19,7 +19,8 @@
 - name: Display parameters to create launcher app
   debug:
     msg:
-      - "Parameters: "
+      - "Template Url : {{ launcher_template_url }}"
+      - "Parameters used to create the application from the template : "
       - "LAUNCHER_BOOSTER_CATALOG_REPOSITORY={{ launcher_catalog_git_repo }}"
       - "LAUNCHER_BOOSTER_CATALOG_REF={{ launcher_catalog_git_branch }}"
       - "LAUNCHER_KEYCLOAK_URL={{ launcher_keycloak_url }}"
