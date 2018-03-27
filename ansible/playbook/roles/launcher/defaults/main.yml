@@ -4,8 +4,10 @@ launcher_github_username:
 launcher_github_token:
 launcher_keycloak_url: http://launcher-keycloak:8080/auth
 launcher_keycloak_realm: launch
-launcher_openshift_user:
-launcher_openshift_pwd:
+
+# Check these values as they could be different for your cluster
+launcher_openshift_user: admin
+launcher_openshift_pwd: admin
 
 launcher_version: v15
 launcher_catalog_git_repo: https://github.com/snowdrop/cloud-native-catalog.git
