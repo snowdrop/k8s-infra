@@ -1,5 +1,5 @@
 - name: Check if project/namespace exists
-  command: oc get project/{{ launcher_project_name }}
+  command: oc get project/{{ launcher_project_name }} -n {{ launcher_project_name }}
   register: r_get_project
   ignore_errors: true
 
@@ -8,12 +8,13 @@
   when: r_get_project.stdout == ""
 
 - name: Check if Launcher template exists
-  command: oc get template/{{ launcher_template_name }}
+  command: oc get template/{{ launcher_template_name }} -n {{ launcher_project_name }}
   register: r_get_template
+  ignore_errors: true
 
 - name: Deploy the Launcher template
   command: oc create -n {{ launcher_project_name }} -f https://raw.githubusercontent.com/fabric8-launcher/launcher-openshift-templates/{{ launcher_version }}/openshift/launcher-template.yaml
-  when: r_get_template == ""
+  when: r_get_template.stdout == ""
 
 - name: Display parameters to create launcher app
   debug:
@@ -21,8 +22,8 @@
       - "Parameters: "
       - "LAUNCHER_BOOSTER_CATALOG_REPOSITORY={{ launcher_catalog_git_repo }}"
       - "LAUNCHER_BOOSTER_CATALOG_REF={{ launcher_catalog_git_branch }}"
-      - "LAUNCHER_KEYCLOAK_URL="
-      - "LAUNCHER_KEYCLOAK_REALM="
+      - "LAUNCHER_KEYCLOAK_URL={{ launcher_keycloak_url }}"
+      - "LAUNCHER_KEYCLOAK_REALM={{ launcher_keycloak_realm }}"
       - "LAUNCHER_MISSIONCONTROL_OPENSHIFT_USERNAME={{ launcher_openshift_user }}"
       - "LAUNCHER_MISSIONCONTROL_OPENSHIFT_PASSWORD={{ launcher_openshift_pwd }}"
       - "LAUNCHER_MISSIONCONTROL_OPENSHIFT_CONSOLE_URL={{ launcher_openshift_console_url }}"
@@ -35,11 +36,14 @@
     oc new-app {{ launcher_template_name }}  -n {{ launcher_project_name }} \
         -p LAUNCHER_BOOSTER_CATALOG_REPOSITORY={{ launcher_catalog_git_repo }} \
         -p LAUNCHER_BOOSTER_CATALOG_REF={{ launcher_catalog_git_branch }} \
-        -p LAUNCHER_KEYCLOAK_URL= \
-        -p LAUNCHER_KEYCLOAK_REALM= \
+        -p LAUNCHER_KEYCLOAK_URL={{ launcher_keycloak_url }} \
+        -p LAUNCHER_KEYCLOAK_REALM={{ launcher_keycloak_realm }} \
         -p LAUNCHER_MISSIONCONTROL_OPENSHIFT_USERNAME={{ launcher_openshift_user }} \
         -p LAUNCHER_MISSIONCONTROL_OPENSHIFT_PASSWORD={{ launcher_openshift_pwd }} \
         -p LAUNCHER_MISSIONCONTROL_OPENSHIFT_CONSOLE_URL={{ launcher_openshift_console_url }} \
         -p LAUNCHER_MISSIONCONTROL_OPENSHIFT_API_URL={{ launcher_openshift_console_url }} \
         -p LAUNCHER_MISSIONCONTROL_GITHUB_USERNAME={{ launcher_github_username }} \
         -p LAUNCHER_MISSIONCONTROL_GITHUB_TOKEN={{ launcher_github_token }}
+
+- name: Crate Keycloak launcher
+  include_tasks: keycloak.yml

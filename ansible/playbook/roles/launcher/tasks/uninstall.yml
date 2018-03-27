@@ -3,7 +3,7 @@
   register: r_get_project
   ignore_errors: true
 
-- name: Delete resources of the project if it exists
+- name: Delete resources of the Fabric8 launcher project (frontend, backend) if they exist
   shell: |
     oc delete all -l app={{ launcher_template_name }} -n {{ launcher_project_name }}
     oc delete {{ item }}  -l app={{ launcher_template_name }} -n {{ launcher_project_name }}
@@ -12,4 +12,15 @@
     - configmap
     - serviceaccount
     - rolebinding.authorization.openshift.io
+
+- name: Delete resources of the keycloak launcher
+  shell: |
+    oc delete all -l app={{ launcher_keycloak_template_name }} -n {{ launcher_project_name }}
+  #   oc delete {{ item }}/{{ launcher_keycloak_template_name }} -n {{ launcher_project_name }}
+  # with_items:
+  #   - svc
+  #   - route
+  #   - dc
+  # ignore_errors: true
+
 
