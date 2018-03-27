@@ -5,20 +5,6 @@ cluster_flavour: ocp
 
 istio:
   release_tag_name: "0.6.0"
-  addon:
-    - "grafana"
-    - "prometheus"
-    - "servicegraph"
-  jaeger: true
-  delete_resources: true
-
-istio_all_addons:
-  - "grafana"
-  - "prometheus"
-  - "servicegraph"
-
-istio:
-  release_tag_name: "0.6.0"
   dest: "/home/istio"
   auth: false
   namespace: istio-system
@@ -29,4 +15,3 @@ istio:
     - "jaeger"
   samples:
     - "helloworld"
-  delete_resources: true
