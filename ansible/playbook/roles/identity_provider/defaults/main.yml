@@ -1,3 +1,10 @@
-
 cluster_host_config_dir: /var/lib/origin/openshift.local.config
 users_pwd_file: users.htpasswd
+
+users:
+  admin:
+    user: admin
+    pwd: {{ openshift_admin_pwd }}
+  guest:
+    user: developer
+    pwd: developer
