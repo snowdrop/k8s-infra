@@ -3,9 +3,9 @@
   gather_facts: "{{ gathering_host_info | default('true') | bool == true }}"
 
   roles:
-    - { role: 'persistence',          tags: 'persistence',          when: target_platform == 'cloud' } # When minishift or oc cluster up is NOT used
-    - { role: 'identity_provider',    tags: 'identity_provider',    when: target_platform == 'cloud'}  # Use HTPasswdPasswordIdentityProvider as Identity Provider -> more secure
-    - { role: 'enable_cluster_admin', tags: 'enable_cluster_admin', when: target_platform == 'cloud' } # When oc cluster up is used
+    - { role: 'persistence',          tags: 'persistence'}          # When Minishift or oc cluster up is NOT used
+    - { role: 'identity_provider',    tags: 'identity_provider'}    # Use HTPasswdPasswordIdentityProvider as Identity Provider -> more secure
+    - { role: 'enable_cluster_admin', tags: 'enable_cluster_admin'} # When oc cluster up is used
     - { role: 'create_projects',      tags: 'create_projects'}
     - { role: 'install_nexus',        tags: 'nexus'}
     - { role: 'install_jenkins',      tags: 'jenkins'}
@@ -18,8 +18,7 @@
       import_role:
         name: launcher
         tasks_from: install.yml
-      tags:
-        - install-launcher
+      tags: install-launcher
 
     - name: Uninstall launcher
       import_role:
