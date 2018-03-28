@@ -3,5 +3,6 @@ local-hostname: cloud
 network-interfaces: |
   auto enp0s3
   iface enp0s3 inet dhcp
+  dns-nameservers 192.168.1.1 8.8.8.8 8.8.4.4
   auto enp0s8
   iface enp0s8 inet dhcp
