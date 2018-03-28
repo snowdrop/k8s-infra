@@ -11,8 +11,6 @@ openshift_client_dest: /usr/local/bin
 openshift_force_client_install: false
 
 openshift_recreate: yes
-openshift_admin_user: admin
-openshift_admin_pwd:
 
 cluster_ip_address: 192.168.99.50
 cluster_use_existing_config: true
