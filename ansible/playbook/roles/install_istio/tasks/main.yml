@@ -5,6 +5,7 @@
     repo: "{{ istio_git_repo }}"
     dest: "{{ istio_repo_dest }}"
     version: "{{ istio_git_branch }}"
+    force: yes
   connection: local
 
 - debug:
