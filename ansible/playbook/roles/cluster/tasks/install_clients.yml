@@ -55,15 +55,18 @@
     path: "{{ temp_output.stdout }}/{{ archive_path }}/oc"
   register: oc
 
-- name: Copy 'oc' to the requested directory if it exists within the extracted folder
+- name: Copy tool to the requested directory if it exists within the extracted folder
   copy:
-    src: "{{ temp_output.stdout }}/{{ archive_path }}/oc"
-    dest: "{{ openshift_client_dest }}/oc"
+    src: "{{ temp_output.stdout }}/{{ archive_path }}/{{ item }}"
+    dest: "{{ openshift_client_dest }}/{{ item }}"
     mode: 0775
     remote_src: true
   become: yes
   become_user: root
   when: oc.stat.exists
+  with_items:
+    - oc
+    - kubectl
 
 - name: Remove the temp directory
   file:

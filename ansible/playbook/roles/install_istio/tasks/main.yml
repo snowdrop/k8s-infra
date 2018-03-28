@@ -1,3 +1,5 @@
+- include_tasks: patch_master.yml
+
 - name: Clone Istio project
   git:
     repo: "{{ istio_git_repo }}"
@@ -14,16 +16,25 @@
     - "Git istio branch: {{ istio_git_branch }}"
     - "Istio version to be installed: {{ istio.release_tag_name }}"
     - "Using TLS: {{ istio.auth }}"
-    - "With Distributed Jaeger Tracing: {{ istio.jaeger }}"
-    - "Delete resources for new deployment: {{ istio.delete_resources }}"
     - "Target cloud platform: {{ cluster_flavour }}"
     - "Destination to install istio client, examples,...: {{ istio.dest }}"
     - "Namespace where istio will be installed: {{ istio.namespace }}"
     - "Addons: {{ istio.addon }}"
     - "Install samples: {{ istio.samples }}"
 
-# TODO: How to reuse the istio role coming from the istio ansible playbook ?
-# For this commit, it is assumed to be copy/paste under our list of local roles
+- name: Create temporary symlink to istio playbook
+  file:
+    src: "{{ istio_repo_dest }}/install/ansible"
+    dest: "istio_playbook_src"
+    state: link
+  connection: local
+
 - name: Execute the Istio Role
   include_role:
-    name: istio
+    name: istio_playbook_src/istio
+
+- name: Delete temporary symlink to istio playbook
+  file:
+    path: "istio_playbook_src"
+    state: absent
+  connection: local
