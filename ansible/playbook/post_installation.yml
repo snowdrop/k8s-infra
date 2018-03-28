@@ -3,14 +3,14 @@
   gather_facts: "{{ gathering_host_info | default('true') | bool == true }}"
 
   roles:
-    - { role: 'enable_cluster_admin', tags: 'enable_cluster_admin', when: target_platform == 'cloud' }
+    - { role: 'persistence',          tags: 'persistence',          when: target_platform == 'cloud' } # When minishift or oc cluster up is NOT used
+    - { role: 'identity_provider',    tags: 'identity_provider',    when: target_platform == 'cloud'}  # Use HTPasswdPasswordIdentityProvider as Identity Provider -> more secure
+    - { role: 'enable_cluster_admin', tags: 'enable_cluster_admin', when: target_platform == 'cloud' } # When oc cluster up is used
     - { role: 'create_projects',      tags: 'create_projects'}
-    - { role: 'persistence',          tags: 'persistence',          when: target_platform == 'cloud' }
     - { role: 'install_nexus',        tags: 'nexus'}
     - { role: 'install_jenkins',      tags: 'jenkins'}
     - { role: 'install_jaeger',       tags: 'jaeger'}
     - { role: 'install_istio',        tags: 'istio'}
-    - { role: 'identity_provider',    tags: 'identity_provider'}
 
   tasks:
     # Launcher Role
