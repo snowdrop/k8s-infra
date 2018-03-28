@@ -4,8 +4,8 @@
 - name: Grant cluster-admin to developer 
   command: oc adm policy add-cluster-role-to-user cluster-admin {{ openshift_user }}
 
-- name: Log in as developer
-  command: oc login -u {{ openshift_user }}  -p {{ openshift_user }}
+- name: Log in as admin
+  command: oc login -u {{ openshift_user }}  -p {{ openshift_pwd }}
  
 - name: Set the namespace to 'default'
   command: oc project default 
