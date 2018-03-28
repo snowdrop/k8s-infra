@@ -1,3 +1,5 @@
+- include_tasks: patch_master.yml
+
 - name: Clone Istio project
   git:
     repo: "{{ istio_git_repo }}"
