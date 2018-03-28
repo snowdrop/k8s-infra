@@ -4,7 +4,7 @@ users_pwd_file: users.htpasswd
 users:
   admin:
     user: admin
-    pwd: "{{ openshift_admin_pwd }}"
+    password: "{{ openshift_admin_pwd }}"
   guest:
     user: developer
-    pwd: developer
+    password: developer11

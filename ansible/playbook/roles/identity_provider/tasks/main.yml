@@ -17,7 +17,7 @@
   when: not p.stat.exists
 
 - name: Create user/pwd
-  command: "htpasswd -b {{ path_users_pwd }} {{ item.value.user }} {{ item.value.pwd }}"
+  command: "htpasswd -b {{ path_users_pwd }} {{ item.value.user }} {{ item.value.password }}"
   with_dict: "{{ users }}"
 
 - name: Generate patch using template
