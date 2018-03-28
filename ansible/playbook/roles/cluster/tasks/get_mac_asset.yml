@@ -2,5 +2,5 @@
   set_fact:
     asset_url: "{{ item.browser_download_url }}"
     asset_name: "{{ item.browser_download_url | basename }}"
-  when: "'-mac.zip' in item.name and 'server' in item.name"
+  when: "'-mac.zip' in item.name and 'client' in item.name"
 
