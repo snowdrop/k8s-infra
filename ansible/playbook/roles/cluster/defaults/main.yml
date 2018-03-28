@@ -20,7 +20,7 @@ cluster_host_config_dir: /var/lib/origin/openshift.local.config
 cluster_host_data_dir: /var/lib/openshift/data
 cluster_host_volumes_dir: /var/lib/openshift/volumes
 cluster_host_pv_dir: /var/lib/openshift/pv
-cluster_service_catalog: true
+cluster_service_catalog: false
 
 openshift_up_options: '
   --version={{ openshift_release_tag_name }}
