@@ -13,7 +13,10 @@
 - name: Config used to install Istio
   debug:
     msg:
+    - "Git istio repo: {{ istio_git_repo }}"
     - "Git istio branch: {{ istio_git_branch }}"
+    - "Git istio download directory: {{ istio_repo_dest }}"
+    - "Git istio playbook directory: {{ istio_repo_dest }}/install/ansible"
     - "Istio version to be installed: {{ istio.release_tag_name }}"
     - "Using TLS: {{ istio.auth }}"
     - "Target cloud platform: {{ cluster_flavour }}"
