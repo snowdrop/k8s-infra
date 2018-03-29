@@ -1,0 +1,71 @@
+- name: Get the Mac asset
+  include: get_mac_asset.yml
+  with_items: "{{ assets.json }}"
+  when: assets is defined and ansible_os_family == 'Darwin'
+
+- name: Get the Linux asset
+  include: get_linux_asset.yml
+  with_items: "{{ assets.json }}"
+  when: "assets is defined and ansible_os_family in ['RedHat', 'Debian']"
+
+- name: Should have an asset_name
+  assert:
+    that: asset_name is defined
+
+- name: Create a temp dir
+  command: mktemp -d -t ansible.XXXXXXXXXX
+  register: temp_output
+
+- name: Show temp dir
+  debug: msg="Temp dir - {{ temp_output.stdout }}"
+
+- name: Show the asset name
+  debug: msg="Asset name = {{ asset_name }}"
+
+- name: Download the asset
+  get_url:
+    url: "{{ asset_url }}"
+    dest: "{{ temp_output.stdout }}/{{ asset_name }}"
+
+- name: Unzip the archive
+  command: "unzip {{ asset_name }}"
+  args:
+    chdir: "{{ temp_output.stdout }}"
+  when: "'zip' in asset_name"
+
+- name: Untar the archive
+  unarchive:
+    src: "{{ temp_output.stdout }}/{{ asset_name }}"
+    dest: "{{ temp_output.stdout }}"
+    remote_src: yes
+  when: "'tar.gz' in asset_name"
+
+- name: Set path to the extracted folder for tar.gz archive
+  set_fact:
+    archive_path: "{{ asset_name | regex_replace('\\.(tar\\.gz|\\zip)', '') }}/"
+  when: "'tar.gz' in asset_name"
+
+- name: Set path to the extracted folder for zip archive
+  set_fact:
+    archive_path: ""
+  when: "'zip' in asset_name"
+
+- name: Check if 'oc' client exists within the extracted archive folder
+  stat:
+    path: "{{ temp_output.stdout }}/{{ archive_path }}/oc"
+  register: oc
+
+- name: Copy 'oc' to the requested directory if it exists within the extracted folder
+  copy:
+    src: "{{ temp_output.stdout }}/{{ archive_path }}/oc"
+    dest: "{{ openshift_client_dest }}/oc"
+    mode: 0775
+    remote_src: true
+  become: yes
+  become_user: root
+  when: oc.stat.exists
+
+- name: Remove the temp directory
+  file:
+    path: "{{ temp_output.stdout }}"
+    state: absent

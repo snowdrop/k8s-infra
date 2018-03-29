@@ -6,6 +6,7 @@
     - { role: 'persistence',          tags: 'persistence'}          # When Minishift or oc cluster up is NOT used
     - { role: 'identity_provider',    tags: 'identity_provider'}    # Use HTPasswdPasswordIdentityProvider as Identity Provider -> more secure
     - { role: 'enable_cluster_admin', tags: 'enable_cluster_admin'} # When oc cluster up is used
+    - { role: 'install_oc',           tags: 'install_oc'}           # Install oc client when cluster role is not used
     - { role: 'create_projects',      tags: 'create_projects'}
     - { role: 'install_nexus',        tags: 'nexus'}
     - { role: 'install_jenkins',      tags: 'jenkins'}
