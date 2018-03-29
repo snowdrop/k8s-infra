@@ -14,6 +14,9 @@
   file:
     path: "{{ path_users_pwd }}"
     state: touch
+    owner: root
+    group: root
+    mode: 0644
   when: not p.stat.exists
 
 - name: Create user/pwd
