@@ -2,6 +2,17 @@
 - hosts: "{{ openshift_node | default('masters') }}"
   gather_facts: "{{ gathering_host_info | default('true') | bool == true }}"
 
+  pre_tasks:
+    - set_fact:
+        openshift_ansible_playbook_path: ../openshift-ansible/playbooks/byo/openshift-cluster/service-catalog.yml
+      when: openshift_release.find("v3.7") != -1
+      tags:
+        - install_asb
+    - set_fact:
+        openshift_ansible_playbook_path: ../openshift-ansible/playbooks/openshift-service-catalog/private/config.yml
+      when: openshift_release.find("v3.9") != -1
+      tags:
+        - install_asb
   roles:
     - { role: 'persistence',          tags: 'persistence'}          # When Minishift or oc cluster up is NOT used
     - { role: 'identity_provider',    tags: 'identity_provider'}    # Use HTPasswdPasswordIdentityProvider as Identity Provider -> more secure
@@ -35,15 +46,12 @@
       tags:
         - patch-launcher
 
-
-# Unfortunately this can't be a separate role, because the path where the various playbooks are looked up get's messed-up
-- include: '../openshift-ansible/playbooks/byo/openshift-cluster/service-catalog.yml'
-  vars:
-    ansible_service_broker_registry_whitelist: [".*-apb$"]
-    ansible_service_broker_install: true
-    ansible_service_broker_registry_tag: v3.7
-    ansible_service_broker_image_tag: v3.7
-  tags:
-    - install_asb
-  when:
-    experimental_features | default('disable') == 'enable'
+    # Include openshift-ansible playbook to install ASB. Don't forget to git clone the project !!
+    # - include_tasks: '{{ openshift_ansible_playbook_path }}'
+    #   vars:
+    #     ansible_service_broker_registry_whitelist: [".*-apb$"]
+    #     ansible_service_broker_install: true
+    #     ansible_service_broker_registry_tag: '{{ openshift_release }}'
+    #     ansible_service_broker_image_tag: '{{ openshift_release }}'
+    #   tags:
+    #     - install_asb
