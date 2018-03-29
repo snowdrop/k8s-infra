@@ -34,5 +34,7 @@ users:
 
 runcmd:
   - yum install -y NetworkManager
-  - sudo systemctl start NetworkManager
-  - sudo systemctl enable NetworkManager
+  - systemctl enable docker
+  - systemctl start docker
+  - systemctl start NetworkManager
+  - systemctl enable NetworkManager
