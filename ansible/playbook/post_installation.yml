@@ -26,25 +26,9 @@
 
   tasks:
     # Launcher Role
-    - name: Install launcher
-      import_role:
-        name: launcher
-        tasks_from: install.yml
-      tags: install-launcher
-
-    - name: Uninstall launcher
-      import_role:
-        name: launcher
-        tasks_from: uninstall.yml
-      tags:
-        - uninstall-launcher
-
-    - name: Patch launcher-clusters configmap
-      import_role:
-        name: launcher
-        tasks_from: patch_configmap.yml
-      tags:
-        - patch-launcher
+    - {name: "Install launcher                 ", import_role: {name: launcher, tasks_from: install.yml},         tags: [install-launcher]}
+    - {name: "Uninstall launcher               ", import_role: {name: launcher, tasks_from: uninstall.yml},       tags: [uninstall-launcher]}
+    - {name: "Patch launcher-clusters configmap", import_role: {name: launcher, tasks_from: patch_configmap.yml}, tags: [uninstall-launcher]}
 
     # Include openshift-ansible playbook to install ASB. Don't forget to git clone the project !!
     # - include_tasks: '{{ openshift_ansible_playbook_path }}'
