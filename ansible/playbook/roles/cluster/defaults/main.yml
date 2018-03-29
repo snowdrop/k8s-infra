@@ -13,8 +13,9 @@ openshift_force_client_install: false
 openshift_recreate: yes
 
 # Cluster configuration
-cluster_ip_address: {{ public_ip_address }} # Re use the inventory ip address
+cluster_ip_address: "{{ public_ip_address }}" # Re use the inventory ip address
 cluster_use_existing_config: true
+cluster_log_level: 1
 
 # Switch to docker folder config dir as it uses a different path and not the onde defined for oc cluster up
 cluster_host_config_dir: /var/lib/origin/openshift.local.config
@@ -36,7 +37,7 @@ openshift_up_options: '
   --use-existing-config={{ cluster_use_existing_config }}
   --public-hostname={{ cluster_ip_address }}
   --routing-suffix={{ cluster_ip_address }}.nip.io
-  --loglevel=1
+  --loglevel={{ cluster_log_level }}
   --service-catalog={{ cluster_service_catalog }}
   --logging={{ cluster_logging }}
   --metrics={{ cluster_metrics }}'
