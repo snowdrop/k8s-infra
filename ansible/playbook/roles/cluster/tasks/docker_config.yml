@@ -2,7 +2,8 @@
   copy:
     content: |
       {
-        "insecure-registries" : [ "172.30.0.0/16" ]
+        "insecure-registries" : [ "172.30.0.0/16" ],
+        "hosts" : [ "unix://", "tcp://0.0.0.0:2376" ]
       }
     dest:  /etc/docker/daemon.json
 
