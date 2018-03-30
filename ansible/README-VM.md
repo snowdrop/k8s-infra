@@ -33,11 +33,6 @@ ssh root@192.168.99.50 "cd install/ansible && ansible-playbook -i inventory/clou
 git clone -b release-3.7 https://github.com/openshift/openshift-ansible.git
 ```
 
-**NOTE** : Install RPMs packages if your OS is not CentOS7
-```bash
-ansible-playbook -i inventory/cloud_host playbook/enable_rpm_packages.yaml -e openshift_node=masters
-```
-
 - Generate inventory host file containing the definition about the OpenShift instance to be provisioned from a j2 template
 
 ```bash
