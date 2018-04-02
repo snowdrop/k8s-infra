@@ -76,7 +76,7 @@ ansible-playbook -i inventory openshift-ansible/playbooks/byo/openshift-cluster/
   - Install Nexus, Jenkins  
 
 ```bash
-ansible-playbook -i inventory playbook/post_installation.yml -e openshift_node=masters
+ansible-playbook -i inventory playbook/post_installation.yml -e openshift_node=masters -e openshift_admin_pwd=admin
 ```
 
 ## Old content not used
