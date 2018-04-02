@@ -1,3 +1,8 @@
+- assert:
+    that:
+      - "openshift_admin_pwd != ''"
+    msg: "Please specify an password that will be used for the cluster using the 'openshift_admin_pwd' variable. The easiest way to do is to add -e openshift_admin_pwd=foopass to your Ansible CLI invocation"
+
 - name: Login as system:admin
   command: oc login https://{{ public_ip_address }}:8443 -u system:admin
 
