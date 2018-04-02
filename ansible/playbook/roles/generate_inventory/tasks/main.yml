@@ -1,5 +1,8 @@
+- set_fact:
+    name: "{{ 'simple' if type == 'simple' else 'cloud'}}"
+
 - name: Create Ansible Host file
   template:
-    src: "{{ role_path }}/templates/cloud.inventory.j2"
-    dest: ../inventory/cloud_host
+    src: "{{ role_path }}/templates/{{ name }}.inventory.j2"
+    dest: ../inventory/{{ name }}_host
 
