@@ -1,10 +1,10 @@
 - name: Login as system:admin
   command: oc login https://{{ public_ip_address }}:8443 -u system:admin
 
-- name: Grant cluster-admin to developer
+- name: Grant cluster-admin to {{ openshift_admin_user }}
   command: oc adm policy add-cluster-role-to-user cluster-admin {{ openshift_admin_user }}
 
-- name: Log in as admin
+- name: Log in as {{ openshift_admin_user }}
   command: oc login -u {{ openshift_admin_user }} -p {{ openshift_admin_pwd }}
 
 - name: Set the namespace to 'default'
