@@ -11,7 +11,7 @@
     state: absent
     path: "{{ item }}"
   with_items:
-      - /var/lib/openshift/config/
+      - /var/lib/origin/openshift.local.config
       - /var/lib/openshift/data/member/
 
 - name: Restart docker
