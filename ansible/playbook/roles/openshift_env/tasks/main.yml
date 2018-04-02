@@ -1,0 +1,44 @@
+---
+
+# When the tasks complete, a variable named
+# openshift_env (dictionary)
+# will be populated containing the following variables
+# client (type: string, example: "3.9.0")
+# client_full (type: string, example: "v3.9.0-alpha.3+78ddc10")
+# server (type: string, example: "3.9.0")
+# server_full (type: string, example: "v3.9.0-alpha.3+78ddc10")
+# containerized (type: bool)
+# config_dir (type: string)
+
+- set_fact:
+    openshift_env: {}
+
+- name: Determine version of Openshift
+  openshift_version:
+  register: version_out
+
+- set_fact:
+    openshift_env: "{{ openshift_env | combine( { 'client': version_out.client, 'client_full': version_out.client_full, 'server': version_out.server, 'server_full': version_out.server_full } ) }}"
+
+- name: Check if there are docker containers matching the version running
+  shell: "docker ps | grep {{ openshift_env['server'] }} 2> /dev/null"
+  ignore_errors: true
+  register: docker_out
+
+- set_fact:
+    openshift_env: "{{ openshift_env | combine({ 'containerized': (docker_out.stdout | length > 0) }) }}"
+
+- set_fact:
+    config_dir: ""
+
+- name: Find yml files in {{ item }}
+  include_tasks: determine_is_openshift_config_dir.yml
+  when: config_dir == ''
+  with_items: "{{ candicate_config_dirs }}"
+
+- set_fact:
+    openshift_env: "{{ openshift_env | combine({ 'config_dir': config_dir }) }}"
+
+- debug:
+    var: openshift_env
+    verbosity: 2
