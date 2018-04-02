@@ -9,6 +9,8 @@
 # server_full (type: string, example: "v3.9.0-alpha.3+78ddc10")
 # containerized (type: bool)
 # config_dir (type: string)
+# has_pv_storage (bool: true): Determines whether the environment already provides Persistent Volume storage or not.
+#                              Currently this is only set to true when we have detected a containerized environment
 
 - set_fact:
     openshift_env: {}
@@ -38,6 +40,9 @@
 
 - set_fact:
     openshift_env: "{{ openshift_env | combine({ 'config_dir': config_dir }) }}"
+
+- set_fact:
+    openshift_env: "{{ openshift_env | combine({ 'has_pv_storage': openshift_env.containerized }) }}"
 
 - debug:
     var: openshift_env
