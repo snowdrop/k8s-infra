@@ -1,3 +1,3 @@
 ---
 openshift_admin_user: admin
-openshift_admin_pwd:
+openshift_admin_pwd: ''
