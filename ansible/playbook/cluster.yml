@@ -1,5 +1,5 @@
 ---
-- hosts: "{{ openshift_node }}"
+- hosts: "masters"
   gather_facts: False
   tasks:
     - name: Shutdown Openshift cluster - oc cluster down
