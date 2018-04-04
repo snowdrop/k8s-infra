@@ -1,0 +1,22 @@
+- name: Install Openshift RPM packages
+  shell: |
+    yum -y localinstall {{ rpm_repo_url }}/{{ item }}
+  become: true
+  register: result
+  retries: 5
+  delay: 30
+  until: result.rc == 0
+  with_items:
+    - origin-clients-3.7.0-1.0.7ed6862.x86_64.rpm
+    - origin-3.7.0-1.0.7ed6862.x86_64.rpm
+    - origin-master-3.7.0-1.0.7ed6862.x86_64.rpm
+    - tuned-profiles-origin-node-3.7.0-1.0.7ed6862.x86_64.rpm
+    - origin-node-3.7.0-1.0.7ed6862.x86_64.rpm
+    - origin-dockerregistry-3.7.0-1.0.7ed6862.x86_64.rpm
+    - origin-sdn-ovs-3.7.0-1.0.7ed6862.x86_64.rpm
+    - origin-pod-3.7.0-1.0.7ed6862.x86_64.rpm
+    - origin-service-catalog-3.7.0-1.0.7ed6862.x86_64.rpm
+    - origin-template-service-broker-3.7.0-1.0.7ed6862.x86_64.rpm
+    - origin-docker-excluder-3.7.0-1.0.7ed6862.noarch.rpm
+    - origin-cluster-capacity-3.7.0-1.0.7ed6862.x86_64.rpm
+    - origin-excluder-3.7.0-1.0.7ed6862.noarch.rpm
