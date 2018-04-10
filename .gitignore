@@ -3,3 +3,4 @@
 **/.vagrant/
 **/inventory/cloud_host
 **/user-data
+**/*.retry
