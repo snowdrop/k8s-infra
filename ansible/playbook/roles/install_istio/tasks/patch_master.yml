@@ -14,7 +14,7 @@
     command: cat /tmp/mutating_webhook_patch.json
     register: patch
 
-  - name: Patch master-config file to use HTPasswdPasswordIdentityProvider
+  - name: Patch master-config file to use Mutating Webhook
     command: "oc ex config patch {{ cluster_host_config_dir }}/master/master-config.yaml --patch '{{ patch.stdout }}'"
     register: r
 
