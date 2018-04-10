@@ -1,43 +1,51 @@
-- name: Set config file
-  set_fact:
-    config_file: /etc/origin/master/master-config.yaml
+- assert:
+    that:
+      - "openshift_env.config_dir != ''"
+    msg: "Unable to determine the Openshift configuration directory -> You are probably running an unsupported Openshift version or in an unsupported environment"
 
-- name: Update configuration file
-  shell: |
-    echo "jenkinsPipelineConfig:" >> {{ config_file }}
-    echo "  autoProvisionEnabled: false" >> {{ config_file }}
+- name: Set master config file
+  set_fact:
+    config_file: "{{ openshift_env.config_dir }}/master/master-config.yaml"
+
+- name: Generate patch using template
+  template:
+    src: "templates/jenkins_patch.json.j2"
+    dest: /tmp/jenkins_patch.json
+
+- name: Get patch file
+  command: cat /tmp/htpwd_ip_patch.json
+  register: patch
+
+- name: Patch master-config file
+  command: "oc ex config patch {{ openshift_env.config_dir }}/master/master-config.yaml --patch '{{ patch.stdout }}'"
+  register: r
+
+- name: Copy patch to new master config file
+  copy: content="{{ r.stdout }}" dest={{ openshift_env.config_dir }}/master/master-config.yaml
 
 - name: Restart master
   include_role:
     name: restart_master
 
-- name: Wait for master to become ready
-  pause:
-    seconds: 30
+- set_fact:
+    namespace: "{{ infra_project | default('infra') }}"
 
-- name: Set namespace
-  set_fact:
-    namespace: "{{ infra_project }}"
+- name: Create namespace
+  command: "oc new-project {{ namespace }}"
+  ignore_errors: true
 
 - name: Set Jenkins app name
   set_fact:
     jenkins_app: jenkins-persistent
 
-- name: Delete Jenkins Application, ServiceAccount, RoleBinding, PersistentVolumeClaim
-  shell: |
-    oc delete all -l app={{ jenkins_app }} -n {{ namespace }}
-    oc delete sa jenkins --ignore-not-found=true -n {{ namespace }}
-    oc delete rolebindings jenkins_edit --ignore-not-found=true -n {{ namespace }}
-    oc delete persistentvolumeclaim jenkins --ignore-not-found=true -n {{ namespace }}
-
 - name: Change scc permission to allow jenkins pod to run within the docker container using its userid
   shell: "oc adm policy add-scc-to-group anyuid system:authenticated -n {{ namespace }}"
 
 - name: Install {{ jenkins_app }}
-  shell: "oc new-app JENKINS_PASSWORD=admin123 {{ jenkins_app }} -n {{ namespace }}"
+  command: "oc new-app JENKINS_PASSWORD=admin123 {{ jenkins_app }} -n {{ namespace }}"
 
 - name: Add role cluster admin to the jenkins service account
-  shell: "oc policy add-role-to-user admin system:serviceaccount:{{ namespace }}:jenkins"
+  command: "oc policy add-role-to-user admin system:serviceaccount:{{ namespace }}:jenkins"
 
 - name: Get Jenkins Service Account Token
   shell: |

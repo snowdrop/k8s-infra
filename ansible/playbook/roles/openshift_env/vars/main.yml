@@ -1,0 +1,3 @@
+candicate_config_dirs:
+  - /etc/origin
+  - /var/lib/origin/openshift.local.config
