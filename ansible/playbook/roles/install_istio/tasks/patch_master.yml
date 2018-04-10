@@ -1,20 +1,26 @@
 ### This will only work for clusters created using oc cluster up
 
-- name: Generate patch using template
-  template:
-    src: "mutating_webhook_patch.j2"
-    dest: /tmp/mutating_webhook_patch.json
+- name: Check if master config is already patched
+  command: cat {{ cluster_host_config_dir }}/master/master-config.yaml
+  register: master_content
 
-- name: Get patch file
-  command: cat /tmp/mutating_webhook_patch.json
-  register: patch
+- block:
+  - name: Generate patch using template
+    template:
+      src: "mutating_webhook_patch.j2"
+      dest: /tmp/mutating_webhook_patch.json
 
-- name: Patch master-config file to use HTPasswdPasswordIdentityProvider
-  command: "oc ex config patch {{ cluster_host_config_dir }}/master/master-config.yaml --patch '{{ patch.stdout }}'"
-  register: r
+  - name: Get patch file
+    command: cat /tmp/mutating_webhook_patch.json
+    register: patch
 
-- name: Copy patch to new master config file
-  copy: content="{{ r.stdout }}" dest={{ cluster_host_config_dir }}/master/master-config.yaml
+  - name: Patch master-config file to use HTPasswdPasswordIdentityProvider
+    command: "oc ex config patch {{ cluster_host_config_dir }}/master/master-config.yaml --patch '{{ patch.stdout }}'"
+    register: r
 
-- name: Restart origin container
-  shell: "docker restart origin"
+  - name: Copy patch to new master config file
+    copy: content="{{ r.stdout }}" dest={{ cluster_host_config_dir }}/master/master-config.yaml
+
+  - name: Restart origin container
+    shell: "docker restart origin"
+  when: master_content.stdout.find('MutatingAdmissionWebhook') == -1
