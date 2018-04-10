@@ -3,7 +3,7 @@
 # - Specify the node to be used from the inventory file
 # - Define a condition when a role should be executed
 openshift_node: masters
-openshift_release_tag_name: v3.9.0-alpha.3
+openshift_release_tag_name: v3.9.0
 gathering_host_info: true
 
 # Namespace where nexus, jaeger, jenkins, ... will be installed
