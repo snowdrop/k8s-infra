@@ -4,3 +4,5 @@
 **/inventory/cloud_host
 **/user-data
 **/*.retry
+/ansible/inventory/simple_host
+/ansible/inventory/cloud_host
