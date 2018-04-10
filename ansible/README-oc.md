@@ -21,6 +21,17 @@ ansible-playbook -i inventory/simple_host playbook/cluster.yml -e openshift_rele
 -e "@extra_vars.yml"
 ```
 
+- To stop the cluster, then run this command
+```bash
+ansible-playbook -i inventory/simple_host playbook/cluster.yml --tags "down" 
+```
+- To clean up the environment* before to re-install the OpenShift cluster, use the `clean` parameter
+```bash
+ansible-playbook -i inventory/simple_host playbook/cluster.yml --tags "clean" 
+```
+
+* : stop docker daemon, remove tmpfs partitions
+
 # Post installation
 
 ```bash
