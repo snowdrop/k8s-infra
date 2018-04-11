@@ -2,6 +2,11 @@
 - hosts: "{{ openshift_node | default('masters') }}"
   gather_facts: "{{ gathering_host_info | default('true') | bool == true }}"
 
+  # Define default values for variables that are common between roles
+  vars:
+    openshift_admin_user: admin
+    openshift_admin_pwd: ''
+
   pre_tasks:
     - set_fact:
         openshift_ansible_playbook_path: ../openshift-ansible/playbooks/byo/openshift-cluster/service-catalog.yml

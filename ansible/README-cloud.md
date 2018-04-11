@@ -49,7 +49,7 @@ For example in order to enable installation of the service broker the following 
 - Execute post tasks such as setup persistence, install nexus, jenkins, jaeger
 
 ```bash
-ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e openshift_node=masters
+ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e openshift_node=masters -e openshift_admin_pwd=admin
 ```
 
 You can also select to only install specific parts by using Ansible's `tags` support like so: `--tags install_nexus,install_jaeger`
@@ -61,7 +61,7 @@ The tags can be found in ` playbook/post_installation.yml`
 For the first machine the following will create the first 5 users
 
 ```bash
-ansible-playbook -i inventory/cloud_host playbook/add_users.yml -e openshift_node=masters -e number_of_users=5 -e first_user_offset=1
+ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e openshift_node=masters --tags identity_provider -e number_of_extra_users=5 -e first_extra_user_offset=1 -e openshift_admin_pwd=admin
 ```
 
 This step will create 5 users with credentials like `user1/pwd1` while also creating a project for like `user1` for each user

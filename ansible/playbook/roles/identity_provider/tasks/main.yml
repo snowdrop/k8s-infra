@@ -3,6 +3,11 @@
       - "openshift_env.config_dir != ''"
     msg: "Unable to determine the Openshift configuration directory -> You are probably running an unsupported Openshift version or in an unsupported environment"
 
+- assert:
+    that:
+      - "openshift_admin_pwd != ''"
+    msg: "Please specify an password that will be used for the cluster using the 'openshift_admin_pwd' variable. The easiest way to do is to add -e openshift_admin_pwd=foopass to your Ansible CLI invocation"
+
 - set_fact:
     path_users_pwd: "{{ openshift_env.config_dir }}/{{ users_pwd_file }}"
 
@@ -24,9 +29,14 @@
     mode: 0644
   when: not p.stat.exists
 
+- name: Add extra users
+  set_fact:
+    users: "{{ users }} + {{ [ { 'name': 'user' + item, 'password': 'pwd' + item } ] }}"
+  with_sequence: start={{ first_extra_user_offset }} count={{ number_of_extra_users }} format=%d
+
 - name: Create user/pwd
-  command: "htpasswd -b {{ path_users_pwd }} {{ item.value.user }} {{ item.value.password }}"
-  with_dict: "{{ users }}"
+  command: "htpasswd -b {{ path_users_pwd }} {{ item.name }} {{ item.password }}"
+  with_items: "{{ users }}"
 
 - name: Generate patch using template
   template:
