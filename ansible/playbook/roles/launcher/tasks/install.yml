@@ -1,5 +1,5 @@
 - name: Check if project/namespace exists
-  command: oc get project/{{ launcher_project_name }} -n {{ launcher_project_name }}
+  command: oc get project/{{ launcher_project_name }}
   register: r_get_project
   ignore_errors: true
 
