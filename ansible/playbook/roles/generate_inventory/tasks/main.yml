@@ -6,3 +6,7 @@
     src: "{{ role_path }}/templates/{{ name }}.inventory.j2"
     dest: ../inventory/{{ name }}_host
 
+- name: Show inventory file location
+  debug:
+    msg: "Inventory file created here : ../inventory/{{ name }}_host"
+
