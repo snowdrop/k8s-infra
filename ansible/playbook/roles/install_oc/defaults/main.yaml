@@ -5,7 +5,7 @@ openshift_github_name: origin
 openshift_github_url: https://api.github.com/repos
 
 # Openshift parameters
-openshift_release_tag_name: "v3.7.2"
+openshift_release_tag_name: "v3.9.0"
 
 openshift_client_dest: /usr/local/bin
 openshift_force_client_install: false
