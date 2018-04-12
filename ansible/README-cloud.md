@@ -22,7 +22,7 @@ fi
 Take care to supply the correct IP address in the corresponding argument
 
 ```bash
-ansible-playbook playbook/generate_inventory.yml -e ip_address=192.168.199.50 -e openshift_origin_version=3.9
+ansible-playbook playbook/generate_inventory.yml -e ip_address=192.168.99.50 -e openshift_origin_version=3.9
 ```
 
 The inventory is later user by the [official](https://github.com/openshift/openshift-ansible) Openshift Ansible installation playbook to customize the setup
@@ -36,22 +36,26 @@ ansible-playbook -i inventory/cloud_host openshift-ansible/playbooks/prerequisit
 ansible-playbook -i inventory/cloud_host openshift-ansible/playbooks/deploy_cluster.yml
 ```
 
-REMARK : Customization of the installation is possible by changing the variables found in `inventory/cloud_host` from the command line using Ansible's `-e` syntax.
+REMARK : Customization of the installation (inventory file generated) is possible by changing the variables found in `inventory/cloud_host` from the command line using Ansible's `-e` syntax.
 
-- Execute post tasks such as setup persistence, enable cluster admin
+- Execute post installation steps such as : 
+  - Enable cluster admin role for `admin` user
+  - Setup persistence using `HostPath` mounted volumes `/tmp/pv001 ...`,
+  - Create `infra` project
+  - Install Nexus, Jenkins 
 
 ```bash
 ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e openshift_admin_pwd=admin --tags "enable_cluster_admin,persistence"
 ```
 
+Remark : You can also select to only install specific parts by using Ansible's `tags` support like so: `--tags install_nexus,install_jaeger`
+If you would like to execute all roles except some, you can use Ansible's `--skip-tags` in the same fashion. 
+The tags can be found in ` playbook/post_installation.yml`
+
 - Install the service catalog
 ```bash
 ansible-playbook -i inventory/cloud_host openshift-ansible/playbooks/openshift-service-catalog/config.yml
 ```
-
-You can also select to only install specific parts by using Ansible's `tags` support like so: `--tags install_nexus,install_jaeger`
-If you would like to execute all roles except some, you can use Ansible's `--skip-tags` in the same fashion. 
-The tags can be found in ` playbook/post_installation.yml`
 
 - Create users and projects
 
