@@ -22,8 +22,8 @@
 - set_fact:
     openshift_env: "{{ openshift_env | combine( { 'client': version_out.client, 'client_full': version_out.client_full, 'server': version_out.server, 'server_full': version_out.server_full } ) }}"
 
-- name: Check if there are docker containers matching the version running
-  shell: "docker ps | grep {{ openshift_env['server'] }} 2> /dev/null"
+- name: Check if there are (non-pod) docker containers matching the version running
+  shell: "docker ps | grep origin:v{{ openshift_env['server'] }} 2> /dev/null"
   ignore_errors: true
   register: docker_out
 
