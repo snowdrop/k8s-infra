@@ -6,9 +6,11 @@ at https://robot.your-server.de/server
 ### Install CentOS 7.4 Minimal
 
 * Select CentOS 7.4 in Linux tab and accept initiate installation. Take care to note the root password supplied.
+
 ![Linux installation](linux-installation.png)
 
 * Initiate a reset from the Reset tab.
+
 ![Hardware reset](hardware-reset.png)
 
 * Wait a few minutes for the installation to complete
@@ -25,7 +27,9 @@ sshpass -f pwd.txt ssh -o StrictHostKeyChecking=no root@195.201.87.126 "mkdir ~/
 sshpass -f pwd.txt ssh-copy-id -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa.pub root@195.201.87.126
 ```
 
-### PRe-req : Install NetworkManager
+### Prerequisites
+
+In order to install OpenShift using the `openshift-ansible` playbook, it is mandatory to install the NetworkManager Package 
 
 ```bash
 yum install -y NetworkManager
