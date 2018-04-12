@@ -21,21 +21,23 @@ Next, we will install the CentOS 7 OS which is proposed by Hetzner Cloud Platfor
 
 * Wait a few minutes for the installation to complete
 
-### Copy ssh key to machine
+### Copy your ssh public key to the machine
 
-You need to perform `ssh-copy-id root@ipaddress` in order to later perform password-less login
+You need to perform a `ssh-copy-id root@ipaddress` in order to later perform password-less login
 The root password is supplied via email when the Hetzner machine is initially created
+Save it under the file `pwd.txt`
+
+From a terminal, you can then execute the following command to add your public key within the list of the authorized keys of the cloud vm
 
 E.g
 
 ```bash
-sshpass -f pwd.txt ssh -o StrictHostKeyChecking=no root@195.201.87.126 "mkdir ~/.ssh && chmod 700 ~/.ssh && touch ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys"
-sshpass -f pwd.txt ssh-copy-id -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa.pub root@195.201.87.126
+sshpass -f pwd.txt ssh-copy-id -i ~/.ssh/id_rsa.pub root@ipaddress
 ```
 
 ### Prerequisites
 
-In order to install OpenShift using the `openshift-ansible` playbook, it is mandatory to install the NetworkManager Package 
+In order to install OpenShift using the `openshift-ansible` playbook, it is mandatory to install first the NetworkManager Package 
 
 ```bash
 yum install -y NetworkManager
