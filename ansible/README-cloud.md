@@ -67,6 +67,12 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
 
 This step will create 5 users with credentials like `user1/pwd1` while also creating a project for like `user1` for each user
 
+## Issue
+
+- The defaultNodeSelector defined within `/etc/origin/master-config.yml` file contains this value `defaultNodeSelector: node-role.kubernetes.io/compute=true` which prevents 
+  a pod to be created. This error is reported as openshift event error `0/1 nodes are available: 1 MatchNodeSelector.`
+  The workaround is to remove the value and to restart the service `systemctl restart origin-master-api.service` 
+
 ## Soft clean up of an existing machine
 
 If all you care to do is reset openshift back to zero then stop the API, Controllers, and etcd. Then follow these instructions
