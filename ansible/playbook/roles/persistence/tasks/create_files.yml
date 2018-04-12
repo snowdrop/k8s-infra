@@ -5,6 +5,7 @@
     chmod -R a+w /tmp/{{ item.key }}
     chcon -Rt svirt_sandbox_file_t /tmp/{{ item.key }}
   with_dict: "{{ volumes }}"
+  ignore_errors: true
 
 - name: Copy pv file to master
   template:
