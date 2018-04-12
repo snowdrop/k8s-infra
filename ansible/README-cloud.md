@@ -1,4 +1,4 @@
-# Install all in one Openshift Origin 3.7 on machine
+# Install all in one Openshift Origin 3.9 on machine
 
 ## Prerequisites
 
@@ -14,7 +14,7 @@ First git clone the OpenShift Ansible project locally using the branch correspon
 ```bash
 echo "#### Git clone openshift ansible"
 if [ ! -d "openshift-ansible" ]; then
-  git clone -b release-3.7 https://github.com/openshift/openshift-ansible.git
+  git clone -b release-3.9 https://github.com/openshift/openshift-ansible.git
 fi
 ```
 
@@ -22,39 +22,40 @@ fi
 Take care to supply the correct IP address in the corresponding argument
 
 ```bash
-ansible-playbook playbook/generate_inventory.yml -e ip_address=
+ansible-playbook playbook/generate_inventory.yml -e ip_address=192.168.99.50 -e openshift_origin_version=3.9
 ```
 
 The inventory is later user by the [official](https://github.com/openshift/openshift-ansible) Openshift Ansible installation playbook to customize the setup
 If you would like to customize some of the options, then first change the template file at `roles/generate_inventory/templates/cloud.inventory.j2`
 before running the `playbook/generate_inventory.yml` role
 
-**NOTE** : Install RPMs packages if your OS is not CentOS7 s
-
-```bash
-ansible-playbook -i inventory/cloud_host playbook/install_package.yml -e openshift_node=masters
-```
-
 - Install OpenShift
 
 ```bash
-ansible-playbook -i inventory/cloud_host openshift-ansible/playbooks/byo/config.yml
+ansible-playbook -i inventory/cloud_host openshift-ansible/playbooks/prerequisites.yml
+ansible-playbook -i inventory/cloud_host openshift-ansible/playbooks/deploy_cluster.yml
 ```
 
-Customization of the installation is possible by changing the variables found in `inventory/cloud_host` from the command line using Ansible's `-e` syntax.
-For example in order to enable installation of the service broker the following command could be executed
+REMARK : Customization of the installation (inventory file generated) is possible by changing the variables found in `inventory/cloud_host` from the command line using Ansible's `-e` syntax.
 
-`ansible-playbook -i inventory/cloud_host openshift-ansible/playbooks/byo/config.yml -e openshift_enable_service_catalog=true` 
-
-- Execute post tasks such as setup persistence, install nexus, jenkins, jaeger
+- Execute post installation steps such as : 
+  - Enable cluster admin role for `admin` user
+  - Setup persistence using `HostPath` mounted volumes `/tmp/pv001 ...`,
+  - Create `infra` project
+  - Install Nexus, Jenkins 
 
 ```bash
-ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e openshift_node=masters -e openshift_admin_pwd=admin
+ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e openshift_admin_pwd=admin --tags "enable_cluster_admin,persistence"
 ```
 
-You can also select to only install specific parts by using Ansible's `tags` support like so: `--tags install_nexus,install_jaeger`
+Remark : You can also select to only install specific parts by using Ansible's `tags` support like so: `--tags install_nexus,install_jaeger`
 If you would like to execute all roles except some, you can use Ansible's `--skip-tags` in the same fashion. 
 The tags can be found in ` playbook/post_installation.yml`
+
+- Install the service catalog
+```bash
+ansible-playbook -i inventory/cloud_host openshift-ansible/playbooks/openshift-service-catalog/config.yml
+```
 
 - Create users and projects
 
@@ -66,14 +67,11 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
 
 This step will create 5 users with credentials like `user1/pwd1` while also creating a project for like `user1` for each user
 
-## Issues
+## Issue
 
-- Due to a bug with the ASB Service catalog, then the following command must be applied before to create a service instance
-
-```bash
-oc project openshift-ansible-service-broker
-oc patch clusterrole/asb-auth --type json --patch '[ { "op": "add", "path": "/rules/5", "value":  { "apiGroups": [ "networking.k8s.io", ""], "attributeRestrictions": null, "resources": [ "networkpolicies" ], "verbs": [ "create", "delete" ] }  } ]'
-```
+- The defaultNodeSelector defined within `/etc/origin/master-config.yml` file contains this value `defaultNodeSelector: node-role.kubernetes.io/compute=true` which prevents 
+  a pod to be created. This error is reported as openshift event error `0/1 nodes are available: 1 MatchNodeSelector.`
+  The workaround is to remove the value and to restart the service `systemctl restart origin-master-api.service` 
 
 ## Soft clean up of an existing machine
 

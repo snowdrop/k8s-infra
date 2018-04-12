@@ -6,14 +6,19 @@ etcd
 [OSEv3:vars]
 ansible_user=root
 
-public_ip_address = {{ ip_address }}
-host_key_checking = False
+public_ip_address={{ ip_address }}
+host_key_checking=false
 
-# For Atomic VM
-containerized = false
-
+{% if openshift_origin_version == '3.9' %}
+containerized=true
+#openshift_repos_enable_testing=true
+openshift_enable_excluders=false
+openshift_release=v{{ openshift_origin_version }}
+{% else %}
+containerized=false
 openshift_release=v{{ openshift_origin_version }}
 openshift_pkg_version=-{{ openshift_origin_version }}.0
+{% endif %}
 
 openshift_deployment_type=origin
 
@@ -40,8 +45,6 @@ ansible_python_interpreter=/usr/bin/python
 openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider', 'filename': '/etc/origin/master/htpasswd'}]
 # htpasswd -nb admin admin
 openshift_master_htpasswd_users={'admin': '$apr1$DloeoaY3$nqbN9fQBkyXgbj58buqEM.'}
-
-
 
 
 {% set host_info = 'localhost ansible_connection=local' if ((use_local is defined) and (use_local | bool)) else ip_address %}
