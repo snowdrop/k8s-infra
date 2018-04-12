@@ -38,7 +38,7 @@ openshift_node_kubelet_args={'pods-per-core': ['20']}
 
 # ASB Service Catalog
 openshift_enable_service_catalog=false
-ansible_service_broker_registry_whitelist=".*-apb$"
+ansible_service_broker_registry_whitelist=[".*-apb$"]
 
 # Python Interpreter
 ansible_python_interpreter=/usr/bin/python
