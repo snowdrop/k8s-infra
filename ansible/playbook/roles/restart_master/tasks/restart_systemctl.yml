@@ -1,5 +1,5 @@
 - set_fact:
-    custom_service_name: "{{ custom_service_name | default('') }}"
+    custom_service_name: "{{ custom_service_name | default('dummy') }}"
 
 - set_fact:
     origin_services: origin-master-api origin-master-controllers
