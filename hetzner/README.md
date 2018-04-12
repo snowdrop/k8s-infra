@@ -45,6 +45,12 @@ systemctl enable NetworkManager
 systemctl start NetworkManager
 ```
 
+like also `Ansible` as `openshift_env` role uses a Python script
+
+```bash
+yum install -y ansible
+```
+
 ## Install OpenShift
 
 Follow the instructions in `../ansible/README-cloud.md`
