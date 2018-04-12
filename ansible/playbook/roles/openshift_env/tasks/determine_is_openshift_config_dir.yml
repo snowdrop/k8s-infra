@@ -1,13 +1,17 @@
 # Takes a directory name to be examined for Openshift configuration files (in the form of the 'item' variable)
 # and set the 'config_dir' if the input directory matches
 
-- name: Find yml files
-  find:
-    paths: "{{ item }}"
-    recurse: yes
-    patterns: 'master-config.yaml'
-  register: files_out
+- block:
 
-- set_fact:
-    config_dir: "{{ item }}"
-    when: files | length > 0
+  - name: Find yml files
+    find:
+      paths: "{{ item }}"
+      recurse: yes
+      patterns: 'master-config.yaml'
+    register: files_out
+
+  - set_fact:
+      config_dir: "{{ item }}"
+    when: files_out.files | length > 0
+
+  when: config_dir == ""

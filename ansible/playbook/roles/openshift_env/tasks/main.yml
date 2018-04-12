@@ -35,7 +35,6 @@
 
 - name: Find yml files in {{ item }}
   include_tasks: determine_is_openshift_config_dir.yml
-  when: config_dir == ''
   with_items: "{{ candicate_config_dirs }}"
 
 - set_fact:
