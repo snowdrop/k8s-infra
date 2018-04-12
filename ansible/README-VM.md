@@ -59,7 +59,7 @@ ansible-playbook -i inventory openshift-ansible/playbooks/byo/config.yml
 
 ** NOTES **
 
-- If during the execution of the byo playbook, the service-catloag role reports this error, then relaunch the following playbook
+- If during the execution of the byo playbook, the service-catalog role reports this error, then relaunch the following playbook
 ```bash
 TASK [ansible_service_broker : Create the Broker resource in the catalog] **************************************************************************************************************************************************************************
 fatal: [192.168.99.50]: FAILED! => {"changed": false, "failed": true, "msg": {"cmd": "/usr/bin/oc create -f /tmp/brokerout-dJmL1S -n default", "results": {}, "returncode": 1, "stderr": "error: unable to recognize \"/tmp/brokerout-dJmL1S\": no matches for servicecatalog.k8s.io/, Kind=ClusterServiceBroker\n", "stdout": ""}}
