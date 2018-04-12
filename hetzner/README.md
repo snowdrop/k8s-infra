@@ -9,6 +9,8 @@ E.g : `PX91-SSD (50 TB) #820400`
 
 ### Install CentOS 7.4 Minimal
 
+Next, we will install the CentOS 7 OS which is proposed by Hetzner Cloud Platform.
+
 * Select CentOS 7.4 in Linux tab and accept initiate installation. Take care to note the root password supplied.
 
 ![Linux installation](linux-installation.png)
