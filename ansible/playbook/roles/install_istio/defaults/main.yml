@@ -6,6 +6,3 @@ istio_git_branch: master
 
 # Folder where the project will be cloned on your machine
 istio_repo_dest: ~/.istio/playbooks
-
-# Directory where the Openshift configuration files can be found
-cluster_host_config_dir: /var/lib/origin/openshift.local.config
