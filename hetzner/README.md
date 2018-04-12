@@ -1,7 +1,9 @@
 ## OS Installation on Hetzner Cloud Machine
 
 You first need to login to Hetzner robot
-at https://robot.your-server.de/server and then select your machine by clicking on its [link](PX91-SSD (50 TB) #820400)
+at https://robot.your-server.de/server and then select your machine by clicking on its the server link
+
+E.g : `PX91-SSD (50 TB) #820400`
 
 ![Hetzner](hetzner-server.png) 
 
