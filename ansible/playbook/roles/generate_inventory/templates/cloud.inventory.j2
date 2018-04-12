@@ -61,4 +61,4 @@ openshift_master_htpasswd_users={'admin': '$apr1$DloeoaY3$nqbN9fQBkyXgbj58buqEM.
 # openshift-sdn gets installed. We mark the master node as not
 # schedulable.
 [nodes]
-{{ host_info }} openshift_node_labels="{'region':'infra','zone':'default'}" openshift_public_hostname={{ ip_address }} openshift_schedulable=true openshift_ip={{ ip_address }}
+{{ host_info }} openshift_node_labels="{'region':'infra','zone':'default', 'node-role.kubernetes.io/compute': 'true'}" openshift_public_hostname={{ ip_address }} openshift_ip={{ ip_address }}
