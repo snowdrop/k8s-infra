@@ -6,32 +6,23 @@
 #
 # where commands are:
 # imageCache          Enable or disable to use docker images cached on the local user's disk. Default is false
-# ocp version         Version of OpenShift Origin. Default to : 3.7.1
+# ocp version         Version of OpenShift Origin. Default to : 3.9.0
 #
-# ./bootstrap_vm.sh true 3.7.1
+# ./bootstrap_vm.sh true 3.9.0
 #
 
 DEMO_PROFILE_DIR="$HOME/.minishift/profiles/demo"
 IMAGE_CACHE=${1:-false}
-OCP_VERSION=${2:-3.7.1}
+OCP_VERSION=${2:-3.9.0}
 
 docker_images=(
-  jaegertracing/all-in-one:latest
   openshift/origin-docker-registry:v$OCP_VERSION
   openshift/origin-haproxy-router:v$OCP_VERSION
   openshift/origin-deployer:v$OCP_VERSION
   openshift/origin:v$OCP_VERSION
   openshift/origin-pod:v$OCP_VERSION
   openshift/origin-sti-builder:v$OCP_VERSION
-  fabric8/s2i-java:2.0
-  fabric8/configmapcontroller:2.3.7
   registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:latest
-  quay.io/coreos/etcd:latest
-  ansibleplaybookbundle/origin-ansible-service-broker:latest
-  openshiftio/launchpad-backend:v12
-  openshiftio/launchpad-frontend:v12
-  openshiftio/launchpad-missioncontrol:v13
-  registry.access.redhat.com/rhscl/mysql-57-rhel7:latest
 )
 IMAGES=$(printf "%s " "${docker_images[@]}")
 
@@ -42,6 +33,7 @@ fi
 if [ ! -d "$demo_PROFILE_DIR" ]; then
   minishift profile set demo
   minishift --profile demo addons install minishift-addons/add-ons/ansible-service-broker
+  minishift --profile demo config set iso centos
   minishift --profile demo config set memory 6GB
   minishift --profile demo config set cpus 4
   minishift --profile demo config set openshift-version v$OCP_VERSION

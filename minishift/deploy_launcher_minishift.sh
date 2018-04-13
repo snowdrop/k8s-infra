@@ -11,8 +11,8 @@
 # ./deploy_launcher_minishift.sh -p projectName -i username:password -g myGithubUser:myGithubToken -v v3
 
 # Set Default values
-PROJECTNAME="myproject"
-id="developer:developer"
+PROJECTNAME="devex"
+id="admin:admin"
 VERSION="v13"
 
 while getopts p:g:t:i:v:c: option
@@ -63,10 +63,6 @@ echo "----------------- Install Launchpad template --------------------"
 oc create -n $PROJECTNAME -f https://raw.githubusercontent.com/openshiftio/launchpad-templates/$VERSION/openshift/launchpad-template.yaml
 echo "------------------------------------------"
 
-# Local Deployment
-# -p LAUNCHPAD_MISSIONCONTROL_OPENSHIFT_API_URL=https://openshift.default.svc.cluster.local
-# -p LAUNCHPAD_KEYCLOAK_URL=https://sso.prod-preview.openshift.io/auth \
-# -p LAUNCHPAD_KEYCLOAK_REALM=fabric8 \
 echo "------------------ Create launch pad mission application ---------------------"
 oc new-app launchpad -n $PROJECTNAME \
     -p LAUNCHPAD_BACKEND_CATALOG_GIT_REF="master" \
@@ -75,8 +71,6 @@ oc new-app launchpad -n $PROJECTNAME \
     -p LAUNCHPAD_MISSIONCONTROL_GITHUB_TOKEN=${GITHUB_IDENTITY[1]} \
     -p LAUNCHPAD_MISSIONCONTROL_OPENSHIFT_CONSOLE_URL=$CONSOLE_URL \
     -p LAUNCHPAD_MISSIONCONTROL_OPENSHIFT_API_URL=$CONSOLE_URL \
-    -p LAUNCHPAD_KEYCLOAK_URL= \
-    -p LAUNCHPAD_KEYCLOAK_REALM= \
     -p LAUNCHPAD_MISSIONCONTROL_OPENSHIFT_USERNAME=${IDENTITY[0]} \
     -p LAUNCHPAD_MISSIONCONTROL_OPENSHIFT_PASSWORD=${IDENTITY[1]}
 echo "------------------------------------------"

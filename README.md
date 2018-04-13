@@ -1,7 +1,7 @@
 # Instructions to install OpenShift 
 
 This project details how to provision a vm with OpenShift Origin and to install different applications that we propose and which are required
-required to play with Hands On Lab, do local demo or simply to test.
+to play with Hands On Lab, do local demo or simply to test.
 
 List of features available 
 
@@ -12,7 +12,7 @@ List of features available
 - [Ansible Service Broker](http://automationbroker.io/)
 - [Launcher with customized catalog](fabric8-launcher)
 
-Different provisioning modes are proposed due to the existing limitations that we are currently faced. By example, top of `minishift|cdk`,
+Different provisioning modes are proposed due to some limitations that we are currently faced. By example, top of `minishift|cdk`,
 we can't use Ansible Playbooks to provision post OpenShift installation our different features as the partitioning on the vm's filesystem doesn't allow to install easily packages.
 Bash script, execution of manual `oc` commands will then be required.  
 
@@ -31,27 +31,39 @@ Table of Contents
 
 ## Minishift
 
-To provision MiniShift with OpenShift Origin 3.9.0 and install the Ansible Service Broker, then use the 
-following bash script `bootstrap_vm.sh <image_cache_bolloean> <ocp_version>`. 
+To provision MiniShift with OpenShift Origin 3.9.0 and install :
 
-It will create a :
+- Ansible Service Broker
+- Fabric8 Launcher,
+ 
+then use the following bash script `bootstrap_vm.sh <image_cache_boolean> <ocp_version>`. 
 
-- Minishift vm using xhyve as hypervisor 
-- `demo` profile
+It will then create a `centos7` vm using `xhyve` as hypervisor
 
-and will :
+Here is a resume about what the script currently do
 
-- Git clone `minishift addons` repo to install `ansible-service-broker`
-- Enable/disable minishift cache (according to boolean parameter)
+- Create a MiniShift `demo` profile
+- Git clone `MiniShift addons` repo to install `ansible-service-broker`
+- Enable/disable `MiniShift` cache (according to the `boolean` parameter)
 - Install the docker images within the OpenShift registry according to the ocp version defined
-- Start Minishift using the experimental features and will use the `boot2docker` iso image
+- Start `MiniShift` using the experimental features
 
 ```bash
 cd minishift    
-./bootstrap_vm.sh true 3.7.1
+./bootstrap_vm.sh true 3.9.0
 ```
 
-**NOTE** : When the vm has been created, then it can be stopped/started using the commands `minishift stop|start --profile demo`
+**NOTE** : The caching option can be used in order to export on your local file system the docker images to bootsrtrap the process to recrete next time the vm.
+**NOTE** : The user to use to access the vm is `admin` with the password `admin`. This user has been granted with the Openshift Cluster Admin role.
+**NOTE** : When the vm has been created, then it can be stopped/started using the commands `minishift stop|start --profile demo`.
+
+To install the Fabric8-launcher, then use this `deploy_launcher_minishift.sh` bash script. You can specify as parameters
+the user/password to be used to access OpenShift like also your github user and token to play with the Launcher - `git flow`.
+
+```bash
+cd minishift 
+./deploy_launcher_minishift.sh -p projectName -i username:password -g myGithubUser:myGithubToken 
+```
 
 ## Virtualbox
 
