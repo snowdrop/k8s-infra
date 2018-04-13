@@ -1,5 +1,6 @@
 - set_fact:
     name: "{{ 'simple' if type is defined and type == 'simple' else 'cloud'}}"
+    username: "{{ username | default('root') }}"
 
 - name: Create Ansible Host file
   template:

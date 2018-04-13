@@ -29,12 +29,22 @@ The inventory is later user by the [official](https://github.com/openshift/opens
 If you would like to customize some of the options, then first change the template file at `roles/generate_inventory/templates/cloud.inventory.j2`
 before running the `playbook/generate_inventory.yml` role
 
+Furthermore, the above command will generate an inventory file that will use `root` as `ansible_user`.
+If another user other than `root` is to be used for accessing the machine over ssh, you can pass the `username` variable like so:
+
+```bash
+ansible-playbook playbook/generate_inventory.yml -e ip_address=192.168.99.50 -e openshift_origin_version=3.9 -e username=centos
+```
+
 - Install OpenShift
 
 ```bash
 ansible-playbook -i inventory/cloud_host openshift-ansible/playbooks/prerequisites.yml
 ansible-playbook -i inventory/cloud_host openshift-ansible/playbooks/deploy_cluster.yml
 ```
+
+If the `ansible_user` that is has been set in the inventory is not `root`, then the `--become` flag needs to be added to both
+of the above commands 
 
 REMARK : Customization of the installation (inventory file generated) is possible by changing the variables found in `inventory/cloud_host` from the command line using Ansible's `-e` syntax.
 
@@ -43,6 +53,7 @@ REMARK : Customization of the installation (inventory file generated) is possibl
   - Setup persistence using `HostPath` mounted volumes `/tmp/pv001 ...`,
   - Create `infra` project
   - Install Nexus, Jenkins 
+ 
 
 ```bash
 ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e openshift_admin_pwd=admin --tags "enable_cluster_admin,persistence"
