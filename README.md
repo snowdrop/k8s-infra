@@ -29,12 +29,14 @@ bash script, manual `oc` commands or `Minishift` addons to install some of the f
 Table of Contents
 =================
 
-   * [Minishift](#minishift)
-   * [Virtualbox](#virtualbox)
-      * [MacOS's users only](#macoss-users-only)
-      * [Common steps](#common-steps)
-      * [Create CentOS vm on Virtualbox](#create-centos-vm-on-virtualbox)
-   * [Using Cloud Provider - Hetzner](#using-cloud-provider---hetzner)
+   * [Installation of Openshift](#installation-of-openshift)
+      * [Minishift](#minishift)
+      * [Virtualbox](#virtualbox)
+         * [MacOS's users only](#macoss-users-only)
+         * [Common steps](#common-steps)
+         * [Create CentOS vm on Virtualbox](#create-centos-vm-on-virtualbox)
+      * [Using Cloud Provider - Hetzner](#using-cloud-provider---hetzner)
+   * [Turn on your OpenShift machine into a cloud Native Dev environment](#turn-on-your-openshift-machine-into-a-cloud-native-dev-environment)
 
 # Installation of Openshift
 
