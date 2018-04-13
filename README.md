@@ -24,10 +24,9 @@ Table of Contents
       * [MacOS's users only](#macoss-users-only)
       * [Common steps](#common-steps)
       * [Create CentOS vm on Virtualbox](#create-centos-vm-on-virtualbox)
-   * [Cloud - Hetzner](#cloud---hetzner)
-      * [OS Installation on Hetzner Cloud Machine](#os-installation-on-hetzner-cloud-machine)
-      * [Install Fedora on Machine](#install-fedora-on-machine)
-      * [Copy ssh key to machine](#copy-ssh-key-to-machine)
+      * [Experimental : Atomic Centos and Ansible](#experimental--atomic-centos-and-ansible)
+   * [Using Cloud Provider - Hetzner](#using-cloud-provider---hetzner)
+
 
 ## Minishift
 
@@ -54,7 +53,9 @@ cd minishift
 ```
 
 **NOTE** : The caching option can be used in order to export on your local file system the docker images to bootstrap the process to recreate next time the vm.
+
 **NOTE** : The user to use to access the vm is `admin` with the password `admin`. This user has been granted with the OpenShift Cluster Admin role.
+
 **NOTE** : When the vm has been created, then it can be stopped/started using the commands `minishift stop|start --profile demo`.
 
 To install the `Fabric8-launcher` and to play with the runtime's missions, then use this `deploy_launcher_minishift.sh` bash script. You can specify as parameters
@@ -244,6 +245,6 @@ ssh root@192.168.99.50 "systemctl status ose-ansible"
 ssh root@192.168.99.50 "cat /var/log/ansible.log"
 ```
 
-## Cloud - Hetzner
+## Using Cloud Provider - Hetzner
 
-See [hetzner](hetzner/README.md) page explaining how to create a vm.
+See [hetzner](hetzner/README.md) page explaining how to create a cloud vm.
