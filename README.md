@@ -36,6 +36,10 @@ Table of Contents
       * [Create CentOS vm on Virtualbox](#create-centos-vm-on-virtualbox)
    * [Using Cloud Provider - Hetzner](#using-cloud-provider---hetzner)
 
+# Installation of Openshift
+
+The following section explains how to provision OpenShift using `MiniShift`, a bare metal CentOS vm running a Docker daemon or with the 
+help of a cloud provider - Hetzner 
 
 ## Minishift
 
@@ -230,3 +234,5 @@ Warning: Permanently added '192.168.99.50' (ECDSA) to the list of known hosts.
 ## Using Cloud Provider - Hetzner
 
 See [hetzner](hetzner/README.md) page explaining how to create a cloud vm.
+
+# Turn on your OpenShift machine into a cloud Native Dev environment 
