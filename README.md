@@ -1,12 +1,12 @@
 # Instructions to install OpenShift 
 
-This project details how to provision OpenShift Origin using different platform/hypervisors or Cloud provider as presented within the following table
+This project details how to provision OpenShift Origin using different tool, bootstrapping mode, hypervisor or Cloud provider as presented within the following table
 
-| Platform      | Hypervisor    | Cloud Provider |
+| Tool      | ISO  |  Hypervisor    | Cloud Provider |
 | ------------- | -------------:| :-------------:
-| MiniShift     |  Xhyve | Local Machine |
-| Centos 7      | Virtualbox | Local Machine |
-| Centos 7      | - | Hetzner |
+| MiniShift     |  CentOS or boot2docker | Xhyve | Local Machine |
+| oc client     |  Centos 7      | Virtualbox | Local Machine |
+| openshift ansible | Centos 7  | - | Hetzner |
 
 
 Next, you will be then able to install or configure OpenShift
