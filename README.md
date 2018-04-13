@@ -1,18 +1,28 @@
 # Instructions to install OpenShift 
 
-This project details how to provision a vm with OpenShift Origin and to install different applications that we propose and which are required
-to play with Hands On Lab, do local demo or simply to test.
+This project details how to provision OpenShift Origin using different platform/hypervisors or Cloud provider as presented within the following table
 
-List of features available 
+| Platform      | Hypervisor    | Cloud Provider |
+| ------------- | -------------:| :-------------:
+| MiniShift     |  Xhyve | Local Machine |
+| Centos 7      | Virtualbox | Local Machine |
+| Centos 7      | - | Hetzner |
 
-- Persistence using `hotPath` as `persistenceVolume`
-- Nexus Repository Server
-- Jenkins
-- Distributed Tracing - Jaeger
-- [Ansible Service Broker](http://automationbroker.io/)
-- [Launcher with customized catalog](fabric8-launcher)
 
-Different provisioning modes are proposed due to some limitations that we are currently faced. By example, top of `minishift|cdk`,
+Next, you will be then able to install or configure OpenShift
+to play with Hands On Lab, do local demo or simply to test using one of the following features :
+
+- Create list of user/password and their corresponding project
+- Grant Cluster admin role to a user 
+- Configure Master-configuration of Openshift to use `htpasswd` as identity provider
+- Enable Persistence using `hotPath` as `persistenceVolume`
+- Install Nexus Repository Server
+- Install Jenkins and configure it to trigger the build of the `s2i` build started within the Openshift project
+- Install Distributed Tracing - Jaeger
+- Deploy the [Ansible Service Broker](http://automationbroker.io/)
+- Enable the Fabric8 [Launcher](http://fabric8-launcher)
+
+**NOTE**: Different provisioning modes are proposed due to some limitations that we are currently faced. By example, top of `minishift|cdk`,
 we can't use Ansible Playbooks to provision post OpenShift installation our different features as the partitioning on the vm's filesystem doesn't allow to install easily packages.
 Bash script, execution of manual `oc` commands will then be required.  
 
@@ -24,7 +34,6 @@ Table of Contents
       * [MacOS's users only](#macoss-users-only)
       * [Common steps](#common-steps)
       * [Create CentOS vm on Virtualbox](#create-centos-vm-on-virtualbox)
-      * [Experimental : Atomic Centos and Ansible](#experimental--atomic-centos-and-ansible)
    * [Using Cloud Provider - Hetzner](#using-cloud-provider---hetzner)
 
 
@@ -32,8 +41,8 @@ Table of Contents
 
 To provision MiniShift with OpenShift Origin 3.9.0 and install :
 
+- Fabric8 Launcher
 - Ansible Service Broker
-- Fabric8 Launcher,
  
 then use the following bash script `bootstrap_vm.sh <image_cache_boolean> <ocp_version>`. 
 
@@ -216,33 +225,6 @@ Are you sure you want to continue connecting (yes/no)? yes
 Warning: Permanently added '192.168.99.50' (ECDSA) to the list of known hosts.
 
 [root@cloud ~]# 
-```
-
-### Experimental : Atomic Centos and Ansible
-
-See : http://www.projectatomic.io/docs/quickstart/
-
-- Create the vm as we did before but use this qcow file instead `CentOS-Atomic-Host-7-GenericCloud.qcow2`
-- Execute these commands to resize the atomic partition, import your private key, inventory file and install the service `ose-ansible`
-
-```bash
-./create-vm.sh /Users/dabou
-ssh-keygen -R "192.168.99.50"
-
-echo "##### Resize atomic-root partition = +8G"
-ssh root@192.168.99.50 "lvresize --size=+8g --resizefs atomicos/root"
-
-echo "#### Secure copy the inventory file to the host machine"
-scp /Users/dabou/Code/rhoar/cloud-native/infra/virtualbox/inventory-atomic root@192.168.99.50:/root/inventory
-# scp /Users/dabou/.ssh/id_rsa root@192.168.99.50:/root/my_key.rsa
-
-echo "#### Install ose ansible installer"
-ssh root@192.168.99.50 "atomic install --system --storage=ostree --set INVENTORY_FILE=/root/inventory registry.access.redhat.com/openshift3/ose-ansible"   
-
-echo "#### Restart service and check status"
-ssh root@192.168.99.50 "systemctl start ose-ansible"
-ssh root@192.168.99.50 "systemctl status ose-ansible"
-ssh root@192.168.99.50 "cat /var/log/ansible.log"
 ```
 
 ## Using Cloud Provider - Hetzner
