@@ -13,7 +13,7 @@
 # Set Default values
 PROJECTNAME="devex"
 id="admin:admin"
-VERSION="v13"
+VERSION="v15"
 CATALOG="https://github.com/fabric8-launcher/launcher-booster-catalog.git"
 
 while getopts p:g:t:i:v:c: option
@@ -61,17 +61,19 @@ echo "------------------------------------------"
 
 # Install the launchpad-missioncontrol template
 echo "----------------- Install Launchpad template --------------------"
-oc create -n $PROJECTNAME -f https://raw.githubusercontent.com/openshiftio/launchpad-templates/$VERSION/openshift/launchpad-template.yaml
+oc create -n $PROJECTNAME -f https://raw.githubusercontent.com/fabric8-launcher/launcher-openshift-templates/$VERSION/openshift/launcher-template.yaml
 echo "------------------------------------------"
 
 echo "------------------ Create launch pad mission application ---------------------"
-oc new-app launchpad -n $PROJECTNAME \
-    -p LAUNCHPAD_BACKEND_CATALOG_GIT_REF="master" \
-    -p LAUNCHPAD_BACKEND_CATALOG_GIT_REPOSITORY=$CATALOG \
-    -p LAUNCHPAD_MISSIONCONTROL_GITHUB_USERNAME=${GITHUB_IDENTITY[0]} \
-    -p LAUNCHPAD_MISSIONCONTROL_GITHUB_TOKEN=${GITHUB_IDENTITY[1]} \
-    -p LAUNCHPAD_MISSIONCONTROL_OPENSHIFT_CONSOLE_URL=$CONSOLE_URL \
-    -p LAUNCHPAD_MISSIONCONTROL_OPENSHIFT_API_URL=$CONSOLE_URL \
-    -p LAUNCHPAD_MISSIONCONTROL_OPENSHIFT_USERNAME=${IDENTITY[0]} \
-    -p LAUNCHPAD_MISSIONCONTROL_OPENSHIFT_PASSWORD=${IDENTITY[1]}
+oc new-app fabric8-launcher -n $PROJECTNAME \
+    -p LAUNCHER_BOOSTER_CATALOG_REF="master" \
+    -p LAUNCHER_BOOSTER_CATALOG_REPOSITORY=$CATALOG \
+    -p LAUNCHER_MISSIONCONTROL_GITHUB_USERNAME=${GITHUB_IDENTITY[0]} \
+    -p LAUNCHER_MISSIONCONTROL_GITHUB_TOKEN=${GITHUB_IDENTITY[1]} \
+    -p LAUNCHER_MISSIONCONTROL_OPENSHIFT_CONSOLE_URL=$CONSOLE_URL \
+    -p LAUNCHER_MISSIONCONTROL_OPENSHIFT_API_URL=$CONSOLE_URL \
+    -p LAUNCHER_MISSIONCONTROL_OPENSHIFT_USERNAME=${IDENTITY[0]} \
+    -p LAUNCHER_MISSIONCONTROL_OPENSHIFT_PASSWORD=${IDENTITY[1]} \
+    -p LAUNCHER_KEYCLOAK_URL= \
+    -p LAUNCHER_KEYCLOAK_REALM=
 echo "------------------------------------------"
