@@ -9,7 +9,7 @@ This project details how to provision OpenShift Origin using different tool or b
 | Ansible    |  Centos 7              | -            | Hetzner        |
 
 
-No matter which approach you will prefer to use, you will be then able to install or configure OpenShift
+No matter which approach you prefer to use, you will be then able to install or configure OpenShift
 to play with Hands On Lab, do local demo or simply to test using one of the following features :
 
 - Create list of user/password and their corresponding project
@@ -22,9 +22,9 @@ to play with Hands On Lab, do local demo or simply to test using one of the foll
 - Deploy the [Ansible Service Broker](http://automationbroker.io/)
 - Enable the Fabric8 [Launcher](http://fabric8-launcher)
 
-**NOTE**: Different provisioning modes are proposed due to some limitations that we are currently faced. By example, top of `minishift|cdk`,
-we can't use Ansible Playbooks to provision post OpenShift installation our different features as the partitioning on the vm's filesystem doesn't allow to install easily packages.
-Bash script, execution of manual `oc` commands will then be required.  
+**NOTE**: Due to some limitations that we are currently faced with `minishift|cdk` where
+we can't use Ansible Playbooks to provision post OpenShift installation our different features, then it will be required in this case to use 
+bash script, manual `oc` commands or `Minishift` addons to install some features available.  
 
 Table of Contents
 =================
