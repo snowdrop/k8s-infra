@@ -14,6 +14,7 @@
 PROJECTNAME="devex"
 id="admin:admin"
 VERSION="v13"
+CATALOG="https://github.com/fabric8-launcher/launcher-booster-catalog.git"
 
 while getopts p:g:t:i:v:c: option
 do

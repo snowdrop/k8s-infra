@@ -53,16 +53,18 @@ cd minishift
 ./bootstrap_vm.sh true 3.9.0
 ```
 
-**NOTE** : The caching option can be used in order to export on your local file system the docker images to bootsrtrap the process to recrete next time the vm.
-**NOTE** : The user to use to access the vm is `admin` with the password `admin`. This user has been granted with the Openshift Cluster Admin role.
+**NOTE** : The caching option can be used in order to export on your local file system the docker images to bootstrap the process to recreate next time the vm.
+**NOTE** : The user to use to access the vm is `admin` with the password `admin`. This user has been granted with the OpenShift Cluster Admin role.
 **NOTE** : When the vm has been created, then it can be stopped/started using the commands `minishift stop|start --profile demo`.
 
-To install the Fabric8-launcher, then use this `deploy_launcher_minishift.sh` bash script. You can specify as parameters
+To install the `Fabric8-launcher` and to play with the runtime's missions, then use this `deploy_launcher_minishift.sh` bash script. You can specify as parameters
 the user/password to be used to access OpenShift like also your github user and token to play with the Launcher - `git flow`.
 
 ```bash
 cd minishift 
 ./deploy_launcher_minishift.sh -p projectName -i username:password -g myGithubUser:myGithubToken 
+
+E.g ./deploy_launcher_minishift.sh -p devex -g myGithubUser:myGithubToken
 ```
 
 ## Virtualbox
