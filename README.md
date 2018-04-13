@@ -3,9 +3,9 @@
 This project details how to provision OpenShift Origin using different tool, bootstrapping mode, hypervisor or Cloud provider as presented within the following table
 
 | Tool      | ISO  |  Hypervisor    | Cloud Provider |
-| ------------- | -------------:| :-------------:
-| MiniShift     |  CentOS or boot2docker | Xhyve | Local Machine |
-| oc client     |  Centos 7      | Virtualbox | Local Machine |
+| ---------- | -------------:| :-------------: | ------------ |
+| MiniShift  |  CentOS or boot2docker | Xhyve | Local Machine |
+| oc client  |  Centos 7      | Virtualbox | Local Machine |
 | openshift ansible | Centos 7  | - | Hetzner |
 
 
