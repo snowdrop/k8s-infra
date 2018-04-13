@@ -46,10 +46,7 @@ help of a cloud provider - Hetzner
 
 ## Minishift
 
-To provision MiniShift with OpenShift Origin 3.9.0 and install :
-
-- Fabric8 Launcher
-- Ansible Service Broker
+To provision MiniShift with OpenShift Origin 3.9.0 and install the `Ansible Service Broker`
  
 then use the following bash script `bootstrap_vm.sh <image_cache_boolean> <ocp_version>`. 
 
@@ -73,16 +70,6 @@ cd minishift
 **NOTE** : The user to use to access the vm is `admin` with the password `admin`. This user has been granted with the OpenShift Cluster Admin role.
 
 **NOTE** : When the vm has been created, then it can be stopped/started using the commands `minishift stop|start --profile demo`.
-
-To install the `Fabric8-launcher` and to play with the runtime's missions, then use this `deploy_launcher_minishift.sh` bash script. You can specify as parameters
-the user/password to be used to access OpenShift like also your github user and token to play with the Launcher - `git flow`.
-
-```bash
-cd minishift 
-./deploy_launcher_minishift.sh -p projectName -i username:password -g myGithubUser:myGithubToken 
-
-E.g ./deploy_launcher_minishift.sh -p devex -g myGithubUser:myGithubToken
-```
 
 ## Virtualbox
 
@@ -238,4 +225,24 @@ Warning: Permanently added '192.168.99.50' (ECDSA) to the list of known hosts.
 
 See [hetzner](hetzner/README.md) page explaining how to create a cloud vm.
 
-# Turn on your OpenShift machine into a cloud Native Dev environment 
+# Turn on your OpenShift machine into a cloud Native Dev environment
+
+## Bash scripts (minishift only)
+
+Due to the limitation explained within the introduction part, we can't use the ansible playbooks created and presented hereafter 
+but instead `minishift addons` and bash script
+
+To install the `Fabric8-launcher` and to play with the runtime's missions, then use this `deploy_launcher_minishift.sh` bash script. You can specify as parameters
+the user/password to be used to access OpenShift like also your github user and token to play with the Launcher - `git flow`.
+
+```bash
+cd minishift 
+./deploy_launcher_minishift.sh -p projectName -i username:password -g myGithubUser:myGithubToken 
+
+E.g ./deploy_launcher_minishift.sh -p devex -g myGithubUser:myGithubToken
+```
+
+## Ansible playbooks
+
+See [Ansible post installation](ansible/README-post-installation.md) file to provision OpenShift with one of the features proposed.
+ 
