@@ -17,7 +17,7 @@ to play with Hands On Lab, do local demo or simply to test using one of the foll
 - Configure Master-configuration of Openshift to use `htpasswd` as identity provider
 - Enable Persistence using `hotPath` as `persistenceVolume`
 - Install Nexus Repository Server
-- Install Jenkins and configure it to trigger the build of the `s2i` build started within the Openshift project
+- Install Jenkins and configure it to trigger the build of the `s2i` builds started within the Openshift project
 - Install Distributed Tracing - Jaeger
 - Deploy the [Ansible Service Broker](http://automationbroker.io/)
 - Enable the Fabric8 [Launcher](http://fabric8-launcher)
