@@ -1,4 +1,4 @@
-# Instructions to install OpenShift 
+# Instructions to install OpenShift and Cloud Native Features
 
 This project details how to provision OpenShift Origin using different tool or bootstrapping mode, iso image, hypervisor or Cloud provider as presented within the following table
 
