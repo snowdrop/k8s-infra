@@ -1,15 +1,20 @@
 # Instructions to install OpenShift 
 
-This project details how to provision a vm with OpenShift Origin and to to install the following applications required for a Hands On Lab, local demo, test :
+This project details how to provision a vm with OpenShift Origin and to install different applications that we propose and which are required
+required to play with Hands On Lab, do local demo or simply to test.
 
-- Nexus, Jenkins, Jaeger
-- Ansible Service Broker
-- Launcher with customized catalog
+List of features available 
 
-Different provisioning mode are proposed as by example with :
+- Persistence using `hotPath` as `persistenceVolume`
+- Nexus Repository Server
+- Jenkins
+- Distributed Tracing - Jaeger
+- [Ansible Service Broker](http://automationbroker.io/)
+- [Launcher with customized catalog](fabric8-launcher)
 
-- `minishift`, we can't use ansible Playbooks to provision it and Openshift is installed as docker images and doesn;'t run as services
-- and for Centos vm (running on virtualbox, hetzner cloud, ....), we provision them using OpenShift Ansible playbooks and ocp is installed with different services, master, node, etcd, ....
+Different provisioning modes are proposed due to the existing limitations that we are currently faced. By example, top of `minishift|cdk`,
+we can't use Ansible Playbooks to provision post OpenShift installation our different features as the partitioning on the vm's filesystem doesn't allow to install easily packages.
+Bash script, execution of manual `oc` commands will then be required.  
 
 Table of Contents
 =================
@@ -26,7 +31,7 @@ Table of Contents
 
 ## Minishift
 
-To provision MiniShift with OpenShift Origin 3.7.1 and install the Ansible Service Broker, then use the 
+To provision MiniShift with OpenShift Origin 3.9.0 and install the Ansible Service Broker, then use the 
 following bash script `bootstrap_vm.sh <image_cache_bolloean> <ocp_version>`. 
 
 It will create a :
