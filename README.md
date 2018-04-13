@@ -24,7 +24,7 @@ to play with Hands On Lab, do local demo or simply to test using one of the foll
 
 **NOTE**: Due to some limitations that we are currently faced with `minishift|cdk` where
 we can't use Ansible Playbooks to provision post OpenShift installation our different features, then it will be required in this case to use 
-bash script, manual `oc` commands or `Minishift` addons to install some features available.  
+bash script, manual `oc` commands or `Minishift` addons to install some of the features available.  
 
 Table of Contents
 =================
