@@ -4,9 +4,9 @@ This project details how to provision OpenShift Origin using different tool or b
 
 | Tool       | Run As                                     | ISO                    |  Hypervisor  | Cloud Provider |
 | ---------- | ------------------------------------------ | -----------------------| :----------: | -------------- |
-| MiniShift  | `oc cluster up` -> launch docker container | CentOS or boot2docker | Xhyve        | Local Machine  |
-| oc client  | `systemctl service` & docker container     | Centos 7              | Virtualbox   | Local Machine  |
-| Ansible    | `systemctl service` & docker container     | Run As | Centos 7              | -            | Hetzner        |
+| MiniShift  | `oc cluster up` -> launch docker container | CentOS or boot2docker  | Xhyve        | Local Machine  |
+| Ansible    | `oc cluster up` -> launch docker container | Centos 7               | Virtualbox   | Local Machine  |
+| Ansible    | `systemctl service` & docker container     | Centos 7               | -            | Hetzner        |
 
 
 No matter which approach you prefer to use, you will be then able to install or configure OpenShift
