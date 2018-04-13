@@ -9,7 +9,7 @@ This project details how to provision OpenShift Origin using different tool or b
 | Ansible    |  Centos 7              | -            | Hetzner        |
 
 
-Next, you will be then able to install or configure OpenShift
+No matter which approach you will prefer to use, you will be then able to install or configure OpenShift
 to play with Hands On Lab, do local demo or simply to test using one of the following features :
 
 - Create list of user/password and their corresponding project
