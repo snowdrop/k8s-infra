@@ -1,2 +1,0 @@
-- name: Restart origin container
-  command: "docker restart origin"
