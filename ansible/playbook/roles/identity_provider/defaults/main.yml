@@ -1,4 +1,3 @@
-cluster_host_config_dir: /var/lib/origin/openshift.local.config
 users_pwd_file: users.htpasswd
 
 number_of_extra_users: 0
