@@ -70,10 +70,10 @@ ansible-playbook -i inventory/cloud_host openshift-ansible/playbooks/openshift-s
 
 - Create users and projects
 
-For the first machine the following will create the first 5 users
+For the first machine the following will create an admin user (who is granted cluster-admin priviledges) and an extra 5 users (user1 - user5)
 
 ```bash
-ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e openshift_node=masters --tags identity_provider -e number_of_extra_users=5 -e first_extra_user_offset=1 -e openshift_admin_pwd=admin
+ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e openshift_node=masters --tags identity_provider,enable_cluster_admin,add_extra_users -e number_of_extra_users=5 -e first_extra_user_offset=1 -e openshift_admin_pwd=admin
 ```
 
 This step will create 5 users with credentials like `user1/pwd1` while also creating a project for like `user1` for each user 

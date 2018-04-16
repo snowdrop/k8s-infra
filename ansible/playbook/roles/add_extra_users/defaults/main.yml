@@ -1,0 +1,4 @@
+users_pwd_file: users.htpasswd
+
+number_of_extra_users: 1
+first_extra_user_offset: 1
