@@ -79,7 +79,7 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
 This step will create 5 users with credentials like `user1/pwd1` while also creating a project for like `user1` for each user
 
 By default these users will have admin roles (although not cluster-admin) and will each have a project that corresponds to the user name.
-These defaults can be changed using the `make_users_admin` and `create_user_project` flags 
+These defaults can be changed using the `make_users_admin` and `create_user_project` flags. See [here](playbook/roles/add_extra_users/defaults/main.yml) 
 
 ## Soft clean up of an existing machine
 
