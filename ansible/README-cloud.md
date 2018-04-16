@@ -63,6 +63,8 @@ Remark : You can also select to only install specific parts by using Ansible's `
 If you would like to execute all roles except some, you can use Ansible's `--skip-tags` in the same fashion. 
 The tags can be found in ` playbook/post_installation.yml`
 
+Remark on persistence: The number of PVs to be created can be controlled by the `number_of_volumes` variable. See [here](playbook/roles/persistence/defaults/main.yml)
+
 - Install the service catalog
 ```bash
 ansible-playbook -i inventory/cloud_host openshift-ansible/playbooks/openshift-service-catalog/config.yml

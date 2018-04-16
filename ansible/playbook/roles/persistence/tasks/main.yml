@@ -1,8 +1,8 @@
-- name: Create files to mount
-  include: create_files.yml
-
 - name: Setup security
-  include: config_role_sa.yml
+  import_tasks: config_role_sa.yml
 
-- include: create_pv.yml pv_name={{ item.key }}
-  with_dict: "{{ volumes }}"
+- name: Create persistence volume
+  include_tasks: create_single_pv.yml
+  vars:
+    volume_name: "{{ volume_name_prefix }}{{ item }}"
+  with_sequence: start={{ first_volume_offset }} count={{ number_of_volumes }} format=%03d

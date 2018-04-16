@@ -1,36 +1,6 @@
-volume:
-  defaults: #define the defaults for all Persistent Volumes
-      storage: 5Gi
-      persistentVolumeReclaimPolicy: Recycle
+number_of_volumes: 10
+first_volume_offset: 1
 
-volumes:
-    pv0001:
-      storage: "{{ volume.defaults.storage }}"
-      persistentVolumeReclaimPolicy: "{{ volume.defaults.persistentVolumeReclaimPolicy }}"
-    pv0002:
-      storage: "{{ volume.defaults.storage }}"
-      persistentVolumeReclaimPolicy: "{{ volume.defaults.persistentVolumeReclaimPolicy }}"
-    pv0003:
-      storage: "{{ volume.defaults.storage }}"
-      persistentVolumeReclaimPolicy: "{{ volume.defaults.persistentVolumeReclaimPolicy }}"
-    pv0004:
-      storage: "{{ volume.defaults.storage }}"
-      persistentVolumeReclaimPolicy: "{{ volume.defaults.persistentVolumeReclaimPolicy }}"
-    pv0005:
-      storage: "{{ volume.defaults.storage }}"
-      persistentVolumeReclaimPolicy: "{{ volume.defaults.persistentVolumeReclaimPolicy }}"
-    pv0006:
-      storage: "{{ volume.defaults.storage }}"
-      persistentVolumeReclaimPolicy: "{{ volume.defaults.persistentVolumeReclaimPolicy }}"
-    pv0007:
-      storage: "{{ volume.defaults.storage }}"
-      persistentVolumeReclaimPolicy: "{{ volume.defaults.persistentVolumeReclaimPolicy }}"
-    pv0008:
-      storage: "{{ volume.defaults.storage }}"
-      persistentVolumeReclaimPolicy: "{{ volume.defaults.persistentVolumeReclaimPolicy }}"
-    pv0009:
-      storage: "{{ volume.defaults.storage }}"
-      persistentVolumeReclaimPolicy: "{{ volume.defaults.persistentVolumeReclaimPolicy }}"
-    pv0010:
-      storage: "{{ volume.defaults.storage }}"
-      persistentVolumeReclaimPolicy: "{{ volume.defaults.persistentVolumeReclaimPolicy }}"
+volume_name_prefix: pv
+volume_reclaim_policy: Recycle
+volume_storage: 5Gi
