@@ -76,7 +76,10 @@ For the first machine the following will create an admin user (who is granted cl
 ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e openshift_node=masters --tags identity_provider,enable_cluster_admin,add_extra_users -e number_of_extra_users=5 -e first_extra_user_offset=1 -e openshift_admin_pwd=admin
 ```
 
-This step will create 5 users with credentials like `user1/pwd1` while also creating a project for like `user1` for each user 
+This step will create 5 users with credentials like `user1/pwd1` while also creating a project for like `user1` for each user
+
+By default these users will have admin roles (although not cluster-admin) and will each have a project that corresponds to the user name.
+These defaults can be changed using the `make_users_admin` and `create_user_project` flags 
 
 ## Soft clean up of an existing machine
 

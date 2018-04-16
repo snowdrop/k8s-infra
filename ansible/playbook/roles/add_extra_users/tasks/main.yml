@@ -9,4 +9,27 @@
   include_role:
     name: restart_master
 
+- block:
+
+    - name: Login with admin user
+      command: oc login -u admin -p admin
+
+    - name: Grant user admin priviledges
+      command: oc adm policy add-role-to-user admin user{{ item }}
+      with_sequence: start={{ first_extra_user_offset }} count={{ number_of_extra_users }} format=%d
+
+  when: make_users_admin | bool == true
+
+- name: Create user project
+  shell: |
+    oc login -u user{{ item }} -p pwd{{ item }}
+    oc new-project user{{ item }}
+  with_sequence: start={{ first_extra_user_offset }} count={{ number_of_extra_users }} format=%d
+  when: create_user_project | bool == true
+
+- name: Login with admin user
+  command: oc login -u admin -p admin
+
+
+
 
