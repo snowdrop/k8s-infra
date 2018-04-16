@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: {{ item.key }}
+  name: {{ volume_name }}
 spec:
   capacity:
-    storage: {{ item.value.storage }}
+    storage: {{ volume_storage }}
   accessModes:
     - ReadWriteOnce
-  persistentVolumeReclaimPolicy: {{ item.value.persistentVolumeReclaimPolicy }}
+  persistentVolumeReclaimPolicy: {{ volume_reclaim_policy }}
   hostPath:
-    path: /tmp/{{ item.key }}
+    path: /tmp/{{ volume_name }}
