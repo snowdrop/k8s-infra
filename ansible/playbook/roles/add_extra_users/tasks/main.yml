@@ -5,10 +5,6 @@
   command: "htpasswd -b {{ path_users_pwd }} user{{ item }} pwd{{ item }}"
   with_sequence: start={{ first_extra_user_offset }} count={{ number_of_extra_users }} format=%d
 
-- name: Restart master
-  include_role:
-    name: restart_master
-
 - block:
 
     - name: Login with admin user
