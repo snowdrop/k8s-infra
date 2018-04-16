@@ -7,3 +7,4 @@
   shell: |
     oc adm policy add-scc-to-user hostmount-anyuid system:serviceaccount:openshift-infra:pv-recycler-controller
     oc create -f /tmp/sa-pv-recyler-controller.yml
+  ignore_errors: true
