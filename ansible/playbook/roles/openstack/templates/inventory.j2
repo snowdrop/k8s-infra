@@ -1,0 +1,54 @@
+[OSEv3:children]
+masters
+nodes
+etcd
+
+[OSEv3:vars]
+ansible_user=centos
+ansible_ssh_private_key_file=inventory/id_openstack.rsa
+
+public_ip_address={{ openstack_output.server.accessIPv4 }}
+host_key_checking=false
+
+containerized=true
+openshift_enable_excluders=false
+openshift_release=v3.9
+
+openshift_deployment_type=origin
+
+openshift_hostname={{ openstack.vm.name }}
+openshift_master_cluster_public_hostname={{ openstack_output.server.accessIPv4 }}
+openshift_master_default_subdomain={{ openstack_output.server.accessIPv4 }}.nip.io
+openshift_master_unsupported_embedded_etcd=true
+
+# To avoid message
+# - Available disk space in "/var" (9.5 GB) is below minimum recommended (40.0 GB)
+# - Docker storage drivers 'overlay' and 'overlay2' are only supported with 'xfs' as the backing storage, but this host's storage is type 'extfs'
+# - Available memory (2.0 GiB) is too far below recommended value (16.0 GiB)
+# - Docker version is higher than expected
+openshift_disable_check = docker_storage,memory_availability,disk_availability,docker_image_availability,package_version
+
+# we need to increase the pods per core because we might temporarily have multiple build pods running at the same time
+openshift_node_kubelet_args={'pods-per-core': ['20']}
+
+# ASB Service Catalog
+openshift_enable_service_catalog=false
+ansible_service_broker_registry_whitelist=[".*-apb$"]
+
+# Python Interpreter
+ansible_python_interpreter=/usr/bin/python
+
+# Enable htpasswd auth
+openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider', 'filename': '/etc/origin/master/htpasswd'}]
+# htpasswd -nb admin admin
+openshift_master_htpasswd_users={'admin': '$apr1$DloeoaY3$nqbN9fQBkyXgbj58buqEM.'}
+
+
+[masters]
+{{ openstack_output.server.accessIPv4 }} openshift_public_hostname={{ openstack_output.server.accessIPv4 }} openshift_hostname={{ openstack_output.server.private_v4 }}
+
+[etcd]
+{{ openstack_output.server.accessIPv4 }}
+
+[nodes]
+{{ openstack_output.server.accessIPv4 }} openshift_node_labels="{'region':'infra','zone':'default', 'node-role.kubernetes.io/compute': 'true'}" openshift_public_hostname={{ openstack_output.server.accessIPv4 }} openshift_hostname={{ openstack_output.server.private_v4 }}

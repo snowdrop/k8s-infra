@@ -50,4 +50,14 @@
         - "You can ssh into the newly created VM using the following command:"
         - "ssh -i {{ key_path }} centos@{{ openstack_output.server.accessIPv4 }}"
 
+  - name: Generate Openshift 3.9 inventory
+    template:
+      src: inventory.j2
+      dest: ../inventory/openstack_host
+
+  - name: Copy private key to inventory
+    copy:
+      src: "{{ key_path }}"
+      dest: ../inventory/id_openstack.rsa
+
   when: state == "present"
