@@ -14,7 +14,7 @@
   shell: ssh-keygen -b 2048 -t rsa -f {{ key_path }} -q -N ""
   when: st.stat.exists == false
 
-- name: Create SSH key to use with instances
+- name: Create SSH key to use with instance {{ openstack.vm.name }}
   os_keypair:
     state: present
     auth:
