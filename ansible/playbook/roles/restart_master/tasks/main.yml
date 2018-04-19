@@ -24,10 +24,6 @@
   - name: Restart systemd services
     command: systemctl restart {{ services_to_restart }}
 
-  - name: Wait for master to stand up
-    pause:
-      seconds: 10
-
   - set_fact:
       services_restarted: true
 
@@ -42,3 +38,7 @@
     command: "docker restart origin"
 
   when: services_restarted == false and openshift_env.containerized == true
+
+- name: Wait for master to stand up
+  pause:
+    seconds: 10

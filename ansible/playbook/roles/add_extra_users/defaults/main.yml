@@ -1,0 +1,10 @@
+users_pwd_file: users.htpasswd
+
+number_of_extra_users: 1
+first_extra_user_offset: 1
+
+# whether the extra users should be given admin rights
+make_users_admin: true
+
+# whether a project should be created for each extra user
+create_user_project: true

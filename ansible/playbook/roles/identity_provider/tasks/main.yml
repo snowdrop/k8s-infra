@@ -29,14 +29,8 @@
     mode: 0644
   when: not p.stat.exists
 
-- name: Add extra users
-  set_fact:
-    users: "{{ users }} + {{ [ { 'name': 'user' + item, 'password': 'pwd' + item } ] }}"
-  with_sequence: start={{ first_extra_user_offset }} count={{ number_of_extra_users }} format=%d
-
 - name: Create user/pwd
-  command: "htpasswd -b {{ path_users_pwd }} {{ item.name }} {{ item.password }}"
-  with_items: "{{ users }}"
+  command: "htpasswd -b {{ path_users_pwd }} {{ openshift_admin_user}} {{ openshift_admin_pwd }}"
 
 - name: Generate patch using template
   template:
