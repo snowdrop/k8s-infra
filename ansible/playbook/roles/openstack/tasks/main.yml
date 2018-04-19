@@ -1,0 +1,53 @@
+---
+
+- name: Generate keys locally and import the pub key into Openstack
+  include_tasks: keys.yml
+  when: state == "present"
+
+- name: "{{ 'Create' if state == \"present\" else 'Delete' }} {{ openstack.vm.name }} - {{ openstack.vm.title }}"
+  os_server:
+    state: "{{ state }}"
+    auth:
+      project_name: "{{ openstack.os_project_name }}"
+      username: "{{ openstack.os_username }}"
+      password: "{{ openstack.os_password }}"
+      auth_url: "{{ openstack.os_auth_url }}"
+    name: "{{ openstack.vm.name }}"
+    image: "{{ openstack.vm.image }}"
+    key_name: "{{ openstack.vm.key_name }}"
+    timeout: 200
+    flavor: "{{ openstack.vm.flavor }}"
+    auto_floating_ip: yes
+    network: "{{ openstack.vm.network }}"
+    security_groups: "{{ openstack.vm.security_group }}"
+  register: openstack_output
+
+- name: Delete key {{ openstack.sshkey_name }} from server
+  os_keypair:
+    state: absent
+    auth:
+      project_name: "{{ openstack.os_project_name }}"
+      username: "{{ openstack.os_username }}"
+      password: "{{ openstack.os_password }}"
+      auth_url: "{{ openstack.os_auth_url }}"
+    name: "{{ openstack.sshkey_name }}"
+  when: state == "absent"
+
+- name: Print Openstack output
+  debug:
+    var: openstack_output
+
+- block:
+
+  - name: Show IP addresses
+    debug:
+      msg: "VM Public IP : {{ openstack_output.server.accessIPv4 }} / VM Private IP: {{ openstack_output.server.private_v4 }}"
+
+
+  - name: Show useful ssh login info
+    debug:
+      msg:
+        - "You can ssh into the newly created VM using the following command:"
+        - "ssh -i {{ key_path }} centos@{{ openstack_output.server.accessIPv4 }}"
+
+  when: state == "present"
