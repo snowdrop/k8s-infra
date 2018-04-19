@@ -14,6 +14,17 @@ For example to override the VM flavor, one would execute the following command:
 
 To delete a VM, simply replace `"state": "present"` with `"state": "absent"`
 
+## SSH to the vm
+
+In order to ssh to the vm, you must first recuperate the floating IP address assigned to the VM like the PRivate key 
+
+TODO : How can we do that ?
+
+```bash
+ssh -i ~/.ssh/id_openstack.rsa centos@10.8.250.104
+```
+
+
 ## Update the created VM so Openshift can be installed on it
 
 After ssh-ing into the machine the following changes need to be made:
