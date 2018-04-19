@@ -1,9 +1,9 @@
-# Install all in one Openshift Origin 3.9 on an Openstack machine
+# Install all in one Openshift Origin on Openstack
 
-## Provision Machine from Openstack
+## Provision a Virtual Machine
 
-The first thing that needs to be done is to provision a fairly large CentOS machine from Openstack.
-This can of course be done via the UI or can be automated using the ansible openstack playbook like so:
+The first thing that needs to be done is to provision a fairly large CentOS virtual machine top of the Cloud operating system Openstack.
+This can of course be done via the OpenStack UI or can be automated using our Ansible openstack playbook like so:
 
 `ansible-playbook playbook/openstack.yml -e '{"state": "present", "hostname": "somehostname", "openstack": {"os_username": "username", "os_password": "password", "os_auth_url": "https://somehost:13000/v2.0/"}}'`
 
