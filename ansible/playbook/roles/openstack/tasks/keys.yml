@@ -24,3 +24,4 @@
       auth_url: "{{ openstack.os_auth_url }}"
     name: "{{ openstack.sshkey_name }}"
     public_key_file: "{{ key_path }}.pub"
+    ignore_errors: true
