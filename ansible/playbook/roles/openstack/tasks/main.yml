@@ -56,9 +56,9 @@
       mode: 0600
 
   - name: Show useful ssh login info
-      debug:
-        msg:
-          - "You can ssh into the newly created VM using the following command:"
-          - "ssh -i inventory/id_openstack.rsa centos@{{ openstack_output.server.accessIPv4 }}"
+    debug:
+      msg:
+        - "You can ssh into the newly created VM using the following command:"
+        - "ssh -i inventory/id_openstack.rsa centos@{{ openstack_output.server.accessIPv4 }}"
 
   when: state == "present"
