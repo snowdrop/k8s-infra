@@ -44,10 +44,9 @@
     debug:
       msg: "VM Public IP : {{ openstack_output.server.accessIPv4 }} / VM Private IP: {{ openstack_output.server.private_v4 }}"
 
-  - name: Generate Openshift 3.9 inventory
-    template:
-      src: inventory.j2
-      dest: ../inventory/openstack_host
+  - set_fact:
+      private_key_in_inventory: inventory/id_openstack.rsa
+      login_username: centos
 
   - name: Copy private key to inventory
     copy:
@@ -55,10 +54,34 @@
       dest: ../inventory/id_openstack.rsa
       mode: 0600
 
+  - include_role:
+      name: generate_inventory
+    vars:
+      ip_address: "{{ openstack_output.server.accessIPv4  }}"
+      private_ip_address: "{{ openstack_output.server.private_v4  }}"
+      username: "{{ login_username }}"
+      keyfile: "{{ private_key_in_inventory }}"
+      hostname: "{{ openstack.vm.name }}"
+      openshift_origin_version: "3.9"
+
+  - set_fact:
+      internal_ssh_command: "ssh -o \"StrictHostKeyChecking no\" -i {{ private_key_in_inventory }} -tt {{ login_username }}@{{ openstack_output.server.accessIPv4 }}"
+
+  - name: Disable selinux
+    command: "{{ internal_ssh_command }} \"sudo sed -i 's/^SELINUX=.*/SELINUX=disabled/g' /etc/selinux/config\""
+
+  - name: Install network manager
+    command: "{{ internal_ssh_command }} \"sudo yum install -y NetworkManager\""
+
+  - name: Reboot instance
+    command: "{{ internal_ssh_command }} \"sudo reboot\""
+    ignore_errors: true
+
   - name: Show useful ssh login info
     debug:
       msg:
         - "You can ssh into the newly created VM using the following command:"
-        - "ssh -i inventory/id_openstack.rsa centos@{{ openstack_output.server.accessIPv4 }}"
+        - "ssh -i {{ private_key_in_inventory }} {{ login_username }}@{{ openstack_output.server.accessIPv4 }}"
+
 
   when: state == "present"
