@@ -44,13 +44,6 @@
     debug:
       msg: "VM Public IP : {{ openstack_output.server.accessIPv4 }} / VM Private IP: {{ openstack_output.server.private_v4 }}"
 
-
-  - name: Show useful ssh login info
-    debug:
-      msg:
-        - "You can ssh into the newly created VM using the following command:"
-        - "ssh -i {{ key_path }} centos@{{ openstack_output.server.accessIPv4 }}"
-
   - name: Generate Openshift 3.9 inventory
     template:
       src: inventory.j2
@@ -61,5 +54,11 @@
       src: "{{ key_path }}"
       dest: ../inventory/id_openstack.rsa
       mode: 0600
+
+  - name: Show useful ssh login info
+      debug:
+        msg:
+          - "You can ssh into the newly created VM using the following command:"
+          - "ssh -i inventory/id_openstack.rsa centos@{{ openstack_output.server.accessIPv4 }}"
 
   when: state == "present"
