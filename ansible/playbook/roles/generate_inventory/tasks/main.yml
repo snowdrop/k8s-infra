@@ -1,13 +1,12 @@
 - set_fact:
-    name: "{{ 'simple' if type is defined and type == 'simple' else 'cloud'}}"
-    username: "{{ username | default('root') }}"
+    file_name: "{{ 'simple' if type is defined and type == 'simple' else 'cloud'}}"
 
 - name: Create Ansible Host file
   template:
-    src: "{{ role_path }}/templates/{{ name }}.inventory.j2"
-    dest: ../inventory/{{ name }}_host
+    src: "{{ role_path }}/templates/{{ file_name }}.inventory.j2"
+    dest: ../inventory/{{ file_name }}_host
 
 - name: Show inventory file location
   debug:
-    msg: "Inventory file created here : ../inventory/{{ name }}_host"
+    msg: "Inventory file created here : ../inventory/{{ file_name }}_host"
 

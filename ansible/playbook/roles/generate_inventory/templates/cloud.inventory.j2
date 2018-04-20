@@ -4,7 +4,10 @@ nodes
 etcd
 
 [OSEv3:vars]
-ansible_user={{ username }}
+ansible_user={{ username | default('root') }}
+{% if keyfile is defined %}
+ansible_ssh_private_key_file={{ keyfile }}
+{% endif %}
 
 public_ip_address={{ ip_address }}
 host_key_checking=false
@@ -21,7 +24,8 @@ openshift_pkg_version=-{{ openshift_origin_version }}.0
 
 openshift_deployment_type=origin
 
-openshift_hostname={{ ip_address }}
+
+openshift_hostname={{ hostname if (hostname is defined) else ip_address }}
 openshift_master_cluster_public_hostname={{ ip_address }}
 openshift_master_default_subdomain={{ ip_address }}.nip.io
 openshift_master_unsupported_embedded_etcd=true
@@ -50,17 +54,18 @@ openshift_master_htpasswd_users={'admin': '$apr1$DloeoaY3$nqbN9fQBkyXgbj58buqEM.
 
 
 {% set host_info = 'localhost ansible_connection=local' if ((use_local is defined) and (use_local | bool)) else ip_address %}
+{% set private_ip_address = private_ip_address if (private_ip_address is defined) else ip_address %}
 
 # host group for masters
 [masters]
-{{ host_info }} openshift_public_hostname={{ ip_address }} openshift_ip={{ ip_address }}
+{{ host_info }} openshift_public_hostname={{ ip_address }} openshift_hostname={{ private_ip_address }}
 
 # host group for etcd, should run on a node that is not schedulable
 [etcd]
-{{ host_info }} openshift_ip={{ ip_address }}
+{{ host_info }}
 
 # host group for worker nodes, we list master node here so that
 # openshift-sdn gets installed. We mark the master node as not
 # schedulable.
 [nodes]
-{{ host_info }} openshift_node_labels="{'region':'infra','zone':'default', 'node-role.kubernetes.io/compute': 'true'}" openshift_public_hostname={{ ip_address }} openshift_ip={{ ip_address }}
+{{ host_info }} openshift_node_labels="{'region':'infra','zone':'default', 'node-role.kubernetes.io/compute': 'true'}" openshift_public_hostname={{ ip_address }} openshift_hostname={{ private_ip_address }}
