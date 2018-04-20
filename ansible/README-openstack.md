@@ -17,34 +17,6 @@ To delete a VM, simply replace `"state": "present"` with `"state": "absent"`
 When using `"state": "present"`, the playbook will also generate an Openshift 3.9 inventory file in `inventory/cloud_host` 
 as well as the private key of the new VM as `inventory/id_openstack.rsa` 
 
-## SSH to the vm
-
-One of the last statements of the playbook provides the sample command that can be used to ssh into the newly created machine.
-It should look something like the following:
-
-```bash
-ssh -i inventory/id_openstack.rsa centos@10.8.244.25
-```
-
-
-## Update the created VM so Openshift can be installed on it
-
-After ssh-ing into the machine the following changes need to be made:
-
-* Disable selinux
-  
-  selinux can be disabled by setting `SELINUX=disabled` in `/etc/selinux/config`
-  
-* Install network manager
-
-  `sudo yum install -y NetworkManager`
-  
-* Restart VM
-  
-  This can easily be done by the Openstack UI using `Soft Reboot Instance`
-  
-## Execute openshift-ansible playbooks
-
 The openshift-ansible playbooks can now be launched like so:
 
 ```bash

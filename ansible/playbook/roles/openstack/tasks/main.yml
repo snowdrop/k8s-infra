@@ -64,6 +64,19 @@
       hostname: "{{ openstack.vm.name }}"
       openshift_origin_version: "3.9"
 
+  - set_fact:
+      internal_ssh_command: "ssh -o \"StrictHostKeyChecking no\" -i {{ private_key_in_inventory }} -tt {{ login_username }}@{{ openstack_output.server.accessIPv4 }}"
+
+  - name: Disable selinux
+    command: "{{ internal_ssh_command }} \"sudo sed -i 's/^SELINUX=.*/SELINUX=disabled/g' /etc/selinux/config\""
+
+  - name: Install network manager
+    command: "{{ internal_ssh_command }} \"sudo yum install -y NetworkManager\""
+
+  - name: Reboot instance
+    command: "{{ internal_ssh_command }} \"sudo reboot\""
+    ignore_errors: true
+
   - name: Show useful ssh login info
     debug:
       msg:
