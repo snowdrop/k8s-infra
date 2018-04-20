@@ -60,5 +60,6 @@
     copy:
       src: "{{ key_path }}"
       dest: ../inventory/id_openstack.rsa
+      mode: 0600
 
   when: state == "present"
