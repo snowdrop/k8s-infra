@@ -65,7 +65,7 @@
       openshift_origin_version: "3.9"
 
   - set_fact:
-      internal_ssh_command: "ssh -o \"StrictHostKeyChecking no\" -i {{ private_key_in_inventory }} -tt {{ login_username }}@{{ openstack_output.server.accessIPv4 }}"
+      internal_ssh_command: "ssh -o \"StrictHostKeyChecking=no\" -o \"UserKnownHostsFile=/dev/null\" -i {{ private_key_in_inventory }} -tt {{ login_username }}@{{ openstack_output.server.accessIPv4 }}"
 
   - name: Disable selinux
     command: "{{ internal_ssh_command }} \"sudo sed -i 's/^SELINUX=.*/SELINUX=disabled/g' /etc/selinux/config\""
