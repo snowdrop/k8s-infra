@@ -70,6 +70,9 @@
   - name: Disable selinux
     command: "{{ internal_ssh_command }} \"sudo sed -i 's/^SELINUX=.*/SELINUX=disabled/g' /etc/selinux/config\""
 
+  - name: Make commands under /usr/local/bin accessible to sudoers
+    command: "{{ internal_ssh_command }} \"sudo sed -i -e '/secure_path/ s[=.*[&:/usr/local/bin[' /etc/sudoers\""
+
   - name: Install network manager
     command: "{{ internal_ssh_command }} \"sudo yum install -y NetworkManager\""
 
