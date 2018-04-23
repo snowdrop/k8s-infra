@@ -73,6 +73,12 @@
   - name: Install network manager
     command: "{{ internal_ssh_command }} \"sudo yum install -y NetworkManager\""
 
+  - name: Install Ansible
+    command: "{{ internal_ssh_command }} \"yum install -y ansible\""
+
+  - name: Install Red-Hat certificates
+    command: "{{ internal_ssh_command }} \"yum install -y python-rhsm-certificates\""
+
   - name: Reboot instance
     command: "{{ internal_ssh_command }} \"sudo reboot\""
     ignore_errors: true
