@@ -1,2 +1,2 @@
 [masters]
-{{ ip_address }} public_ip_address={{ ip_address }} ansible_user={{ username }}
+{{ ip_address }} public_ip_address={{ ip_address }} ansible_user={{ username | default('root') }}
