@@ -22,5 +22,14 @@ The openshift-ansible playbooks can now be launched like so:
 ```bash
 ansible-playbook -i inventory/cloud_host openshift-ansible/playbooks/prerequisites.yml --become
 ansible-playbook -i inventory/cloud_host openshift-ansible/playbooks/deploy-playbook.yml --become
-```  
+```
+
+### Perform post installation tasks
+
+The tasks defined in the `post_installation` role are available once the cluster is setup.
+For example to grant cluster admin rights to the `admin` user and also change the admin user's password to `dummy` execute the following:
+
+```bash
+ansible-playbook -i inventory/cloud_host playbook/post_installation.yml --tags enable_cluster_admin,identity_provider -e openshift_admin_pwd=dummy --become
+```   
 
