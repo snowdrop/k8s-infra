@@ -1,11 +1,10 @@
 - set_fact:
     infra_project: "{{ infra_project | default('infra') }}"
 
-- name: Use Infra namespace/project
-  command: oc project {{ infra_project }}
+- name: Create project
+  command: oc new-project {{ infra_project }}
+  ignore_errors: true
 
-- name: Use Infra namespace/project
-  command: oc project {{ infra_project }}
 
 - name: Install Nexus App
   shell: |
