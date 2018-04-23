@@ -31,5 +31,11 @@ For example to grant cluster admin rights to the `admin` user and also change th
 
 ```bash
 ansible-playbook -i inventory/cloud_host playbook/post_installation.yml --tags enable_cluster_admin,identity_provider -e openshift_admin_pwd=dummy --become
+```
+
+Or to install Nexus:
+
+```bash
+ansible-playbook -i inventory/cloud_host playbook/post_installation.yml --tags persistence,nexus --become
 ```   
 
