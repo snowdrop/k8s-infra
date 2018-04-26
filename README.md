@@ -226,9 +226,11 @@ See [hetzner](hetzner/README.md) page explaining how to create a cloud vm.
 # Turn on your OpenShift machine into a cloud Native Dev environment 
 ## Bash scripts (minishift only)
 
-**Note** : Due to the limitation explained within the introduction, we can't use ansible playbooks to configure some of the features, we will be using `minishift addons` and bash scripts instead.
+**Note** : Due to the limitation explained within the introduction, we can't use ansible playbooks to configure some of the features proposed. 
 
-To install the `Fabric8-launcher` and play with missions / boosters, use the `deploy_launcher_minishift.sh` bash script. Using this script, you will specify an OpenShift account user/password (using the admin/admin user is recommended unless you know what you are doing), and also your github user and API access token ([get an access token here](https://github.com/settings/tokens)) - This will enable you to use the `git flow` when running missions / boosters, rather than downloading boosters as zip files and deploying them manually.
+We will then use the following bash script - `deploy_launcher_minishift.sh` instead to install the `Fabric8 launcher` and play with missions / boosters.
+Using this script, you will have to specify your OpenShift account user/password and also your github user and API access token ([get an access token here](https://github.com/settings/tokens)).
+This will enable you to use the `git flow` when running missions / boosters, rather than downloading boosters as zip files and deploying them manually.
 
 ```bash
 cd minishift 
