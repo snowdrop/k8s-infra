@@ -224,7 +224,7 @@ Warning: Permanently added '192.168.99.50' (ECDSA) to the list of known hosts.
 See [hetzner](hetzner/README.md) page explaining how to create a cloud vm.
 
 # Turn on your OpenShift machine into a cloud Native Dev environment 
-## Bash scripts (minishift only)
+## Bash script (minishift only)
 
 **Note** : Due to the limitation explained within the introduction, we can't use ansible playbooks to configure some of the features proposed. 
 
@@ -241,5 +241,5 @@ E.g ./deploy_launcher_minishift.sh -p devex -g myGithubUser:myGithubToken
 
 ## Ansible playbooks
 
-See [Ansible post installation](ansible/README-post-installation.md) file to provision OpenShift with one of the features proposed.
+See [Ansible post installation](ansible/README-post-installation.md) file to provision OpenShift with one of the Cloud Development features proposed.
  
