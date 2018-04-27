@@ -46,21 +46,15 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
 - To only install specific roles, you will pass a comma separated values list using the `--tags install_nexus,install_jaeger` parameter
 - If you would like to execute all roles except some, you can use Ansible's `--skip-tags` in the same fashion. 
 
-## Role's remarks
+## Role's command
 
-- Role : Persistence 
+- Role : identity_provider
 
-  The number of PVs to be created can be controlled by the `number_of_volumes` variable. See [here](playbook/roles/persistence/defaults/main.yml).
-  By default, 10 volumes of %Gb each will be created.
-
-- Role : Service catalog
-
-  To install the service catalog, execute this command
   ```bash
-  ansible-playbook -i inventory/cloud_host openshift-ansible/playbooks/openshift-service-catalog/config.yml
+  ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e openshift_admin_pwd=admin --tags "identity_provider"
   ```
-
-- Role : Create users and projects
+  
+- Role : add_extra_users
 
   **WARNING**: Role `identity_provider` must be executed before !
   
@@ -74,3 +68,65 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
   
   By default these users will have admin roles (although not cluster-admin) and will each have a project that corresponds to the user name.
   These defaults can be changed using the `make_users_admin` and `create_user_project` flags. See [here](playbook/roles/add_extra_users/defaults/main.yml) 
+
+- Role : enable_cluster_admin
+
+  ```bash
+  ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e openshift_admin_pwd=admin --tags "enable_cluster_admin"
+  ```
+  
+- Role : Persistence
+
+  ```bash
+  ansible-playbook -i inventory/cloud_host playbook/post_installation.yml --tags persistence -e openshift_admin_pwd=admin
+  ```
+  
+  The number of PVs to be created can be controlled by the `number_of_volumes` variable. See [here](playbook/roles/persistence/defaults/main.yml).
+  By default, 10 volumes of %Gb each will be created.
+
+- Role : install_nexus
+
+  The nexus server will be installed under the project `infra` and will contain the Red Hat proxy servers
+  
+  ```bash
+  ansible-playbook -i inventory/cloud_host playbook/post_installation.yml --tags nexus
+  ```
+
+- Role : install_jenkins
+
+  The Jenkins server will be installed under the project `infra` 
+  
+  ```bash
+  ansible-playbook -i inventory/cloud_host playbook/post_installation.yml --tags jenkins
+  ```
+
+- Role : install_jaeger
+
+  ```bash
+  ansible-playbook -i inventory/cloud_host playbook/post_installation.yml --tags jaeger
+  ```
+
+- Role : install_istio
+
+  ```bash
+  ansible-playbook -i inventory/cloud_host playbook/post_installation.yml --tags istio
+  ```
+
+- Role : install_launcher
+
+  ```bash
+  ansible-playbook -i inventory/cloud_host playbook/post_installation.yml --tags {install-launcher|uninstall-launcher}
+  ```
+
+- Role : install_oc
+
+  ```bash
+  ansible-playbook -i inventory/cloud_host playbook/post_installation.yml --tags install_oc
+  ```
+
+- Role : Service catalog
+
+  To install the service catalog, execute this command
+  ```bash
+  ansible-playbook -i inventory/cloud_host openshift-ansible/playbooks/openshift-service-catalog/config.yml
+  ```
