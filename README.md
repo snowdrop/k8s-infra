@@ -90,14 +90,14 @@ can work with different hypervisors and can better automate the process to boots
  
 1. Configure a private network between the guest and the host
 
-  This private network will be used between your machine and the Linux vm and will let you to ssh to it
-  
-  ```
-  vboxmanage hostonlyif create
-  vboxmanage hostonlyif ipconfig vboxnet0 --ip 192.168.99.1 --netmask 255.255.255.0
-  vboxmanage dhcpserver add --ifname vboxnet0 --ip 192.168.99.20 --netmask 255.255.255.0 --lowerip 192.168.99.50 --upperip 192.168.99.50
-  vboxmanage dhcpserver modify --ifname vboxnet0 --enable
-  ```
+   This private network will be used between your machine and the Linux vm and will let you to ssh to it
+   
+   ```
+   vboxmanage hostonlyif create
+   vboxmanage hostonlyif ipconfig vboxnet0 --ip 192.168.99.1 --netmask 255.255.255.0
+   vboxmanage dhcpserver add --ifname vboxnet0 --ip 192.168.99.20 --netmask 255.255.255.0 --lowerip 192.168.99.50 --upperip 192.168.99.50
+   vboxmanage dhcpserver modify --ifname vboxnet0 --enable
+   ```
 
 2. Create a Vagrant file
 
@@ -176,7 +176,7 @@ the corresponding package.
     systemctl start docker
     ```
 
-.2 Edit the file “/etc/docker/daemon.json” to specify the IP Address and the PORT on which the server can be access from the HOST:
+2. Edit the file “/etc/docker/daemon.json” to specify the IP Address and the PORT on which the server can be access from the HOST:
 
    ```json
    {
