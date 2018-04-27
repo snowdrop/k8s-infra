@@ -6,17 +6,17 @@ The table hereafter summarizes the roles available that you can call using the `
 
 | Role Name | Description  |
 | --------- | ------------ | 
-| add_extra_users | Create list of users/passwords and their corresponding project |
-| enable_cluster_admin | Grant Cluster admin role to an OpenShift user |
-| identity_provider | Set the Master-configuration of OpenShift to use `htpasswd` as its identity provider |
-| persistence | Enable Persistence using `hotPath` as `persistenceVolume` |
-| install_nexus | Install Nexus Repository Server |
-| install_jenkins | Install Jenkins and configure it to handle `s2i` builds started within an OpenShift project |
-| install_jaeger | Install Distributed Tracing - Jaeger |
-| install_istio | Install ServiceMesh - Istio |
-| service_catalog | Deploy the [Ansible Service Broker](http://automationbroker.io/) |
-| install_launcher | Install and enable the Fabric8 [Launcher](http://fabric8-launcher) |
-| install_oc | Install oc client within the vm
+| [add_extra_users](#command-add_extra_users) | Create list of users/passwords and their corresponding project |
+| [enable_cluster_admin](#command-enable_cluster_admin) | Grant Cluster admin role to an OpenShift user |
+| [identity_provider](#command-identity_provider) | Set the Master-configuration of OpenShift to use `htpasswd` as its identity provider |
+| [persistence](#command-persistence) | Enable Persistence using `hotPath` as `persistenceVolume` |
+| [install_nexus](#command-install_nexus) | Install Nexus Repository Server |
+| [install_jenkins](#command-install_jenkins) | Install Jenkins and configure it to handle `s2i` builds started within an OpenShift project |
+| [install_jaeger](#command-install_jaeger) | Install Distributed Tracing - Jaeger |
+| [install_istio](#command-install_istio) | Install ServiceMesh - Istio |
+| [service_catalog](#command-service-catalog) | Deploy the [Ansible Service Broker](http://automationbroker.io/) |
+| [install_launcher](#command-install_launcher) | Install and enable the Fabric8 [Launcher](http://fabric8-launcher) |
+| [install_oc](#command-install_oc) | Install oc client within the vm
 
 ## Prerequisite
 
@@ -48,13 +48,13 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
 
 ## Role's command
 
-- Role : identity_provider
+### Command identity_provider
 
   ```bash
   ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e openshift_admin_pwd=admin --tags "identity_provider"
   ```
   
-- Role : add_extra_users
+### Command add_extra_users
 
   **WARNING**: Role `identity_provider` must be executed before !
   
@@ -69,13 +69,13 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
   By default these users will have admin roles (although not cluster-admin) and will each have a project that corresponds to the user name.
   These defaults can be changed using the `make_users_admin` and `create_user_project` flags. See [here](playbook/roles/add_extra_users/defaults/main.yml) 
 
-- Role : enable_cluster_admin
+### Command enable_cluster_admin
 
   ```bash
   ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e openshift_admin_pwd=admin --tags "enable_cluster_admin"
   ```
   
-- Role : Persistence
+### Command Persistence
 
   ```bash
   ansible-playbook -i inventory/cloud_host playbook/post_installation.yml --tags persistence -e openshift_admin_pwd=admin
@@ -84,7 +84,7 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
   The number of PVs to be created can be controlled by the `number_of_volumes` variable. See [here](playbook/roles/persistence/defaults/main.yml).
   By default, 10 volumes of %Gb each will be created.
 
-- Role : install_nexus
+### Command install_nexus
 
   The nexus server will be installed under the project `infra` and will contain the Red Hat proxy servers
   
@@ -92,7 +92,7 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
   ansible-playbook -i inventory/cloud_host playbook/post_installation.yml --tags nexus
   ```
 
-- Role : install_jenkins
+### Command install_jenkins
 
   The Jenkins server will be installed under the project `infra` 
   
@@ -100,31 +100,31 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
   ansible-playbook -i inventory/cloud_host playbook/post_installation.yml --tags jenkins
   ```
 
-- Role : install_jaeger
+### Command install_jaeger
 
   ```bash
   ansible-playbook -i inventory/cloud_host playbook/post_installation.yml --tags jaeger
   ```
 
-- Role : install_istio
+### Command install_istio
 
   ```bash
   ansible-playbook -i inventory/cloud_host playbook/post_installation.yml --tags istio
   ```
 
-- Role : install_launcher
+### Command install_launcher
 
   ```bash
   ansible-playbook -i inventory/cloud_host playbook/post_installation.yml --tags {install-launcher|uninstall-launcher}
   ```
 
-- Role : install_oc
+### Command install_oc
 
   ```bash
   ansible-playbook -i inventory/cloud_host playbook/post_installation.yml --tags install_oc
   ```
 
-- Role : Service catalog
+### Command Service catalog
 
   To install the service catalog, execute this command
   ```bash
