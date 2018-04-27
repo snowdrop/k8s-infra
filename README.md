@@ -438,7 +438,7 @@ See [hetzner](hetzner/README.md) page explaining how to create a cloud vm.
 
 ### Private Cloud Provider - Openstack
 
-See
+See [OpenStack](ansible/README-openstack.md) page explaining how to create an OpenStack cloud vm.
 
 # Turn on your OpenShift machine into a Cloud Native Dev environment 
 
