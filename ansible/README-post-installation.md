@@ -8,7 +8,7 @@ The table hereafter summarizes the roles available that you can call using the `
 | --------- | ------------ | 
 | add_extra_users | Create list of users/passwords and their corresponding project |
 | enable_cluster_admin | Grant Cluster admin role to an OpenShift user |
-| identity_provider | Set the Master-configuration of Openshift to use `htpasswd` as its identity provider |
+| identity_provider | Set the Master-configuration of OpenShift to use `htpasswd` as its identity provider |
 | persistence | Enable Persistence using `hotPath` as `persistenceVolume` |
 | install_nexus | Install Nexus Repository Server |
 | install_jenkins | Install Jenkins and configure it to handle `s2i` builds started within an OpenShift project |
@@ -63,7 +63,7 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
   For the first machine the following will create an admin user (who is granted cluster-admin priviledges) and an extra 5 users (user1 - user5)
 
   ```bash
-  ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e openshift_node=masters --tags identity_provider,enable_cluster_admin,add_extra_users -e number_of_extra_users=5 -e first_extra_user_offset=1 -e openshift_admin_pwd=admin
+  ansible-playbook -i inventory/cloud_host playbook/post_installation.yml --tags add_extra_users -e number_of_extra_users=5 -e first_extra_user_offset=1 -e openshift_admin_pwd=admin
   ```
   
   This step will create 5 users with credentials like `user1/pwd1` while also creating a project for like `user1` for each user
