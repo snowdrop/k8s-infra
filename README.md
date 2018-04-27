@@ -225,7 +225,7 @@ summarize and present the possibilities offered:
 **NOTE**: 
 - Excepted the `option 1` where the `Minishift` tool manages the whole process to create the vm and next install the docker server, the other `options` only require a Linux VM and Docker server.
 - For `option 3 and 4`, the Linux VM must be accessible using `ssh`
-- `option2, 3 & 4` can also performed using `fedora`, `rhel` or `ubuntu` operating system but they haven't been tested and will not be presented here
+- The `option 2, 3 & 4` can also performed using `fedora`, `rhel` or `ubuntu` operating system but they haven't been tested and will not be presented here.
 
 ### Local - MiniShift
 
