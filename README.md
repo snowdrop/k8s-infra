@@ -440,6 +440,11 @@ See [hetzner](hetzner/README.md) page explaining how to create a cloud vm.
 
 See [OpenStack](ansible/README-openstack.md) page explaining how to create an OpenStack cloud vm.
 
+As the vm is running now and docker server alive, you can install `OpenShift` using either one of the following approaches :
+
+- Simple using the `oc` binary tool and the command [oc cluster up](https://github.com/openshift/origin/blob/master/docs/cluster_up_down.md) within the vm
+- More elaborated using `Ansible` tool with our `cluster` [role](ansible/README-oc.md) or with the `openshift-ansible` all-in-one playbook as described [here](ansible/README-cloud.md)
+
 # Turn on your OpenShift machine into a Cloud Native Dev environment 
 
 Independent of the approach you choose before, you'll be able to install or configure OpenShift
