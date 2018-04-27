@@ -6,16 +6,15 @@
 
 ## Instructions
 
-- To create an all in one cluster using oc cluster command, then it is required to have a CentOS vm that you can access using ssh
-
-  First you need to generate the inventory file. If the the IP address of the VM is `192.168.99.50`, then the command to be executed 
+- To create an all in one cluster using the oc cluster role, then it is required to first generate an inventory file
+  If the the IP address of the VM is `192.168.99.50`, then the command to be executed 
   
   ```bash
   cd ansible/
   ansible-playbook playbook/generate_inventory.yml -e ip_address=192.168.99.50 -e type=simple
   ```
 
-- Next you can execute one of the role available to `up`, `down` or `clean` the cluster created
+- Next you can execute one of these tags to `up`, `down` or `clean` the cluster created
 
   ```bash
   ansible-playbook -i inventory/simple_host playbook/cluster.yml --tags "up" 
