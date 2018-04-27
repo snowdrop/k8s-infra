@@ -36,7 +36,7 @@ The documentation has been designed around the following topics
 
 - Why or when to use it ? 
   - For linux container development and testing
-  - To bootstrap `OpenShift` using the `oc cluster up` command. This approach is not recommended and Minishift should then be used in this case.
+  - To bootstrap `OpenShift` using the `oc cluster up` command. This approach is not recommended and the [Minishift tool]() should then be used for that purpose.
 
 - Prerequisites 
   * [Virtualbox](https://www.virtualbox.org/wiki/Downloads)
@@ -54,18 +54,16 @@ The documentation has been designed around the following topics
 
 - Alternatively, if you prefer to install `Docker` using the docker package that you can download from [here](https://download.docker.com/mac/stable/Docker.dmg), then the following tools including docker machine
   will be installed :
-- Docker client
-- Docker compose
-- Docker machine
-- Docker credential osxkeychain
+  - Docker client
+  - Docker compose
+  - Docker machine
+  - Docker credential osxkeychain
 
 - To verify, validate if docker machine works with Virtualbox, then execute this command to create a vm named `default` using a lightweight linux distribution - [boot2docker](https://github.com/boot2docker/boot2docker) 
 
-```bash
-docker-machine create --driver virtualbox default
-```
-
-
+  ```bash
+  docker-machine create --driver virtualbox default
+  ```
 
 #### Vagrant
 
