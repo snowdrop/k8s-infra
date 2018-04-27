@@ -212,15 +212,18 @@ the corresponding package.
 
 ## Provision OpenShift
 
-As different tools / bootstrapping methods are available and serve different purposes, the following table 
-present them:
+As different tools / bootstrapping methods are available and serve different purposes to install `OpenShift`, the following table 
+summarize and present the possibilities offered:
 
-| Cloud Provider      | Tool       | Run As               | ISO                    |  Hypervisor       |
-| ------------------- | ---------- | -------------------- | -----------------------| :---------------: |
-| Local Machine       | MiniShift  | `oc cluster up`      | CentOS or boot2docker  | Xhyve, Virtualbox |
-| Local Machine       | Ansible    | `oc cluster up`      | CentOS 7               | Virtualbox        |
-| Public  - Hetzner   | Ansible    | `systemctl service`  | CentOS 7               | -                 |
-| Private - OpenStack | Ansible    | `systemctl service`  | CentOS 7               | -                 |
+| Option  | Cloud Provider      | Tool       | Run As               | ISO                    |  Hypervisor       |
+| ------: | ------------------- | ---------- | -------------------- | -----------------------| :---------------: |
+| 1 | Local Machine       | MiniShift  | `oc cluster up`      | CentOS or boot2docker  | Xhyve, Virtualbox |
+| 2 | Local Machine       | Ansible, oc    | `oc cluster up`      | CentOS 7               | Virtualbox        |
+| 3 | Remote Public  - Hetzner   | Ansible    | `systemctl service`  | CentOS 7               | -                 |
+| 4 | Remote Private - OpenStack | Ansible    | `systemctl service`  | CentOS 7               | -                 |
+
+**NOTE**: Excepted the `option 1` where the `Minishift` tool manages the whole process to create the vm and next install the docker server, the other `options` only require a Linux VM and Docker server.
+For `option 3 and 4`, the Linux VM must be accessible using `ssh` 
 
 ### Local - MiniShift
 
