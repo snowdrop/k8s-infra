@@ -1,4 +1,4 @@
-# Instructions to install OpenShift using oc cluster command
+# Instructions to install OpenShift using a cluster ansible role
 
 - To create an all in one cluster using oc cluster command, then it is required to have a CentOS vm that you can access using ssh
 
