@@ -75,7 +75,92 @@ Using docker-machine commands, you can start, inspect, stop, and restart a manag
 
 #### Vagrant
 
-TODO
+Vagrant is a Ruby tool for building and managing Linux virtual machine environments. It offers more flexibility than `docker machine` as you can select the Linux OS that you would like to run locally, 
+can work with different hypervisors and can better automate the process to bootstrap a Linux vm, configure it and execute post installations tasks. 
+
+- Prerequisites 
+  * [Virtualbox](https://www.virtualbox.org/wiki/Downloads)
+  * [Vagrant](https://releases.hashicorp.com/vagrant/2.0.4/vagrant_2.0.4_x86_64.dmg)
+  
+- Why or when to use it ? 
+  - To select the Linux OS to be tested
+  - To customize your Linux vm with your needed/requested packages
+  
+- How To
+ 
+. Configure a private network between the guest and the host
+
+  This private network will be used between your machine and the Linux vm and will let you to ssh to it
+  
+  ```
+  vboxmanage hostonlyif create
+  vboxmanage hostonlyif ipconfig vboxnet0 --ip 192.168.99.1 --netmask 255.255.255.0
+  vboxmanage dhcpserver add --ifname vboxnet0 --ip 192.168.99.20 --netmask 255.255.255.0 --lowerip 192.168.99.50 --upperip 192.168.99.50
+  vboxmanage dhcpserver modify --ifname vboxnet0 --enable
+  ```
+
+. Create a Vagrant file
+
+  ```
+  cat > Vagrantfile << 'EOF'
+  Vagrant.configure(2) do |config|
+    config.vm.box = "centos/7"
+  
+    config.vm.provider "virtualbox" do |v, override|
+      v.name = "centos-7-docker"
+      v.memory = 6144
+      v.customize ["modifyvm", :id, "--cpus", "4"]
+      v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+    end
+    
+    # Add private network
+    config.vm.network "private_network", ip: "192.168.99.50"
+    
+    # Execute post installation
+    config.vm.provision :shell, path: "post-installation.sh"
+  end    
+  EOF
+  ```
+  
+. Create a bash script containing the commands to be executed to install docker and condigure it
+  ```
+  mkdir vagrant-centos && vagrant-centos
+  
+  cat > post-installation.sh << 'EOF'
+  #!/bin/bash
+  
+  echo "Install docker, wget packages"
+  sudo yum install -y git docker wget python-rhsm-certificates
+  
+  echo "Configure docker"
+  sudo bash -c "cat > /etc/docker/daemon.json" << 'EOFILE'
+    {
+      "insecure-registries" : [ "172.30.0.0/16" ],
+      "hosts" : [ "unix://", "tcp://0.0.0.0:2376" ]
+    }
+  EOFILE
+  
+  echo "Start and enable docker service"
+  sudo groupadd docker
+  sudo usermod -aG docker vagrant
+  sudo systemctl enable docker
+  sudo systemctl start docker
+  
+  sudo sysctl -w vm.max_map_count=262144
+  EOF
+  ```  
+
+. Start Vagrant VM
+  ```
+  vagrant plugin install ssh
+  vagrant up
+  ```
+
+. ssh to the vm
+  ```
+  vagrant ssh
+  ```  
+  
 
 ### Linux
 
