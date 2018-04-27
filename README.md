@@ -486,5 +486,5 @@ E.g ./deploy_launcher_minishift.sh -p devex -g myGithubUser:myGithubToken
 
 ## Ansible playbooks
 
-See [Ansible post installation](ansible/README-post-installation.md) file to provision OpenShift with one of the Cloud Development features proposed.
+See [Ansible post installation](ansible/README-post-installation.md) file to provision OpenShift with one of the Cloud Development features.
  

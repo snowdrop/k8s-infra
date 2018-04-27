@@ -6,18 +6,6 @@
   vars:
     openshift_admin_user: admin
     openshift_admin_pwd: ''
-
-  pre_tasks:
-    - set_fact:
-        openshift_ansible_playbook_path: ../openshift-ansible/playbooks/byo/openshift-cluster/service-catalog.yml
-      when: openshift_release.find("v3.7") != -1
-      tags:
-        - install_asb
-    - set_fact:
-        openshift_ansible_playbook_path: ../openshift-ansible/playbooks/openshift-service-catalog/private/config.yml
-      when: openshift_release.find("v3.9") != -1
-      tags:
-        - install_asb
   roles:
     - { role: 'persistence',          tags: 'persistence'}          # When Minishift or oc cluster up is NOT used
     - { role: 'identity_provider',    tags: 'identity_provider'}    # Use HTPasswdPasswordIdentityProvider as Identity Provider -> more secure
@@ -35,13 +23,3 @@
     - {name: "Install launcher                 ", import_role: {name: launcher, tasks_from: install.yml},         tags: [install-launcher]}
     - {name: "Uninstall launcher               ", import_role: {name: launcher, tasks_from: uninstall.yml},       tags: [uninstall-launcher]}
     - {name: "Patch launcher-clusters configmap", import_role: {name: launcher, tasks_from: patch_configmap.yml}, tags: [uninstall-launcher]}
-
-    # Include openshift-ansible playbook to install ASB. Don't forget to git clone the project !!
-    # - include_tasks: '{{ openshift_ansible_playbook_path }}'
-    #   vars:
-    #     ansible_service_broker_registry_whitelist: [".*-apb$"]
-    #     ansible_service_broker_install: true
-    #     ansible_service_broker_registry_tag: '{{ openshift_release }}'
-    #     ansible_service_broker_image_tag: '{{ openshift_release }}'
-    #   tags:
-    #     - install_asb
