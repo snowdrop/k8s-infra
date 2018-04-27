@@ -233,7 +233,7 @@ summarize and present the possibilities offered:
 - For `option 3 and 4`, the Linux VM must be accessible using `ssh`
 - The `option 2, 3 & 4` can also performed using `fedora`, `rhel` or `ubuntu` operating system but they haven't been tested and will not be presented here.
 
-### Local Machine - Minishift
+### Local - Minishift
 
 `Minishift` is a tool that helps you to run `OpenShift` locally by launching a single-node `OpenShift` cluster inside a virtual machine.
 
