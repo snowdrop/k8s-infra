@@ -32,7 +32,15 @@ The documentation has been designed around the following topics
 
 ### Mac OSX
 
+As the MacOS operating system doesn't support natively `Linux container`, it is then required to run a `Linux` vm using either `Virtualbox` or `Xhyve` as
+hypervisor technology able to launch such virtual machine locally.
+
+Different tools, approaches exist to turn your mac into a `Containerized` platform and they are presented hereafter.
+
 #### Docker machine
+
+Docker machine is a client Tool communicating with the `Virtualbox` hypervisor and able to manage Linux VMs.
+Using docker-machine commands, you can start, inspect, stop, and restart a managed host, upgrade the Docker client and daemon, and configure a Docker client to talk to your host.
 
 - Why or when to use it ? 
   - For linux container development and testing
