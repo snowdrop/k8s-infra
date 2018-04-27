@@ -23,9 +23,8 @@ Table of Contents
 
 # Instructions to install OpenShift and Cloud Native Features
 
-This project details prerequisites and steps required to prepare the machine / environment to 
-become a Cloud Development Platform using as foundation - Linux Container and OpenShift as the
-orchestration and management platform of the containers.
+This project details the prerequisites and steps necessary to convert a machine / environment into a Cloud Development Platform using using Linux Container as a foundation and OpenShift as the
+orchestration and management platform of the those containers.
 
 The documentation has been designed around the following topics 
 
@@ -37,10 +36,10 @@ The documentation has been designed around the following topics
 
 ### Mac OSX
 
-As the MacOS operating system doesn't support natively `Linux container`, it is then required to run a `Linux` vm using either `Virtualbox` or `Xhyve` as
-hypervisor able to manage virtual machine locally.
+As the MacOS operating system doesn't natively support `Linux container`, it is then required to run a `Linux` vm using either `Virtualbox` or `Xhyve` as the
+hypervisor which is able to manage virtual machine locally.
 
-Different tools, approaches exist to turn your mac into a `Containerized` platform and they are presented hereafter.
+Various tools, approaches exist to turn your mac into a `Containerized` platform and are presented hereafter.
 
 #### Docker machine
 
@@ -168,7 +167,7 @@ can work with different hypervisors and can better automate the process to boots
   
 ### Linux
 
-For Linux native operating system, it is not by default required to use a hypervisor and then `docker` can be installed directly using 
+When using a Linux operating system, it is not by necessary to use a hypervisor and `docker` can be installed directly using 
 the corresponding package.
 
 - CentOS/Fedora
@@ -228,7 +227,7 @@ summarize and present the possibilities offered:
 | 4       | Remote Private - OpenStack | Testing, Productization                              | Ansible     | CentOS, Fedora, RHEL    | -                 |
 
 **NOTE**: 
-- Excepted the `option 1` where the `Minishift` tool manages the whole process to create the vm and next install the docker server, the other `options` only require a Linux VM and Docker server.
+- Aside from `option 1` where the `Minishift` tool manages the whole process to create the vm and next install the docker server, the other `options` only require a Linux VM and Docker server.
 - For `option 3 and 4`, the Linux VM must be accessible using `ssh`
 - The `option 2, 3 & 4` can also performed using `fedora`, `rhel` or `ubuntu` operating system but they haven't been tested and will not be presented here.
 
@@ -281,10 +280,10 @@ summarize and present the possibilities offered:
 While we can use Vagrant in combination with Virtualbox to install easily one of the vagrant boxes available such as `CentOS`, `Fedora`, `Ubuntu`, the iso image used (and its packaging)
 doesn't necessarily fit the requirements that you need.
 
-This is specifically true when you will be interested to validate a new version of `OpenShift` using as deployment tool `ansible-playbooks` which requires some `prerequisites` like also to have as
+This is specifically true when you are interested in validating a new version of `OpenShift` using `ansible-playbooks` as the deployment tool. The playooks requires some `prerequisites` in addition to having a
 primary ethernet adapter, the one to be used by the Openshift Master API (which is the Kubernetes controller, ....).
 
-For such environment, it is well suitable to customize a Linux ISO image and next to convert it to a `vmdk` file using the `cloud-init` tool to perform such additional tasks.
+For such an environment, it makes sense to customize a Linux ISO image and next to convert it to a `vmdk` file using the `cloud-init` tool to perform such additional tasks.
 
 The following section explains how you can create a customized CentOS Generic Cloud `qcow2` image and repackage it as a `vmdk` file for Virtualbox.
 
@@ -446,7 +445,7 @@ Warning: Permanently added '192.168.99.50' (ECDSA) to the list of known hosts.
 
 ### OpenShift Deployment
 
-As the vm is running now and docker server alive, you can install `OpenShift` using either one of the following approaches :
+As the vm is now running and the docker daemon is up, you can install `OpenShift` using either one of the following approaches :
 
 - Simple using the `oc` binary tool and the command [oc cluster up](https://github.com/openshift/origin/blob/master/docs/cluster_up_down.md) within the vm
 - More elaborated using `Ansible` tool with our `cluster` [role](ansible/README-oc.md) or with the `openshift-ansible` all-in-one playbook as described [here](ansible/README-cloud.md)
