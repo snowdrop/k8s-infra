@@ -243,33 +243,33 @@ summarize and present the possibilities offered:
 
 - How To
 
-1. Download and [install](https://docs.openshift.org/latest/minishift/getting-started/installing.html) `Minishift` using latest release available
-
-2. Start it locally
-
-   ```bash
-   minishift start
-   ```
+  1. Download and [install](https://docs.openshift.org/latest/minishift/getting-started/installing.html) `Minishift` using latest release available
+  
+  2. Start it locally
+  
+     ```bash
+     minishift start
+     ```
  
-3. For a more complex scenario where additional features are required, then you can (re)use the following bash script - `bootstrap_vm.sh <image_cache_boolean> <ocp_version>`. 
-   It will create a `centos7` vm using `xhyve` hypervisor and next execute this list of tasks
-
-   - Create a MiniShift `demo` profile
-   - Git clone `MiniShift addons` repo to install the `ansible-service-broker`
-   - Enable/disable `MiniShift` cache (according to the `boolean` parameter)
-   - Install the docker images within the OpenShift registry, according to the ocp version defined
-   - Start `MiniShift` using the experimental features
-   
-   ```bash
-   cd minishift    
-   ./bootstrap_vm.sh true 3.9.0
-   ```
-   
-   **NOTE** : The caching option can be used in order to export the docker images locally, which will speed up the bootstrap process next time you recreate the OpenShift virtual machine / installation.
-   
-   **NOTE** : The user to use to access the OpenShift installation is `admin` with the password `admin`. This user has been granted the OpenShift Cluster Admin role.
-   
-   **NOTE** : Once the virtual machine has been created, it can be stopped/started using the commands `minishift stop|start --profile demo`.
+  3. For a more complex scenario where additional features are required, then you can (re)use the following bash script - `bootstrap_vm.sh <image_cache_boolean> <ocp_version>`. 
+     It will create a `centos7` vm using `xhyve` hypervisor and next execute this list of tasks
+  
+     - Create a MiniShift `demo` profile
+     - Git clone `MiniShift addons` repo to install the `ansible-service-broker`
+     - Enable/disable `MiniShift` cache (according to the `boolean` parameter)
+     - Install the docker images within the OpenShift registry, according to the ocp version defined
+     - Start `MiniShift` using the experimental features
+     
+     ```bash
+     cd minishift    
+     ./bootstrap_vm.sh true 3.9.0
+     ```
+     
+     **NOTE** : The caching option can be used in order to export the docker images locally, which will speed up the bootstrap process next time you recreate the OpenShift virtual machine / installation.
+     
+     **NOTE** : The user to use to access the OpenShift installation is `admin` with the password `admin`. This user has been granted the OpenShift Cluster Admin role.
+     
+     **NOTE** : Once the virtual machine has been created, it can be stopped/started using the commands `minishift stop|start --profile demo`.
 
 ### Local - Virtualbox Hypervisor
 
