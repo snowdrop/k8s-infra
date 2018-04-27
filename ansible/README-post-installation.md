@@ -141,6 +141,27 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
   ansible-playbook -i inventory/cloud_host playbook/post_installation.yml \
      --tags {install-launcher|uninstall-launcher}
   ```
+  
+    
+  The `launcher` role also accepts the following parameters that can be added using Ansible's `extra-vars` [syntax](http://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html#passing-variables-on-the-command-line):
+  
+  
+| Name | Description  | Default
+| --------- | ------------ | ------------ |
+| launcher_project_name | The project where the launcher will be installed | devex |
+| launcher_github_username | The github username to use |  |
+| launcher_github_token | The github token to use |  |
+| launcher_keycloak_url | The keycloak URL to use |  |
+| launcher_keycloak_realm | The keycloak realm to use | |
+| launcher_openshift_user | The launcher openshift user | admin |
+| launcher_openshift_pwd | The launcher openshift user | admin |
+| launcher_template_version | The launcher template version | master |
+| launcher_template_name | The launcher template name | fabric8-launcher |  
+| launcher_template_url | The launcher template URL | https://raw.githubusercontent.com/fabric8-launcher/launcher-openshift-templates/master/openshift/launcher-template.yaml |  
+| launcher_catalog_git_repo | Git Repo where the catalog is defined | https://github.com/fabric8-launcher/launcher-booster-catalog.git |  
+| launcher_catalog_git_branch | Git branch where the catalog is defined | master |  
+| launcher_template_name | The project where the launcher will be installed | devex |  
+| launcher_keycloak_template_name | The project where the launcher will be installed | devex |  
 
 ### Command install_oc
 
