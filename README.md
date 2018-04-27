@@ -303,7 +303,7 @@ As MacOS users can't execute natively the linux commands such as , part of the d
 
 2. Move to the `install/cloud-init` directory mounted into the vm by vagrant
    ```bash
-   cd install/cloud-init 
+   cd install 
    ```
 
 #### Common steps
@@ -386,7 +386,7 @@ To automatically create a new Virtualbox VM using the customized CentOS ISO imag
 - Start vm and configure SSH Port forward
 
 ```bash
-cd virtualbox/build-centos-iso/cloud-init 
+cd virtualbox'
 ./create-vm.sh </LOCAL/HOME/DIR>
 ```
 Example:
