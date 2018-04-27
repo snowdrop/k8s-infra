@@ -61,7 +61,7 @@ Using docker-machine commands, you can start, inspect, stop, and restart a manag
   ```
 
 - Alternatively, if you prefer to install `Docker` using the docker package that you can download from [here](https://download.docker.com/mac/stable/Docker.dmg), then the following tools including docker machine
-  will be installed :
+  will be also installed :
   - Docker client
   - Docker compose
   - Docker machine
