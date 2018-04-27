@@ -1,8 +1,10 @@
 # Instructions to install OpenShift using a cluster ansible role
 
-- Prerequisite:
+## Prerequisite:
   - Linux VM (CentOS7, ...) that you can ssh and where your public key has been imported
   - Ansible [2.4](http://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
+
+## Instructions
 
 - To create an all in one cluster using oc cluster command, then it is required to have a CentOS vm that you can access using ssh
 
