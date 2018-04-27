@@ -1,19 +1,25 @@
 Table of Contents
 =================
 
+   * [Table of Contents](#table-of-contents)
    * [Instructions to install OpenShift and Cloud Native Features](#instructions-to-install-openshift-and-cloud-native-features)
       * [Become a Docker Machine](#become-a-docker-machine)
+         * [Mac OSX](#mac-osx)
+            * [Docker machine](#docker-machine)
+            * [Vagrant](#vagrant)
+         * [Linux](#linux)
       * [Provision OpenShift](#provision-openshift)
-         * [Local - MiniShift](#local---minishift)
-         * [Local - Virtualbox](#local---virtualbox)
+         * [Local Machine - Minishift](#local-machine---minishift)
+         * [Local - Customized Linux VM](#local---customized-linux-vm)
             * [MacOS's users only](#macoss-users-only)
             * [Common steps](#common-steps)
             * [Create CentOS vm on VirtualBox](#create-centos-vm-on-virtualbox)
          * [Public Cloud Provider - Hetzner](#public-cloud-provider---hetzner)
          * [Private Cloud Provider - Openstack](#private-cloud-provider---openstack)
-   * [Turn on your OpenShift machine into a cloud Native Dev environment](#turn-on-your-openshift-machine-into-a-cloud-native-dev-environment)
+   * [Turn on your OpenShift machine into a Cloud Native Dev environment](#turn-on-your-openshift-machine-into-a-cloud-native-dev-environment)
       * [Bash script (minishift only)](#bash-script-minishift-only)
       * [Ansible playbooks](#ansible-playbooks)
+
 
 
 # Instructions to install OpenShift and Cloud Native Features
