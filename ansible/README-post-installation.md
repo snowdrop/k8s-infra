@@ -124,6 +124,16 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
   ansible-playbook -i inventory/cloud_host playbook/post_installation.yml \
      --tags istio
   ```
+ 
+    
+  The `istio` role also accepts the following parameters that can be added using Ansible's `extra-vars` [syntax](http://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html#passing-variables-on-the-command-line):
+  
+  
+| Name | Description  | Default
+| --------- | ------------ | ------------ |
+| istio_git_repo | The git repository where the ansible playbook for installing Istio exists | https://github.com/istio/istio.git |
+| istio_git_branch | The git branch where the ansible playbook for installing Istio exists | master |
+| istio_repo_dest | Directory where the project will be cloned on the target machine | ~/.istio/playbooks |
 
 ### Command install_launcher
 
