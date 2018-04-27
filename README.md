@@ -218,7 +218,7 @@ summarize and present the possibilities offered:
 | Option  | Cloud Provider             | Purpose                                              | Tool        | ISO                     |  Hypervisor       |
 | ------: | ---------------------------| ---------------------------------------------------- | ----------- | ------------------------| :---------------: |
 | 1       | Local Machine              | Local dvlpt                                          | Minishift   | CentOS or boot2docker   | Xhyve, Virtualbox |
-| 2       | Local Machine              | Local dvlpt, test new oc release, validate playbooks | Ansible, oc | CentOS                  | Virtualbox        |
+| 2       | Local Machine              | Local dvlpt, test new oc release, validate playbooks | Ansible     | CentOS                  | Virtualbox        |
 | 3       | Remote Public  - Hetzner   | Demo, Hands On Lab machine                           | Ansible     | CentOS, Fedora, RHEL    | -                 |
 | 4       | Remote Private - OpenStack | Testing, Productization                              | Ansible     | CentOS, Fedora, RHEL    | -                 |
 
@@ -271,9 +271,17 @@ summarize and present the possibilities offered:
      
      **NOTE** : Once the virtual machine has been created, it can be stopped/started using the commands `minishift stop|start --profile demo`.
 
-### Local - Virtualbox Hypervisor
+### Local - Customized Linux VM
 
-This section explains how you can create a customized CentOS Generic Cloud `qcow2` image and repackage it as a `vmdk` file for Virtualbox.
+While we can use Vagrant in combination with Virtualbox to install easily one of the vagrant boxes available such as `CentOS`, `Fedora`, `Ubuntu`, the iso image used (and its packaging)
+doesn't necessarily fit the requirements that you need.
+
+This is specifically true when you will be interested to validate a new version of `OpenShift` using as deployment tool `ansible-playbooks` which requires some `prerequisites` like also to have as
+primary ethernet adapter, the one to be used by the Openshift Master API (which is the Kubernetes controller, ....).
+
+For such environment, it is well suitable to customize a Linux ISO image and next to convert it to a `vmdk` file using the `cloud-init` tool to perform such additional tasks.
+
+The following section explains how you can create a customized CentOS Generic Cloud `qcow2` image and repackage it as a `vmdk` file for Virtualbox.
 
 #### MacOS's users only
 
