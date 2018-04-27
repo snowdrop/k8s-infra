@@ -89,7 +89,7 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
   ```
   
   The number of PVs to be created can be controlled by the `number_of_volumes` variable. See [here](playbook/roles/persistence/defaults/main.yml).
-  By default, 10 volumes of %Gb each will be created.
+  By default, 10 volumes of 5Gb each will be created.
 
 ### Command install_nexus
 
