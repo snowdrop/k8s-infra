@@ -1,47 +1,46 @@
-# Instructions to install OpenShift and Cloud Native Features
-
-This project details how to provision OpenShift Origin using different tools / bootstrapping methods such as: a pre-built ISO image, native hypervisor, or Cloud provider as presented below:
-
-| Tool       | Run As               | ISO                    |  Hypervisor  | Cloud Provider |
-| ---------- | -------------------- | -----------------------| :----------: | -------------- |
-| MiniShift  | `oc cluster up`      | CentOS or boot2docker  | Xhyve        | Local Machine  |
-| Ansible    | `oc cluster up`      | Centos 7               | Virtualbox   | Local Machine  |
-| Ansible    | `systemctl service`  | Centos 7               | -            | Hetzner        |
-
-
-Independent of the approach you choose, you'll be able to install or configure OpenShift
-to play with the Hands On Lab, run local demos, or simply test one of the following features of the OpenShift system:
-
-- Create list of users/passwords and their corresponding projects
-- Grant Cluster admin role to an OpenShift user 
-- Set the Master-configuration of Openshift to use `htpasswd` as its identity provider
-- Enable Persistence using `hotPath` as `persistenceVolume`
-- Install Nexus Repository Server
-- Install Jenkins and configure it to handle `s2i` builds started within the OpenShift project
-- Install Distributed Tracing - Jaeger
-- Install ServiceMesh - Istio
-- Deploy the [Ansible Service Broker](http://automationbroker.io/)
-- Install and enable the Fabric8 [Launcher](http://fabric8-launcher)
-
-**NOTE**: Due to some limitations we are currently facing with `minishift|cdk`, where
-we can't use Ansible Playbooks to provision our different features once OpenShift is installed, we will instead use 
-bash script, manual `oc` commands or `Minishift` addons to install some of the features.  
-
 Table of Contents
 =================
 
-   * [Installation of Openshift](#installation-of-openshift)
-      * [Minishift](#minishift)
-      * [Virtualbox](#virtualbox)
-         * [MacOS's users only](#macoss-users-only)
-         * [Common steps](#common-steps)
-         * [Create CentOS vm on Virtualbox](#create-centos-vm-on-virtualbox)
-      * [Using Cloud Provider - Hetzner](#using-cloud-provider---hetzner)
+   * [Instructions to install OpenShift and Cloud Native Features](#instructions-to-install-openshift-and-cloud-native-features)
+      * [Become a Docker Machine](#become-a-docker-machine)
+      * [Provision OpenShift](#provision-openshift)
+         * [Local - MiniShift](#local---minishift)
+         * [Local - Virtualbox](#local---virtualbox)
+            * [MacOS's users only](#macoss-users-only)
+            * [Common steps](#common-steps)
+            * [Create CentOS vm on VirtualBox](#create-centos-vm-on-virtualbox)
+         * [Public Cloud Provider - Hetzner](#public-cloud-provider---hetzner)
+         * [Private Cloud Provider - Openstack](#private-cloud-provider---openstack)
    * [Turn on your OpenShift machine into a cloud Native Dev environment](#turn-on-your-openshift-machine-into-a-cloud-native-dev-environment)
+      * [Bash script (minishift only)](#bash-script-minishift-only)
+      * [Ansible playbooks](#ansible-playbooks)
 
-# Installation of Openshift
 
-## Minishift
+# Instructions to install OpenShift and Cloud Native Features
+
+This project details prerequisites and steps required to prepare your machine / environment to :
+
+- Become a Docker machine
+- Next, to provision OpenShift and
+- Finally to turn it on into a Cloud Native Developer Box 
+
+## Become a Docker Machine
+
+TODO
+
+## Provision OpenShift
+
+As different tools / bootstrapping methods are available and serve different purposes, the following table 
+present them:
+
+| Tool       | Run As               | ISO                    |  Hypervisor  | Cloud Provider      |
+| ---------- | -------------------- | -----------------------| :----------: | ------------------- |
+| MiniShift  | `oc cluster up`      | CentOS or boot2docker  | Xhyve        | Local Machine       |
+| Ansible    | `oc cluster up`      | CentOS 7               | Virtualbox   | Local Machine       |
+| Ansible    | `systemctl service`  | CentOS 7               | -            | Hetzner (Public)    |
+| Ansible    | `systemctl service`  | CentOS 7               | -            | OpenStack (Private) |
+
+### Local - MiniShift
 
 This section explains how to provision OpenShift Origin 3.9.0 using `MiniShift`, a bare metal CentOS vm running a Docker daemon or with the help of a cloud provider - (In this case, [Hetzner](https://www.hetzner.com/)), and the following additional projects:
 
@@ -69,11 +68,11 @@ cd minishift
 
 **NOTE** : Once the virtual machine has been created, it can be stopped/started using the commands `minishift stop|start --profile demo`.
 
-## Virtualbox
+### Local - Virtualbox
 
 This section explains how you can create a customized CentOS Generic Cloud `qcow2` image and repackage it as a `vmdk` file for Virtualbox.
 
-### MacOS's users only
+#### MacOS's users only
 
 As MacOS users can't execute natively all the linux commands, part of the different bash scripts, it is required to create a Linux vm on virtualbox:
 
@@ -91,7 +90,7 @@ vagrant ssh
 cd install 
 ```
 
-### Common steps
+#### Common steps
 
 In order to prepare the Centos VM for the cloud, we are using the [cloud-init](http://cloudinit.readthedocs.io/en/latest) tool which is a set of python scripts and utilities to make your cloud images be all they can be! 
 
@@ -158,7 +157,7 @@ ls -la $HOME/images
 -rw-r--r--    1 dabou  staff       374784 Mar 15 09:06 vbox-config.iso
 ```
 
-### Create CentOS vm on VirtualBox
+#### Create CentOS vm on VirtualBox
 
 To automatically create a new Virtualbox VM using the customized CentOS ISO image (the `iso` file including the `cloud-init` config files), execute the following script `create_vm.sh` on the machine running VirtualBox. This script will perform the following tasks:
 
@@ -219,14 +218,35 @@ Warning: Permanently added '192.168.99.50' (ECDSA) to the list of known hosts.
 [root@cloud ~]# 
 ```
 
-## Using Cloud Provider - Hetzner
+### Public Cloud Provider - Hetzner
 
 See [hetzner](hetzner/README.md) page explaining how to create a cloud vm.
 
+### Private Cloud Provider - Openstack
+
+See
+
 # Turn on your OpenShift machine into a cloud Native Dev environment 
+
+Independent of the approach you choose before, you'll be able to install or configure OpenShift
+to play with the Hands On Lab, run local demos, or simply test one of the following features:
+
+- Create list of users/passwords and their corresponding project
+- Grant Cluster admin role to an OpenShift user 
+- Set the Master-configuration of Openshift to use `htpasswd` as its identity provider
+- Enable Persistence using `hotPath` as `persistenceVolume`
+- Install Nexus Repository Server
+- Install Jenkins and configure it to handle `s2i` builds started within an OpenShift project
+- Install Distributed Tracing - Jaeger
+- Install ServiceMesh - Istio
+- Deploy the [Ansible Service Broker](http://automationbroker.io/)
+- Install and enable the Fabric8 [Launcher](http://fabric8-launcher)
+
 ## Bash script (minishift only)
 
-**Note** : Due to the limitation explained within the introduction, we can't use ansible playbooks to configure some of the features proposed. 
+**NOTE**: Due to some limitations we are currently facing with `minishift|cdk`, where
+we can't use Ansible Playbooks to provision our different features once OpenShift is installed, we will instead use 
+bash script, manual `oc` commands or `Minishift` addons to install some of the features.  
 
 We will then use the following bash script - `deploy_launcher_minishift.sh` instead to install the `Fabric8 launcher` and play with missions / boosters.
 Using this script, you will have to specify your OpenShift account user/password and also your github user and API access token ([get an access token here](https://github.com/settings/tokens)).
