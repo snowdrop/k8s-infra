@@ -113,8 +113,10 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
 
   ```bash
   ansible-playbook -i inventory/cloud_host playbook/post_installation.yml \
-     --tags jaeger
+     --tags jaeger \
+     -e infra_project=infra
   ```
+  **WARNING**: the `infra_project` parameter is mandatory
 
 ### Command install_istio
 
