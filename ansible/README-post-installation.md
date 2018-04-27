@@ -16,6 +16,7 @@ The table hereafter summarizes the roles available that you can call using the `
 | install_istio | Install ServiceMesh - Istio |
 | service_catalog | Deploy the [Ansible Service Broker](http://automationbroker.io/) |
 | install_launcher | Install and enable the Fabric8 [Launcher](http://fabric8-launcher) |
+| install_oc | Install oc client within the vm
 
 ## Prerequisite
 
