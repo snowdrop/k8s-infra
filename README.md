@@ -285,37 +285,36 @@ The following section explains how you can create a customized CentOS Generic Cl
 
 #### MacOS's users only
 
-As MacOS users can't execute natively all the linux commands, part of the different bash scripts, it is required to create a Linux vm on virtualbox:
+As MacOS users can't execute natively the linux commands such as , part of the different bash scripts, it is required to create a Linux vm on virtualbox first:
 
-- Create and start a vm on virtualbox
-```bash
-cd virtualbox/build-centos-iso
-vagrant plugin install vagrant-vbguest
-vagrant plugin install sshd
-vagrant up
-vagrant ssh
-```
+1. Create and start a vm on virtualbox
+   ``bash
+   cd virtualbox/build-centos-iso
+   vagrant plugin install vagrant-vbguest
+   vagrant plugin install ssh
+   vagrant up
+   vagrant ssh
+   ``
 
-- Move to the `install` directory mounted into the vm by vagrant
-```bash
-cd install 
-```
+2. Move to the `install/cloud-init` directory mounted into the vm by vagrant
+   ```bash
+   cd install/cloud-init 
+   ```
 
 #### Common steps
 
 In order to prepare the Centos VM for the cloud, we are using the [cloud-init](http://cloudinit.readthedocs.io/en/latest) tool which is a set of python scripts and utilities to make your cloud images be all they can be! 
 
-We will use this tool to install our Cloud on Virtualbox, with your own parameters such as:
+We will use this tool to configure post installation our vm on Virtualbox, with these parameters :
 
 - Network configuration (NAT, vboxnet),
 - User : `root`, pwd : `centos`
 - Additionally add non root user, user, password, ssh authorized key, 
 - yum packages, ...
 
-
 **Note** : Centos 7 ISO packages include version `0.7.9` of the `cloud-init` tool by default. 
 
-To prepare your CentOS image (the `iso` file that Virtualbox will use to bootstrap your vm), you will have to execute the following script, which will perform the following tasks :
+To prepare the CentOS image (the `iso` file that Virtualbox will use to bootstrap your vm), you will have to execute the bash script `./new-iso.sh`, which will perform the following tasks :
 
 - Add your SSH public key within the `user-data` file using as input the `user-data.tpl` file 
 - Package the files `user-data` and `meta-data` within an ISO file created using `genisoimage` application
@@ -326,7 +325,6 @@ To prepare your CentOS image (the `iso` file that Virtualbox will use to bootstr
 Execute this bash script to repackage the CentOS ISO image and pass your parameters for `</LOCAL/HOME/DIR>` and the name of the Generic Cloud Centos file `<QCOW2_IMAGE_NAME>`, which the script downloads from `http://cloud.centos.org/centos/7/images/`
 
 ```bash
-cd virtualbox/build-centos-iso/cloud-init
 ./new-iso.sh </LOCAL/HOME/DIR> <QCOW2_IMAGE_NAME> <BOOLEAN_RESIZE_QCOQ_IMAGE>
 ```
 
