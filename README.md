@@ -438,7 +438,7 @@ See [hetzner](hetzner/README.md) page explaining how to create a cloud vm.
 
 ### Private Cloud Provider - Openstack
 
-See [OpenStack](ansible/README-openstack.md) page explaining how to create an OpenStack cloud vm.
+See [OpenStack](openstack/README.md) page explaining how to create an OpenStack cloud vm.
 
 As the vm is running now and docker server alive, you can install `OpenShift` using either one of the following approaches :
 
