@@ -33,12 +33,12 @@ TODO
 As different tools / bootstrapping methods are available and serve different purposes, the following table 
 present them:
 
-| Tool       | Run As               | ISO                    |  Hypervisor  | Cloud Provider      |
-| ---------- | -------------------- | -----------------------| :----------: | ------------------- |
-| MiniShift  | `oc cluster up`      | CentOS or boot2docker  | Xhyve        | Local Machine       |
-| Ansible    | `oc cluster up`      | CentOS 7               | Virtualbox   | Local Machine       |
-| Ansible    | `systemctl service`  | CentOS 7               | -            | Hetzner (Public)    |
-| Ansible    | `systemctl service`  | CentOS 7               | -            | OpenStack (Private) |
+| Cloud Provider      | Tool       | Run As               | ISO                    |  Hypervisor       |
+| ------------------- | ---------- | -------------------- | -----------------------| :---------------: |
+| Local Machine       | MiniShift  | `oc cluster up`      | CentOS or boot2docker  | Xhyve, Virtualbox |
+| Local Machine       | Ansible    | `oc cluster up`      | CentOS 7               | Virtualbox        |
+| Public - Hetzner    | Ansible    | `systemctl service`  | CentOS 7               | -                 |
+| Private - OpenStack | Ansible    | `systemctl service`  | CentOS 7               | -                 |
 
 ### Local - MiniShift
 
