@@ -88,7 +88,7 @@ can work with different hypervisors and can better automate the process to boots
   
 - How To
  
-. Configure a private network between the guest and the host
+1. Configure a private network between the guest and the host
 
   This private network will be used between your machine and the Linux vm and will let you to ssh to it
   
@@ -99,7 +99,7 @@ can work with different hypervisors and can better automate the process to boots
   vboxmanage dhcpserver modify --ifname vboxnet0 --enable
   ```
 
-. Create a Vagrant file
+2. Create a Vagrant file
 
   ```
   cat > Vagrantfile << 'EOF'
@@ -122,7 +122,7 @@ can work with different hypervisors and can better automate the process to boots
   EOF
   ```
   
-. Create a bash script containing the commands to be executed to install docker and condigure it
+3. Create a bash script containing the commands to be executed to install docker and condigure it
   ```
   mkdir vagrant-centos && vagrant-centos
   
@@ -150,63 +150,65 @@ can work with different hypervisors and can better automate the process to boots
   EOF
   ```  
 
-. Start Vagrant VM
+4. Start Vagrant VM
   ```
   vagrant plugin install ssh
   vagrant up
   ```
 
-. ssh to the vm
+5. ssh to the vm
   ```
   vagrant ssh
   ```  
   
-
 ### Linux
+
+For Linux native operating system, it is not by default required to use a hypervisor and then `docker` can be installed directly using 
+the corresponding package.
 
 - CentOS/Fedora
 
-. Install Atomic docker package (if not yet done):
+1. Install Atomic docker package (if not yet done):
 
-```bash
-yum install docker
-systemctl enable docker
-systemctl start docker
-```
+    ```bash
+    yum install docker
+    systemctl enable docker
+    systemctl start docker
+    ```
 
-. Edit the file “/etc/docker/daemon.json” to specify the IP Address and the PORT on which the server can be access from the HOST:
+.2 Edit the file “/etc/docker/daemon.json” to specify the IP Address and the PORT on which the server can be access from the HOST:
 
-```json
-{
-"insecure-registries" : [ "172.30.0.0/16" ],
-"hosts" : [ "unix://", "tcp://0.0.0.0:2376" ]
-}
-```
+   ```json
+   {
+   "insecure-registries" : [ "172.30.0.0/16" ],
+   "hosts" : [ "unix://", "tcp://0.0.0.0:2376" ]
+   }
+   ```
 
-. Define the `DOCKER_HOST` env var within the HOST machine
+3. Define the `DOCKER_HOST` env var within the HOST machine
 
-```bash
-export DOCKER_HOST=tcp://ETHERNET_IP_ADDRESS:2376
-```
+   ```bash
+   export DOCKER_HOST=tcp://ETHERNET_IP_ADDRESS:2376
+   ```
 
 - Ubuntu
 
-. Follow installation instructions for Docker CE at https://docs.docker.com/install/linux/docker-ce/ubuntu/
-. Create the following file (and directories, if necessary)
+1. Follow installation instructions for Docker CE at https://docs.docker.com/install/linux/docker-ce/ubuntu/
+2. Create the following file (and directories, if necessary)
 
-```
-/etc/systemd/system/docker.service.d/overlay.conf
-[Service]
-ExecStart=
-ExecStart=/usr/bin/dockerd -H tcp://0.0.0.0:2376 -H unix:///var/run/docker.sock --label provider=generic --insecure-registry 172.30.0.0/16
-Environment=
-```
+   ```
+   /etc/systemd/system/docker.service.d/overlay.conf
+   [Service]
+   ExecStart=
+   ExecStart=/usr/bin/dockerd -H tcp://0.0.0.0:2376 -H unix:///var/run/docker.sock --label provider=generic --insecure-registry 172.30.0.0/16
+   Environment=
+   ```
 
-. Run the following commands
-```bash
-sudo systemctl daemon-reload
-sudo systemctl restart docker
-```
+3. Run the following commands
+   ```bash
+   sudo systemctl daemon-reload
+   sudo systemctl restart docker
+   ```
 
 ## Provision OpenShift
 
