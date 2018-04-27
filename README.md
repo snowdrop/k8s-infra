@@ -9,7 +9,7 @@ Table of Contents
             * [Vagrant](#vagrant)
          * [Linux](#linux)
       * [Provision OpenShift](#provision-openshift)
-         * [Local Machine - Minishift](#local-machine---minishift)
+         * [Local - Minishift](#local---minishift)
          * [Local - Customized Linux VM](#local---customized-linux-vm)
             * [MacOS's users only](#macoss-users-only)
             * [Common steps](#common-steps)
@@ -19,7 +19,6 @@ Table of Contents
    * [Turn on your OpenShift machine into a Cloud Native Dev environment](#turn-on-your-openshift-machine-into-a-cloud-native-dev-environment)
       * [Bash script (minishift only)](#bash-script-minishift-only)
       * [Ansible playbooks](#ansible-playbooks)
-
 
 
 # Instructions to install OpenShift and Cloud Native Features
