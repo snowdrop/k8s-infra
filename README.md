@@ -30,7 +30,76 @@ The documentation has been designed around the following topics
 
 ## Become a Docker Machine
 
+### Mac OSX
+
+#### Docker machine
+
+- Prerequisites 
+  * [Virtualbox](https://www.virtualbox.org/wiki/Downloads)
+
+- Follow installation instructions for Docker machine at https://docs.docker.com/machine/install-machine/ or execute the following commands
+  within a terminal. Change the version of the `docker-machine` according to the latest version published [here](https://github.com/docker/machine/releases/)
+```bash
+base=https://github.com/docker/machine/releases/download/v0.14.0 &&
+curl -L $base/docker-machine-$(uname -s)-$(uname -m) >/usr/local/bin/docker-machine &&
+chmod +x /usr/local/bin/docker-machine
+```
+
+**NOTE**: If you install `Docker` using the [dmg package](https://download.docker.com/mac/stable/Docker.dmg), then the following tools will be installed :
+- Docker client
+- Docker compose
+- Docker machine
+- Docker credential osxkeychain
+
+#### Vagrant
+
 TODO
+
+### Linux
+
+- CentOS/Fedora
+
+. Install Atomic docker package (if not yet done):
+
+```bash
+yum install docker
+systemctl enable docker
+systemctl start docker
+```
+
+. Edit the file “/etc/docker/daemon.json” to specify the IP Address and the PORT on which the server can be access from the HOST:
+
+```json
+{
+"insecure-registries" : [ "172.30.0.0/16" ],
+"hosts" : [ "unix://", "tcp://0.0.0.0:2376" ]
+}
+```
+
+. Define the `DOCKER_HOST` env var within the HOST machine
+
+```bash
+export DOCKER_HOST=tcp://ETHERNET_IP_ADDRESS:2376
+```
+
+- Ubuntu
+
+. Follow installation instructions for Docker CE at https://docs.docker.com/install/linux/docker-ce/ubuntu/
+. Create the following file (and directories, if necessary)
+
+```
+/etc/systemd/system/docker.service.d/overlay.conf
+[Service]
+ExecStart=
+ExecStart=/usr/bin/dockerd -H tcp://0.0.0.0:2376 -H unix:///var/run/docker.sock --label provider=generic --insecure-registry 172.30.0.0/16
+Environment=
+```
+
+. Run the following commands
+```bash
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+```
 
 ## Provision OpenShift
 
