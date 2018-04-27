@@ -33,7 +33,7 @@ The documentation has been designed around the following topics
 ### Mac OSX
 
 As the MacOS operating system doesn't support natively `Linux container`, it is then required to run a `Linux` vm using either `Virtualbox` or `Xhyve` as
-hypervisor technology able to launch such virtual machine locally.
+hypervisor able to manage virtual machine locally.
 
 Different tools, approaches exist to turn your mac into a `Containerized` platform and they are presented hereafter.
 
