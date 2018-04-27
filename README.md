@@ -9,17 +9,17 @@ Table of Contents
             * [Vagrant](#vagrant)
          * [Linux](#linux)
       * [Provision OpenShift](#provision-openshift)
-         * [Local - Minishift](#local---minishift)
-         * [Local - Customized Linux VM](#local---customized-linux-vm)
+         * [Option 1 : Local - Minishift](#option-1--local---minishift)
+         * [Option 2 : Local - Customized Linux VM](#option-2--local---customized-linux-vm)
             * [MacOS's users only](#macoss-users-only)
             * [Common steps](#common-steps)
             * [Create CentOS vm on VirtualBox](#create-centos-vm-on-virtualbox)
-         * [Public Cloud Provider - Hetzner](#public-cloud-provider---hetzner)
-         * [Private Cloud Provider - Openstack](#private-cloud-provider---openstack)
+         * [Option 3 : Public Cloud Provider - Hetzner](#option-3--public-cloud-provider---hetzner)
+         * [Option 4 : Private Cloud Provider - Openstack](#option-4--private-cloud-provider---openstack)
+         * [OpenShift Deployment](#openshift-deployment)
    * [Turn on your OpenShift machine into a Cloud Native Dev environment](#turn-on-your-openshift-machine-into-a-cloud-native-dev-environment)
       * [Bash script (minishift only)](#bash-script-minishift-only)
       * [Ansible playbooks](#ansible-playbooks)
-
 
 # Instructions to install OpenShift and Cloud Native Features
 
@@ -232,7 +232,7 @@ summarize and present the possibilities offered:
 - For `option 3 and 4`, the Linux VM must be accessible using `ssh`
 - The `option 2, 3 & 4` can also performed using `fedora`, `rhel` or `ubuntu` operating system but they haven't been tested and will not be presented here.
 
-### Local - Minishift
+### Option 1 : Local - Minishift
 
 `Minishift` is a tool that helps you to run `OpenShift` locally by launching a single-node `OpenShift` cluster inside a virtual machine.
 
@@ -276,7 +276,7 @@ summarize and present the possibilities offered:
      
      **NOTE** : Once the virtual machine has been created, it can be stopped/started using the commands `minishift stop|start --profile demo`.
 
-### Local - Customized Linux VM
+### Option 2 : Local - Customized Linux VM
 
 While we can use Vagrant in combination with Virtualbox to install easily one of the vagrant boxes available such as `CentOS`, `Fedora`, `Ubuntu`, the iso image used (and its packaging)
 doesn't necessarily fit the requirements that you need.
@@ -432,13 +432,19 @@ Warning: Permanently added '192.168.99.50' (ECDSA) to the list of known hosts.
 [root@cloud ~]# 
 ```
 
-### Public Cloud Provider - Hetzner
+- Move to `OpenShift deployment` [section](#openshift-deployment) to see how to provision the local VM.
 
-See [hetzner](hetzner/README.md) page explaining how to create a cloud vm.
+### Option 3 : Public Cloud Provider - Hetzner
 
-### Private Cloud Provider - Openstack
+- See [hetzner](hetzner/README.md) page explaining how to create a cloud vm.
+- Move to `OpenShift deployment` [section](#openshift-deployment) to see how to provision the local VM.
 
-See [OpenStack](openstack/README.md) page explaining how to create an OpenStack cloud vm.
+### Option 4 : Private Cloud Provider - Openstack
+
+- See [OpenStack](openstack/README.md) page explaining how to create an OpenStack cloud vm.
+- Move to `OpenShift deployment` [section](#openshift-deployment) hereafter to see how to provision the local VM.
+
+### OpenShift Deployment
 
 As the vm is running now and docker server alive, you can install `OpenShift` using either one of the following approaches :
 
