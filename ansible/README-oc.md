@@ -1,7 +1,8 @@
 # Instructions to install OpenShift using a cluster ansible role
 
-## Prerequisite:
-  - Linux VM (CentOS7, ...) that you can ssh and where your public key has been imported
+## Prerequisite
+
+  - Linux VM (CentOS7, ...) running, that you can ssh on port 22 and where your public key has been imported
   - Ansible [2.4](http://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
 
 ## Instructions

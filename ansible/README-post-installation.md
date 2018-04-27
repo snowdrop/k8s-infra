@@ -17,6 +17,12 @@ The table hereafter summarizes the roles available that you can call using the `
 | service_catalog | Deploy the [Ansible Service Broker](http://automationbroker.io/) |
 | install_launcher | Install and enable the Fabric8 [Launcher](http://fabric8-launcher) |
 
+## Prerequisite
+
+  - Linux VM (CentOS7, ...) running, that you can ssh on port 22 and where your public key has been imported
+  - Ansible [2.4](http://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
+  - OpenShift installed using `cluster` role or `openshift playbook`
+
 ## General command
 
 The post_installation playbook, that yu can execute as presented hereafter performs various tasks.
