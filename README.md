@@ -18,11 +18,15 @@ Table of Contents
 
 # Instructions to install OpenShift and Cloud Native Features
 
-This project details prerequisites and steps required to prepare your machine / environment to :
+This project details prerequisites and steps required to prepare the machine / environment to 
+become a Cloud Development Platform using as foundation - Linux Container and OpenShift as the
+orchestration and management platform of the containers.
+
+The documentation has been designed around the following topics 
 
 - Become a Docker machine
 - Next, to provision OpenShift and
-- Finally to turn it on into a Cloud Native Developer Box 
+- Finally to turn it on into a Cloud Native Developer Box !
 
 ## Become a Docker Machine
 
@@ -37,7 +41,7 @@ present them:
 | ------------------- | ---------- | -------------------- | -----------------------| :---------------: |
 | Local Machine       | MiniShift  | `oc cluster up`      | CentOS or boot2docker  | Xhyve, Virtualbox |
 | Local Machine       | Ansible    | `oc cluster up`      | CentOS 7               | Virtualbox        |
-| Public - Hetzner    | Ansible    | `systemctl service`  | CentOS 7               | -                 |
+| Public  - Hetzner   | Ansible    | `systemctl service`  | CentOS 7               | -                 |
 | Private - OpenStack | Ansible    | `systemctl service`  | CentOS 7               | -                 |
 
 ### Local - MiniShift
@@ -68,7 +72,7 @@ cd minishift
 
 **NOTE** : Once the virtual machine has been created, it can be stopped/started using the commands `minishift stop|start --profile demo`.
 
-### Local - Virtualbox
+### Local - Virtualbox Hypervisor
 
 This section explains how you can create a customized CentOS Generic Cloud `qcow2` image and repackage it as a `vmdk` file for Virtualbox.
 
@@ -226,7 +230,7 @@ See [hetzner](hetzner/README.md) page explaining how to create a cloud vm.
 
 See
 
-# Turn on your OpenShift machine into a cloud Native Dev environment 
+# Turn on your OpenShift machine into a Cloud Native Dev environment 
 
 Independent of the approach you choose before, you'll be able to install or configure OpenShift
 to play with the Hands On Lab, run local demos, or simply test one of the following features:
