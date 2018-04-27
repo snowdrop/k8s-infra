@@ -61,6 +61,8 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
 
 - Role : Create users and projects
 
+  **WARNING**: Role `identity_provider` must be executed before !
+  
   For the first machine the following will create an admin user (who is granted cluster-admin priviledges) and an extra 5 users (user1 - user5)
 
   ```bash
