@@ -227,33 +227,49 @@ summarize and present the possibilities offered:
 - For `option 3 and 4`, the Linux VM must be accessible using `ssh`
 - The `option 2, 3 & 4` can also performed using `fedora`, `rhel` or `ubuntu` operating system but they haven't been tested and will not be presented here.
 
-### Local - MiniShift
+### Local Machine - Minishift
 
-This section explains how to provision OpenShift Origin 3.9.0 using `MiniShift`, a bare metal CentOS vm running a Docker daemon or with the help of a cloud provider - (In this case, [Hetzner](https://www.hetzner.com/)), and the following additional projects:
+`Minishift` is a tool that helps you to run `OpenShift` locally by launching a single-node `OpenShift` cluster inside a virtual machine.
 
-- Fabric8 Launcher
-- Ansible Service Broker
+- Why or when to use it ? 
+  - To try out `OpenShift` or develop with it, day-to-day, on your local machine
+  - `ansible playbooks` can't be use to perform post installation tasks
+  - `addons` exist to install additional features but syntax is very basic
+
+- Prerequisites
+  - [Xhyve](https://docs.openshift.org/latest/minishift/getting-started/setting-up-virtualization-environment.html#setting-up-xhyve-driver) OR 
+  - [Virtualbox](https://docs.openshift.org/latest/minishift/getting-started/setting-up-virtualization-environment.html#setting-up-virtualbox-driver) OR 
+  - [Hyperkit](https://docs.openshift.org/latest/minishift/getting-started/setting-up-virtualization-environment.html#setting-up-hyperkit-driver) hypervisor is installed
+
+- How To
+
+1. Download and [install](https://docs.openshift.org/latest/minishift/getting-started/installing.html) `Minishift` using latest release available
+
+2. Start it locally
+
+   ```bash
+   minishift start
+   ```
  
-First, use the following bash script `bootstrap_vm.sh <image_cache_boolean> <ocp_version>`, which will create a `centos7` vm using the `xhyve` hypervisor.
+3. For a more complex scenario where additional features are required, then you can (re)use the following bash script - `bootstrap_vm.sh <image_cache_boolean> <ocp_version>`. 
+   It will create a `centos7` vm using `xhyve` hypervisor and next execute this list of tasks
 
-Here is a summary of what the script will do:
-
-- Create a MiniShift `demo` profile
-- Git clone `MiniShift addons` repo to install the `ansible-service-broker`
-- Enable/disable `MiniShift` cache (according to the `boolean` parameter)
-- Install the docker images within the OpenShift registry, according to the ocp version defined
-- Start `MiniShift` using the experimental features
-
-```bash
-cd minishift    
-./bootstrap_vm.sh true 3.9.0
-```
-
-**NOTE** : The caching option can be used in order to export the docker images locally, which will speed up the bootstrap process next time you recreate the OpenShift virtual machine / installation.
-
-**NOTE** : The user to use to access the OpenShift installation is `admin` with the password `admin`. This user has been granted the OpenShift Cluster Admin role.
-
-**NOTE** : Once the virtual machine has been created, it can be stopped/started using the commands `minishift stop|start --profile demo`.
+   - Create a MiniShift `demo` profile
+   - Git clone `MiniShift addons` repo to install the `ansible-service-broker`
+   - Enable/disable `MiniShift` cache (according to the `boolean` parameter)
+   - Install the docker images within the OpenShift registry, according to the ocp version defined
+   - Start `MiniShift` using the experimental features
+   
+   ```bash
+   cd minishift    
+   ./bootstrap_vm.sh true 3.9.0
+   ```
+   
+   **NOTE** : The caching option can be used in order to export the docker images locally, which will speed up the bootstrap process next time you recreate the OpenShift virtual machine / installation.
+   
+   **NOTE** : The user to use to access the OpenShift installation is `admin` with the password `admin`. This user has been granted the OpenShift Cluster Admin role.
+   
+   **NOTE** : Once the virtual machine has been created, it can be stopped/started using the commands `minishift stop|start --profile demo`.
 
 ### Local - Virtualbox Hypervisor
 
