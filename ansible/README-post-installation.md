@@ -61,7 +61,10 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
   For the first machine the following will create an admin user (who is granted cluster-admin priviledges) and an extra 5 users (user1 - user5)
 
   ```bash
-  ansible-playbook -i inventory/cloud_host playbook/post_installation.yml --tags add_extra_users -e number_of_extra_users=5 -e first_extra_user_offset=1 -e openshift_admin_pwd=admin
+  ansible-playbook -i inventory/cloud_host playbook/post_installation.yml --tags add_extra_users \
+     -e number_of_extra_users=5 \
+     -e first_extra_user_offset=1 \
+     -e openshift_admin_pwd=admin
   ```
   
   This step will create 5 users with credentials like `user1/pwd1` while also creating a project for like `user1` for each user
@@ -72,13 +75,17 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
 ### Command enable_cluster_admin
 
   ```bash
-  ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e openshift_admin_pwd=admin --tags "enable_cluster_admin"
+  ansible-playbook -i inventory/cloud_host playbook/post_installation.yml \
+     -e openshift_admin_pwd=admin \
+     --tags "enable_cluster_admin"
   ```
   
 ### Command Persistence
 
   ```bash
-  ansible-playbook -i inventory/cloud_host playbook/post_installation.yml --tags persistence -e openshift_admin_pwd=admin
+  ansible-playbook -i inventory/cloud_host playbook/post_installation.yml \
+    --tags persistence \
+    -e openshift_admin_pwd=admin
   ```
   
   The number of PVs to be created can be controlled by the `number_of_volumes` variable. See [here](playbook/roles/persistence/defaults/main.yml).
@@ -89,7 +96,8 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
   The nexus server will be installed under the project `infra` and will contain the Red Hat proxy servers
   
   ```bash
-  ansible-playbook -i inventory/cloud_host playbook/post_installation.yml --tags nexus
+  ansible-playbook -i inventory/cloud_host playbook/post_installation.yml \
+     --tags nexus
   ```
 
 ### Command install_jenkins
@@ -97,31 +105,36 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
   The Jenkins server will be installed under the project `infra` 
   
   ```bash
-  ansible-playbook -i inventory/cloud_host playbook/post_installation.yml --tags jenkins
+  ansible-playbook -i inventory/cloud_host playbook/post_installation.yml \
+     --tags jenkins
   ```
 
 ### Command install_jaeger
 
   ```bash
-  ansible-playbook -i inventory/cloud_host playbook/post_installation.yml --tags jaeger
+  ansible-playbook -i inventory/cloud_host playbook/post_installation.yml \
+     --tags jaeger
   ```
 
 ### Command install_istio
 
   ```bash
-  ansible-playbook -i inventory/cloud_host playbook/post_installation.yml --tags istio
+  ansible-playbook -i inventory/cloud_host playbook/post_installation.yml \
+     --tags istio
   ```
 
 ### Command install_launcher
 
   ```bash
-  ansible-playbook -i inventory/cloud_host playbook/post_installation.yml --tags {install-launcher|uninstall-launcher}
+  ansible-playbook -i inventory/cloud_host playbook/post_installation.yml \
+     --tags {install-launcher|uninstall-launcher}
   ```
 
 ### Command install_oc
 
   ```bash
-  ansible-playbook -i inventory/cloud_host playbook/post_installation.yml --tags install_oc
+  ansible-playbook -i inventory/cloud_host playbook/post_installation.yml \
+     --tags install_oc
   ```
 
 ### Command Service catalog
