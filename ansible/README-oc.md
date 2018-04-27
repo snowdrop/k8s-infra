@@ -6,8 +6,8 @@
 
 ## Instructions
 
-- To create an all in one cluster using the oc cluster role, then it is required to first generate an inventory file
-  If the the IP address of the VM is `192.168.99.50`, then the command to be executed 
+- To create an all in one cluster using the oc cluster role, then it is required to first generate an inventory file.
+  If the the IP address of the VM is `192.168.99.50`, then the command to be executed is
   
   ```bash
   cd ansible/
