@@ -21,7 +21,8 @@ add_ssh_key(){
 ##
 gen_iso(){
     echo "##### 2. Generating ISO file containing user-data, meta-data files and used by cloud-init at bootstrap"
-    genisoimage -output ${IMAGE_DIR}/vbox-config.iso -volid cidata -joliet -r meta-data user-data
+    # genisoimage -output ${IMAGE_DIR}/vbox-config.iso -volid cidata -joliet -r meta-data user-data
+    mkisofs -output ${IMAGE_DIR}/vbox-config.iso -volid cidata -joliet -r meta-data user-data
 }
 
 ##
