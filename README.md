@@ -215,12 +215,12 @@ the corresponding package.
 As different tools / bootstrapping methods are available and serve different purposes to install `OpenShift`, the following table 
 summarize and present the possibilities offered:
 
-| Option  | Cloud Provider             | Purpose                                              | Tool        | Run As               | ISO                     |  Hypervisor       |
-| ------: | ---------------------------| ---------------------------------------------------- | ----------- | -------------------- | ------------------------| :---------------: |
-| 1       | Local Machine              | Local dvlpt                                          | Minishift   | `oc cluster up`      | CentOS or boot2docker   | Xhyve, Virtualbox |
-| 2       | Local Machine              | Local dvlpt, test new oc release, validate playbooks | Ansible, oc | `oc cluster up`      | CentOS                  | Virtualbox        |
-| 3       | Remote Public  - Hetzner   | Demo, Hands On Lab machine                           | Ansible     | `systemctl service`  | CentOS, Fedora, RHEL    | -                 |
-| 4       | Remote Private - OpenStack | Testing, Productization                              | Ansible     | `systemctl service`  | CentOS, Fedora, RHEL    | -                 |
+| Option  | Cloud Provider             | Purpose                                              | Tool        | ISO                     |  Hypervisor       |
+| ------: | ---------------------------| ---------------------------------------------------- | ----------- | ------------------------| :---------------: |
+| 1       | Local Machine              | Local dvlpt                                          | Minishift   | CentOS or boot2docker   | Xhyve, Virtualbox |
+| 2       | Local Machine              | Local dvlpt, test new oc release, validate playbooks | Ansible, oc | CentOS                  | Virtualbox        |
+| 3       | Remote Public  - Hetzner   | Demo, Hands On Lab machine                           | Ansible     | CentOS, Fedora, RHEL    | -                 |
+| 4       | Remote Private - OpenStack | Testing, Productization                              | Ansible     | CentOS, Fedora, RHEL    | -                 |
 
 **NOTE**: 
 - Excepted the `option 1` where the `Minishift` tool manages the whole process to create the vm and next install the docker server, the other `options` only require a Linux VM and Docker server.
