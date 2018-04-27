@@ -44,13 +44,13 @@ The documentation has been designed around the following topics
 - Follow installation instructions for Docker machine at https://docs.docker.com/machine/install-machine/ or execute the following commands
   within a terminal. 
   
-**WARNING**: Change the version of the `docker-machine` according to the latest version published [here](https://github.com/docker/machine/releases/)
+  **WARNING**: Change the version of the `docker-machine` according to the latest version published [here](https://github.com/docker/machine/releases/)
 
-```bash
-base=https://github.com/docker/machine/releases/download/v0.14.0 &&
-curl -L $base/docker-machine-$(uname -s)-$(uname -m) >/usr/local/bin/docker-machine &&
-chmod +x /usr/local/bin/docker-machine
-```
+  ```bash
+  base=https://github.com/docker/machine/releases/download/v0.14.0 &&
+  curl -L $base/docker-machine-$(uname -s)-$(uname -m) >/usr/local/bin/docker-machine &&
+  chmod +x /usr/local/bin/docker-machine
+  ```
 
 - Alternatively, if you prefer to install `Docker` using the docker package that you can download from [here](https://download.docker.com/mac/stable/Docker.dmg), then the following tools including docker machine
   will be installed :
