@@ -23,6 +23,7 @@
       - "Parameters used to create the application from the template : "
       - "LAUNCHER_BOOSTER_CATALOG_REPOSITORY={{ launcher_catalog_git_repo }}"
       - "LAUNCHER_BOOSTER_CATALOG_REF={{ launcher_catalog_git_branch }}"
+      - "LAUNCHER_BOOSTER_CATALOG_FILTER={{ launcher_catalog_filter }}"
       - "LAUNCHER_KEYCLOAK_URL={{ launcher_keycloak_url }}"
       - "LAUNCHER_KEYCLOAK_REALM={{ launcher_keycloak_realm }}"
       - "LAUNCHER_MISSIONCONTROL_OPENSHIFT_USERNAME={{ launcher_openshift_user }}"
@@ -37,6 +38,7 @@
     oc new-app {{ launcher_template_name }}  -n {{ launcher_project_name }} \
         -p LAUNCHER_BOOSTER_CATALOG_REPOSITORY={{ launcher_catalog_git_repo }} \
         -p LAUNCHER_BOOSTER_CATALOG_REF={{ launcher_catalog_git_branch }} \
+        -p LAUNCHER_BOOSTER_CATALOG_FILTER={{ launcher_catalog_filter }} \
         -p LAUNCHER_KEYCLOAK_URL={{ launcher_keycloak_url }} \
         -p LAUNCHER_KEYCLOAK_REALM={{ launcher_keycloak_realm }} \
         -p LAUNCHER_MISSIONCONTROL_OPENSHIFT_USERNAME={{ launcher_openshift_user }} \
