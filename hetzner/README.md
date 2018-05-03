@@ -45,10 +45,11 @@ systemctl enable NetworkManager
 systemctl start NetworkManager
 ```
 
-like also :
+as well as :
  
  - `Ansible` as `openshift_env` role uses the Ansible Python scripts
  - `python-rhsm-certificates` which is required to access the Red Hat Docker registry
+ - `atomic` which is needed during the Openshift 3.10 installation
 
 ```bash
 yum install -y ansible python-rhsm-certificates
