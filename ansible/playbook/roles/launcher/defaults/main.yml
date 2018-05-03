@@ -22,8 +22,5 @@ launcher_catalog_git_branch: master
 
 launcher_openshift_console_url: https://192.168.99.50:8443/
 
-# Address used to configure the endpoint of the launcher-cluster configMAps
-launcher_openshift_consoleUrl: https://192.168.99.50:8443/
-
 launcher_keycloak_template_name: launcher-keycloak
 launcher_catalog_filter: 
