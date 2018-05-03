@@ -161,7 +161,8 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
 | launcher_catalog_git_repo | Git Repo where the catalog is defined | https://github.com/fabric8-launcher/launcher-booster-catalog.git |  
 | launcher_catalog_git_branch | Git branch where the catalog is defined | master |  
 | launcher_catalog_filter | The filter used to limit which catalog entries will appear |  |  
-| launcher_openshift_console_url | The URL where the Openshift console is accessible | https://192.168.99.50:8443/ |  
+| launcher_openshift_console_url | The URL where the Openshift console is accessible | Looked up automatically using `oc` |  
+| launcher_openshift_api_url | The URL of the Openshift API | https://openshift.default.svc.cluster.local |  
 | launcher_keycloak_template_name | The project where the launcher will be installed | devex |  
 
 ### Command install_oc
