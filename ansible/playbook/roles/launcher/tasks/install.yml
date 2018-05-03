@@ -12,6 +12,17 @@
   register: r_get_template
   ignore_errors: true
 
+- block:
+
+  - name: Get openshift URL
+    command: oc whoami --show-server
+    register: openshift_url
+
+  - set_fact:
+      launcher_openshift_console_url: "{{ openshift_url.stdout }}"
+
+  when: "not launcher_openshift_console_url == ''"
+
 - name: Deploy the Launcher template
   command: oc create -n {{ launcher_project_name }} -f https://raw.githubusercontent.com/fabric8-launcher/launcher-openshift-templates/{{ launcher_template_version }}/openshift/launcher-template.yaml
   when: r_get_template.stdout == ""
@@ -29,7 +40,7 @@
       - "LAUNCHER_MISSIONCONTROL_OPENSHIFT_USERNAME={{ launcher_openshift_user }}"
       - "LAUNCHER_MISSIONCONTROL_OPENSHIFT_PASSWORD={{ launcher_openshift_pwd }}"
       - "LAUNCHER_MISSIONCONTROL_OPENSHIFT_CONSOLE_URL={{ launcher_openshift_console_url }}"
-      - "LAUNCHER_MISSIONCONTROL_OPENSHIFT_API_URL={{ launcher_openshift_console_url }}"
+      - "LAUNCHER_MISSIONCONTROL_OPENSHIFT_API_URL={{ launcher_openshift_api_url }}"
       - "LAUNCHER_MISSIONCONTROL_GITHUB_USERNAME={{ launcher_github_username }}"
       - "LAUNCHER_MISSIONCONTROL_GITHUB_TOKEN={{ launcher_github_token }}"
 
@@ -44,6 +55,6 @@
         -p LAUNCHER_MISSIONCONTROL_OPENSHIFT_USERNAME={{ launcher_openshift_user }} \
         -p LAUNCHER_MISSIONCONTROL_OPENSHIFT_PASSWORD={{ launcher_openshift_pwd }} \
         -p LAUNCHER_MISSIONCONTROL_OPENSHIFT_CONSOLE_URL={{ launcher_openshift_console_url }} \
-        -p LAUNCHER_MISSIONCONTROL_OPENSHIFT_API_URL={{ launcher_openshift_console_url }} \
+        -p LAUNCHER_MISSIONCONTROL_OPENSHIFT_API_URL={{ launcher_openshift_api_url }} \
         -p LAUNCHER_MISSIONCONTROL_GITHUB_USERNAME={{ launcher_github_username }} \
         -p LAUNCHER_MISSIONCONTROL_GITHUB_TOKEN={{ launcher_github_token }}
