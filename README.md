@@ -311,7 +311,8 @@ To create from the Centos ISO file a VirtualDisk that Virtualbox can use, you wi
 
 **WARNING** : The following tools `virtualbox, mkisofs, wget` are required on your machine before to execute the bash script !
 
-Execute this bash script where you pass as parameters directory containing the ISO, vdi files `</LOCAL/HOME/DIR>` and the name of the Generic Cloud file `<IMAGE_NAME>` to be downloaded,
+Execute this bash script where you pass as parameter, the directory containing the ISO, vdi files `</LOCAL/HOME/DIR>` and the name of the Generic Cloud file `<IMAGE_NAME>` to be downloaded
+and next repackaged
 
 ```bash
 ./new-iso.sh </PATH/TO/IMAGES/DIR> <IMAGE_NAME>
