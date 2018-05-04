@@ -12,7 +12,7 @@ Table of Contents
          * [Option 1 : Local - Minishift](#option-1--local---minishift)
          * [Option 2 : Local - Customized Linux VM](#option-2--local---customized-linux-vm)
             * [Create vdi file from Cloud ISO file](#create-vdi-file-from-cloud-iso-file)
-            * [Create CentOS vm on VirtualBox](#create-centos-vm-on-virtualbox)
+            * [Create CentOS vm on VirtualBox](#create-vm-on-virtualbox)
          * [Option 3 : Public Cloud Provider - Hetzner](#option-3--public-cloud-provider---hetzner)
          * [Option 4 : Private Cloud Provider - Openstack](#option-4--private-cloud-provider---openstack)
          * [OpenShift Deployment](#openshift-deployment)
@@ -347,13 +347,15 @@ ls -la $HOME/images
 -rw-r--r--    1 dabou  staff      131072 May  4 14:43 vbox-config.iso
 ```
 
-#### Create CentOS vm on VirtualBox
+#### Create VM on VirtualBox
 
-To automatically create a new Virtualbox VM using the customized CentOS Cloud image, execute the following script `create_vm.sh` on the machine running VirtualBox. This script will perform the following tasks:
+To automate the process to create a vm top of `Virtualbox`, you will then execute the following script `create_vm.sh`.
+
+This script will perform the following tasks:
 
 - Power off the virtual machine if it is running
 - Unregister the vm `$VIRTUAL_BOX_NAME` and delete it
-- Rename Centos `vdj` to `disk.vdi`
+- Rename Centos `vdi` to `disk.vdi`
 - Resize the `vdi` disk to `15GB`
 - Create `vboxnet0` network and set dhcp server IP : `192.168.99.50/24`
 - Create Virtual Machine
