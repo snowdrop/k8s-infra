@@ -283,7 +283,7 @@ doesn't necessarily fit the requirements that you need.
 This is specifically true when you are interested in validating a new version of `OpenShift` using `ansible-playbooks` as the deployment tool. The playooks requires some `prerequisites` in addition to having a
 primary ethernet adapter, the one to be used by the Openshift Master API (which is the Kubernetes controller, ....).
 
-For such an environment, it makes sense to customize a Linux ISO image and next to convert it to a `vmdk` file using the `cloud-init` tool to perform such additional tasks.
+For such an environment, it makes sense to customize a Linux ISO image and next to convert it to a `vdi` file using the `cloud-init` tool to perform such additional tasks.
 
 The following section explains how you can create a customized CentOS Generic Cloud image and repackage it as a `vdi` file for Virtualbox.
 
@@ -358,7 +358,7 @@ To automatically create a new Virtualbox VM using the customized CentOS Cloud im
 - Create Virtual Machine
 - Define NIC adapters; NAT accessing internet and `vboxnet0` to create a private network between the host and the guest
 - Customize vm; ram, cpu, ...
-- Create IDE Controller, attach iso dvd and vmdk disk
+- Create IDE Controller, attach iso dvd and vdi disk
 - Start vm and configure SSH Port forward
 
 ```bash
@@ -378,7 +378,7 @@ VBoxManage: error: Could not find a registered machine named 'CentOS-7'
 VBoxManage: error: Details: code VBOX_E_OBJECT_NOT_FOUND (0x80bb0001), component VirtualBoxWrap, interface IVirtualBox, callee nsISupports
 VBoxManage: error: Context: "FindMachine(Bstr(VMName).raw(), machine.asOutParam())" at line 153 of file VBoxManageMisc.cpp
 No VM by name CentOS-7
-######### Copy disk.vmdk created
+######### Copy disk.vdi created
 ######### Create vboxnet0 network and set dhcp server : 192.168.99.0/24
 0%...10%...20%...30%...40%...50%...60%...70%...80%...90%...100%
 0%...10%...20%...30%...40%...50%...60%...70%...80%...90%...100%
@@ -389,7 +389,7 @@ UUID: e5ca6778-2405-40cf-ba4b-5843f2da802a
 Settings file: '/Users/dabou/VirtualBox VMs/CentOS-7/CentOS-7.vbox'
 ######### Define NIC adapters; NAT and vboxnet0
 ######### Customize vm; ram, cpu, ....
-######### Create IDE Controller, attach vmdk disk and iso dvd
+######### Create IDE Controller, attach vdi disk and iso dvd
 ######### start vm and configure SSH Port forward
 Waiting for VM "CentOS-7" to power on...
 VM "CentOS-7" has been successfully started.
