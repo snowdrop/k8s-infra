@@ -11,8 +11,7 @@ Table of Contents
       * [Provision OpenShift](#provision-openshift)
          * [Option 1 : Local - Minishift](#option-1--local---minishift)
          * [Option 2 : Local - Customized Linux VM](#option-2--local---customized-linux-vm)
-            * [MacOS's users only](#macoss-users-only)
-            * [Common steps](#common-steps)
+            * [Create vdi file from Cloud ISO file](#create-vdi-file-from-cloud-iso-file)
             * [Create CentOS vm on VirtualBox](#create-centos-vm-on-virtualbox)
          * [Option 3 : Public Cloud Provider - Hetzner](#option-3--public-cloud-provider---hetzner)
          * [Option 4 : Private Cloud Provider - Openstack](#option-4--private-cloud-provider---openstack)
@@ -20,6 +19,7 @@ Table of Contents
    * [Turn on your OpenShift machine into a Cloud Native Dev environment](#turn-on-your-openshift-machine-into-a-cloud-native-dev-environment)
       * [Bash script (minishift only)](#bash-script-minishift-only)
       * [Ansible playbooks](#ansible-playbooks)
+
 
 # Instructions to install OpenShift and Cloud Native Features
 
