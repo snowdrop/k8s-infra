@@ -1,10 +1,8 @@
 #!/usr/bin/env bash
 
-LOCAL_HOME_DIR=$1
-IMAGE_DIR=${LOCAL_HOME_DIR}/images
+IMAGE_DIR=$1
 VIRTUAL_BOX_NAME="CentOS-7" # VM Name
 OSTYPE="Linux_64";
-DISKSIZE=20480; #in MB
 RAM=5120; #in MB
 CPU=4;
 CPUCAP=100;
@@ -19,8 +17,8 @@ echo "######### .............. Done"
 echo "######### unregister vm "$VIRTUAL_BOX_NAME" and delete it"
 vboxmanage unregistervm $VIRTUAL_BOX_NAME --delete || echo "No VM by name ${VIRTUAL_BOX_NAME}"
 
-echo "######### Copy disk.vmdk created"
-cp ${IMAGE_DIR}/centos7.vmdk ${IMAGE_DIR}/disk.vmdk
+echo "######### Copy disk.vdi created"
+cp ${IMAGE_DIR}/centos7.vdi ${IMAGE_DIR}/disk.vdi
 
 ####################################################################
 echo "######### Create vboxnet0 network and set dhcp server : 192.168.99.0/24"
@@ -65,10 +63,13 @@ vboxmanage modifyvm ${VIRTUAL_BOX_NAME} --clipboard bidirectional;
 vboxmanage modifyvm ${VIRTUAL_BOX_NAME} --usb "$USB";
 vboxmanage modifyvm ${VIRTUAL_BOX_NAME} --vrde on;
 
-echo "######### Create IDE Controller, attach vmdk disk and iso dvd"
+echo "######### Resize VDI disk to 15GB"
+vboxmanage modifyhd ${IMAGE_DIR}/disk.vdi --resize 20000
+
+echo "######### Create IDE Controller, attach vdi disk and iso dvd"
 vboxmanage storagectl ${VIRTUAL_BOX_NAME} --name "IDE Controller" --add ide --hostiocache on
 vboxmanage storageattach ${VIRTUAL_BOX_NAME} --storagectl "IDE Controller" --port 0 --device 0 --type dvddrive --medium ${IMAGE_DIR}/vbox-config.iso
-vboxmanage storageattach ${VIRTUAL_BOX_NAME} --storagectl "IDE Controller" --port 1 --device 0 --type hdd --medium ${IMAGE_DIR}/disk.vmdk
+vboxmanage storageattach ${VIRTUAL_BOX_NAME} --storagectl "IDE Controller" --port 1 --device 0 --type hdd --medium ${IMAGE_DIR}/disk.vdi
 
 echo "######### start vm and configure SSH Port forward"
 vboxmanage startvm ${VIRTUAL_BOX_NAME} --type headless

@@ -285,31 +285,14 @@ primary ethernet adapter, the one to be used by the Openshift Master API (which 
 
 For such an environment, it makes sense to customize a Linux ISO image and next to convert it to a `vmdk` file using the `cloud-init` tool to perform such additional tasks.
 
-The following section explains how you can create a customized CentOS Generic Cloud `qcow2` image and repackage it as a `vmdk` file for Virtualbox.
+The following section explains how you can create a customized CentOS Generic Cloud image and repackage it as a `vdi` file for Virtualbox.
 
-#### MacOS's users only
+#### Create vdi file from Cloud ISO file
 
-As MacOS users can't execute natively the linux commands such as , part of the different bash scripts, it is required to create a Linux vm on virtualbox first:
+In order to configure the Centos VM for the cloud, we are using the [cloud-init](http://cloudinit.readthedocs.io/en/latest) tool which is a set of python scripts and utilities 
+to make your cloud images be all they can be! 
 
-1. Create and start a vm on virtualbox
-   ``bash
-   cd virtualbox/build-centos-iso
-   vagrant plugin install vagrant-vbguest
-   vagrant plugin install ssh
-   vagrant up
-   vagrant ssh
-   ``
-
-2. Move to the `install/cloud-init` directory mounted into the vm by vagrant
-   ```bash
-   cd install 
-   ```
-
-#### Common steps
-
-In order to prepare the Centos VM for the cloud, we are using the [cloud-init](http://cloudinit.readthedocs.io/en/latest) tool which is a set of python scripts and utilities to make your cloud images be all they can be! 
-
-We will use this tool to configure post installation our vm on Virtualbox, with these parameters :
+We are using this tool to configure post installation our vm on Virtualbox, with these parameters :
 
 - Network configuration (NAT, vboxnet),
 - User : `root`, pwd : `centos`
@@ -322,61 +305,55 @@ To prepare the CentOS image (the `iso` file that Virtualbox will use to bootstra
 
 - Add your SSH public key within the `user-data` file using as input the `user-data.tpl` file 
 - Package the files `user-data` and `meta-data` within an ISO file created using `genisoimage` application
-- Download the CentOS Generic Cloud image and save it under `/LOCAL/HOME/DIR/images`
-- Convert the `qcow2` Centos ISO image to `vmdk` file format
-- Save the vmdk image under `/LOCAL/HOME/DIR/images`
+- Download the CentOS Generic Cloud image and save it under `/PATH/TO/IMAGES/DIR`
+- Convert the `raw` Centos ISO image to `vdi` file format
+- Save the `vdi` file under `/PATH/TO/IMAGES/DIR`
+
+**WARNING** : The following tools `virtualbox, mkisofs, wget` are required on your machine before to execute the bash scripts !
 
 Execute this bash script to repackage the CentOS ISO image and pass your parameters for `</LOCAL/HOME/DIR>` and the name of the Generic Cloud Centos file `<QCOW2_IMAGE_NAME>`, which the script downloads from `http://cloud.centos.org/centos/7/images/`
 
 ```bash
-./new-iso.sh </LOCAL/HOME/DIR> <QCOW2_IMAGE_NAME> <BOOLEAN_RESIZE_QCOQ_IMAGE>
+./new-iso.sh </PATH/TO/IMAGES/DIR> <CENTOS_IMAGE_NAME>
 ```
 
 Example:
 ```bash
-./new-iso.sh /Users/dabou CentOS-7-x86_64-GenericCloud.qcow2c true
-##### 1. Add ssh public key and create user-data file
-##### 2. Generating ISO file containing user-data, meta-data files and used by cloud-init at bootstrap
+./new-iso.sh /Users/dabou/images CentOS-7-x86_64-GenericCloud
+#### 1. Add ssh public key and create user-data file
+#### 2. http://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.raw.tar.gz is already there
+#### 3. Untar the cloud ra.tar.gz file
+x CentOS-7-x86_64-GenericCloud-1802.raw
+#### 4. Generating ISO file containing user-data, meta-data files and used by cloud-init at bootstrap
 Total translation table size: 0
 Total rockridge attributes bytes: 331
 Total directory bytes: 0
 Path table size(bytes): 10
 Max brk space used 0
-183 extents written (0 MB)
-#### 3. Downloading  http://cloud.centos.org/centos/7/images//CentOS-7-x86_64-GenericCloud.qcow2c ....
---2018-03-15 08:55:14--  http://cloud.centos.org/centos/7/images//CentOS-7-x86_64-GenericCloud.qcow2c
-Resolving cloud.centos.org (cloud.centos.org)... 162.252.80.138
-Connecting to cloud.centos.org (cloud.centos.org)|162.252.80.138|:80... connected.
-HTTP request sent, awaiting response... 200 OK
-Length: 394918400 (377M)
-Saving to: '/Users/dabou/images/CentOS-7-x86_64-GenericCloud.qcow2c'
-
-100%[==========================================================================================================================================================================================================>] 394,918,400 1.15MB/s   in 3m 54s 
-
-2018-03-15 08:59:08 (1.61 MB/s) - '/Users/dabou/images/CentOS-7-x86_64-GenericCloud.qcow2c' saved [394918400/394918400]
-
-#### Optional - Resizing qcow2 Image - +20G
-Image resized.
-#### 4. Converting QCOW to VMDK format
-    (100.00/100%)
+64 extents written (0 Mb)
+#### 5. Converting ISO to VDI format
+Converting from raw image file="/Users/dabou/images/CentOS-7-x86_64-GenericCloud-1802.raw" to file="/Users/dabou/images/centos7.vdi"...
+Creating dynamic image with size 8589934592 bytes (8192MB)...
 Done
 ```
-The new ISO image is created locally on your machine under the directory `$HOME/images`
+The `vdi` file is then created on your machine under the directory passed as parameter `</PATH/TO/IMAGES/DIR>`
 ```bash
 ls -la $HOME/images
--rw-r--r--@   1 dabou  staff         6148 Mar 15 09:06 .DS_Store
--rw-r--r--    1 dabou  staff     61675897 Mar 15 09:06 CentOS-7-x86_64-GenericCloud.qcow2c
--rw-r--r--    1 dabou  staff            0 Mar 15 09:06 centos7.vmdk
--rw-r--r--    1 dabou  staff       374784 Mar 15 09:06 vbox-config.iso
+-rw-r--r--    1 dabou  staff  8589934592 Mar  7 22:15 CentOS-7-x86_64-GenericCloud-1802.raw
+-rw-r--r--@   1 dabou  staff   380383665 Mar  7 22:15 CentOS-7-x86_64-GenericCloud.raw.tar.gz
+-rw-r--r--@   1 dabou  staff   648761897 Mar 15 18:07 CentOS-Atomic-Host-7-GenericCloud.qcow2.gz
+-rw-------    1 dabou  staff   905969664 May  4 14:43 centos7.vdi
+-rw-r--r--    1 dabou  staff      131072 May  4 14:43 vbox-config.iso
 ```
 
 #### Create CentOS vm on VirtualBox
 
-To automatically create a new Virtualbox VM using the customized CentOS ISO image (the `iso` file including the `cloud-init` config files), execute the following script `create_vm.sh` on the machine running VirtualBox. This script will perform the following tasks:
+To automatically create a new Virtualbox VM using the customized CentOS Cloud image, execute the following script `create_vm.sh` on the machine running VirtualBox. This script will perform the following tasks:
 
 - Power off the virtual machine if it is running
 - Unregister the vm `$VIRTUAL_BOX_NAME` and delete it
-- Rename Centos `vmdk` to `disk.vmdk`
+- Rename Centos `vdj` to `disk.vdi`
+- Resize the `vdi` disk to `15GB`
 - Create `vboxnet0` network and set dhcp server IP : `192.168.99.50/24`
 - Create Virtual Machine
 - Define NIC adapters; NAT accessing internet and `vboxnet0` to create a private network between the host and the guest
@@ -385,8 +362,8 @@ To automatically create a new Virtualbox VM using the customized CentOS ISO imag
 - Start vm and configure SSH Port forward
 
 ```bash
-cd virtualbox'
-./create-vm.sh </LOCAL/HOME/DIR>
+cd virtualbox
+./create-vm.sh </PATH/TO/IMAGES/DIR>
 ```
 Example:
 ```bash

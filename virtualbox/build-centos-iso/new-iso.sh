@@ -1,65 +1,61 @@
 #!/bin/bash
 
-LOCAL_HOME_DIR=$1
-CENTOS_QCOW2=$2
-RESIZE=${3:-false}
-CENTOS_ISO_SERVER=http://cloud.centos.org/centos/7/images/
-IMAGE_DIR=${LOCAL_HOME_DIR}/images
+IMAGE_DIR=$1
+CENTOS_NAME=${2:-CentOS-7-x86_64-GenericCloud}
+CENTOS_ISO_SERVER=http://cloud.centos.org/centos/7/images
 OS_NAME="centos7"
 
 ##
 ## Add public key
 ##
 add_ssh_key(){
-    echo "##### 1. Add ssh public key and create user-data file"
-    YOUR_SSH_KEY=$(cat ${LOCAL_HOME_DIR}/.ssh/id_rsa.pub)
+    echo "#### 1. Add ssh public key and create user-data file"
+    YOUR_SSH_KEY=$(cat ~/.ssh/id_rsa.pub)
     sed "s|SSH_PUBLIC_KEY|${YOUR_SSH_KEY}|g" user-data.tpl > user-data
+}
+
+##
+## Download Centos7 Generic cloud image and extract it
+##
+wget_centos() {
+    if [ ! -f "${IMAGE_DIR}/${CENTOS_NAME}.raw.tar.gz" ]; then
+       echo "#### 2. Downloading  ${CENTOS_ISO_SERVER}/${CENTOS_NAME}.raw.tar.gz ...."
+       wget --progress=bar -O ${IMAGE_DIR}/${CENTOS_NAME}.raw.tar.gz ${CENTOS_ISO_SERVER}/${CENTOS_NAME}.raw.tar.gz
+    else
+        echo "#### 2. ${CENTOS_ISO_SERVER}/${CENTOS_NAME}.raw.tar.gz is already there"
+    fi
+}
+
+##
+## Untar the cloud ra.tar.gz file
+##
+untar() {
+    echo "#### 3. Untar the cloud ra.tar.gz file"
+    tar -xvzf ${IMAGE_DIR}/${CENTOS_NAME}.raw.tar.gz -C ${IMAGE_DIR}
 }
 
 ##
 ## Generate the config-drive iso
 ##
 gen_iso(){
-    echo "##### 2. Generating ISO file containing user-data, meta-data files and used by cloud-init at bootstrap"
-    # genisoimage -output ${IMAGE_DIR}/vbox-config.iso -volid cidata -joliet -r meta-data user-data
+    echo "#### 4. Generating ISO file containing user-data, meta-data files and used by cloud-init at bootstrap"
     mkisofs -output ${IMAGE_DIR}/vbox-config.iso -volid cidata -joliet -r meta-data user-data
 }
 
 ##
-## Download Centos Generic cloud image
-##
-wget_centos_qcow() {
-    if [ ! -f "${IMAGE_DIR}/${CENTOS_QCOW2}" ]; then
-       echo "#### 3. Downloading  ${CENTOS_ISO_SERVER}/${CENTOS_QCOW2} ...."
-       wget --progress=bar -O ${IMAGE_DIR}/${CENTOS_QCOW2} ${CENTOS_ISO_SERVER}/${CENTOS_QCOW2}
-    fi
-}
-
-
-##
-## Resize qcow2 with +20G
-##
-resize(){
-    echo "#### Optional - Resizing qcow2 Image - +15G"
-    qemu-img resize ${IMAGE_DIR}/${CENTOS_QCOW2} +15G
-}
-
-##
-## Convert qcow to vmdk
+## Convert ISO to vmdk
 ##
 make_vmdk(){
-    echo "#### 4. Converting QCOW to VMDK format"
-    if [ -f "${IMAGE_DIR}/${OS_NAME}.vmdk" ]; then
-      rm ${IMAGE_DIR}/${OS_NAME}.vmdk
+    echo "#### 5. Converting ISO to VDI format"
+    if [ -f "${IMAGE_DIR}/${OS_NAME}.vdi" ]; then
+      rm ${IMAGE_DIR}/${OS_NAME}.vdi
     fi
-    touch ${IMAGE_DIR}/${OS_NAME}.vmdk
-    qemu-img convert -p -f qcow2 ${IMAGE_DIR}/${CENTOS_QCOW2} -O vmdk ${IMAGE_DIR}/${OS_NAME}.vmdk
+    VBoxManage convertfromraw ${IMAGE_DIR}/${CENTOS_NAME}*.raw ${IMAGE_DIR}/${OS_NAME}.vdi --format VDI
 }
 
-mkdir -p ${IMAGE_DIR}
 add_ssh_key
+wget_centos
+untar
 gen_iso
-wget_centos_qcow
-if $RESIZE; then resize; fi
 make_vmdk
 echo "Done"
