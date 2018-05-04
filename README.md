@@ -280,28 +280,28 @@ summarize and present the possibilities offered:
 While we can use Vagrant in combination with Virtualbox to install easily one of the vagrant boxes available such as `CentOS`, `Fedora`, `Ubuntu`, the iso image used (and its packaging)
 doesn't necessarily fit the requirements that you need.
 
-This is specifically true when you are interested in validating a new version of `OpenShift` using `ansible-playbooks` as the deployment tool. The playooks requires some `prerequisites` in addition to having a
-primary ethernet adapter, the one to be used by the Openshift Master API (which is the Kubernetes controller, ....).
+This is specifically true when you are interested in validating a new version of `OpenShift` using `ansible-playbooks` as the deployment tool.
+The `Ansible playooks` requires some `prerequisites` in addition to having a
+primary ethernet adapter, the one to be used by the OpenShift Master API (which is the Kubernetes controller, ....).
 
-For such an environment, it makes sense to customize a Linux ISO image and next to convert it to a `vdi` file using the `cloud-init` tool to perform such additional tasks.
+For such an environment, it makes sense to customize a Linux ISO image and to perform post-installation tasks to make it ready for your needs
 
-The following section explains how you can create a customized CentOS Generic Cloud image and repackage it as a `vdi` file for Virtualbox.
+The following section explains how you can create a customized Generic Cloud image, repackaged as a `vdi` file for Virtualbox.
 
-#### Create vdi file from Cloud ISO file
+#### Create vdi file from Cloud ISO
 
-In order to configure the Centos VM for the cloud, we are using the [cloud-init](http://cloudinit.readthedocs.io/en/latest) tool which is a set of python scripts and utilities 
-to make your cloud images be all they can be! 
+In order to customize the Linux VM for the cloud, we are using the [cloud-init](http://cloudinit.readthedocs.io/en/latest) tool which is a set of python scripts and utilities 
+able to perform tasks as defined hereafter : 
 
-We are using this tool to configure post installation our vm on Virtualbox, with these parameters :
+- Configure the Network adapters (NAT, vboxnet),
+- Add a `root` user and configure its password
+- Additionally add non root user
+- Import your public ssh key and authorize it, 
+- Install `docker, ansible, networkManager` packages using yum
 
-- Network configuration (NAT, vboxnet),
-- User : `root`, pwd : `centos`
-- Additionally add non root user, user, password, ssh authorized key, 
-- yum packages, ...
+**Note** : Centos 7 ISO includes the `cloud-init` tool by default (version `0.7.9`). 
 
-**Note** : Centos 7 ISO packages include version `0.7.9` of the `cloud-init` tool by default. 
-
-To prepare the CentOS image (the `iso` file that Virtualbox will use to bootstrap your vm), you will have to execute the bash script `./new-iso.sh`, which will perform the following tasks :
+To create from the Centos ISO file a VirtualDisk that Virtualbox can use, you will have to execute the following bash script `./new-iso.sh`, which will perform the following tasks :
 
 - Add your SSH public key within the `user-data` file using as input the `user-data.tpl` file 
 - Package the files `user-data` and `meta-data` within an ISO file created using `genisoimage` application
@@ -309,7 +309,7 @@ To prepare the CentOS image (the `iso` file that Virtualbox will use to bootstra
 - Convert the `raw` Centos ISO image to `vdi` file format
 - Save the `vdi` file under `/PATH/TO/IMAGES/DIR`
 
-**WARNING** : The following tools `virtualbox, mkisofs, wget` are required on your machine before to execute the bash scripts !
+**WARNING** : The following tools `virtualbox, mkisofs, wget` are required on your machine before to execute the bash script !
 
 Execute this bash script to repackage the CentOS ISO image and pass your parameters for `</LOCAL/HOME/DIR>` and the name of the Generic Cloud Centos file `<QCOW2_IMAGE_NAME>`, which the script downloads from `http://cloud.centos.org/centos/7/images/`
 
