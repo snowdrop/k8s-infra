@@ -13,7 +13,7 @@
     dest: /tmp/jenkins_patch.json
 
 - name: Get patch file
-  command: cat /tmp/htpwd_ip_patch.json
+  command: cat /tmp/jenkins_patch.json
   register: patch
 
 - name: Patch master-config file
