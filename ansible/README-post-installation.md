@@ -115,6 +115,8 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
   ansible-playbook -i inventory/cloud_host playbook/post_installation.yml \
      --tags jenkins
   ```
+  
+  **WARNING**: In case you would be interested to re-install jenkins, then the namespace `infra` must be deleted and recreated manually !
 
 ### Command install_jaeger
 
