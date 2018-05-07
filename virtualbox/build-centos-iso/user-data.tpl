@@ -15,6 +15,7 @@ packages:
   - ansible
   - net-tools
   - NetworkManager
+  - python-rhsm-certificates
 
 users:
   - name: centos
