@@ -99,6 +99,13 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
   ansible-playbook -i inventory/cloud_host playbook/post_installation.yml \
      --tags nexus
   ```
+  
+  The `nexus` role also accepts the following parameters that can be added using Ansible's `extra-vars` [syntax](http://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html#passing-variables-on-the-command-line):
+  
+  
+| Name | Description  | Default
+| --------- | ------------ | ------------ |
+| persistence | Whether or not the Nexus instance uses persistent storage | true
 
 ### Command install_jenkins
 

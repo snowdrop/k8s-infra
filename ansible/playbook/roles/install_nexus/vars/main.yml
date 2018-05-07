@@ -1,6 +1,5 @@
 ---
 debug: false
-persistence: true
 
 repos:
   jboss_ea:
