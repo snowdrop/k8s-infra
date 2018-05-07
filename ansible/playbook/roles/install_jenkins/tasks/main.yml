@@ -47,6 +47,10 @@
 - name: Add role cluster admin to the jenkins service account
   command: "oc policy add-role-to-user admin system:serviceaccount:{{ namespace }}:jenkins"
 
+- name: Wait until SA becomes available
+  pause:
+    minutes: 1
+
 - name: Get Jenkins Service Account Token
   command: "oc serviceaccounts get-token jenkins"
   register: sa_jenkins_token
