@@ -48,8 +48,7 @@
   command: "oc policy add-role-to-user admin system:serviceaccount:{{ namespace }}:jenkins"
 
 - name: Get Jenkins Service Account Token
-  shell: |
-    oc get sa/jenkins -n {{ namespace }} {% raw %}--template='{{range .secrets}}{{ .name }} {{end}}' | xargs -n 1 oc get secret --template='{{ if .data.token }}{{ .data.token }}{{end}}' {% endraw %} | head -n 1 | base64 -d -
+  command: "oc serviceaccounts get-token jenkins"
   register: sa_jenkins_token
 
 - name: Print token
