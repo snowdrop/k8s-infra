@@ -12,15 +12,9 @@ ansible_ssh_private_key_file={{ keyfile }}
 public_ip_address={{ ip_address }}
 host_key_checking=false
 
-{% if openshift_origin_version == '3.9' %}
 containerized=true
 openshift_enable_excluders=false
 openshift_release=v{{ openshift_origin_version }}
-{% else %}
-containerized=false
-openshift_release=v{{ openshift_origin_version }}
-openshift_pkg_version=-{{ openshift_origin_version }}.0
-{% endif %}
 
 openshift_deployment_type=origin
 
