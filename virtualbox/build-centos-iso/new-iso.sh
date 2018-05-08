@@ -5,9 +5,7 @@ CENTOS_NAME=${2:-CentOS-7-x86_64-GenericCloud}
 CENTOS_ISO_SERVER=http://cloud.centos.org/centos/7/images
 OS_NAME="centos7"
 
-##
-## Add public key
-##
+
 get_host_timezone(){
   if [[ "$OSTYPE" == "linux-gnu" ]]; then
     echo "$(cat /etc/timezone)"
