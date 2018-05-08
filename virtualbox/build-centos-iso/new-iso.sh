@@ -12,7 +12,7 @@ get_host_timezone(){
   if [[ "$OSTYPE" == "linux-gnu" ]]; then
     echo "$(cat /etc/timezone)"
   elif [[ "$OSTYPE" == "darwin"* ]]; then
-    echo "$(systemsetup -gettimezone)"
+    echo -e "from time import gmtime, strftime\nprint strftime('%Z', gmtime())" | python
   else # just return UTC since we don't know how to extract the host timezone
      echo "UTC"
   fi
