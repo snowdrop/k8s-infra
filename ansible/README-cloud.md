@@ -19,7 +19,7 @@
 - Generate the inventory host file containing the parameters used by the `openshift` like the IP address of the VM to ssh.
 
   ```bash
-  ansible-playbook playbook/generate_inventory.yml -e ip_address=192.168.99.50 -e openshift_origin_version=3.9
+  ansible-playbook playbook/generate_inventory.yml -e ip_address=192.168.99.50
   ```
   
   **WARNING**: Take care to supply the correct IP address in the corresponding argument !
@@ -32,7 +32,7 @@
   If another user other than `root` is to be used for accessing the machine over ssh, you can pass the `username` variable like so:
   
   ```bash
-  ansible-playbook playbook/generate_inventory.yml -e ip_address=192.168.99.50 -e openshift_origin_version=3.9 -e username=centos
+  ansible-playbook playbook/generate_inventory.yml -e ip_address=192.168.99.50 -e username=centos
   ```
 
 - Install OpenShift

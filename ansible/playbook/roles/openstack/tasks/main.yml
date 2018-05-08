@@ -62,7 +62,6 @@
       username: "{{ login_username }}"
       keyfile: "{{ private_key_in_inventory }}"
       hostname: "{{ openstack.vm.name }}"
-      openshift_origin_version: "3.9"
 
   - set_fact:
       internal_ssh_command: "ssh -o \"StrictHostKeyChecking=no\" -o \"UserKnownHostsFile=/dev/null\" -i {{ private_key_in_inventory }} -tt {{ login_username }}@{{ openstack_output.server.accessIPv4 }}"
