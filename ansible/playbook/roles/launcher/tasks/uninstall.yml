@@ -5,8 +5,8 @@
 
 - name: Delete resources of the Fabric8 launcher project (frontend, backend) if they exist
   shell: |
-    oc delete all -l app={{ launcher_template_name }} -n {{ launcher_project_name }}
-    oc delete {{ item }}  -l app={{ launcher_template_name }} -n {{ launcher_project_name }}
+    oc {{ openshift_env.oc_admin_kubeconfig_arg }} delete all -l app={{ launcher_template_name }} -n {{ launcher_project_name }}
+    oc {{ openshift_env.oc_admin_kubeconfig_arg }} delete {{ item }}  -l app={{ launcher_template_name }} -n {{ launcher_project_name }}
   when: r_get_project.stdout != ""
   with_items:
     - configmap
