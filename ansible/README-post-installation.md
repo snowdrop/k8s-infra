@@ -86,6 +86,7 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
 | Name | Description  | Default
 | --------- | ------------ | ------------ |
 | cluster_role_name | The name of the cluster role to grant to the admin user | cluster-admin  
+| user | The user to which to grant the cluster role | admin  
 | openshift_admin_pwd | The password of the admin user |   
   
 ### Command Persistence

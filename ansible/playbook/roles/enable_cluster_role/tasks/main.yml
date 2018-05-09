@@ -1,19 +1,25 @@
+- set_fact:
+    cluster_role_name: "{{ cluster_role_name | default('cluster-admin') }}"
+    user: "{{ user | default('admin') }}"
+
 - assert:
     that:
       - "openshift_admin_pwd != ''"
     msg: "Please specify an password that will be used for the cluster using the 'openshift_admin_pwd' variable. The easiest way to do is to add -e openshift_admin_pwd=foopass to your Ansible CLI invocation"
-
-- set_fact:
-    cluster_role_name: "{{ cluster_role_name | default('cluster-admin') }}"
+  when: user == 'admin'
 
 - name: Login as system:admin
   command: oc login https://{{ public_ip_address }}:8443 -u system:admin
 
 - name: Grant role to {{ openshift_admin_user }}
-  command: oc adm policy add-cluster-role-to-user {{ cluster_role_name }} {{ openshift_admin_user }}
+  command: oc adm policy add-cluster-role-to-user {{ cluster_role_name }} {{ user }}
 
-- name: Log in as {{ openshift_admin_user }}
-  command: oc login -u {{ openshift_admin_user }} -p {{ openshift_admin_pwd }}
+- block:
 
-- name: Set the namespace to 'default'
-  command: oc project default
+  - name: Log in as {{ openshift_admin_user }}
+    command: oc login -u {{ openshift_admin_user }} -p {{ openshift_admin_pwd }}
+
+  - name: Set the namespace to 'default'
+    command: oc project default
+
+  when: user == 'admin'
