@@ -4,7 +4,7 @@
   ignore_errors: true
 
 - name: Create project if it doesn't exist yet
-  command: oc new-project {{ launcher_project_name }}
+  command: oc {{ openshift_env.oc_admin_kubeconfig_arg }} new-project {{ launcher_project_name }}
   when: r_get_project.stdout == ""
 
 - name: Check if Launcher template exists
@@ -24,7 +24,7 @@
   when: "not launcher_openshift_console_url == ''"
 
 - name: Deploy the Launcher template
-  command: oc create -n {{ launcher_project_name }} -f https://raw.githubusercontent.com/fabric8-launcher/launcher-openshift-templates/{{ launcher_template_version }}/openshift/launcher-template.yaml
+  command: oc {{ openshift_env.oc_admin_kubeconfig_arg }} create -n {{ launcher_project_name }} -f https://raw.githubusercontent.com/fabric8-launcher/launcher-openshift-templates/{{ launcher_template_version }}/openshift/launcher-template.yaml
   when: r_get_template.stdout == ""
 
 - name: Display parameters to create launcher app
@@ -46,7 +46,7 @@
 
 - name: Create launcher application
   shell: |
-    oc new-app {{ launcher_template_name }}  -n {{ launcher_project_name }} \
+    oc {{ openshift_env.oc_admin_kubeconfig_arg }} new-app {{ launcher_template_name }}  -n {{ launcher_project_name }} \
         -p LAUNCHER_BOOSTER_CATALOG_REPOSITORY={{ launcher_catalog_git_repo }} \
         -p LAUNCHER_BOOSTER_CATALOG_REF={{ launcher_catalog_git_branch }} \
         -p LAUNCHER_BOOSTER_CATALOG_FILTER={{ launcher_catalog_filter }} \
