@@ -29,10 +29,9 @@
 
 - set_fact:
     namespace: "{{ infra_project | default('infra') }}"
-    oc_config_arg: "--config {{ openshift_env.config_dir }}/master/admin.kubeconfig"
 
 - name: Create namespace
-  command: "oc --config {{ openshift_env.config_dir }}/master/admin.kubeconfig new-project {{ namespace }}"
+  command: "oc {{ openshift_env.oc_admin_kubeconfig_arg }} {{ namespace }}"
   ignore_errors: true
 
 - name: Set Jenkins app name
@@ -40,16 +39,16 @@
     jenkins_app: jenkins-persistent
 
 - name: Change scc permission to allow jenkins pod to run within the docker container using its userid
-  shell: "oc {{ oc_config_arg }} adm policy add-scc-to-group anyuid system:authenticated -n {{ namespace }}"
+  shell: "oc {{ openshift_env.oc_admin_kubeconfig_arg }} adm policy add-scc-to-group anyuid system:authenticated -n {{ namespace }}"
 
 - name: Install {{ jenkins_app }}
-  command: "oc {{ oc_config_arg }} new-app JENKINS_PASSWORD=admin123 {{ jenkins_app }} -n {{ namespace }}"
+  command: "oc {{ openshift_env.oc_admin_kubeconfig_arg }} new-app JENKINS_PASSWORD=admin123 {{ jenkins_app }} -n {{ namespace }}"
 
 - name: Add role cluster admin to the jenkins service account
-  command: "oc {{ oc_config_arg }} policy add-role-to-user admin system:serviceaccount:{{ namespace }}:jenkins"
+  command: "oc {{ openshift_env.oc_admin_kubeconfig_arg }} policy add-role-to-user admin system:serviceaccount:{{ namespace }}:jenkins"
 
 - name: Get Jenkins Service Account Token
-  command: "oc {{ oc_config_arg }} serviceaccounts get-token jenkins -n {{ namespace }}"
+  command: "oc {{ openshift_env.oc_admin_kubeconfig_arg }} serviceaccounts get-token jenkins -n {{ namespace }}"
   register: sa_jenkins_token
   until: sa_jenkins_token.rc == 0
   retries: 12
