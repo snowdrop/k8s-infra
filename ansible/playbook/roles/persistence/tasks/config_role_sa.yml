@@ -5,6 +5,6 @@
 
 - name: Define scc security for the pv-recycler-controller
   shell: |
-    oc adm policy add-scc-to-user hostmount-anyuid system:serviceaccount:openshift-infra:pv-recycler-controller
-    oc create -f /tmp/sa-pv-recyler-controller.yml
+    oc {{ openshift_env.oc_admin_kubeconfig_arg }} adm policy add-scc-to-user hostmount-anyuid system:serviceaccount:openshift-infra:pv-recycler-controller
+    oc {{ openshift_env.oc_admin_kubeconfig_arg }} create -f /tmp/sa-pv-recyler-controller.yml
   ignore_errors: true
