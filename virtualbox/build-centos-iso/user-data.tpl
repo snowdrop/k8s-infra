@@ -39,3 +39,4 @@ runcmd:
   - systemctl start docker
   - systemctl start NetworkManager
   - systemctl enable NetworkManager
+  - timedatectl set-timezone TIMEZONE

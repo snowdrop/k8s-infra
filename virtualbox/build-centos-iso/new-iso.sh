@@ -5,13 +5,24 @@ CENTOS_NAME=${2:-CentOS-7-x86_64-GenericCloud}
 CENTOS_ISO_SERVER=http://cloud.centos.org/centos/7/images
 OS_NAME="centos7"
 
-##
-## Add public key
-##
-add_ssh_key(){
-    echo "#### 1. Add ssh public key and create user-data file"
+
+get_host_timezone(){
+  if [[ "$OSTYPE" == "linux-gnu" ]]; then
+    echo "$(cat /etc/timezone)"
+  elif [[ "$OSTYPE" == "darwin"* ]]; then
+    echo -e "from time import gmtime, strftime\nprint strftime('%Z', gmtime())" | python
+  else # just return UTC since we don't know how to extract the host timezone
+     echo "UTC"
+  fi
+}
+
+create_user_data(){
+    echo "#### 1. Create user-data file"
     YOUR_SSH_KEY=$(cat ~/.ssh/id_rsa.pub)
-    sed "s|SSH_PUBLIC_KEY|${YOUR_SSH_KEY}|g" user-data.tpl > user-data
+    HOST_TIMEZONE=$(get_host_timezone)
+    sed "s|SSH_PUBLIC_KEY|${YOUR_SSH_KEY}|g" user-data.tpl > user-data.tmp
+    sed "s|TIMEZONE|${HOST_TIMEZONE}|g" user-data.tmp > user-data
+    rm user-data.tmp
 }
 
 ##
@@ -53,7 +64,7 @@ make_vmdk(){
     VBoxManage convertfromraw ${IMAGE_DIR}/${CENTOS_NAME}*.raw ${IMAGE_DIR}/${OS_NAME}.vdi --format VDI
 }
 
-add_ssh_key
+create_user_data
 wget_centos
 untar
 gen_iso
