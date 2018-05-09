@@ -7,7 +7,7 @@ The table hereafter summarizes the roles available that you can call using the `
 | Role Name | Description  |
 | --------- | ------------ | 
 | [add_extra_users](#command-add_extra_users) | Create list of users/passwords and their corresponding project |
-| [enable_cluster_admin](#command-enable_cluster_admin) | Grant Cluster admin role to an OpenShift user |
+| [enable_cluster_role](#command-enable_cluster_role) | Grant a cluster role to an OpenShift user |
 | [identity_provider](#command-identity_provider) | Set the Master-configuration of OpenShift to use `htpasswd` as its identity provider |
 | [persistence](#command-persistence) | Enable Persistence using `hotPath` as `persistenceVolume` |
 | [install_nexus](#command-install_nexus) | Install Nexus Repository Server |
@@ -37,7 +37,7 @@ ansible-playbook -i inventory/simple_host playbook/post_installation.yml -e open
 To install one of the roles, you will specify it using the `--tags` parameter as showed hereafter.
 
 ```bash
-ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e openshift_admin_pwd=admin --tags "enable_cluster_admin"
+ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e openshift_admin_pwd=admin --tags "enable_cluster_role"
 ```
 
 **Remarks** : 
@@ -72,13 +72,21 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
   By default these users will have admin roles (although not cluster-admin) and will each have a project that corresponds to the user name.
   These defaults can be changed using the `make_users_admin` and `create_user_project` flags. See [here](playbook/roles/add_extra_users/defaults/main.yml) 
 
-### Command enable_cluster_admin
+### Command enable_cluster_role
 
   ```bash
   ansible-playbook -i inventory/cloud_host playbook/post_installation.yml \
      -e openshift_admin_pwd=admin \
-     --tags "enable_cluster_admin"
+     --tags "enable_cluster_role"
   ```
+  
+  The `enable_cluster_role` role also accepts the following parameters that can be added using Ansible's `extra-vars` [syntax](http://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html#passing-variables-on-the-command-line):
+  
+  
+| Name | Description  | Default
+| --------- | ------------ | ------------ |
+| cluster_role_name | The name of the cluster role to grant to the admin user | cluster-admin  
+| openshift_admin_pwd | The password of the admin user |   
   
 ### Command Persistence
 
