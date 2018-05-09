@@ -1,12 +1,11 @@
 - set_fact:
     namespace: "{{ infra_project | default('infra') }}"
-    oc_config_arg: "--config {{ openshift_env.config_dir }}/master/admin.kubeconfig"
 
 - name: Use Infra namespace/project
-  command: oc {{ oc_config_arg }} new-project  {{ namespace }}
+  command: oc {{ openshift_env.oc_admin_kubeconfig_arg }} new-project  {{ namespace }}
   ignore_errors: true
 
 - name: Install Jaeger
   shell: |
-    oc {{ oc_config_arg }} process -f https://raw.githubusercontent.com/jaegertracing/jaeger-openshift/master/all-in-one/jaeger-all-in-one-template.yml | oc {{ oc_config_arg }} -n {{ namespace }} create -f -
-    oc {{ oc_config_arg }} expose service jaeger-collector --port=14268 -n {{ namespace }}
+    oc {{ openshift_env.oc_admin_kubeconfig_arg }} process -f https://raw.githubusercontent.com/jaegertracing/jaeger-openshift/master/all-in-one/jaeger-all-in-one-template.yml | oc {{ openshift_env.oc_admin_kubeconfig_arg }} -n {{ namespace }} create -f -
+    oc {{ openshift_env.oc_admin_kubeconfig_arg }} expose service jaeger-collector --port=14268 -n {{ namespace }}

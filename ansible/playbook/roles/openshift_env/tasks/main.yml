@@ -43,6 +43,9 @@
 - set_fact:
     openshift_env: "{{ openshift_env | combine({ 'has_pv_storage': openshift_env.containerized }) }}"
 
+- set_fact:
+    openshift_env: "{{ openshift_env | combine({ 'oc_admin_kubeconfig_arg': ' --config ' + config_dir + '/master/admin.kubeconfig ' }) }}"
+
 - debug:
     var: openshift_env
     verbosity: 2
