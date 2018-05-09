@@ -15,7 +15,7 @@
   ignore_errors: true
 
 - name: Delete pv {{ pv_name }}
-  command: "oc delete pv/{{ volume_name }} --ignore-not-found=true"
+  command: "oc {{ openshift_env.oc_admin_kubeconfig_arg }} delete pv/{{ volume_name }} --ignore-not-found=true"
 
 - name: Copy pv file to master
   template:
@@ -23,4 +23,4 @@
     dest: "{{ pv_definition_file }}"
 
 - name: Create pv {{ pv_name }}
-  command: "oc create -f {{ pv_definition_file }}"
+  command: "oc {{ openshift_env.oc_admin_kubeconfig_arg }} create -f {{ pv_definition_file }}"
