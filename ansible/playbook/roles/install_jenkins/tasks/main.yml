@@ -17,7 +17,7 @@
   register: patch
 
 - name: Patch master-config file
-  command: "oc ex config patch {{ openshift_env.config_dir }}/master/master-config.yaml --patch '{{ patch.stdout }}'"
+  command: "oc {{ openshift_env.oc_admin_kubeconfig_arg }} ex config patch {{ openshift_env.config_dir }}/master/master-config.yaml --patch '{{ patch.stdout }}'"
   register: r
 
 - name: Copy patch to new master config file
@@ -31,7 +31,7 @@
     namespace: "{{ infra_project | default('infra') }}"
 
 - name: Create namespace
-  command: "oc {{ openshift_env.oc_admin_kubeconfig_arg }} {{ namespace }}"
+  command: "oc {{ openshift_env.oc_admin_kubeconfig_arg }} new-project {{ namespace }}"
   ignore_errors: true
 
 - name: Set Jenkins app name
