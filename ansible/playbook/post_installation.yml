@@ -11,6 +11,7 @@
     - { role: 'identity_provider',    tags: 'identity_provider'}    # Use HTPasswdPasswordIdentityProvider as Identity Provider -> more secure
     - { role: 'enable_cluster_role', tags: 'enable_cluster_role'}
     - { role: 'add_extra_users',      tags: 'add_extra_users'}
+    - { role: 'delete_extra_users',   tags: 'delete_extra_users'}
     - { role: 'install_oc',           tags: 'install_oc'}           # Install oc client when cluster role is not used
     - { role: 'create_projects',      tags: 'create_projects'}
     - { role: 'install_nexus',        tags: 'nexus'}

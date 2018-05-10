@@ -7,6 +7,7 @@ The table hereafter summarizes the roles available that you can call using the `
 | Role Name | Description  |
 | --------- | ------------ | 
 | [add_extra_users](#command-add_extra_users) | Create list of users/passwords and their corresponding project |
+| [delete_extra_users](#command-delete_extra_users) | Delete extra users created using `add_extra_users` |
 | [enable_cluster_role](#command-enable_cluster_role) | Grant a cluster role to an OpenShift user |
 | [identity_provider](#command-identity_provider) | Set the Master-configuration of OpenShift to use `htpasswd` as its identity provider |
 | [persistence](#command-persistence) | Enable Persistence using `hotPath` as `persistenceVolume` |
@@ -69,7 +70,20 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
   This step will create 5 users with credentials like `user1/pwd1` while also creating a project for like `user1` for each user
   
   By default these users will have admin roles (although not cluster-admin) and will each have a project that corresponds to the user name.
-  These defaults can be changed using the `make_users_admin` and `create_user_project` flags. See [here](playbook/roles/add_extra_users/defaults/main.yml) 
+  These defaults can be changed using the `make_users_admin` and `create_user_project` flags. See [here](playbook/roles/add_extra_users/defaults/main.yml)
+  
+### Command delete_extra_users
+
+  **WARNING**: Role `identity_provider` must be executed before !
+
+  ```bash
+  ansible-playbook -i inventory/cloud_host playbook/post_installation.yml --tags delete_extra_users \
+     -e number_of_extra_users=5 \
+     -e first_extra_user_offset=1 \
+  ```
+  
+  This step will delete 5 users whose user names are like  `user1` while also deleting the projects like `user1` that were associated to those users
+    
 
 ### Command enable_cluster_role
 
