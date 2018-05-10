@@ -77,3 +77,9 @@ echo "######### start vm and configure SSH Port forward"
 vboxmanage startvm ${VIRTUAL_BOX_NAME} --type headless
 vboxmanage controlvm ${VIRTUAL_BOX_NAME} natpf2 ssh,tcp,127.0.0.1,5222,,22
 
+if [ -x "$(command -v ansible-playbook)" ]; then
+  echo "######### Generating Ansible inventory file"
+  SCRIPT_ABSOLUTE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+  ansible-playbook ${SCRIPT_ABSOLUTE_DIR}/../ansible/playbook/generate_inventory.yml -e ip_address=${IP_ADDRESS} -e type=simple
+fi
+

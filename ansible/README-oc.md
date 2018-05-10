@@ -14,6 +14,9 @@
   cd ansible/
   ansible-playbook playbook/generate_inventory.yml -e ip_address=192.168.99.50 -e type=simple
   ```
+  
+**NOTE**: This step is not needed if the target VM was created using the [create-vm.sh](../virtualbox/create-vm.sh) script
+since the script automatically invokes said command once the VM has been created  
 
 - Next you can execute one of these tags to `up`, `down` or `clean` the cluster created
 
