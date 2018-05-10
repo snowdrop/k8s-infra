@@ -7,6 +7,8 @@ CENTOS_NAME=${2:-CentOS-7-x86_64-GenericCloud}
 CENTOS_ISO_SERVER=http://cloud.centos.org/centos/7/images
 OS_NAME="centos7"
 
+SCRIPT_ABSOLUTE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 
 get_host_timezone(){
   if [[ "$OSTYPE" == "linux-gnu" ]]; then
@@ -22,9 +24,9 @@ create_user_data(){
     echo "#### 1. Create user-data file"
     YOUR_SSH_KEY=$(cat ~/.ssh/id_rsa.pub)
     HOST_TIMEZONE=$(get_host_timezone)
-    sed "s|SSH_PUBLIC_KEY|${YOUR_SSH_KEY}|g" user-data.tpl > user-data.tmp
-    sed "s|TIMEZONE|${HOST_TIMEZONE}|g" user-data.tmp > user-data
-    rm user-data.tmp
+    sed "s|SSH_PUBLIC_KEY|${YOUR_SSH_KEY}|g" "${SCRIPT_ABSOLUTE_DIR}"/user-data.tpl > "${SCRIPT_ABSOLUTE_DIR}"/user-data.tmp
+    sed "s|TIMEZONE|${HOST_TIMEZONE}|g" "${SCRIPT_ABSOLUTE_DIR}"/user-data.tmp > "${SCRIPT_ABSOLUTE_DIR}"/user-data
+    rm "${SCRIPT_ABSOLUTE_DIR}"/user-data.tmp
 }
 
 ##
@@ -52,7 +54,7 @@ untar() {
 ##
 gen_iso(){
     echo "#### 4. Generating ISO file containing user-data, meta-data files and used by cloud-init at bootstrap"
-    mkisofs -output ${IMAGE_DIR}/vbox-config.iso -volid cidata -joliet -r meta-data user-data
+    mkisofs -output ${IMAGE_DIR}/vbox-config.iso -volid cidata -joliet -r "${SCRIPT_ABSOLUTE_DIR}"/meta-data "${SCRIPT_ABSOLUTE_DIR}"/user-data
 }
 
 ##
