@@ -6,7 +6,11 @@
     src: "{{ role_path }}/templates/{{ file_name }}.inventory.j2"
     dest: ../inventory/{{ file_name }}_host
 
+- name:
+  shell: 'echo "$( cd "$( dirname {{ playbook_dir }}/../inventory/{{ file_name }}_host )" && pwd )"'
+  register: inventory_dir_out
+
 - name: Show inventory file location
   debug:
-    msg: "Inventory file created here : ../inventory/{{ file_name }}_host"
+    msg: "Inventory file created at : {{ inventory_dir_out.stdout }}/{{ file_name }}_host"
 
