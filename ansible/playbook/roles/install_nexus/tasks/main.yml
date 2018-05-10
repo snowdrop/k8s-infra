@@ -22,15 +22,24 @@
     	--initial-delay-seconds 30 \
     	--get-url=http://:8081/nexus/content/groups/public
 
-- name: Enable persistence
-  shell: |
-      oc {{ openshift_env.oc_admin_kubeconfig_arg }} volumes dc/nexus --add \
-          --name 'nexus-volume-1' \
-          --type 'pvc' \
-          --mount-path '/sonatype-work/' \
-          --claim-name 'nexus-pv' \
-          --claim-size '5G' \
-          --overwrite
+- block:
+
+  - set_fact:
+      claim_name: nexus-pv
+
+  - name: Remove existing claim
+    command: oc {{ openshift_env.oc_admin_kubeconfig_arg }} delete pvc {{ claim_name }} --ignore-not-found=true
+
+  - name: Enable persistence
+    shell: |
+        oc {{ openshift_env.oc_admin_kubeconfig_arg }} volumes dc/nexus --add \
+            --name 'nexus-volume-1' \
+            --type 'pvc' \
+            --mount-path '/sonatype-work/' \
+            --claim-name '{{ claim_name }}' \
+            --claim-size '5G' \
+            --overwrite
+
   when: persistence
 
 - name: Get Nexus Route
@@ -43,7 +52,7 @@
     status_code: 200
   register: result
   until: result.status == 200
-  retries: 5
+  retries: 20
   delay: 30
 
 - name: Create JBoss Repos
