@@ -17,8 +17,5 @@
     - { role: 'install_jenkins',      tags: 'jenkins'}
     - { role: 'install_jaeger',       tags: 'jaeger'}
     - { role: 'install_istio',        tags: 'istio'}
-
-  tasks:
-    # Launcher Role
-    - {name: "Install launcher                 ", import_role: {name: launcher, tasks_from: install.yml},         tags: [install-launcher]}
-    - {name: "Uninstall launcher               ", import_role: {name: launcher, tasks_from: uninstall.yml},       tags: [uninstall-launcher]}
+    - { role: 'install_launcher',     tags: 'install-launcher'}
+    - { role: 'uninstall_launcher',   tags: 'uninstall-launcher'}
