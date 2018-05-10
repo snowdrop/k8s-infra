@@ -8,11 +8,8 @@
     msg: "Please specify an password that will be used for the cluster using the 'openshift_admin_pwd' variable. The easiest way to do is to add -e openshift_admin_pwd=foopass to your Ansible CLI invocation"
   when: user == 'admin'
 
-- name: Login as system:admin
-  command: oc login https://{{ public_ip_address }}:8443 -u system:admin
-
 - name: Grant role to {{ openshift_admin_user }}
-  command: oc adm policy add-cluster-role-to-user {{ cluster_role_name }} {{ user }}
+  command: oc {{ openshift_env.oc_admin_kubeconfig_arg }} adm policy add-cluster-role-to-user {{ cluster_role_name }} {{ user }}
 
 - block:
 
