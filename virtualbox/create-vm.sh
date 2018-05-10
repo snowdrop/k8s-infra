@@ -10,6 +10,8 @@ PAE="on";
 VRAM=8;
 USB="off";
 
+readonly IP_ADDRESS=192.168.99.50
+
 echo "######### Poweroff machine if it runs"
 vboxmanage controlvm $VIRTUAL_BOX_NAME poweroff
 echo "######### .............. Done"
@@ -26,7 +28,7 @@ vboxmanage hostonlyif remove vboxnet0
 vboxmanage hostonlyif create
 vboxmanage hostonlyif ipconfig vboxnet0 --ip 192.168.99.1 --netmask 255.255.255.0
 vboxmanage dhcpserver remove --ifname vboxnet0
-vboxmanage dhcpserver add --ifname vboxnet0 --ip 192.168.99.20 --netmask 255.255.255.0 --lowerip 192.168.99.50 --upperip 192.168.99.50
+vboxmanage dhcpserver add --ifname vboxnet0 --ip 192.168.99.20 --netmask 255.255.255.0 --lowerip ${IP_ADDRESS} --upperip ${IP_ADDRESS}
 vboxmanage dhcpserver modify --ifname vboxnet0 --enable
 
 ##########################################
