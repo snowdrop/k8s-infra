@@ -23,5 +23,4 @@ launcher_catalog_git_branch: master
 launcher_openshift_console_url:
 launcher_openshift_api_url: https://openshift.default.svc.cluster.local
 
-launcher_keycloak_template_name: launcher-keycloak
-launcher_catalog_filter: 
+launcher_catalog_filter:
