@@ -1,0 +1,33 @@
+---
+- hosts: "{{ openshift_node | default('masters') }}"
+  gather_facts: false
+
+  tasks:
+
+  - assert:
+      that:
+        - "(gh_usernames is defined) and (gh_usernames is iterable) and ( gh_usernames | length >= 1)"
+      msg:
+        - "Please specify the GitHub usernames by using the 'gh_usernames' variable"
+        - "The easiest way to do is to use the -e syntax. For example you could use: "
+        - "-e gh_usernames=foo"
+        - "-e '{gh_usernames: [foo, bar]}'"
+
+  - name: Install epel
+    yum:
+      name: epel-release
+      state: present
+
+  - name: Install pip
+    yum:
+      name: python-pip
+      state: present
+
+  - name: Install ssh-import-id
+    pip:
+      name: ssh-import-id
+      state: present
+
+  - name: Import Github public key
+    command: "ssh-import-id gh:{{ item }}"
+    with_items: "{{ gh_usernames }}"
