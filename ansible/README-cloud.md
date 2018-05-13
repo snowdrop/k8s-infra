@@ -34,6 +34,12 @@
   ```bash
   ansible-playbook playbook/generate_inventory.yml -e ip_address=192.168.99.50 -e username=centos
   ```
+  
+- Optional: Add any other user public keys to allow those users to ssh into the target machine
+
+  ```bash
+  ansible-playbook -i inventory/simple_host playbook/import_public_key.yml -e '{gh_usernames: [foo, bar]}'
+  ```   
 
 - Install OpenShift
 
