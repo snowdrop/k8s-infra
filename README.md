@@ -371,17 +371,12 @@ cd virtualbox
 ```
 Example:
 ```bash
-./create-vm.sh /Users/dabou
+./create-vm.sh /Users/dabou/images 
 ######### Poweroff machine if it runs
-VBoxManage: error: Could not find a registered machine named 'CentOS-7'
-VBoxManage: error: Details: code VBOX_E_OBJECT_NOT_FOUND (0x80bb0001), component VirtualBoxWrap, interface IVirtualBox, callee nsISupports
-VBoxManage: error: Context: "FindMachine(Bstr(a->argv[0]).raw(), machine.asOutParam())" at line 383 of file VBoxManageControlVM.cpp
+VBoxManage: error: Machine 'CentOS-7' is not currently running
 ######### .............. Done
 ######### unregister vm CentOS-7 and delete it
-VBoxManage: error: Could not find a registered machine named 'CentOS-7'
-VBoxManage: error: Details: code VBOX_E_OBJECT_NOT_FOUND (0x80bb0001), component VirtualBoxWrap, interface IVirtualBox, callee nsISupports
-VBoxManage: error: Context: "FindMachine(Bstr(VMName).raw(), machine.asOutParam())" at line 153 of file VBoxManageMisc.cpp
-No VM by name CentOS-7
+0%...10%...20%...30%...40%...50%...60%...70%...80%...90%...100%
 ######### Copy disk.vdi created
 ######### Create vboxnet0 network and set dhcp server : 192.168.99.0/24
 0%...10%...20%...30%...40%...50%...60%...70%...80%...90%...100%
@@ -389,14 +384,42 @@ No VM by name CentOS-7
 Interface 'vboxnet0' was successfully created
 ######### Create VM
 Virtual machine 'CentOS-7' is created and registered.
-UUID: e5ca6778-2405-40cf-ba4b-5843f2da802a
+UUID: ac99a6b7-0415-41b3-82ff-46f1b9dc4fec
 Settings file: '/Users/dabou/VirtualBox VMs/CentOS-7/CentOS-7.vbox'
 ######### Define NIC adapters; NAT and vboxnet0
 ######### Customize vm; ram, cpu, ....
+######### Resize VDI disk to 15GB
+0%...10%...20%...30%...40%...50%...60%...70%...80%...90%...100%
 ######### Create IDE Controller, attach vdi disk and iso dvd
 ######### start vm and configure SSH Port forward
 Waiting for VM "CentOS-7" to power on...
 VM "CentOS-7" has been successfully started.
+######### Generating Ansible inventory file
+ [WARNING]: Unable to parse /etc/ansible/hosts as an inventory source
+
+ [WARNING]: No inventory was parsed, only implicit localhost is available
+
+ [WARNING]: provided hosts list is empty, only localhost is available. Note that the implicit localhost does not match 'all'
+
+
+PLAY [localhost] ********************************************************************************************************************************************************************************************************
+
+TASK [generate_inventory : set_fact] ************************************************************************************************************************************************************************************
+ok: [localhost]
+
+TASK [generate_inventory : Create Ansible Host file] ********************************************************************************************************************************************************************
+ok: [localhost]
+
+TASK [generate_inventory : command] *************************************************************************************************************************************************************************************
+changed: [localhost]
+
+TASK [generate_inventory : Show inventory file location] ****************************************************************************************************************************************************************
+ok: [localhost] => {
+    "msg": "Inventory file created at : /Users/dabou/Code/snowdrop/openshift-infra/ansible/inventory/simple_host"
+}
+
+PLAY RECAP **************************************************************************************************************************************************************************************************************
+localhost                  : ok=4    changed=1    unreachable=0    failed=0  
 ```
 
 **Note** : VirtualBox will fail to unregister and remove the vm the first time you execute the script; warning messages will be displayed!
