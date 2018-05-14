@@ -363,6 +363,7 @@ This script will perform the following tasks:
 - Customize vm; ram, cpu, ...
 - Create IDE Controller, attach iso dvd and vdi disk
 - Start vm and configure SSH Port forward
+- Create an ansible inventory file that can be used to execute the project's playbooks against the newly created vm (this is only done if Ansible is installed) 
 
 ```bash
 cd virtualbox

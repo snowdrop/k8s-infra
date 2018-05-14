@@ -10,6 +10,8 @@ PAE="on";
 VRAM=8;
 USB="off";
 
+readonly IP_ADDRESS=192.168.99.50
+
 echo "######### Poweroff machine if it runs"
 vboxmanage controlvm $VIRTUAL_BOX_NAME poweroff
 echo "######### .............. Done"
@@ -26,7 +28,7 @@ vboxmanage hostonlyif remove vboxnet0
 vboxmanage hostonlyif create
 vboxmanage hostonlyif ipconfig vboxnet0 --ip 192.168.99.1 --netmask 255.255.255.0
 vboxmanage dhcpserver remove --ifname vboxnet0
-vboxmanage dhcpserver add --ifname vboxnet0 --ip 192.168.99.20 --netmask 255.255.255.0 --lowerip 192.168.99.50 --upperip 192.168.99.50
+vboxmanage dhcpserver add --ifname vboxnet0 --ip 192.168.99.20 --netmask 255.255.255.0 --lowerip ${IP_ADDRESS} --upperip ${IP_ADDRESS}
 vboxmanage dhcpserver modify --ifname vboxnet0 --enable
 
 ##########################################
@@ -74,4 +76,10 @@ vboxmanage storageattach ${VIRTUAL_BOX_NAME} --storagectl "IDE Controller" --por
 echo "######### start vm and configure SSH Port forward"
 vboxmanage startvm ${VIRTUAL_BOX_NAME} --type headless
 vboxmanage controlvm ${VIRTUAL_BOX_NAME} natpf2 ssh,tcp,127.0.0.1,5222,,22
+
+if [ -x "$(command -v ansible-playbook)" ]; then
+  echo "######### Generating Ansible inventory file"
+  SCRIPT_ABSOLUTE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+  ansible-playbook ${SCRIPT_ABSOLUTE_DIR}/../ansible/playbook/generate_inventory.yml -e ip_address=${IP_ADDRESS} -e type=simple
+fi
 
