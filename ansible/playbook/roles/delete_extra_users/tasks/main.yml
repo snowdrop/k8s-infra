@@ -3,11 +3,11 @@
 
 - name: Delete user from password file
   command: "htpasswd -D {{ path_users_pwd }} user{{ item }}"
-  with_sequence: start={{ first_extra_user_offset }} count={{ number_of_extra_users }} format=%d
+  with_sequence: start={{ first_extra_user_offset }} count={{ number_of_extra_users }} format=%02d
 
 - name: Delete user project
   command: "oc {{ openshift_env.oc_admin_kubeconfig_arg }} delete project user{{ item }} --ignore-not-found=true"
-  with_sequence: start={{ first_extra_user_offset }} count={{ number_of_extra_users }} format=%d
+  with_sequence: start={{ first_extra_user_offset }} count={{ number_of_extra_users }} format=%02d
 
 
 

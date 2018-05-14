@@ -3,12 +3,12 @@
 
 - name: Add user/pwd to file
   command: "htpasswd -b {{ path_users_pwd }} user{{ item }} pwd{{ item }}"
-  with_sequence: start={{ first_extra_user_offset }} count={{ number_of_extra_users }} format=%d
+  with_sequence: start={{ first_extra_user_offset }} count={{ number_of_extra_users }} format=%02d
 
 - block:
     - name: Grant user admin priviledges
       command: oc {{ openshift_env.oc_admin_kubeconfig_arg }} adm policy add-role-to-user admin user{{ item }}
-      with_sequence: start={{ first_extra_user_offset }} count={{ number_of_extra_users }} format=%d
+      with_sequence: start={{ first_extra_user_offset }} count={{ number_of_extra_users }} format=%02d
 
   when: make_users_admin | bool == true
 
@@ -16,7 +16,7 @@
   shell: |
     oc login -u user{{ item }} -p pwd{{ item }}
     oc new-project user{{ item }}
-  with_sequence: start={{ first_extra_user_offset }} count={{ number_of_extra_users }} format=%d
+  with_sequence: start={{ first_extra_user_offset }} count={{ number_of_extra_users }} format=%02d
   when: create_user_project | bool == true
 
 
