@@ -79,7 +79,7 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
   ```bash
   ansible-playbook -i inventory/cloud_host playbook/post_installation.yml --tags delete_extra_users \
      -e number_of_extra_users=5 \
-     -e first_extra_user_offset=1 \
+     -e first_extra_user_offset=1
   ```
   
   This step will delete 5 users whose user names are like  `user1` while also deleting the projects like `user1` that were associated to those users
