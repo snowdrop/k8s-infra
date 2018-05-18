@@ -35,8 +35,9 @@ users:
 
 runcmd:
   - yum install -y NetworkManager
+  - rm -rf /etc/docker/certs.d/registry.access.redhat.com
   - systemctl enable docker
-  - systemctl start docker
+  - systemctl restart docker
   - systemctl start NetworkManager
   - systemctl enable NetworkManager
   - timedatectl set-timezone TIMEZONE
