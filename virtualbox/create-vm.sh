@@ -1,10 +1,38 @@
 #!/usr/bin/env bash
 
-IMAGE_DIR=$1
+CPU=2
+RAM=4000
+DISK=25000
+
+if (($# == 0)); then
+        echo "Usage : ./create-vm.sh -i /PATH/TO/IMAGE/DIR -c 4 -m 4000 -d 20000"
+        echo "i - /path/to/image/dir - mandatory"
+        echo "c - cpu option - default to 2"
+        echo "m - memory (ram) option - default to 4000"
+        echo "d - hard disk size (option) - default to 20000"
+        exit 2
+fi
+
+while getopts ":i:c:m:d:" option; do
+
+  case ${option} in
+
+    i  ) IMAGE_DIR=${OPTARG};;
+    c  ) CPU=${OPTARG:=${CPU}};;
+    m  ) RAM=${OPTARG:=${RAM}};;
+    d  ) DISK=${OPTARG:=${DISK}};;
+
+    \? )
+         echo "Invalid option: $OPTARG" 1>&2
+         ;;
+    :  )
+         echo "Invalid option: $OPTARG requires an argument" 1>&2
+         ;;
+  esac
+done
+
 VIRTUAL_BOX_NAME="CentOS-7" # VM Name
 OSTYPE="Linux_64";
-RAM=5120; #in MB
-CPU=4;
 CPUCAP=100;
 PAE="on";
 VRAM=8;
@@ -34,6 +62,11 @@ vboxmanage dhcpserver modify --ifname vboxnet0 --enable
 ##########################################
 echo "######### Create VM"
 vboxmanage createvm --name ${VIRTUAL_BOX_NAME} --ostype "$OSTYPE" --register --basefolder=$HOME/VirtualBox\ VMs
+
+echo "######### RAM       : ${RAM}"
+echo "######### CPU       : ${CPU}"
+echo "######### DISK SIZE : ${DISK}"
+
 
 # VirtualBox Network
 echo "######### Define NIC adapters; NAT and vboxnet0"
@@ -66,7 +99,7 @@ vboxmanage modifyvm ${VIRTUAL_BOX_NAME} --usb "$USB";
 vboxmanage modifyvm ${VIRTUAL_BOX_NAME} --vrde on;
 
 echo "######### Resize VDI disk to 15GB"
-vboxmanage modifyhd ${IMAGE_DIR}/disk.vdi --resize 20000
+vboxmanage modifyhd ${IMAGE_DIR}/disk.vdi --resize ${DISK}
 
 echo "######### Create IDE Controller, attach vdi disk and iso dvd"
 vboxmanage storagectl ${VIRTUAL_BOX_NAME} --name "IDE Controller" --add ide --hostiocache on

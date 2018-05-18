@@ -367,11 +367,16 @@ This script will perform the following tasks:
 
 ```bash
 cd virtualbox
-./create-vm.sh </PATH/TO/IMAGES/DIR>
+Usage : ./create-vm.sh -i /PATH/TO/IMAGE/DIR -c 4 -m 4000 -d 20000
+i - /path/to/image/dir - mandatory
+c - cpu option - default to 4
+m - memory (ram) option - default to 4000
+d - hard disk size (option) - default to 20000
+
 ```
 Example:
 ```bash
-./create-vm.sh /Users/dabou/images 
+./create-vm.sh -i /Users/dabou/images 
 ######### Poweroff machine if it runs
 VBoxManage: error: Machine 'CentOS-7' is not currently running
 ######### .............. Done
