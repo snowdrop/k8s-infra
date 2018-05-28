@@ -37,6 +37,10 @@
   
 - Optional: Add any other user public keys to allow those users to ssh into the target machine
 
+  The usernames supplied need to be valid GitHub usernames that have Public Keys uploaded to their accounts, 
+  since those public keys will be downloaded from GitHub and added to the list of authorized keys 
+  that can access the machine
+
   ```bash
   ansible-playbook -i inventory/simple_host playbook/import_public_key.yml -e '{gh_usernames: [foo, bar]}'
   ```   
