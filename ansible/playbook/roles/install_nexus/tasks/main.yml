@@ -9,14 +9,14 @@
 
 - name: Install Nexus App
   shell: |
-    oc {{ openshift_env.oc_admin_kubeconfig_arg }} new-app sonatype/nexus
-    oc {{ openshift_env.oc_admin_kubeconfig_arg }} expose svc/nexus
-    oc {{ openshift_env.oc_admin_kubeconfig_arg }} set probe dc/nexus \
+    oc {{ openshift_env.oc_admin_kubeconfig_arg }} new-app sonatype/nexus -n {{ infra_project }}
+    oc {{ openshift_env.oc_admin_kubeconfig_arg }} expose svc/nexus -n {{ infra_project }}
+    oc {{ openshift_env.oc_admin_kubeconfig_arg }} set probe dc/nexus -n {{ infra_project }} \
     	--liveness \
     	--failure-threshold 3 \
     	--initial-delay-seconds 30 \
     	-- echo ok
-    oc {{ openshift_env.oc_admin_kubeconfig_arg }} set probe dc/nexus \
+    oc {{ openshift_env.oc_admin_kubeconfig_arg }} set probe dc/nexus -n {{ infra_project }} \
     	--readiness \
     	--failure-threshold 3 \
     	--initial-delay-seconds 30 \
@@ -28,11 +28,11 @@
       claim_name: nexus-pv
 
   - name: Remove existing claim
-    command: oc {{ openshift_env.oc_admin_kubeconfig_arg }} delete pvc {{ claim_name }} --ignore-not-found=true
+    command: oc {{ openshift_env.oc_admin_kubeconfig_arg }} delete pvc {{ claim_name }} -n {{ infra_project }} --ignore-not-found=true
 
   - name: Enable persistence
     shell: |
-        oc {{ openshift_env.oc_admin_kubeconfig_arg }} volumes dc/nexus --add \
+        oc {{ openshift_env.oc_admin_kubeconfig_arg }} volumes dc/nexus -n {{ infra_project }} --add \
             --name 'nexus-volume-1' \
             --type 'pvc' \
             --mount-path '/sonatype-work/' \
