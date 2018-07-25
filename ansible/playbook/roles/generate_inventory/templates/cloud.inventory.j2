@@ -46,6 +46,8 @@ openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 
 # htpasswd -nb admin admin
 openshift_master_htpasswd_users={'admin': '$apr1$DloeoaY3$nqbN9fQBkyXgbj58buqEM.'}
 
+openshift_node_groups=[{'name': 'node-config-all-in-one', 'labels': ['node-role.kubernetes.io/master=true', 'node-role.kubernetes.io/infra=true', 'node-role.kubernetes.io/compute=true']}]
+
 
 {% set host_info = 'localhost ansible_connection=local' if ((use_local is defined) and (use_local | bool)) else ip_address %}
 {% set private_ip_address = private_ip_address if (private_ip_address is defined) else ip_address %}
@@ -62,4 +64,4 @@ openshift_master_htpasswd_users={'admin': '$apr1$DloeoaY3$nqbN9fQBkyXgbj58buqEM.
 # openshift-sdn gets installed. We mark the master node as not
 # schedulable.
 [nodes]
-{{ host_info }} openshift_node_labels="{'region':'infra','zone':'default', 'node-role.kubernetes.io/compute': 'true'}" openshift_public_hostname={{ ip_address }} openshift_hostname={{ private_ip_address }}
+{{ host_info }} openshift_node_group_name="node-config-all-in-one" openshift_public_hostname={{ ip_address }} openshift_hostname={{ private_ip_address }}
