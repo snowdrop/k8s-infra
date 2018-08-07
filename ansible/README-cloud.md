@@ -12,7 +12,7 @@
   ```bash
   echo "#### Git clone openshift ansible"
   if [ ! -d "openshift-ansible" ]; then
-    git clone -b release-3.9 https://github.com/openshift/openshift-ansible.git
+    git clone -b release-3.10 https://github.com/openshift/openshift-ansible.git
   fi
   ```
 
