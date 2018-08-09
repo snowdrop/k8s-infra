@@ -12,17 +12,15 @@ ansible_ssh_private_key_file={{ keyfile }}
 public_ip_address={{ ip_address }}
 host_key_checking=false
 
-containerized=true
-openshift_enable_excluders=false
-openshift_release=v{{ openshift_origin_version }}
+openshift_release="{{ openshift_origin_version }}"
 
 openshift_deployment_type=origin
 
+openshift_additional_repos=[{'id': 'origin-repo', 'name': 'Origin-RPMs', 'baseurl': 'https://storage.googleapis.com/origin-ci-test/logs/test_branch_origin_extended_conformance_gce_310/27/artifacts/rpms', 'enabled': 1, 'gpgcheck': 0}]
 
 openshift_hostname={{ hostname if (hostname is defined) else ip_address }}
 openshift_master_cluster_public_hostname={{ ip_address }}
 openshift_master_default_subdomain={{ ip_address }}.nip.io
-openshift_master_unsupported_embedded_etcd=true
 
 # To avoid message
 # - Available disk space in "/var" (9.5 GB) is below minimum recommended (40.0 GB)
@@ -31,8 +29,6 @@ openshift_master_unsupported_embedded_etcd=true
 # - Docker version is higher than expected
 openshift_disable_check = docker_storage,memory_availability,disk_availability,docker_image_availability,package_version
 
-# we need to increase the pods per core because we might temporarily have multiple build pods running at the same time
-openshift_node_kubelet_args={'pods-per-core': ['20']}
 
 # ASB Service Catalog
 openshift_enable_service_catalog=false
@@ -46,7 +42,7 @@ openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 
 # htpasswd -nb admin admin
 openshift_master_htpasswd_users={'admin': '$apr1$DloeoaY3$nqbN9fQBkyXgbj58buqEM.'}
 
-openshift_node_groups=[{'name': 'node-config-all-in-one', 'labels': ['node-role.kubernetes.io/master=true', 'node-role.kubernetes.io/infra=true', 'node-role.kubernetes.io/compute=true']}]
+openshift_node_groups=[{'name': 'node-config-all-in-one', 'labels': ['node-role.kubernetes.io/master=true', 'node-role.kubernetes.io/infra=true', 'node-role.kubernetes.io/compute=true'], 'edits': [{ 'key': 'kubeletArguments.pods-per-core','value': ['20']}]}]
 
 
 {% set host_info = 'localhost ansible_connection=local' if ((use_local is defined) and (use_local | bool)) else ip_address %}
