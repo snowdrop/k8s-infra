@@ -24,6 +24,7 @@ cluster_logging: false
 
 openshift_up_options: '
   --enable=[*]
+  --write-config=true
   --public-hostname={{ cluster_ip_address }}
   --routing-suffix={{ cluster_ip_address }}.nip.io
   --server-loglevel={{ cluster_log_level }}'

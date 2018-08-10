@@ -21,7 +21,7 @@
   register: r
 
 - name: Copy patch to new master config file
-  copy: content="{{ r.stdout }}" dest={{ openshift_env.config_dir }}/master/master-config.yaml
+  copy: content="{{ r.stdout }}" dest={{ openshift_env.master_config_file }}
 
 - name: Restart master
   include_role:

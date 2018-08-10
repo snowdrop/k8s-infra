@@ -11,6 +11,11 @@
     register: files_out
 
   - set_fact:
+      master_config_file: "{{ files_out.files | map(attribute='path') | select('match', '.*(master|openshift-apiserver)/.*') | first }}"
+    when: files_out.files | length > 0
+
+  - set_fact:
+      master_config_dir: "{{ master_config_file | dirname }}"
       config_dir: "{{ item }}"
     when: files_out.files | length > 0
 
