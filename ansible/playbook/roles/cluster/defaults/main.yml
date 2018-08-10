@@ -17,13 +17,8 @@ cluster_ip_address: "{{ public_ip_address }}" # Re use the inventory ip address
 cluster_use_existing_config: true
 cluster_log_level: 1
 
-# Features
-cluster_service_catalog: false
-cluster_metrics: false
-cluster_logging: false
-
 openshift_up_options: '
-  --enable=[*]
+  --enable=[automation-service-broker, centos-imagestreams, persistent-volumes, registry, rhel-imagestreams, router, service-catalog, template-service-broker, web-console]
   --write-config=true
   --public-hostname={{ cluster_ip_address }}
   --routing-suffix={{ cluster_ip_address }}.nip.io
