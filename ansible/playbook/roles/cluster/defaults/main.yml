@@ -5,7 +5,7 @@ openshift_github_name: origin
 openshift_github_url: https://api.github.com/repos
 
 # Openshift parameters
-openshift_release_tag_name: "v3.9.0"
+openshift_release_tag_name: "v3.10.0"
 
 openshift_client_dest: /usr/local/bin
 openshift_force_client_install: false
@@ -17,28 +17,14 @@ cluster_ip_address: "{{ public_ip_address }}" # Re use the inventory ip address
 cluster_use_existing_config: true
 cluster_log_level: 1
 
-# Switch to docker folder config dir as it uses a different path and not the onde defined for oc cluster up
-cluster_host_config_dir: /var/lib/origin/openshift.local.config
-cluster_host_data_dir: /var/lib/openshift/data
-cluster_host_volumes_dir: /var/lib/openshift/volumes
-cluster_host_pv_dir: /var/lib/openshift/pv
-
 # Features
 cluster_service_catalog: false
 cluster_metrics: false
 cluster_logging: false
 
 openshift_up_options: '
-  --version={{ openshift_release_tag_name }}
-  --host-config-dir={{ cluster_host_config_dir }}
-  --host-data-dir={{ cluster_host_data_dir }}
-  --host-volumes-dir={{ cluster_host_volumes_dir }}
-  --host-pv-dir={{ cluster_host_pv_dir }}
-  --use-existing-config={{ cluster_use_existing_config }}
+  --enable=[*]
   --public-hostname={{ cluster_ip_address }}
   --routing-suffix={{ cluster_ip_address }}.nip.io
-  --loglevel={{ cluster_log_level }}
-  --service-catalog={{ cluster_service_catalog }}
-  --logging={{ cluster_logging }}
-  --metrics={{ cluster_metrics }}'
+  --server-loglevel={{ cluster_log_level }}'
 
