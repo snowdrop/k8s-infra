@@ -29,11 +29,6 @@ openshift_master_default_subdomain={{ ip_address }}.nip.io
 # - Docker version is higher than expected
 openshift_disable_check = docker_storage,memory_availability,disk_availability,docker_image_availability,package_version
 
-
-# ASB Service Catalog
-openshift_enable_service_catalog=false
-ansible_service_broker_registry_whitelist=[".*-apb$"]
-
 # Python Interpreter
 ansible_python_interpreter=/usr/bin/python
 
