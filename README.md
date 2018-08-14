@@ -266,7 +266,7 @@ summarize and present the possibilities offered:
      
      ```bash
      cd minishift    
-     ./bootstrap_vm.sh true 3.9.0
+     ./bootstrap_vm.sh true 3.10.0
      ```
      
      **NOTE** : The caching option can be used in order to export the docker images locally, which will speed up the bootstrap process next time you recreate the OpenShift virtual machine / installation.

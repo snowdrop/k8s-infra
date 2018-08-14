@@ -6,14 +6,14 @@
 #
 # where commands are:
 # imageCache          Enable or disable to use docker images cached on the local user's disk. Default is false
-# ocp version         Version of OpenShift Origin. Default to : 3.9.0
+# ocp version         Version of OpenShift Origin. Default to : 3.10.0
 #
-# ./bootstrap_vm.sh true 3.9.0
+# ./bootstrap_vm.sh true 3.10.0
 #
 
 DEMO_PROFILE_DIR="$HOME/.minishift/profiles/demo"
 IMAGE_CACHE=${1:-false}
-OCP_VERSION=${2:-3.9.0}
+OCP_VERSION=${2:-3.10.0}
 
 docker_images=(
   openshift/origin-docker-registry:v$OCP_VERSION

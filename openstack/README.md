@@ -16,7 +16,7 @@ ansible-playbook playbook/openstack.yml -e '{"state": "present", "hostname": "so
 
 To delete a VM, simply replace `"state": "present"` with `"state": "absent"`
 
-When using `"state": "present"`, the playbook will also generate an Openshift 3.9 inventory file in `inventory/cloud_host` 
+When using `"state": "present"`, the playbook will also generate an Openshift 3.10 inventory file in `inventory/cloud_host` 
 as well as the private key of the new VM as `inventory/id_openstack.rsa` 
 
 **IMPORTANT** : The Ansible commands should be executed within the ansible folder !
