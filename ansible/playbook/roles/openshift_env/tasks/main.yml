@@ -54,6 +54,9 @@
     openshift_env: "{{ openshift_env | combine({ 'master_config_file': master_config_file }) }}"
 
 - set_fact:
+    openshift_env: "{{ openshift_env | combine({ 'htpasswd_file': master_config_dir + '/htpasswd' }) }}"
+
+- set_fact:
     openshift_env: "{{ openshift_env | combine({ 'oc_admin_kubeconfig_arg': ' --config ' + master_config_dir + '/admin.kubeconfig' }) }}"
 
 - debug:

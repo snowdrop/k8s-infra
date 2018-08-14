@@ -1,8 +1,5 @@
-- set_fact:
-    path_users_pwd: "{{ openshift_env.config_dir }}/{{ users_pwd_file }}"
-
 - name: Add user/pwd to file
-  command: "htpasswd -b {{ path_users_pwd }} user{{ item }} pwd{{ item }}"
+  command: "htpasswd -b {{ openshift_env.htpasswd_file }} user{{ item }} pwd{{ item }}"
   with_sequence: start={{ first_extra_user_offset }} count={{ number_of_extra_users }} format=%02d
 
 - block:

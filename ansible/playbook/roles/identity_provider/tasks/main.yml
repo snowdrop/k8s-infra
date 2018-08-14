@@ -8,21 +8,18 @@
       - "openshift_admin_pwd != ''"
     msg: "Please specify an password that will be used for the cluster using the 'openshift_admin_pwd' variable. The easiest way to do is to add -e openshift_admin_pwd=foopass to your Ansible CLI invocation"
 
-- set_fact:
-    path_users_pwd: "{{ openshift_env.config_dir }}/{{ users_pwd_file }}"
-
 - name: Install httpd-tools package if not there
   yum:
     name: httpd-tools
     state: present
 
 - stat:
-    path: "{{ path_users_pwd }}"
+    path: "{{ openshift_env.htpasswd_file }}"
   register: p
 
-- name: Create users.htpasswd file
+- name: Create htpasswd file if needed
   file:
-    path: "{{ path_users_pwd }}"
+    path: "{{ openshift_env.htpasswd_file }}"
     state: touch
     owner: root
     group: root
@@ -30,7 +27,7 @@
   when: not p.stat.exists
 
 - name: Create user/pwd
-  command: "htpasswd -b {{ path_users_pwd }} {{ openshift_admin_user}} {{ openshift_admin_pwd }}"
+  command: "htpasswd -b {{ openshift_env.htpasswd_file }} {{ openshift_admin_user}} {{ openshift_admin_pwd }}"
 
 - name: Generate patch using template
   template:
