@@ -39,6 +39,11 @@ openshift_master_htpasswd_users={'admin': '$apr1$DloeoaY3$nqbN9fQBkyXgbj58buqEM.
 
 openshift_node_groups=[{'name': 'node-config-all-in-one', 'labels': ['node-role.kubernetes.io/master=true', 'node-role.kubernetes.io/infra=true', 'node-role.kubernetes.io/compute=true'], 'edits': [{ 'key': 'kubeletArguments.pods-per-core','value': ['20']}]}]
 
+# Used to control the image version of origin-ansible-service-broker
+# see: https://github.com/openshift/openshift-ansible/blob/release-3.10/roles/ansible_service_broker/defaults/main.yml
+# Note: the variable seems to not be used currently, but that is most likely a bug
+ansible_service_broker_image_tag=1.2
+
 
 {% set host_info = 'localhost ansible_connection=local' if ((use_local is defined) and (use_local | bool)) else ip_address %}
 {% set private_ip_address = private_ip_address if (private_ip_address is defined) else ip_address %}
