@@ -1,0 +1,43 @@
+- name: Generate Istio Operator Template
+  template:
+    src: istio_community_operator_template.yaml.j2
+    dest: /tmp/istio_community_operator_template.yaml
+
+- name: Generate Istio CRD file
+  template:
+    src: istio_crd.yaml.j2
+    dest: /tmp/istio_crd.yaml
+
+- name: Create namespace
+  command: oc {{ openshift_env.oc_admin_kubeconfig_arg }} new-project istio-operator
+
+- name: Create Istio Operator
+  command: oc {{ openshift_env.oc_admin_kubeconfig_arg }} new-app -f /tmp/istio_community_operator_template.yaml -n istio-operator
+
+- name: Wait for Istio Operator to run
+  command: oc {{ openshift_env.oc_admin_kubeconfig_arg }} get pods --field-selector status.phase=Running -l name=istio-operator -o jsonpath='{.items[0].metadata.name}'
+  register: operator
+  until: operator.rc == 0
+  delay: 10
+  retries: 20
+
+- name: Create Istio CRD
+  command: oc {{ openshift_env.oc_admin_kubeconfig_arg }} create -f /tmp/istio_crd.yaml -n istio-operator
+
+- name: Wait for the Istio CRD to be created
+  command: oc {{ openshift_env.oc_admin_kubeconfig_arg }} get crd installations.istio.openshift.com -n istio-operator
+  register: crd
+  until: crd.rc == 0
+  delay: 5
+  retries: 5
+
+- name: Wait for pod that performs the actual installation of Istio to run
+  command: oc {{ openshift_env.oc_admin_kubeconfig_arg }} get pods --field-selector status.phase=Running -l job-name=openshift-ansible-istio-installer-job -o jsonpath='{.items[0].metadata.name}' -n istio-system
+  register: install
+  until: install.rc == 0
+  delay: 10
+  retries: 20
+
+
+
+

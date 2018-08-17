@@ -1,0 +1,7 @@
+- name: Ensure Elastic Search sysctl file exists
+  copy:
+    content: "vm.max_map_count = 262144"
+    dest: /etc/sysctl.d/99-elasticsearch.conf
+
+- name: Execute sysctl command
+  command: "sysctl vm.max_map_count=262144"

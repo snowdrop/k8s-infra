@@ -1,44 +1,5 @@
 - include_tasks: patch_master.yml
 
-- name: Clone Istio project
-  git:
-    repo: "{{ istio_git_repo }}"
-    dest: "{{ istio_repo_dest }}"
-    version: "{{ istio_git_branch }}"
-    force: yes
-  connection: local
+- include_tasks: ensure_elasticsearch_will_work.yml
 
-- debug:
-    msg: "Istio git project {{ istio_git_repo }}/{{ istio_git_branch }} cloned to {{ istio_repo_dest }}"
-
-- name: Config used to install Istio
-  debug:
-    msg:
-    - "Git istio repo: {{ istio_git_repo }}"
-    - "Git istio branch: {{ istio_git_branch }}"
-    - "Git istio download directory: {{ istio_repo_dest }}"
-    - "Git istio playbook directory: {{ istio_repo_dest }}/install/ansible"
-    - "Istio version to be installed: {{ istio.release_tag_name }}"
-    - "Using TLS: {{ istio.auth }}"
-    - "Target cloud platform: {{ cluster_flavour }}"
-    - "Destination to install istio client, examples,...: {{ istio.dest }}"
-    - "Namespace where istio will be installed: {{ istio.namespace }}"
-    - "Addons: {{ istio.addon }}"
-    - "Install samples: {{ istio.samples }}"
-
-- name: Create temporary symlink to istio playbook
-  file:
-    src: "{{ istio_repo_dest }}/install/ansible"
-    dest: "istio_playbook_src"
-    state: link
-  connection: local
-
-- name: Execute the Istio Role
-  include_role:
-    name: istio_playbook_src/istio
-
-- name: Delete temporary symlink to istio playbook
-  file:
-    path: "istio_playbook_src"
-    state: absent
-  connection: local
+- include_tasks: install_operator.yml

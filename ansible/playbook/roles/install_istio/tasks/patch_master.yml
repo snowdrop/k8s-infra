@@ -1,5 +1,3 @@
-### This will only work for clusters created using oc cluster up
-
 - name: Check if master config is already patched
   command: cat {{ openshift_env.config_dir }}/master/master-config.yaml
   register: master_content
