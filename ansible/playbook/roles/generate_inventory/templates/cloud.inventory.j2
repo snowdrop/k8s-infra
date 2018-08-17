@@ -44,6 +44,9 @@ openshift_node_groups=[{'name': 'node-config-all-in-one', 'labels': ['node-role.
 # Note: the variable seems to not be used currently, but that is most likely a bug
 ansible_service_broker_image_tag=1.2
 
+# don't install ASB be default
+ansible_service_broker_install=false
+
 
 {% set host_info = 'localhost ansible_connection=local' if ((use_local is defined) and (use_local | bool)) else ip_address %}
 {% set private_ip_address = private_ip_address if (private_ip_address is defined) else ip_address %}
