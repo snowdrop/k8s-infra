@@ -58,3 +58,16 @@
   of the above commands 
   
   **REMARK** : Customization of the installation (inventory file generated) is possible by changing the variables found in `inventory/cloud_host` from the command line using Ansible's `-e` syntax.
+  
+- Setup DNS
+
+  Execute 
+
+  ```bash
+  ansible-playbook -i inventory/cloud_host playbook/dns.yml  
+  ```
+  
+  If the `ansible_user` that is has been set in the inventory is not `root`, then the `--become` flag needs to be added to both
+  of the above commands
+  
+  Check out the [docs](https://docs.okd.io/latest/install/prerequisites.html#prereq-dns) to see more about why this is needed.    
