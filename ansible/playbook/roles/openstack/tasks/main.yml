@@ -84,6 +84,9 @@
   - name: Install Atomic
     command: "{{ internal_ssh_command }} \"sudo yum install -y atomic\""
 
+  - name: Remove erroneous certs
+    command: "{{ internal_ssh_command }} \"sudo rm -rf /etc/docker/certs.d/registry.access.redhat.com\""
+
   - name: Reboot instance
     command: "{{ internal_ssh_command }} \"sudo reboot\""
     ignore_errors: true
