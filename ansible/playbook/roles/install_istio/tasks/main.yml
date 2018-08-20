@@ -1,5 +1,3 @@
 - include_tasks: patch_master.yml
 
-- include_tasks: ensure_elasticsearch_will_work.yml
-
 - include_tasks: install_operator.yml
