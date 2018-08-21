@@ -1,44 +1,21 @@
 - set_fact:
-    services_restarted: false
-    origin_services: origin-master-api origin-master-controllers
-    custom_service_name: "{{ custom_service_name | default('dummy') }}"
+    restart_script: /usr/local/bin/master-restart
 
-- name: Check and see if a custom service exists
-  command: systemctl status {{ custom_service_name }}
-  register: csout
-  ignore_errors: true
+- name: Check if restart script exists
+  stat:
+    path: "{{ restart_script }}"
+  register: sc
 
-- name: Check and see if origin-master-api, origin-master-controllers services exist
-  command: systemctl status {{ origin_services }}
-  register: osout
-  ignore_errors: true
+- name: Use provided restart script
+  command: "{{ restart_script }} api"
+  when: sc.stat.exists == true
 
-- set_fact:
-    services_to_restart: "{{ custom_service_name if csout.rc == 0 else origin_services if osout.rc == 0 else ''}}"
-
-- block:
-
-  - debug:
-      msg: "Will restart the following systemd services: {{ services_to_restart }}"
-
-  - name: Restart systemd services
-    command: systemctl restart {{ services_to_restart }}
-
-  - set_fact:
-      services_restarted: true
-
-  when: "not services_to_restart == ''"
-
-- block:
-
-  - debug:
-      msg: "Will restart the docker container that runs the Openshift master"
-
-  - name: Restart docker container
-    command: "docker restart origin"
-
-  when: services_restarted == false and openshift_env.containerized == true
+- name: Attempt to restart docker container
+  command: "docker restart origin"
+  when: sc.stat.exists == false
 
 - name: Wait for master to stand up
   pause:
-    seconds: 10
+    seconds: 60
+
+

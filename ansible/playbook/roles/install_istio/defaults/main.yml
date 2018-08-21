@@ -1,8 +1,1 @@
-# Repository where the project will be cloned from
-istio_git_repo: https://github.com/istio/istio.git
-
-# Istio github branch to be used to install the istio playbook
-istio_git_branch: master
-
-# Folder where the project will be cloned on your machine
-istio_repo_dest: ~/.istio/playbooks
+istio_authentication: false

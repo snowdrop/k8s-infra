@@ -207,5 +207,5 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
 
   To install the service catalog, execute this command
   ```bash
-  ansible-playbook -i inventory/cloud_host openshift-ansible/playbooks/openshift-service-catalog/config.yml
+  ansible-playbook -i inventory/cloud_host openshift-ansible/playbooks/openshift-service-catalog/config.yml -e ansible_service_broker_install=true
   ```

@@ -9,8 +9,6 @@
 # server_full (type: string, example: "v3.9.0-alpha.3+78ddc10")
 # containerized (type: bool)
 # config_dir (type: string)
-# has_pv_storage (bool: true): Determines whether the environment already provides Persistent Volume storage or not.
-#                              Currently this is only set to true when we have detected a containerized environment
 
 - set_fact:
     openshift_env: {}
@@ -32,19 +30,34 @@
 
 - set_fact:
     config_dir: ""
+    master_config_dir: ""
+    master_config_file: ""
 
 - name: Find yml files in {{ item }}
   include_tasks: determine_is_openshift_config_dir.yml
   with_items: "{{ candicate_config_dirs }}"
 
+- assert:
+    that:
+    - "master_config_dir != ''"
+    - "master_config_file != ''"
+    - "master_config_dir in master_config_file"
+    msg: "Unable to correctly determine the Openshift environment"
+
 - set_fact:
     openshift_env: "{{ openshift_env | combine({ 'config_dir': config_dir }) }}"
 
 - set_fact:
-    openshift_env: "{{ openshift_env | combine({ 'has_pv_storage': openshift_env.containerized }) }}"
+    openshift_env: "{{ openshift_env | combine({ 'master_config_dir': master_config_dir }) }}"
 
 - set_fact:
-    openshift_env: "{{ openshift_env | combine({ 'oc_admin_kubeconfig_arg': ' --config ' + config_dir + '/master/admin.kubeconfig ' }) }}"
+    openshift_env: "{{ openshift_env | combine({ 'master_config_file': master_config_file }) }}"
+
+- set_fact:
+    openshift_env: "{{ openshift_env | combine({ 'htpasswd_file': master_config_dir + '/htpasswd' }) }}"
+
+- set_fact:
+    openshift_env: "{{ openshift_env | combine({ 'oc_admin_kubeconfig_arg': ' --config ' + master_config_dir + '/admin.kubeconfig' }) }}"
 
 - debug:
     var: openshift_env

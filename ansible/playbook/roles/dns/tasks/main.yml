@@ -1,0 +1,9 @@
+- name: Generate dnsmasq template
+  template:
+    src: local.conf.j2
+    dest: /etc/dnsmasq.d/local.conf
+
+- name: restart dnsmasq
+  systemd:
+    state: restarted
+    name: dnsmasq

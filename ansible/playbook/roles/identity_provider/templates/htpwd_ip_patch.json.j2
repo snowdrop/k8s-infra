@@ -9,7 +9,7 @@
         "provider": {
           "apiVersion": "v1",
           "kind": "HTPasswdPasswordIdentityProvider",
-          "file": "{{ path_users_pwd }}"
+          "file": "{{ openshift_env.htpasswd_file }}"
         }
       }
     ]

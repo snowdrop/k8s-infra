@@ -61,12 +61,13 @@
       username: "{{ login_username }}"
       keyfile: "{{ private_key_in_inventory }}"
       hostname: "{{ openstack.vm.name }}"
+      openshift_origin_version: "3.10"
 
   - set_fact:
       internal_ssh_command: "ssh -o \"StrictHostKeyChecking=no\" -o \"UserKnownHostsFile=/dev/null\" -i {{ private_key_in_inventory }} -tt {{ login_username }}@{{ openstack_output.server.accessIPv4 }}"
 
   - name: Disable selinux
-    command: "{{ internal_ssh_command }} \"sudo sed -i 's/^SELINUX=.*/SELINUX=disabled/g' /etc/selinux/config\""
+    command: "{{ internal_ssh_command }} \"sudo sed -i 's/^SELINUX=.*/SELINUX=permissive/g' /etc/selinux/config\""
 
   - name: Make commands under /usr/local/bin accessible to sudoers
     command: "{{ internal_ssh_command }} \"sudo sed -i -e '/secure_path/ s[=.*[&:/usr/local/bin[' /etc/sudoers\""
@@ -79,6 +80,12 @@
 
   - name: Install Red-Hat certificates
     command: "{{ internal_ssh_command }} \"sudo yum install -y python-rhsm-certificates\""
+
+  - name: Install Atomic
+    command: "{{ internal_ssh_command }} \"sudo yum install -y atomic\""
+
+  - name: Remove erroneous certs
+    command: "{{ internal_ssh_command }} \"sudo rm -rf /etc/docker/certs.d/registry.access.redhat.com\""
 
   - name: Reboot instance
     command: "{{ internal_ssh_command }} \"sudo reboot\""
