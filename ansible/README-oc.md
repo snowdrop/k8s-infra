@@ -33,6 +33,12 @@ since the script automatically invokes said command once the VM has been created
     --tags "up" 
   ```
 
+- To add the additional features such as the Ansible Service Broker, then run this command
+
+  ```bash
+  ansible-playbook -i inventory/simple_host playbook/cluster.yml --tags "enable" 
+  ```
+
 - To stop the cluster, then run this command
 
   ```bash
