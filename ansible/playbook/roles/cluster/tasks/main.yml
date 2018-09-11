@@ -48,3 +48,15 @@
 - name: Show cluster up output
   debug:
     var: clusterupout.stdout_lines
+
+- block:
+  - debug:
+      msg: "Enabling ASB"
+
+  - name: Enable additional features such as automation service broker
+    command: "oc cluster add --base-dir={{ cluster_base_dir }} {{ item }}"
+    register: clusterenable
+    with_items:
+    - service-catalog
+    - automation-service-broker
+  when: "enable_asb | default('false') | lower == 'true'"
