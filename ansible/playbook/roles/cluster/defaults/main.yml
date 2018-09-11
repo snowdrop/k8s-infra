@@ -18,7 +18,7 @@ cluster_use_existing_config: true
 cluster_log_level: 1
 
 openshift_up_options: '
-  --enable=*,service-catalog,automation-service-broker
+  --base-dir=/var/lib/origin/openshift.local.clusterup
   --public-hostname={{ cluster_ip_address }}
   --routing-suffix={{ cluster_ip_address }}.nip.io
   --server-loglevel={{ cluster_log_level }}'
