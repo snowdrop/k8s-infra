@@ -34,14 +34,15 @@
   debug:
     msg: "Parameters : {{ openshift_up_options }}"
 
-- name: Enable options
+# - name: Enable options
+- name: Cluster up
   command: "oc cluster up {{ openshift_up_options }}"
   register: clusterupout
-  ignore_errors: yes
+#  ignore_errors: yes
 
-- name: Launch cluster
-  command: "oc cluster up"
-  register: clusterupout
+#- name: Launch cluster
+#  command: "oc cluster up"
+#  register: clusterupout
 
 - name: Cluster up
   include_tasks: cluster_up.yml
