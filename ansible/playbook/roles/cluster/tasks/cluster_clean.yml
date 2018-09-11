@@ -11,7 +11,6 @@
     state: absent
     path: "{{ item }}"
   with_items:
-      - /var/lib/origin/openshift.local.clusterup
       - /var/lib/origin/openshift.local.config
       - /var/lib/openshift/data/member/
 
@@ -37,3 +36,8 @@
       port=22
       delay=1
       timeout=300
+
+- name: Remover cluster base dir folder
+  file:
+    state: absent
+    path: "{{ cluster_base_dir }}"
