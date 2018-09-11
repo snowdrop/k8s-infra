@@ -3,17 +3,19 @@
 CPU=2
 RAM=4000
 DISK=25000
+VIRTUAL_BOX_NAME="CentOS-7" # VM Name
 
 if (($# == 0)); then
-        echo "Usage : ./create-vm.sh -i /PATH/TO/IMAGE/DIR -c 4 -m 4000 -d 20000"
+        echo "Usage : ./create-vm.sh -i /PATH/TO/IMAGE/DIR -c 4 -m 6000 -d 25000"
         echo "i - /path/to/image/dir - mandatory"
         echo "c - cpu option - default to 2"
         echo "m - memory (ram) option - default to 4000"
         echo "d - hard disk size (option) - default to 20000"
+        echo "n - Name of the VirtualBox VM to be created - default to Centos-7"
         exit 2
 fi
 
-while getopts ":i:c:m:d:" option; do
+while getopts ":i:c:m:d:n:" option; do
 
   case ${option} in
 
@@ -21,6 +23,7 @@ while getopts ":i:c:m:d:" option; do
     c  ) CPU=${OPTARG:=${CPU}};;
     m  ) RAM=${OPTARG:=${RAM}};;
     d  ) DISK=${OPTARG:=${DISK}};;
+    n  ) VIRTUAL_BOX_NAME=${OPTARG:=${VIRTUAL_BOX_NAME}};;
 
     \? )
          echo "Invalid option: $OPTARG" 1>&2
@@ -31,7 +34,6 @@ while getopts ":i:c:m:d:" option; do
   esac
 done
 
-VIRTUAL_BOX_NAME="CentOS-7" # VM Name
 OSTYPE="Linux_64";
 CPUCAP=100;
 PAE="on";
