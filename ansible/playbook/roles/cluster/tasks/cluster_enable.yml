@@ -1,0 +1,11 @@
+- name: Enable additional features such as automation service broker
+  command: "oc cluster add {{ item }}"
+  register: clusterenable
+  with_items:
+      - service-catalog
+      - template-service-broker
+      - automation-service-broker
+
+- name: Show cluster enable - output
+  debug:
+    var: clusterenable.stdout_lines

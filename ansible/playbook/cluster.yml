@@ -26,6 +26,12 @@
         tasks_from: cluster_status.yml
       tags: status
 
+    - name: Openshift cluster enable
+      import_role:
+        name: cluster
+        tasks_from: cluster_enable.yml
+      tags: enable
+
     - name: Clean Openshift configs
       import_role:
         name: cluster
