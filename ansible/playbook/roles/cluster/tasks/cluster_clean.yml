@@ -11,6 +11,7 @@
     state: absent
     path: "{{ item }}"
   with_items:
+      - $HOME/openshift.local.clusterup
       - /var/lib/origin/openshift.local.config
       - /var/lib/openshift/data/member/
 
