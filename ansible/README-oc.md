@@ -28,7 +28,7 @@ since the script automatically invokes said command once the VM has been created
 
   ```bash
   ansible-playbook -i inventory/simple_host playbook/cluster.yml \
-    -e openshift_release_tag_name=v3.9.0 \
+    -e openshift_release_tag_name=v3.10.0 \
     -e "@extra_vars.yml" \
     --tags "up" 
   ```
