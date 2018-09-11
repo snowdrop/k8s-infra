@@ -18,8 +18,7 @@ cluster_use_existing_config: true
 cluster_log_level: 1
 
 openshift_up_options: '
-  --enable=[automation-service-broker, centos-imagestreams, persistent-volumes, registry, rhel-imagestreams, router, service-catalog, template-service-broker, web-console]
-  --write-config=true
+  --enable=*,service-catalog,automation-service-broker
   --public-hostname={{ cluster_ip_address }}
   --routing-suffix={{ cluster_ip_address }}.nip.io
   --server-loglevel={{ cluster_log_level }}'
