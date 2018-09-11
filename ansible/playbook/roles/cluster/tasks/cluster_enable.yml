@@ -12,7 +12,3 @@
       - service-catalog
       - automation-service-broker
 
-- name: Show cluster enable - output
-  debug:
-    var: clusterenable.stdout_lines
-
