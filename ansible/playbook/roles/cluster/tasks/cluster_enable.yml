@@ -1,11 +1,18 @@
+- name: Enabled features
+  debug:
+    msg: "Enabled feature : {{ item }}"
+  with_items:
+      - service-catalog
+      - automation-service-broker
+
 - name: Enable additional features such as automation service broker
-  command: "oc cluster add {{ item }}"
+  command: "oc cluster add --base-dir={{ cluster_base_dir }} {{ item }}"
   register: clusterenable
   with_items:
       - service-catalog
-      - template-service-broker
       - automation-service-broker
 
 - name: Show cluster enable - output
   debug:
     var: clusterenable.stdout_lines
+
