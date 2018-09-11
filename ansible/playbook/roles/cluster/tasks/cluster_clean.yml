@@ -6,14 +6,6 @@
 - name: Stop docker
   command: systemctl stop docker
 
-- name: Remover folders
-  file:
-    state: absent
-    path: "{{ item }}"
-  with_items:
-      - /var/lib/origin/openshift.local.config
-      - /var/lib/openshift/data/member/
-
 - name: Restart docker
   command: systemctl start docker
 
