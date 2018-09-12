@@ -21,6 +21,7 @@ cluster_write_config: false
 
 openshift_up_options: '
   --base-dir={{ cluster_base_dir }}
+  --write-config=true
   --public-hostname={{ cluster_ip_address }}
   --routing-suffix={{ cluster_ip_address }}.nip.io
   --server-loglevel={{ cluster_log_level }}

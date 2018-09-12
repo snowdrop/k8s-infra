@@ -34,8 +34,12 @@
   debug:
     msg: "Parameters : {{ openshift_up_options }}"
 
-- name: Cluster up
+- name: Configure cluster
   command: "oc cluster up {{ openshift_up_options }}"
+  register: clusterupout
+
+- name: Launch cluster
+  command: "oc cluster up --base-dir={{ cluster_base_dir }}"
   register: clusterupout
 
 - name: Cluster up
@@ -44,3 +48,16 @@
 - name: Show cluster up output
   debug:
     var: clusterupout.stdout_lines
+
+- block:
+  - debug:
+      msg: "Enabling ASB"
+
+  - set_fact:
+      items: "{{ enable.split(',') | trim }}"
+
+  - name: Enable selected additional features
+    command: "oc cluster add --base-dir={{ cluster_base_dir }} {{ item }}"
+    register: clusterenable
+    with_items: "{{ items }}"
+  when: "enable | default('') | length > 0"
