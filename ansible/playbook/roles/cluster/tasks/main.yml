@@ -48,3 +48,16 @@
 - name: Show cluster up output
   debug:
     var: clusterupout.stdout_lines
+
+- block:
+  - debug:
+      msg: "Enabling ASB"
+
+  - set_fact:
+      items: "{{ enable.split(',') | trim }}"
+
+  - name: Enable selected additional features
+    command: "oc cluster add --base-dir={{ cluster_base_dir }} {{ item }}"
+    register: clusterenable
+    with_items: "{{ items }}"
+  when: "enable | default('') | length > 0"
