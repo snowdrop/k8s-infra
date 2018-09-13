@@ -41,6 +41,9 @@ openshift_node_groups=[{'name': 'node-config-all-in-one', 'labels': ['node-role.
 
 # don't install ASB be default
 ansible_service_broker_install=false
+# we need to pin the version of the catalog (in case it get's installed) to a valid 1.2 version
+# See https://github.com/openshift/openshift-ansible/issues/9960#issuecomment-420686883
+ansible_service_broker_image=docker.io/ansibleplaybookbundle/origin-ansible-service-broker:ansible-service-broker-1.2.17-1
 
 
 {% set host_info = 'localhost ansible_connection=local' if ((use_local is defined) and (use_local | bool)) else ip_address %}
