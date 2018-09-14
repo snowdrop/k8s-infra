@@ -27,7 +27,7 @@ function create_vm {
     sleep 6s
   done
 }
-git
+
 echo "============================================="
 echo "Execute shell script to perform oc cluster up"
 echo "============================================="
