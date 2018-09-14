@@ -18,9 +18,9 @@ function create_vm {
   echo "===================="
   ./virtualbox/create-vm.sh -i ~/images -m 5000 -n okd-3.10
 
-  echo "===================="
-  echo "Sleep till the VM is ready"
-    echo "===================="
+  echo "=============================================================="
+  echo "Sleep till the VM is ready as packages are currently installed"
+    echo "============================================================"
   for i in {1..25}
   do
     echo "Waiting $i of 25"
@@ -28,10 +28,28 @@ function create_vm {
   done
 }
 
-function install_vboxfs {
+function install_guest {
   echo "============================================="
-  echo " Install and build Guestaddition             "
+  echo " Install and build Guest Virtualbox Addition "
   echo "============================================="
+
+  echo "### Upgrading Centos"
+  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP  "sudo yum -y update"
+
+  echo "### Rebooting the VM to use the new kernel updated otherwise the headers version will not match the kernel version"
+  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'sudo shutdown -r now'
+  sleep 5
+  echo "### Waiting for machine to reboot ..."
+  ping_cancelled=false                                          # Keep track of whether the loop was cancelled, or succeeded
+  while ! ping -c1 $PUBLIC_IP &>/dev/null; do sleep 5; done &   # The "&" backgrounds it
+  trap "kill $!; ping_cancelled =true" SIGINT
+  wait $!                                                       # Wait for the loop to exit, one way or another
+  trap - SIGINT                                                 # Remove the trap, now we're done with it
+
+  echo "### Installing deps needed to compile vboxguest addon..."
+  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < sandbox/cluster_up/install_deps.sh
+
+  echo "### Done pinging"
   ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < sandbox/cluster_up/guest_addition.sh
 }
 
@@ -58,23 +76,27 @@ function load_images {
   echo "============================================="
   echo " Load docker images for origin 3.10          "
   echo "============================================="
-  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP "docker load -i /media/sf_share/origin-v3.10.tar"
+  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP "docker load -i /media/sf_shared/origin-v3.10.tar"
 }
 
 if [ "$1" == "all" ]; then
   create_vm
-  install_vboxfs
-  pull_backup_images
+  install_guest
+  # pull_backup_images
   load_images
   cluster_up
 fi
 
-if [ "$1" == "create" ]; then
+if [ "$1" == "create_vm" ]; then
   create_vm
 fi
 
+if [ "$1" == "install_deps" ]; then
+  install_deps
+fi
+
 if [ "$1" == "install_guest" ]; then
-  install_vboxfs
+  install_guest
 fi
 
 if [ "$1" == "bk_images" ]; then
