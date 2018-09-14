@@ -34,12 +34,8 @@
   debug:
     msg: "Parameters : {{ openshift_up_options }}"
 
-- name: Configure cluster
-  command: "oc cluster up {{ openshift_up_options }}"
-  register: clusterupout
-
 - name: Launch cluster
-  command: "oc cluster up --base-dir={{ cluster_base_dir }}"
+  command: "oc cluster up --base-dir={{ cluster_base_dir }} {{ openshift_up_options }}"
   register: clusterupout
 
 - name: Cluster up
