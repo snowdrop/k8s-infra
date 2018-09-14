@@ -5,7 +5,7 @@
 # with oc cluster up
 #
 PUBLIC_IP=192.168.99.50
-CREATE_VM=$1
+PWD=$2
 
 function create_vm {
   echo "=================="
@@ -18,9 +18,9 @@ function create_vm {
   echo "===================="
   ./virtualbox/create-vm.sh -i ~/images -m 5000 -n okd-3.10
 
-  echo "=============================================================="
-  echo "Sleep till the VM is ready as packages are currently installed"
-    echo "============================================================"
+  echo "==================================================================================================="
+  echo "Sleep till the VM is ready as packages are currently installed by cloud init process -> yum install"
+    echo "================================================================================================="
   for i in {1..25}
   do
     echo "Waiting $i of 25"
@@ -89,9 +89,7 @@ function install_catalog {
 
 if [ "$1" == "all" ]; then
   create_vm
-  install_guest
-  # pull_backup_images
-  load_images
+  pull_backup_images
   cluster_up
 fi
 
@@ -104,20 +102,9 @@ if [ "$1" == "create_vm" ]; then
   create_vm
 fi
 
-if [ "$1" == "install_deps" ]; then
-  install_deps
-fi
-
-if [ "$1" == "install_guest" ]; then
-  install_guest
-fi
-
-if [ "$1" == "install_guest" ]; then
-  install_guest
-fi
-
 if [ "$1" == "pull_backup_images" ]; then
   pull_backup_images
+  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP "sshpass -p $PWD scp -o StrictHostKeyChecking=no ./origin-v3.10.tar dabou@192.168.99.1:/Users/dabou/Temp"
 fi
 
 if [ "$1" == "load_images" ]; then
@@ -130,5 +117,14 @@ fi
 
 if [ "$1" == "install_catalog" ]; then
   install_catalog
+fi
+
+
+if [ "$1" == "install_deps" ]; then
+  install_deps
+fi
+
+if [ "$1" == "install_guest" ]; then
+  install_guest
 fi
 
