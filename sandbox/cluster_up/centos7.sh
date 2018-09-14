@@ -16,7 +16,7 @@ function create_vm {
   echo "===================="
   echo "Create Virtualbox VM"
   echo "===================="
-  ./virtualbox/create-vm.sh -i ~/images -m 5000 -n dummy
+  ./virtualbox/create-vm.sh -i ~/images -m 5000 -n okd-3.10
 
   echo "===================="
   echo "Sleep till the VM is ready"

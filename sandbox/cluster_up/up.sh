@@ -25,9 +25,3 @@ echo "==============================="
 oc login -u system:admin
 oc adm policy  add-cluster-role-to-user cluster-admin admin
 oc login -u admin -p admin
-
-echo "==============================="
-echo "Enable ASB, Service catalog"
-echo "==============================="
-oc cluster add service-catalog
-oc cluster add automation-service-broker
