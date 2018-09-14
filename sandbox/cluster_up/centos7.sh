@@ -79,10 +79,23 @@ function load_images {
   ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP "docker load -i /media/sf_shared/origin-v3.10.tar"
 }
 
+function install_catalog {
+  echo "============================================="
+  echo " oc cluster up                               "
+  echo "============================================="
+  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP "oc cluster add --base-dir=/var/lib/origin/openshift.local.clusterup service-catalog"
+  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP "oc cluster add --base-dir=/var/lib/origin/openshift.local.clusterup automation-service-broker"
+}
+
 if [ "$1" == "all" ]; then
   create_vm
   install_guest
   # pull_backup_images
+  load_images
+  cluster_up
+fi
+
+if [ "$1" == "cluster_only" ]; then
   load_images
   cluster_up
 fi
@@ -99,7 +112,11 @@ if [ "$1" == "install_guest" ]; then
   install_guest
 fi
 
-if [ "$1" == "bk_images" ]; then
+if [ "$1" == "install_guest" ]; then
+  install_guest
+fi
+
+if [ "$1" == "pull_backup_images" ]; then
   pull_backup_images
 fi
 
@@ -109,5 +126,9 @@ fi
 
 if [ "$1" == "cluster_up" ]; then
   cluster_up
+fi
+
+if [ "$1" == "install_catalog" ]; then
+  install_catalog
 fi
 
