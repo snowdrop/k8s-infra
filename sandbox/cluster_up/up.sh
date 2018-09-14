@@ -16,7 +16,7 @@ systemctl restart docker
 echo "==============================="
 echo "Bootstrap oc"
 echo "==============================="
-PUBLIC_IP=$(ifconfig eth0 | sed -En 's/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p')
+PUBLIC_IP=$(ifconfig enp0s3 | sed -En 's/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p')
 oc cluster up --public-hostname=${PUBLIC_IP}
 
 echo "==============================="
