@@ -21,7 +21,8 @@ systemctl restart docker
 echo "==============================="
 echo "Bootstrap oc"
 echo "==============================="
-oc cluster up --public-hostname=192.168.99.50
+PUBLIC_IP=$(ifconfig eth0 | sed -En 's/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p')
+oc cluster up --public-hostname=${PUBLIC_IP}
 
 echo "==============================="
 echo "Grant cluster-admin role to admin's user"
@@ -31,7 +32,7 @@ oc adm policy  add-cluster-role-to-user cluster-admin admin
 oc login -u admin -p admin
 
 echo "==============================="
-echo "Enable OAB, Service catalog"
+echo "Enable ASB, Service catalog"
 echo "==============================="
 oc cluster add service-catalog
 oc cluster add automation-service-broker
