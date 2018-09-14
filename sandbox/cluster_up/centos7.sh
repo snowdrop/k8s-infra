@@ -47,21 +47,45 @@ function pull_backup_images {
   ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < sandbox/cluster_up/docker_save_images.sh
 }
 
-echo "============================================="
-echo "Execute shell script to perform oc cluster up"
-echo "============================================="
+function cluster_up {
+  echo "============================================="
+  echo " oc cluster up                               "
+  echo "============================================="
+  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < sandbox/cluster_up/up.sh
+}
+
+function load_images {
+  echo "============================================="
+  echo " Load docker images for origin 3.10          "
+  echo "============================================="
+  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP "docker load -i /media/sf_share/origin-v3.10.tar"
+}
+
+if [ "$1" == "all" ]; then
+  create_vm
+  install_vboxfs
+  pull_backup_images
+  load_images
+  cluster_up
+fi
 
 if [ "$1" == "create" ]; then
   create_vm
+fi
+
+if [ "$1" == "install_guest" ]; then
   install_vboxfs
 fi
 
-echo "============================================="
-echo " Load docker images for origin 3.10          "
-echo "============================================="
-# ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP "docker load -i /media/sf_share/origin-v3.10.tar"
+if [ "$1" == "bk_images" ]; then
+  pull_backup_images
+fi
 
-echo "============================================="
-echo " oc cluster up                               "
-echo "============================================="
-ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < sandbox/cluster_up/up.sh
+if [ "$1" == "load_images" ]; then
+  load_images
+fi
+
+if [ "$1" == "cluster_up" ]; then
+  cluster_up
+fi
+
