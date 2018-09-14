@@ -4,6 +4,7 @@ CPU=2
 RAM=4000
 DISK=25000
 VIRTUAL_BOX_NAME="CentOS-7" # VM Name
+HOST_PATH="$HOME/Temp"
 
 if (($# == 0)); then
         echo "Usage : ./create-vm.sh -i /PATH/TO/IMAGE/DIR -c 4 -m 6000 -d 25000"
@@ -12,10 +13,11 @@ if (($# == 0)); then
         echo "m - memory (ram) option - default to 4000"
         echo "d - hard disk size (option) - default to 20000"
         echo "n - Name of the VirtualBox VM to be created - default to Centos-7"
+        echo "h - hostpath of the shared volume between vm and host"
         exit 2
 fi
 
-while getopts ":i:c:m:d:n:" option; do
+while getopts ":i:c:m:d:n:h:" option; do
 
   case ${option} in
 
@@ -24,6 +26,7 @@ while getopts ":i:c:m:d:n:" option; do
     m  ) RAM=${OPTARG:=${RAM}};;
     d  ) DISK=${OPTARG:=${DISK}};;
     n  ) VIRTUAL_BOX_NAME=${OPTARG:=${VIRTUAL_BOX_NAME}};;
+    h  ) HOST_PATH=${OPTARG:=${HOST_PATH}};;
 
     \? )
          echo "Invalid option: $OPTARG" 1>&2
@@ -107,6 +110,9 @@ echo "######### Create IDE Controller, attach vdi disk and iso dvd"
 vboxmanage storagectl ${VIRTUAL_BOX_NAME} --name "IDE Controller" --add ide --hostiocache on
 vboxmanage storageattach ${VIRTUAL_BOX_NAME} --storagectl "IDE Controller" --port 0 --device 0 --type dvddrive --medium ${IMAGE_DIR}/vbox-config.iso
 vboxmanage storageattach ${VIRTUAL_BOX_NAME} --storagectl "IDE Controller" --port 1 --device 0 --type hdd --medium ${IMAGE_DIR}/disk.vdi
+
+echo "######### Mount shared volume named shared between VM and host at this path "$HOST_PATH" "
+vboxmanage sharedfolder add ${VIRTUAL_BOX_NAME} --name shared --hostpath ${HOST_PATH} --automount
 
 echo "######### start vm and configure SSH Port forward"
 vboxmanage startvm ${VIRTUAL_BOX_NAME} --type headless
