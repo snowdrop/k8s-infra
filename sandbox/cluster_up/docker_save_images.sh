@@ -2,7 +2,8 @@
 
 tar_file=$1
 
-images="docker.io/automationbroker/automation-broker-apb:v3.10\
+images="docker.io/ansibleplaybookbundle/origin-ansible-service-broker:release-1.2\
+ docker.io/automationbroker/automation-broker-apb:v3.10\
  docker.io/openshift/origin-cli:v3.10\
  docker.io/openshift/origin-control-plane:v3.10\
  docker.io/openshift/origin-deployer:v3.10\

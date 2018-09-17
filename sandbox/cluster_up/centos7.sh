@@ -13,6 +13,10 @@ docker_tar_file="./okd-v3.10.tar"
 host=dabou@192.168.99.1
 target_dir="/Users/dabou/images"
 
+check_process() {
+  [ `pgrep -n $1` ] && return 1 || return 0
+}
+
 function create_vm {
   echo "=================="
   echo "Reset ssh key"
@@ -24,13 +28,20 @@ function create_vm {
   echo "===================="
   ./virtualbox/create-vm.sh -i ~/images -m 5000 -n okd-3.10
 
-  echo "==================================================================================================="
-  echo "Sleep till the VM is up and running ..."
-    echo "================================================================================================="
-  for i in {1..5}
-  do
-    echo "Waiting $i of 5"
-    sleep 6s
+  echo "==========================================================="
+  echo "Sleep till the VM is up and running and yum not locked ...."
+  echo "==========================================================="
+  while [ 1 ]; do
+    ts=`date +%T`
+
+    echo "$ts: begin checking..."
+    check_process "yum"
+    if [ $? -eq 0 ]; then
+       break
+    else
+       echo "yum is locked"
+    fi
+    sleep 5
   done
 }
 
