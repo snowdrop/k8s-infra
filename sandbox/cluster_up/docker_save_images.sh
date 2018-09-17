@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+tar_file=$1
+
 images="quay.io/coreos/etcd:v3.3\
  openshift/origin-service-catalog:v3.10\
  quay.io/coreos/etcd:v3.3\
@@ -16,4 +18,4 @@ images="quay.io/coreos/etcd:v3.3\
  openshift/origin-web-console:v3.10\
  openshift/origin-docker-registry:v3.10\
  openshift/origin-cli:v3.10"
-docker save $images > /media/sf_shared/origin-v3.10.tar
+docker save $images > $tar_file
