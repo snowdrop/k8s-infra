@@ -27,22 +27,6 @@ function create_vm {
   echo "Create Virtualbox VM"
   echo "===================="
   ./virtualbox/create-vm.sh -i ~/images -m 5000 -n okd-3.10
-
-  echo "==========================================================="
-  echo "Sleep till the VM is up and running and yum not locked ...."
-  echo "==========================================================="
-  while [ 1 ]; do
-    ts=`date +%T`
-
-    echo "$ts: begin checking..."
-    check_process "yum"
-    if [ $? -eq 0 ]; then
-       break
-    else
-       echo "yum is locked"
-    fi
-    sleep 5
-  done
 }
 
 function post_vm_installation () {
@@ -96,6 +80,7 @@ function install_catalog {
 
 if [ "$1" == "create_vm_export_images" ]; then
   create_vm
+  sleep 5m
   post_vm_installation
   pull_save_images
   export_images
@@ -103,6 +88,16 @@ fi
 
 if [ "$1" == "create_vm_load_images" ]; then
   create_vm
+
+  x=30
+  while [ $x -gt 0 ]
+  do
+    sleep 20s
+    clear
+    echo "$x seconds until process will continue"
+    x=$(( $x - 1 ))
+  done
+
   post_vm_installation
   load_images
   duration=$SECONDS
