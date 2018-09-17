@@ -4,9 +4,11 @@
 # Command to provision a centos7 vm using virtualbox driver
 # with oc cluster up
 #
-PUBLIC_IP=192.168.99.50
+
 PWD=$2
 
+SECONDS=0
+PUBLIC_IP=192.168.99.50
 docker_tar_file="./okd-v3.10.tar"
 host=dabou@192.168.99.1
 target_dir="/Users/dabou/images"
@@ -25,9 +27,9 @@ function create_vm {
   echo "==================================================================================================="
   echo "Sleep till the VM is up and running ..."
     echo "================================================================================================="
-  for i in {1..10}
+  for i in {1..5}
   do
-    echo "Waiting $i of 10"
+    echo "Waiting $i of 5"
     sleep 6s
   done
 }
@@ -92,6 +94,8 @@ if [ "$1" == "create_vm_load_images" ]; then
   create_vm
   post_vm_installation
   load_images
+  duration=$SECONDS
+  echo "$(($duration / 60)) minutes and $(($duration % 60)) seconds elapsed."
 fi
 
 if [ "$1" == "pull_save_images" ]; then
@@ -108,6 +112,8 @@ fi
 
 if [ "$1" == "cluster_up" ]; then
   cluster_up
+  duration=$SECONDS
+  echo "$(($duration / 60)) minutes and $(($duration % 60)) seconds elapsed."
 fi
 
 if [ "$1" == "install_catalog" ]; then
