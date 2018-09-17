@@ -8,10 +8,8 @@ PUBLIC_IP=192.168.99.50
 PWD=$2
 
 docker_tar_file="./okd-v3.10.tar"
-
-function test () {
-    echo "Hello $1"
-}
+host=dabou@192.168.99.1
+target_dir="/Users/dabou/images"
 
 function create_vm {
   echo "=================="
@@ -25,15 +23,98 @@ function create_vm {
   ./virtualbox/create-vm.sh -i ~/images -m 5000 -n okd-3.10
 
   echo "==================================================================================================="
-  echo "Sleep till the VM is ready as packages are currently installed by cloud init process -> yum install"
+  echo "Sleep till the VM is up and running ..."
     echo "================================================================================================="
-  for i in {1..25}
+  for i in {1..10}
   do
-    echo "Waiting $i of 25"
+    echo "Waiting $i of 10"
     sleep 6s
   done
 }
 
+function post_vm_installation () {
+  echo "============================================="
+  echo " Post VM installation steps                 "
+  echo "============================================="
+  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < sandbox/cluster_up/post_vm_installation.sh
+}
+
+function pull_save_images () {
+  echo "============================================="
+  echo " Pull images                                "
+  echo "============================================="
+  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < sandbox/cluster_up/docker_pull_images.sh $images
+
+  echo "============================================="
+  echo " Backup images : $docker_tar_file                   "
+  echo "============================================="
+  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < sandbox/cluster_up/docker_save_images.sh $images $docker_tar_file
+}
+
+function cluster_up {
+  echo "============================================="
+  echo " oc cluster up                               "
+  echo "============================================="
+  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < sandbox/cluster_up/up.sh
+}
+
+function load_images () {
+  echo "========================================================"
+  echo " Import and Load docker images from $docker_tar_file    "
+  echo "========================================================"
+  scp -o StrictHostKeyChecking=no $target_dir/$docker_tar_file root@$PUBLIC_IP:/root
+  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP "docker load -i $docker_tar_file"
+}
+
+function export_images () {
+  echo "============================================="
+  echo " Export docker images - tar file to the host "
+  echo "============================================="
+  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP "sshpass -p $PWD scp -o StrictHostKeyChecking=no $docker_tar_file $host:$target_dir"
+}
+
+function install_catalog {
+  echo "============================================="
+  echo " oc cluster up                               "
+  echo "============================================="
+  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP "oc cluster add --base-dir=/var/lib/origin/openshift.local.clusterup service-catalog"
+  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP "oc cluster add --base-dir=/var/lib/origin/openshift.local.clusterup automation-service-broker"
+}
+
+if [ "$1" == "create_vm_export_images" ]; then
+  create_vm
+  post_vm_installation
+  pull_save_images
+  export_images
+fi
+
+if [ "$1" == "create_vm_load_images" ]; then
+  create_vm
+  load_images
+fi
+
+if [ "$1" == "pull_save_images" ]; then
+  pull_save_images
+fi
+
+if [ "$1" == "load_images" ]; then
+  load_images
+fi
+
+if [ "$1" == "export_images" ]; then
+  export_images
+fi
+
+if [ "$1" == "cluster_up" ]; then
+  cluster_up
+fi
+
+if [ "$1" == "install_catalog" ]; then
+  install_catalog
+fi
+
+
+# NON USED AS PROCESS TO INSTALL VIRTUAL GUEST ADDITION ISO AND COMPILE IT IS TOO LONG
 function install_guest {
   echo "============================================="
   echo " Install and build Guest Virtualbox Addition "
@@ -59,73 +140,6 @@ function install_guest {
   ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < sandbox/cluster_up/guest_addition.sh
 }
 
-function pull_save_images () {
-  echo "============================================="
-  echo " Pull images                                "
-  echo "============================================="
-  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < sandbox/cluster_up/docker_pull_images.sh
-
-  echo "============================================="
-  echo " Backup images : $docker_tar_file                   "
-  echo "============================================="
-  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < sandbox/cluster_up/docker_save_images.sh $docker_tar_file
-}
-
-function cluster_up {
-  echo "============================================="
-  echo " oc cluster up                               "
-  echo "============================================="
-  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < sandbox/cluster_up/up.sh
-}
-
-function load_images {
-  echo "============================================="
-  echo " Load docker images for origin 3.10          "
-  echo "============================================="
-  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP "docker load -i /media/sf_shared/origin-v3.10.tar"
-}
-
-function install_catalog {
-  echo "============================================="
-  echo " oc cluster up                               "
-  echo "============================================="
-  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP "oc cluster add --base-dir=/var/lib/origin/openshift.local.clusterup service-catalog"
-  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP "oc cluster add --base-dir=/var/lib/origin/openshift.local.clusterup automation-service-broker"
-}
-
-if [ "$1" == "all" ]; then
-  create_vm
-  pull_save_images
-  cluster_up
-fi
-
-if [ "$1" == "cluster_only" ]; then
-  load_images
-  cluster_up
-fi
-
-if [ "$1" == "create_vm" ]; then
-  create_vm
-fi
-
-if [ "$1" == "pull_save_images" ]; then
-  pull_save_images
-  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP "sshpass -p $PWD scp -o StrictHostKeyChecking=no ./origin-v3.10.tar dabou@192.168.99.1:/Users/dabou/Temp"
-fi
-
-if [ "$1" == "load_images" ]; then
-  load_images
-fi
-
-if [ "$1" == "cluster_up" ]; then
-  cluster_up
-fi
-
-if [ "$1" == "install_catalog" ]; then
-  install_catalog
-fi
-
-
 if [ "$1" == "install_deps" ]; then
   install_deps
 fi
@@ -133,9 +147,4 @@ fi
 if [ "$1" == "install_guest" ]; then
   install_guest
 fi
-
-if [ "$1" == "test" ]; then
-  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < sandbox/cluster_up/docker_save_images.sh $docker_tar_file
-fi
-
 
