@@ -90,6 +90,7 @@ fi
 
 if [ "$1" == "create_vm_load_images" ]; then
   create_vm
+  post_vm_installation
   load_images
 fi
 
