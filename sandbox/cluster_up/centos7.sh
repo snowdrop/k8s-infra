@@ -7,6 +7,12 @@
 PUBLIC_IP=192.168.99.50
 PWD=$2
 
+docker_tar_file="./okd-v3.10.tar"
+
+function test () {
+    echo "Hello $1"
+}
+
 function create_vm {
   echo "=================="
   echo "Reset ssh key"
@@ -53,16 +59,16 @@ function install_guest {
   ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < sandbox/cluster_up/guest_addition.sh
 }
 
-function pull_backup_images {
+function pull_save_images () {
   echo "============================================="
   echo " Pull images                                "
   echo "============================================="
   ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < sandbox/cluster_up/docker_pull_images.sh
 
   echo "============================================="
-  echo " Backup images as tar file                   "
+  echo " Backup images : $docker_tar_file                   "
   echo "============================================="
-  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < sandbox/cluster_up/docker_save_images.sh
+  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < sandbox/cluster_up/docker_save_images.sh $docker_tar_file
 }
 
 function cluster_up {
@@ -89,7 +95,7 @@ function install_catalog {
 
 if [ "$1" == "all" ]; then
   create_vm
-  pull_backup_images
+  pull_save_images
   cluster_up
 fi
 
@@ -102,8 +108,8 @@ if [ "$1" == "create_vm" ]; then
   create_vm
 fi
 
-if [ "$1" == "pull_backup_images" ]; then
-  pull_backup_images
+if [ "$1" == "pull_save_images" ]; then
+  pull_save_images
   ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP "sshpass -p $PWD scp -o StrictHostKeyChecking=no ./origin-v3.10.tar dabou@192.168.99.1:/Users/dabou/Temp"
 fi
 
@@ -127,4 +133,9 @@ fi
 if [ "$1" == "install_guest" ]; then
   install_guest
 fi
+
+if [ "$1" == "test" ]; then
+  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < sandbox/cluster_up/docker_save_images.sh $docker_tar_file
+fi
+
 
