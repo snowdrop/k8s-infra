@@ -31,19 +31,23 @@ function create_vm {
 
 function post_vm_installation () {
   echo "============================================="
-  echo " Post VM installation steps                 "
+  echo " Post VM installation steps                  "
   echo "============================================="
   ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < sandbox/cluster_up/post_vm_installation.sh
 }
 
 function pull_save_images () {
   echo "============================================="
-  echo " Pull images                                "
+  echo " Pull images                                 "
   echo "============================================="
   ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < sandbox/cluster_up/docker_pull_images.sh $images
 
+  save_images
+}
+
+function save_images () {
   echo "============================================="
-  echo " Backup images : $docker_tar_file                   "
+  echo " Backup images : $docker_tar_file            "
   echo "============================================="
   ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < sandbox/cluster_up/docker_save_images.sh $images $docker_tar_file
 }
@@ -108,12 +112,20 @@ if [ "$1" == "pull_save_images" ]; then
   pull_save_images
 fi
 
+if [ "$1" == "save_images" ]; then
+  save_images
+fi
+
 if [ "$1" == "load_images" ]; then
   load_images
 fi
 
 if [ "$1" == "export_images" ]; then
   export_images
+fi
+
+if [ "$1" == "post_vm_installation" ]; then
+  post_vm_installation
 fi
 
 if [ "$1" == "cluster_up" ]; then
@@ -125,6 +137,9 @@ fi
 if [ "$1" == "install_catalog" ]; then
   install_catalog
 fi
+
+
+
 
 
 # NON USED AS PROCESS TO INSTALL VIRTUAL GUEST ADDITION ISO AND COMPILE IT IS TOO LONG
