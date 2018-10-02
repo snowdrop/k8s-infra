@@ -12,6 +12,8 @@ PUBLIC_IP=192.168.99.50
 docker_tar_file="./okd-v3.10.tar"
 host=dabou@192.168.99.1
 target_dir="/Users/dabou/images"
+SCRIPT=$BASH_SOURCE
+SCRIPTPATH=$(dirname $SCRIPT)
 
 check_process() {
   [ `pgrep -n $1` ] && return 1 || return 0
@@ -33,14 +35,14 @@ function post_vm_installation () {
   echo "============================================="
   echo " Post VM installation steps                  "
   echo "============================================="
-  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < sandbox/cluster_up/post_vm_installation.sh
+  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < $SCRIPTPATH/post_vm_installation.sh
 }
 
 function pull_save_images () {
   echo "============================================="
   echo " Pull images                                 "
   echo "============================================="
-  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < sandbox/cluster_up/docker_pull_images.sh $images
+  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < $SCRIPTPATH/docker_pull_images.sh $images
 
   save_images
 }
@@ -49,14 +51,14 @@ function save_images () {
   echo "============================================="
   echo " Backup images : $docker_tar_file            "
   echo "============================================="
-  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < sandbox/cluster_up/docker_save_images.sh $images $docker_tar_file
+  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < $SCRIPTPATH/docker_save_images.sh $images $docker_tar_file
 }
 
 function cluster_up {
   echo "============================================="
   echo " oc cluster up                               "
   echo "============================================="
-  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < sandbox/cluster_up/up.sh
+  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < $SCRIPTPATH/up.sh
 }
 
 function load_images () {
@@ -162,10 +164,10 @@ function install_guest {
   trap - SIGINT                                                 # Remove the trap, now we're done with it
 
   echo "### Installing deps needed to compile vboxguest addon..."
-  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < sandbox/cluster_up/install_deps.sh
+  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < $SCRIPTPATH/install_deps.sh
 
   echo "### Done pinging"
-  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < sandbox/cluster_up/guest_addition.sh
+  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < $SCRIPTPATH/guest_addition.sh
 }
 
 if [ "$1" == "install_deps" ]; then
