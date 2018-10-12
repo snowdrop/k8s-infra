@@ -18,6 +18,9 @@ images="docker.io/ansibleplaybookbundle/origin-ansible-service-broker:v${version
  docker.io/openshift/origin-service-catalog:v${version}\
  docker.io/openshift/origin-web-console:v${version}\
  docker.io/openshift/origin-service-serving-cert-signer:v${version}\
- quay.io/coreos/etcd:v3.3"
+ quay.io/coreos/etcd:v3.3\
+ quay.io/snowdrop/spring-boot-s2i:latest\
+ quay.io/snowdrop/supervisord:latest\
+ docker.io/centos/postgresql-96-centos7"
 
 docker save $images > $tar_file
