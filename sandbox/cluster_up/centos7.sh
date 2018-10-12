@@ -5,11 +5,12 @@
 # with oc cluster up
 #
 
-PWD=$2
+param=$2 # is password, origin version
+version=${param:-3.11}
 
 SECONDS=0
 PUBLIC_IP=192.168.99.50
-docker_tar_file="./okd-v3.10.tar"
+docker_tar_file="./okd-v${version}.tar"
 host=dabou@192.168.99.1
 target_dir="/Users/dabou/images"
 SCRIPT=$BASH_SOURCE
@@ -35,7 +36,7 @@ function post_vm_installation () {
   echo "============================================="
   echo " Post VM installation steps                  "
   echo "============================================="
-  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < $SCRIPTPATH/post_vm_installation.sh
+  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < $SCRIPTPATH/post_vm_installation.sh $param
 }
 
 function pull_save_images () {
@@ -73,7 +74,7 @@ function export_images () {
   echo "============================================="
   echo " Export docker images - tar file to the host "
   echo "============================================="
-  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP "sshpass -p $PWD scp -o StrictHostKeyChecking=no $docker_tar_file $host:$target_dir"
+  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP "sshpass -p $param scp -o StrictHostKeyChecking=no $docker_tar_file $host:$target_dir"
 }
 
 function install_catalog {
@@ -127,7 +128,7 @@ if [ "$1" == "export_images" ]; then
 fi
 
 if [ "$1" == "post_vm_installation" ]; then
-  post_vm_installation
+  post_vm_installation "$param"
 fi
 
 if [ "$1" == "cluster_up" ]; then
