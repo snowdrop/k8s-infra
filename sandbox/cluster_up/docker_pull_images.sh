@@ -1,19 +1,21 @@
 #!/usr/bin/env bash
 
-images="docker.io/ansibleplaybookbundle/origin-ansible-service-broker:release-1.2\
- docker.io/automationbroker/automation-broker-apb:v3.10\
- docker.io/openshift/origin-cli:v3.10\
- docker.io/openshift/origin-control-plane:v3.10\
- docker.io/openshift/origin-deployer:v3.10\
- docker.io/openshift/origin-docker-builder:v3.10\
- docker.io/openshift/origin-docker-registry:v3.10\
- docker.io/openshift/origin-haproxy-router:v3.10\
- docker.io/openshift/origin-hyperkube:v3.10\
- docker.io/openshift/origin-hypershift:v3.10\
- docker.io/openshift/origin-node:v3.10\
- docker.io/openshift/origin-pod:v3.10\
- docker.io/openshift/origin-service-catalog:v3.10\
- docker.io/openshift/origin-web-console:v3.10\
+version=${1:-3.11}
+images="docker.io/ansibleplaybookbundle/origin-ansible-service-broker:v${version}\
+ docker.io/automationbroker/automation-broker-apb:v${version}\
+ docker.io/openshift/origin-cli:v${version}\
+ docker.io/openshift/origin-control-plane:v${version}\
+ docker.io/openshift/origin-deployer:v${version}\
+ docker.io/openshift/origin-docker-builder:v${version}\
+ docker.io/openshift/origin-docker-registry:v${version}\
+ docker.io/openshift/origin-haproxy-router:v${version}\
+ docker.io/openshift/origin-hyperkube:v${version}\
+ docker.io/openshift/origin-hypershift:v${version}\
+ docker.io/openshift/origin-node:v${version}\
+ docker.io/openshift/origin-pod:v${version}\
+ docker.io/openshift/origin-service-catalog:v${version}\
+ docker.io/openshift/origin-web-console:v${version}\
+ docker.io/openshift/origin-service-serving-cert-signer:v${version}\
  quay.io/coreos/etcd:v3.3"
 
 declare -a array_images=($images)

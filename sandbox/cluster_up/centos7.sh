@@ -5,8 +5,8 @@
 # with oc cluster up
 #
 
-param=$2 # is password, origin version
-version=${param:-3.11}
+version=${2:-3.11}
+param=$3
 
 SECONDS=0
 PUBLIC_IP=192.168.99.50
@@ -43,7 +43,7 @@ function pull_save_images () {
   echo "============================================="
   echo " Pull images                                 "
   echo "============================================="
-  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < $SCRIPTPATH/docker_pull_images.sh $images
+  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < $SCRIPTPATH/docker_pull_images.sh $version
 
   save_images
 }
@@ -52,7 +52,7 @@ function save_images () {
   echo "============================================="
   echo " Backup images : $docker_tar_file            "
   echo "============================================="
-  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < $SCRIPTPATH/docker_save_images.sh $images $docker_tar_file
+  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < $SCRIPTPATH/docker_save_images.sh $docker_tar_file $version
 }
 
 function cluster_up {
@@ -124,7 +124,7 @@ if [ "$1" == "load_images" ]; then
 fi
 
 if [ "$1" == "export_images" ]; then
-  export_images
+  export_images "$param"
 fi
 
 if [ "$1" == "post_vm_installation" ]; then
