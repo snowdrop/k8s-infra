@@ -29,14 +29,14 @@ function create_vm {
   echo "===================="
   echo "Create Virtualbox VM"
   echo "===================="
-  ./virtualbox/create-vm.sh -i ~/images -m 5000 -n okd-3.10
+  ./virtualbox/create-vm.sh -i ~/images -m 5000 -n okd-${version}
 }
 
 function post_vm_installation () {
   echo "============================================="
   echo " Post VM installation steps                  "
   echo "============================================="
-  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < $SCRIPTPATH/post_vm_installation.sh $param
+  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < $SCRIPTPATH/post_vm_installation.sh $version
 }
 
 function pull_save_images () {
@@ -85,6 +85,10 @@ function install_catalog {
   ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP "oc cluster add --base-dir=/var/lib/origin/openshift.local.clusterup automation-service-broker"
 }
 
+if [ "$1" == "create_vm" ]; then
+  create_vm $version
+fi
+
 if [ "$1" == "create_vm_export_images" ]; then
   create_vm
   sleep 5m
@@ -112,7 +116,7 @@ if [ "$1" == "create_vm_load_images" ]; then
 fi
 
 if [ "$1" == "pull_save_images" ]; then
-  pull_save_images
+  pull_save_images $2
 fi
 
 if [ "$1" == "save_images" ]; then
@@ -120,7 +124,7 @@ if [ "$1" == "save_images" ]; then
 fi
 
 if [ "$1" == "load_images" ]; then
-  load_images
+  load_images $2
 fi
 
 if [ "$1" == "export_images" ]; then
@@ -128,7 +132,7 @@ if [ "$1" == "export_images" ]; then
 fi
 
 if [ "$1" == "post_vm_installation" ]; then
-  post_vm_installation "$param"
+  post_vm_installation $2
 fi
 
 if [ "$1" == "cluster_up" ]; then
