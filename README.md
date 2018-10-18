@@ -23,8 +23,8 @@ Table of Contents
 
 # Instructions to install OpenShift and Cloud Native Features
 
-This project details the prerequisites and steps necessary to convert a machine / environment into a Cloud Development Platform using using Linux Container as a foundation and OpenShift as the
-orchestration and management platform of the those containers.
+This project details the prerequisites and steps necessary to convert a machine / environment into a Cloud Development Platform using Linux Container as a foundation and OpenShift as the
+orchestration and management platform of those containers.
 
 The documentation has been designed around the following topics 
 
@@ -126,7 +126,7 @@ can work with different hypervisors and can better automate the process to boots
   EOF
   ```
   
-3. Create a bash script containing the commands to be executed to install docker and condigure it
+3. Create a bash script containing the commands to be executed to install docker and configure it
   ```
   mkdir vagrant-centos && vagrant-centos
   
