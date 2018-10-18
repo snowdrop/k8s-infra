@@ -7,7 +7,7 @@ This can of course be done via the OpenStack UI or can be automated using our An
 ansible-playbook playbook/openstack.yml -e '{"state": "present", "hostname": "somehostname", "openstack": {"os_username": "username", "os_password": "password", "os_auth_url": "https://somehost:13000/v3", "os_project_id": "someprojectid"}}'`
 ```
 
-The playbook also uses the variables defined in `roles/openstack/defaults/main.yml`. Those variables can also be overriden using the syntax above.
+The playbook also uses the variables defined in `roles/openstack/defaults/main.yml`. Those variables can also be overridden using the syntax above.
 For example to override the VM flavor, one would execute the following command:
 
 ```
