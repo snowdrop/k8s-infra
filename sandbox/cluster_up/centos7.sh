@@ -85,33 +85,33 @@ function install_catalog {
   ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP "oc cluster add --base-dir=/var/lib/origin/openshift.local.clusterup automation-service-broker"
 }
 
+function check_ssh {
+    status="nok"
+    until [ "$status" = "ok" ]; do
+      echo "VM is still starting and ssh is not available"
+      sleep 5
+      status=$(ssh  -o StrictHostKeyChecking=no -o BatchMode=yes -o ConnectTimeout=5 root@$PUBLIC_IP echo ok 2>&1)
+      echo "ssh server status : $status"
+    done
+}
+
+function check_file_wait {
+   result="true"
+   until [ "$result" = "false" ]; do
+     echo "Yum process is working, we wait before to continue : ..."
+     sleep 5
+     result=$(ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP test -f /var/run/yum.pid && echo "true" || echo "false")
+     echo "Is /var/run/yum.pid there ? $result"
+   done
+}
+
 if [ "$1" == "create_vm" ]; then
-  create_vm $version
-fi
-
-if [ "$1" == "create_vm_export_images" ]; then
-  create_vm
-  sleep 5m
-  post_vm_installation
-  pull_save_images
-  export_images
-fi
-
-if [ "$1" == "create_vm_load_images" ]; then
-  create_vm
-
-  x=30
-  while [ $x -gt 0 ]
-  do
-    sleep 20s
-    clear
-    echo "$x seconds until process will continue"
-    x=$(( $x - 1 ))
-  done
-
-  post_vm_installation
-  load_images
   duration=$SECONDS
+  create_vm $version
+  check_ssh
+  check_file_wait
+  echo "Yum process is not working, we continue"
+  post_vm_installation $version
   echo "$(($duration / 60)) minutes and $(($duration % 60)) seconds elapsed."
 fi
 
