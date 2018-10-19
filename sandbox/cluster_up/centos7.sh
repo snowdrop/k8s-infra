@@ -14,7 +14,7 @@ docker_tar_file="./okd-v${version}.tar"
 host=dabou@192.168.99.1
 target_dir="/Users/dabou/images"
 SCRIPT=$BASH_SOURCE
-SCRIPTPATH=$(dirname $SCRIPT)
+SCRIPT_PATH=$(dirname $SCRIPT)
 
 check_process() {
   [ `pgrep -n $1` ] && return 1 || return 0
@@ -58,14 +58,14 @@ function post_vm_installation () {
   echo "============================================="
   echo " Post VM installation steps                  "
   echo "============================================="
-  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < $SCRIPTPATH/post_vm_installation.sh $version
+  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < $SCRIPT_PATH/post_vm_installation.sh $version
 }
 
 function pull_save_images () {
   echo "============================================="
   echo " Pull images                                 "
   echo "============================================="
-  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < $SCRIPTPATH/docker_pull_images.sh $version
+  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < $SCRIPT_PATH/docker_pull_images.sh $version
   save_images
 }
 
@@ -73,14 +73,14 @@ function save_images () {
   echo "============================================="
   echo " Backup images : $docker_tar_file            "
   echo "============================================="
-  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < $SCRIPTPATH/docker_save_images.sh $docker_tar_file $version
+  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < $SCRIPT_PATH/docker_save_images.sh $docker_tar_file $version
 }
 
 function cluster_up {
   echo "============================================="
   echo " oc cluster up                               "
   echo "============================================="
-  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < $SCRIPTPATH/up.sh
+  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < $SCRIPT_PATH/up.sh
 }
 
 function export_images () {
@@ -156,7 +156,6 @@ if [ "$1" == "load_images" ]; then
   load_images $2
   duration=$SECONDS
   echo "$(($duration / 60)) minutes and $(($duration % 60)) seconds elapsed."
-
 fi
 
 
@@ -183,10 +182,10 @@ function install_guest {
   trap - SIGINT                                                 # Remove the trap, now we're done with it
 
   echo "### Installing deps needed to compile vboxguest addon..."
-  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < $SCRIPTPATH/install_deps.sh
+  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < $SCRIPT_PATH/install_deps.sh
 
   echo "### Done pinging"
-  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < $SCRIPTPATH/guest_addition.sh
+  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < $SCRIPT_PATH/guest_addition.sh
 }
 
 if [ "$1" == "install_deps" ]; then
