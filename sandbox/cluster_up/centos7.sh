@@ -90,9 +90,10 @@ function check_ssh {
     until [ "$status" = "ok" ]; do
       echo "VM is still starting and ssh is not available"
       sleep 5
-      status=$(ssh  -o StrictHostKeyChecking=no -o BatchMode=yes -o ConnectTimeout=5 root@$PUBLIC_IP echo ok 2>&1)
-      echo "ssh server status : $status"
+      status=$(ssh -o StrictHostKeyChecking=no -o BatchMode=yes -o ConnectTimeout=1 root@$PUBLIC_IP echo ok 2>&1)
+      echo "Status : $status"
     done
+    echo "#################################"
 }
 
 function check_file_wait {
@@ -103,12 +104,17 @@ function check_file_wait {
      result=$(ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP test -f /var/run/yum.pid && echo "true" || echo "false")
      echo "Is /var/run/yum.pid there ? $result"
    done
+   echo "#################################"
 }
 
 if [ "$1" == "create_vm" ]; then
   duration=$SECONDS
+  ssh-keygen -R $PUBLIC_IP
   create_vm $version
+  echo "########### Check SSH connection ################"
   check_ssh
+  ssh-keygen -R $PUBLIC_IP
+  echo "########### Check Yum process ################"
   check_file_wait
   echo "Yum process is not working, we continue"
   post_vm_installation $version
