@@ -20,6 +20,28 @@ check_process() {
   [ `pgrep -n $1` ] && return 1 || return 0
 }
 
+function check_ssh {
+    status="nok"
+    until [ "$status" = "ok" ]; do
+      echo "VM is still starting and ssh is not available"
+      sleep 5
+      status=$(ssh -o StrictHostKeyChecking=no -o BatchMode=yes -o ConnectTimeout=1 root@$PUBLIC_IP echo ok 2>&1)
+      echo "Status : $status"
+    done
+    echo "#################################"
+}
+
+function check_file_wait {
+   result="true"
+   until [ "$result" = "false" ]; do
+     echo "Yum process is working, we wait before to continue : ..."
+     sleep 5
+     result=$(ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP test -f /var/run/yum.pid && echo "true" || echo "false")
+     echo "Is /var/run/yum.pid there ? $result"
+   done
+   echo "#################################"
+}
+
 function create_vm {
   echo "=================="
   echo "Reset ssh key"
@@ -44,7 +66,6 @@ function pull_save_images () {
   echo " Pull images                                 "
   echo "============================================="
   ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < $SCRIPTPATH/docker_pull_images.sh $version
-
   save_images
 }
 
@@ -62,19 +83,19 @@ function cluster_up {
   ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < $SCRIPTPATH/up.sh
 }
 
+function export_images () {
+  echo "============================================="
+  echo " Export docker images - tar file to the host "
+  echo "============================================="
+  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP "sshpass -p $param scp -o StrictHostKeyChecking=no $docker_tar_file $host:$target_dir"
+}
+
 function load_images () {
   echo "========================================================"
   echo " Import and Load docker images from $docker_tar_file    "
   echo "========================================================"
   scp -o StrictHostKeyChecking=no $target_dir/$docker_tar_file root@$PUBLIC_IP:/root
   ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP "docker load -i $docker_tar_file"
-}
-
-function export_images () {
-  echo "============================================="
-  echo " Export docker images - tar file to the host "
-  echo "============================================="
-  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP "sshpass -p $param scp -o StrictHostKeyChecking=no $docker_tar_file $host:$target_dir"
 }
 
 function install_catalog {
@@ -85,30 +106,13 @@ function install_catalog {
   ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP "oc cluster add --base-dir=/var/lib/origin/openshift.local.clusterup automation-service-broker"
 }
 
-function check_ssh {
-    status="nok"
-    until [ "$status" = "ok" ]; do
-      echo "VM is still starting and ssh is not available"
-      sleep 5
-      status=$(ssh -o StrictHostKeyChecking=no -o BatchMode=yes -o ConnectTimeout=1 root@$PUBLIC_IP echo ok 2>&1)
-      echo "Status : $status"
-    done
-    echo "#################################"
-}
-
-function check_file_wait {
-   result="true"
-   until [ "$result" = "false" ]; do
-     echo "Yum process is working, we wait before to continue : ..."
-     sleep 5
-     result=$(ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP test -f /var/run/yum.pid && echo "true" || echo "false")
-     echo "Is /var/run/yum.pid there ? $result"
-   done
-   echo "#################################"
-}
+# Commands to be used to create vm, do a cluster up or install catalog addons
+if [ "$1" == "post_vm_installation" ]; then
+  post_vm_installation $2
+fi
 
 if [ "$1" == "create_vm" ]; then
-  duration=$SECONDS
+  SECONDS=0
   ssh-keygen -R $PUBLIC_IP
   create_vm $version
   echo "########### Check SSH connection ################"
@@ -118,9 +122,22 @@ if [ "$1" == "create_vm" ]; then
   check_file_wait
   echo "Yum process is not working, we continue"
   post_vm_installation $version
+  duration=$SECONDS
   echo "$(($duration / 60)) minutes and $(($duration % 60)) seconds elapsed."
 fi
 
+if [ "$1" == "cluster_up" ]; then
+  SECONDS=0
+  cluster_up
+  duration=$SECONDS
+  echo "$(($duration / 60)) minutes and $(($duration % 60)) seconds elapsed."
+fi
+
+if [ "$1" == "install_catalog" ]; then
+  install_catalog
+fi
+
+# Commands to pull, save docker images and export them within a tar file
 if [ "$1" == "pull_save_images" ]; then
   pull_save_images $2
 fi
@@ -129,26 +146,17 @@ if [ "$1" == "save_images" ]; then
   save_images
 fi
 
-if [ "$1" == "load_images" ]; then
-  load_images $2
-fi
-
 if [ "$1" == "export_images" ]; then
   export_images "$param"
 fi
 
-if [ "$1" == "post_vm_installation" ]; then
-  post_vm_installation $2
-fi
-
-if [ "$1" == "cluster_up" ]; then
-  cluster_up
+# Load images from the tar's docker image file
+if [ "$1" == "load_images" ]; then
+  SECONDS=0
+  load_images $2
   duration=$SECONDS
   echo "$(($duration / 60)) minutes and $(($duration % 60)) seconds elapsed."
-fi
 
-if [ "$1" == "install_catalog" ]; then
-  install_catalog
 fi
 
 
