@@ -6,7 +6,7 @@
 #
 
 version=${2:-3.11}
-param=$3
+password=$3
 
 SECONDS=0
 PUBLIC_IP=192.168.99.50
@@ -87,7 +87,7 @@ function export_images () {
   echo "============================================="
   echo " Export docker images - tar file to the host "
   echo "============================================="
-  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP "sshpass -p $param scp -o StrictHostKeyChecking=no $docker_tar_file $host:$target_dir"
+  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP "sshpass -p $password scp -o StrictHostKeyChecking=no $docker_tar_file $host:$target_dir"
 }
 
 function load_images () {
@@ -147,7 +147,7 @@ if [ "$1" == "save_images" ]; then
 fi
 
 if [ "$1" == "export_images" ]; then
-  export_images "$param"
+  export_images $3
 fi
 
 # Load images from the tar's docker image file
