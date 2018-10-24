@@ -16,7 +16,7 @@ target_dir="/Users/dabou/images"
 SCRIPT=$BASH_SOURCE
 SCRIPT_PATH=$(dirname $SCRIPT)
 
-source $(pwd)/sandbox/cluster_up/var.sh
+source $SCRIPT_PATH/var.sh
 images="images${version//.}"
 
 check_process() {
