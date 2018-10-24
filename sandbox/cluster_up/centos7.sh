@@ -16,6 +16,9 @@ target_dir="/Users/dabou/images"
 SCRIPT=$BASH_SOURCE
 SCRIPT_PATH=$(dirname $SCRIPT)
 
+source $(pwd)/sandbox/cluster_up/var.sh
+images="images${version//.}"
+
 check_process() {
   [ `pgrep -n $1` ] && return 1 || return 0
 }
@@ -65,7 +68,7 @@ function pull_save_images () {
   echo "============================================="
   echo " Pull images                                 "
   echo "============================================="
-  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < $SCRIPT_PATH/docker_pull_images.sh $version
+  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < $SCRIPT_PATH/docker_pull_images.sh "${!images}"
   save_images
 }
 
@@ -73,7 +76,7 @@ function save_images () {
   echo "============================================="
   echo " Backup images : $docker_tar_file            "
   echo "============================================="
-  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < $SCRIPT_PATH/docker_save_images.sh $docker_tar_file $version
+  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < $SCRIPT_PATH/docker_save_images.sh $docker_tar_file "${!images}"
 }
 
 function cluster_up {
