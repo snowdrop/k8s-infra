@@ -6,6 +6,7 @@ echo "==============================="
 PUBLIC_IP=$(ifconfig enp0s3 | sed -En 's/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p')
 oc cluster up \
   --base-dir="/var/lib/origin/openshift.local.clusterup" \
+  --skip-registry-check=true \
   --public-hostname=${PUBLIC_IP}
 
 echo "==============================="
