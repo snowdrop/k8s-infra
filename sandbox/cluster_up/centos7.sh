@@ -80,7 +80,7 @@ function cluster_up {
   echo "============================================="
   echo " oc cluster up                               "
   echo "============================================="
-  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < $SCRIPT_PATH/up.sh
+  ssh -o StrictHostKeyChecking=no root@$PUBLIC_IP 'bash -s' < $SCRIPT_PATH/up.sh $version
 }
 
 function export_images () {
