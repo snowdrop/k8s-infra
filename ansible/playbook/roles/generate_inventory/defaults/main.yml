@@ -1,2 +1,2 @@
 # Release version of Openshift origin to be installed. IT will be used to configure the inventory file from the j2 template
-openshift_origin_version: "3.10"
+openshift_origin_version: "3.11.0"

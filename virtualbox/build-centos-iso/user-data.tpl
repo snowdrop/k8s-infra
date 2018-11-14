@@ -42,3 +42,4 @@ runcmd:
   - systemctl start NetworkManager
   - systemctl enable NetworkManager
   - timedatectl set-timezone TIMEZONE
+  - echo "192.168.99.50 $HOSTNAME" >> /etc/hosts

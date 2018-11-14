@@ -3,7 +3,7 @@
 ## Prerequisite
 
   - Linux VM (CentOS7, ...) running, that you can ssh on port 22 and where your public key has been imported
-  - Ansible [2.4](http://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
+  - Ansible [>=2.7](http://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
 
 ## Instructions
 
@@ -12,7 +12,7 @@
   ```bash
   echo "#### Git clone openshift ansible"
   if [ ! -d "openshift-ansible" ]; then
-    git clone -b release-3.10 https://github.com/openshift/openshift-ansible.git
+    git clone -b release-3.11 https://github.com/openshift/openshift-ansible.git
   fi
   ```
 
@@ -42,7 +42,7 @@
   that can access the machine
 
   ```bash
-  ansible-playbook -i inventory/simple_host playbook/import_public_key.yml -e '{gh_usernames: [foo, bar]}'
+  ansible-playbook -i inventory/cloud_host playbook/import_public_key.yml -e '{gh_usernames: [foo, bar]}'
   ```   
 
 - Install OpenShift

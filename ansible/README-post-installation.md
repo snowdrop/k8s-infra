@@ -22,7 +22,7 @@ The table hereafter summarizes the roles available that you can call using the `
 ## Prerequisite
 
   - Linux VM (CentOS7, ...) running, that you can ssh on port 22 and where your public key has been imported
-  - Ansible [2.4](http://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
+  - Ansible [>=2.7](http://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
   - OpenShift installed using `cluster` role or `openshift playbook`
 
 ## General command

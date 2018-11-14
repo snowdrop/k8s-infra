@@ -32,7 +32,7 @@
 
   - name: Enable persistence
     shell: |
-        oc {{ openshift_env.oc_admin_kubeconfig_arg }} volumes dc/nexus -n {{ infra_project }} --add \
+        oc {{ openshift_env.oc_admin_kubeconfig_arg }} set volume dc/nexus -n {{ infra_project }} --add \
             --name 'nexus-volume-1' \
             --type 'pvc' \
             --mount-path '/sonatype-work/' \

@@ -3,7 +3,7 @@
 ## Prerequisite
 
   - Linux VM (CentOS7, ...) running, that you can ssh on port 22 and where your public key has been imported
-  - Ansible [2.4](http://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
+  - Ansible [>=2.7](http://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
 
 ## Instructions
 
@@ -28,7 +28,7 @@ since the script automatically invokes said command once the VM has been created
 
   ```bash
   ansible-playbook -i inventory/simple_host playbook/cluster.yml \
-    -e openshift_release_tag_name=v3.10.0 \
+    -e openshift_release_tag_name=v3.11.0 \
     -e "@extra_vars.yml" \
     --tags "up" 
   ```
