@@ -48,10 +48,11 @@ ansible_service_broker_image=docker.io/ansibleplaybookbundle/origin-ansible-serv
 
 {% set host_info = 'localhost ansible_connection=local' if ((use_local is defined) and (use_local | bool)) else ip_address %}
 {% set private_ip_address = private_ip_address if (private_ip_address is defined) else ip_address %}
+{% set openshift_hostname = hostname if (hostname is defined) else private_ip_address %}
 
 # host group for masters
 [masters]
-{{ host_info }} openshift_public_hostname={{ ip_address }} openshift_hostname={{ private_ip_address }}
+{{ host_info }} openshift_public_hostname={{ ip_address }} openshift_hostname={{ openshift_hostname }}
 
 # host group for etcd, should run on a node that is not schedulable
 [etcd]
@@ -61,4 +62,4 @@ ansible_service_broker_image=docker.io/ansibleplaybookbundle/origin-ansible-serv
 # openshift-sdn gets installed. We mark the master node as not
 # schedulable.
 [nodes]
-{{ host_info }} openshift_node_group_name="node-config-all-in-one" openshift_public_hostname={{ ip_address }} openshift_hostname={{ private_ip_address }}
+{{ host_info }} openshift_node_group_name="node-config-all-in-one" openshift_public_hostname={{ ip_address }} openshift_hostname={{ openshift_hostname }}
