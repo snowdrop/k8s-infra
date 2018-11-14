@@ -54,7 +54,7 @@ function create_vm {
   echo "===================="
   echo "Create Virtualbox VM"
   echo "===================="
-  ./virtualbox/create-vm.sh -i ~/images -m 5000 -n okd-${version}
+  $HOME/Code/snowdrop/openshift-infra/virtualbox/create-vm.sh -i ~/images -m 5000 -n okd-${version}
 }
 
 function post_vm_installation () {
