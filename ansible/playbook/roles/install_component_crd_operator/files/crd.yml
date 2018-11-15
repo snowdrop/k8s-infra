@@ -1,0 +1,41 @@
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: components.component.k8s.io
+spec:
+  group: component.k8s.io
+  version: v1alpha1
+  names:
+    kind: Component
+    listKind: ComponentList
+    plural: components
+    singular: component
+    shortNames:
+      - cp
+    # categories is a list of grouped resources the custom resource belongs to.
+    categories:
+      - all
+  scope: Namespaced
+  additionalPrinterColumns:
+  - name: Runtime
+    type: string
+    description: "The runtime's technology/framework such as : Spring Boot, Eclipse Vert.x, ...."
+    JSONPath: .spec.runtime
+  - name: Version
+    type: string
+    description: "The version of the runtime"
+    JSONPath: .spec.version
+  - name: Service
+    type: string
+    description: "The service created from the catalog"
+    JSONPath: .spec.services[0].name
+  - name: Type
+    type: string
+    description: "The relation which exists between a component and a service, ..."
+    JSONPath: .spec.link.kind
+  - name: Consumed by
+    type: string
+    JSONPath: .spec.link.targetcomponentname
+  - name: Age
+    type: date
+    JSONPath: .metadata.creationTimestamp

@@ -1,0 +1,8 @@
+---
+# do any asserts here
+
+- include_tasks: install.yml
+  when: component_crd_operator_install | bool
+
+- include_tasks: remove.yml
+  when: component_crd_operator_remove | bool

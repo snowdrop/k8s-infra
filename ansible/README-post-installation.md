@@ -11,6 +11,7 @@ The table hereafter summarizes the roles available that you can call using the `
 | [enable_cluster_role](#command-enable_cluster_role) | Grant a cluster role to an OpenShift user |
 | [identity_provider](#command-identity_provider) | Set the Master-configuration of OpenShift to use `htpasswd` as its identity provider |
 | [persistence](#command-persistence) | Enable Persistence using `hotPath` as `persistenceVolume` |
+| [component_crd_operator](#component-crd-operator)| Install the Component CRD and Operator processing them | 
 | [install_nexus](#command-install_nexus) | Install Nexus Repository Server |
 | [install_jenkins](#command-install_jenkins) | Install Jenkins and configure it to handle `s2i` builds started within an OpenShift project |
 | [install_jaeger](#command-install_jaeger) | Install Distributed Tracing - Jaeger |
@@ -112,6 +113,15 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
   
   The number of PVs to be created can be controlled by the `number_of_volumes` variable. See [here](playbook/roles/persistence/defaults/main.yml).
   By default, 10 volumes of 5Gb each will be created.
+  
+### Component crd operator  
+
+  ```bash
+  ansible-playbook -i inventory/cloud_host playbook/post_installation.yml \
+    --tags component_crd_operator
+  ```
+  
+  To remove the Component CRD and its operator, pass then the following variable `-e component_crd_operator_remove=true -e component_crd_operator_install=false`
 
 ### Command install_nexus
 
