@@ -43,12 +43,10 @@ openshift_master_htpasswd_users={'admin': '$apr1$DloeoaY3$nqbN9fQBkyXgbj58buqEM.
 
 openshift_node_groups=[{'name': 'node-config-all-in-one', 'labels': ['node-role.kubernetes.io/master=true', 'node-role.kubernetes.io/infra=true', 'node-role.kubernetes.io/compute=true'], 'edits': [{ 'key': 'kubeletArguments.pods-per-core','value': ['20']}]}]
 
-# don't install ASB be default
+# Don't install ASB/OAB by default
 ansible_service_broker_install=false
-# we need to pin the version of the catalog (in case it get's installed) to a valid 1.2 version
-# See https://github.com/openshift/openshift-ansible/issues/9960#issuecomment-420686883
 ansible_service_broker_image=docker.io/ansibleplaybookbundle/origin-ansible-service-broker:v3.11
-
+ansible_service_broker_registry_whitelist=[".*-apb$"]
 
 {% set host_info = 'localhost ansible_connection=local' if ((use_local is defined) and (use_local | bool)) else ip_address %}
 {% set private_ip_address = private_ip_address if (private_ip_address is defined) else ip_address %}
