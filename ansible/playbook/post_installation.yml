@@ -13,6 +13,7 @@
     - { role: 'add_extra_users',      tags: 'add_extra_users'}
     - { role: 'delete_extra_users',   tags: 'delete_extra_users'}
     - { role: 'install_oc',           tags: 'install_oc'}           # Install oc client when cluster role is not used
+    - { role: 'docker',               tags: 'docker'}               # Enable to access docker on port 2376
     - { role: 'create_projects',      tags: 'create_projects'}
     - { role: 'install_nexus',        tags: 'nexus'}
     - { role: 'install_jenkins',      tags: 'jenkins'}

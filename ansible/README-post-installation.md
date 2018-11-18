@@ -11,6 +11,7 @@ The table hereafter summarizes the roles available that you can call using the `
 | [enable_cluster_role](#command-enable_cluster_role) | Grant a cluster role to an OpenShift user |
 | [identity_provider](#command-identity_provider) | Set the Master-configuration of OpenShift to use `htpasswd` as its identity provider |
 | [persistence](#command-persistence) | Enable Persistence using `hotPath` as `persistenceVolume` |
+| [docker](#extra-docker-config) | Enable extra docker config to access it using port 2376 |
 | [component_crd_operator](#component-crd-operator)| Install the Component CRD and Operator processing them | 
 | [install_nexus](#command-install_nexus) | Install Nexus Repository Server |
 | [install_jenkins](#command-install_jenkins) | Install Jenkins and configure it to handle `s2i` builds started within an OpenShift project |
@@ -113,6 +114,14 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
   
   The number of PVs to be created can be controlled by the `number_of_volumes` variable. See [here](playbook/roles/persistence/defaults/main.yml).
   By default, 10 volumes of 5Gb each will be created.
+
+### Extra docker config
+
+  ```bash
+  ansible-playbook -i inventory/cloud_host playbook/post_installation.yml --tags docker
+  ```
+  
+  Configure docker daemon to accept traffic on port 2376. Client can then access it using `export DOCKER_HOST=tcp://IP_ADDRESS:2376`   
   
 ### Component crd operator  
 
