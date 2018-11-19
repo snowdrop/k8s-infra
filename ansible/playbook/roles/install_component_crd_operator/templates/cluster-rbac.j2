@@ -4,81 +4,19 @@ metadata:
   name: component-operator
 rules:
 - apiGroups:
-  - component.k8s.io
+  - '*'
+  attributeRestrictions: null
   resources:
-  - "*"
+  - '*'
   verbs:
-  - "*"
-- apiGroups:
-  - ""
-  resources:
-  - pods
-  - services
-  - endpoints
-  - persistentvolumeclaims
-  - events
-  - configmaps
-  - secrets
+  - '*'
+- apiGroups: null
+  attributeRestrictions: null
+  nonResourceURLs:
+  - '*'
+  resources: []
   verbs:
-  - "*"
-- apiGroups:
-  - ""
-  resources:
-  - namespaces
-  verbs:
-  - get
-- apiGroups:
-  - apps
-  resources:
-  - deployments
-  - daemonsets
-  - replicasets
-  - statefulsets
-  verbs:
-  - "*"
-- apiGroups:
-  - apps.openshift.io
-  resources:
-  - deploymentconfigs
-  verbs:
-  - "*"
-- apiGroups:
-  - apps.openshift.io
-  resources:
-  - deploymentconfigs/instantiate
-  verbs:
-  - "create"
-- apiGroups:
-  - route.openshift.io
-  resources:
-  - routes
-  verbs:
-  - "*"
-- apiGroups:
-  - image.openshift.io
-  resources:
-  - imagestreams
-  verbs:
-  - "*"
-- apiGroups:
-  - servicecatalog.k8s.io
-  resources:
-  - serviceinstances
-  - servicebindings
-  verbs:
-  - "*"
-- apiGroups:
-  - automationbroker.io
-  resources:
-  - "access"
-  verbs:
-  - "create"
-- apiGroups:
-  - policy
-  resources:
-  - poddisruptionbudgets
-  verbs:
-  - "*"
+  - '*'
 
 ---
 
