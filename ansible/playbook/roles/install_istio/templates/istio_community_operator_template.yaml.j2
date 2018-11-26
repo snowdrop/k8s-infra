@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Template
 metadata:
-  name: istio-removal-job
+  name: istio-operator-job
 parameters:
 - displayName: Master Public URL
   description: The public URL for master
@@ -10,7 +10,7 @@ parameters:
 - displayName: OpenShift Release
   description: The version of the OpenShift release.
   name: OPENSHIFT_RELEASE
-  value: v3.10.0
+  value: v3.11.0
   required: true
 - displayName: Istio Operator Namespace
   description: The namespace for the Istio operator
@@ -24,7 +24,7 @@ parameters:
 - displayName: Default Version
   description: The default image version for istio deployments
   name: OPENSHIFT_ISTIO_VERSION
-  value: 0.1.0
+  value: 0.5.0
 - displayName: Default Deployment Type
   description: The default deployment type for istio deployments
   name: OPENSHIFT_DEPLOYMENT_TYPE
@@ -43,7 +43,7 @@ objects:
     scope: Namespaced
     version: v1alpha1
 - kind: Role
-  apiVersion: rbac.authorization.k8s.io/v1beta1
+  apiVersion: rbac.authorization.k8s.io/v1
   metadata:
     name: istio-operator
   rules:
@@ -76,7 +76,7 @@ objects:
     verbs:
     - "*"
 - kind: RoleBinding
-  apiVersion: rbac.authorization.k8s.io/v1beta1
+  apiVersion: rbac.authorization.k8s.io/v1
   metadata:
     name: default-account-istio-operator
   subjects:
@@ -116,7 +116,7 @@ objects:
       spec:
         containers:
           - name: istio-operator
-            image: ${OPENSHIFT_ISTIO_PREFIX}istio-operator:${OPENSHIFT_ISTIO_VERSION}
+            image: ${OPENSHIFT_ISTIO_PREFIX}istio-operator-centos7:${OPENSHIFT_ISTIO_VERSION}
             ports:
             - containerPort: 60000
               name: metrics
@@ -128,7 +128,7 @@ objects:
             - "--istioPrefix=${OPENSHIFT_ISTIO_PREFIX}"
             - "--istioVersion=${OPENSHIFT_ISTIO_VERSION}"
             - "--deploymentType=${OPENSHIFT_DEPLOYMENT_TYPE}"
-            imagePullPolicy: Always
+            imagePullPolicy: IfNotPresent
             env:
               - name: WATCH_NAMESPACE
                 valueFrom:
