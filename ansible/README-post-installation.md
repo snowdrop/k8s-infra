@@ -181,9 +181,7 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
   
 | Name | Description  | Default
 | --------- | ------------ | ------------ |
-| istio_git_repo | The git repository where the ansible playbook for installing Istio exists | https://github.com/istio/istio.git |
-| istio_git_branch | The git branch where the ansible playbook for installing Istio exists | master |
-| istio_repo_dest | Directory where the project will be cloned on the target machine | ~/.istio/playbooks |
+| istio_authentication | Whether or not the Istio installation will have auth enabled | false
 
 ### Command install_launcher
 
