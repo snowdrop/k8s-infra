@@ -1,0 +1,3 @@
+# This needs to specified on the command line
+github_secret: ""
+snowdrop_namespace: "snowdrop-site"
