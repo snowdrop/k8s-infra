@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 
+version=${1:-3.11}
+
 echo "==============================="
 echo "Bootstrap oc"
 echo "==============================="
 PUBLIC_IP=$(ifconfig enp0s3 | sed -En 's/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p')
 oc cluster up \
-  --tag=v3.11
+  --tag=v${version} \
   --base-dir="/var/lib/origin/openshift.local.clusterup" \
   --public-hostname=${PUBLIC_IP}
 
