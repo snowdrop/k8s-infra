@@ -1,0 +1,26 @@
+- name: Assert that the github secret has been specified
+  assert:
+    that: github_secret != ""
+    msg: "The github_secret variable has not been specified. Please specify it in the inventory file or using the '-e' syntax"
+
+- name: Create namespace/project if it doesn't exist
+  command: oc {{ openshift_env.oc_admin_kubeconfig_arg }} new-project {{ snowdrop_namespace }}
+  ignore_errors: true
+
+- name: Download the site's Openshift resources
+  get_url:
+    url: https://raw.githubusercontent.com/snowdrop/snowdrop-site-angular/master/openshift/snowdrop-site.yaml
+    dest: /tmp/snowdrop.yaml
+
+- name: Replace placeholder with github secret
+  replace:
+    path: /tmp/snowdrop.yaml
+    regexp: "changeme"
+    replace: "{{ github_secret }}"
+
+- name: Deploy openshift resources
+  command: oc {{ openshift_env.oc_admin_kubeconfig_arg }} apply -f /tmp/snowdrop.yaml -n {{ snowdrop_namespace }}
+
+
+
+

@@ -22,3 +22,4 @@
     - { role: 'install_launcher',     tags: 'install-launcher'}
     - { role: 'uninstall_launcher',   tags: 'uninstall-launcher'}
     - { role: 'install_component_crd_operator',  tags: 'component_crd_operator'}
+    - { role: 'deploy_snowdrop_site',  tags: 'snowdrop'}
