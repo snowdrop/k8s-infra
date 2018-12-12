@@ -2,6 +2,11 @@
 
 version=${1:-3.11}
 
+if ! [ -x "$(command -v oc)" ]; then
+  echo 'Error: oc is not installed.' >&2
+  exit 1
+fi
+
 echo "==============================="
 echo "Bootstrap oc"
 echo "==============================="
