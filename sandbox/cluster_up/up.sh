@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -x
+
 version=${1:-3.11}
 
 if ! [ -x "$(command -v oc)" ]; then
@@ -20,5 +22,6 @@ echo "==============================="
 echo "Grant cluster-admin role to admin's user"
 echo "==============================="
 oc login -u system:admin
-oc adm policy  add-cluster-role-to-user cluster-admin admin
+oc adm policy add-cluster-role-to-user cluster-admin admin
+oc adm policy add-scc-to-group hostmount-anyuid system:serviceaccounts
 oc login -u admin -p admin
