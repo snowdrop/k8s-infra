@@ -18,6 +18,7 @@ The table hereafter summarizes the roles available that you can call using the `
 | [install_jaeger](#command-install_jaeger) | Install Distributed Tracing - Jaeger |
 | [install_istio](#command-install_istio) | Install ServiceMesh - Istio |
 | [service_catalog](#command-service-catalog) | Deploy the [Ansible Service Broker](http://automationbroker.io/) |
+| [install_efk](#command-logging-efk) | Install EFK on the cluster |
 | [install_launcher](#command-install_launcher) | Install and enable the Fabric8 [Launcher](http://fabric8-launcher) |
 | [install_oc](#command-install_oc) | Install oc client within the vm
 
@@ -225,4 +226,11 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
   To install the service catalog, execute this command
   ```bash
   ansible-playbook -i inventory/cloud_host openshift-ansible/playbooks/openshift-service-catalog/config.yml -e ansible_service_broker_install=true
+  ```
+
+### Command Logging EFK
+
+  To install the infrastructure collecting the pod's logs using ElasticSearch Fluendtd & Kibana dashboard, execute this command
+  ```bash
+  ansible-playbook -i inventory/cloud_host openshift-ansible/playbooks/openshift-logging/config.yml -e openshift_logging_install_logging=true
   ```
