@@ -18,7 +18,6 @@ openshift_deployment_type=origin
 
 openshift_additional_repos=[{'id': 'centos-okd-ci', 'name': 'centos-okd-ci', 'baseurl' :'http://buildlogs.centos.org/centos/7/paas/x86_64/openshift-origin311/','gpgcheck' :'0','enabled' :'1'}]
 
-openshift_hostname={{ hostname if (hostname is defined) else ip_address }}
 openshift_master_cluster_public_hostname={{ ip_address }}
 openshift_master_default_subdomain={{ ip_address }}.nip.io
 {% if openshift_docker_selinux_enabled is defined %}
@@ -48,13 +47,17 @@ ansible_service_broker_install=false
 ansible_service_broker_image=docker.io/ansibleplaybookbundle/origin-ansible-service-broker:v3.11
 ansible_service_broker_registry_whitelist=[".*-apb$"]
 
+# EFK
+openshift_logging_es_nodeselector={"node-role.kubernetes.io/master":"true","node-role.kubernetes.io/infra":"true","node-role.kubernetes.io/compute":"true"}
+openshift_logging_es_cpu_request=400m
+openshift_logging_es_memory_limit=1G
+
 {% set host_info = 'localhost ansible_connection=local' if ((use_local is defined) and (use_local | bool)) else ip_address %}
 {% set private_ip_address = private_ip_address if (private_ip_address is defined) else ip_address %}
-{% set openshift_hostname = hostname if (hostname is defined) else private_ip_address %}
 
 # host group for masters
 [masters]
-{{ host_info }} openshift_public_hostname={{ ip_address }} openshift_hostname={{ openshift_hostname }}
+{{ host_info }} openshift_public_hostname={{ ip_address }}
 
 # host group for etcd, should run on a node that is not schedulable
 [etcd]
@@ -64,4 +67,4 @@ ansible_service_broker_registry_whitelist=[".*-apb$"]
 # openshift-sdn gets installed. We mark the master node as not
 # schedulable.
 [nodes]
-{{ host_info }} openshift_node_group_name="node-config-all-in-one" openshift_public_hostname={{ ip_address }} openshift_hostname={{ openshift_hostname }}
+{{ host_info }} openshift_node_group_name="node-config-all-in-one" openshift_public_hostname={{ ip_address }}
