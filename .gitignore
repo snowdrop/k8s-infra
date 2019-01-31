@@ -7,3 +7,6 @@
 **/*.retry
 /ansible/inventory/simple_host
 /ansible/inventory/cloud_host
+
+# Testing purposes
+sandbox/cluster_up/test.sh
