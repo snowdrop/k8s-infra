@@ -1,4 +1,5 @@
 .idea/
+.DS_Store
 **/openshift-ansible/
 **/.vagrant/
 **/inventory/cloud_host
