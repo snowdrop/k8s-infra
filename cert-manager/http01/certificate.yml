@@ -9,11 +9,9 @@ spec:
   commonName: snowdrop.me
   dnsNames:
   - snowdrop.me
-  - www.snowdrop.me
   acme:
     config:
     - http01:
         ingressClass: nginx
       domains:
         - snowdrop.me
-        - www.snowdrop.me

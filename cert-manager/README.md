@@ -3,7 +3,7 @@
 - Blog article : https://www.nearform.com/blog/how-to-run-a-public-docker-registry-in-kubernetes/
 - Cert-manager project: https://docs.cert-manager.io/
 
-## Let'scencrypt Tool
+## LetsEncrypt Tool
 
 Install the following tool in order to communicate with Lets'encrypt
 ```bash
@@ -18,6 +18,11 @@ oc label namespace cert-manager certmanager.k8s.io/disable-validation=true
 
 oc apply -f https://raw.githubusercontent.com/jetstack/cert-manager/v0.6.2/deploy/manifests/00-crds.yaml --validate=false
 oc apply -f https://raw.githubusercontent.com/jetstack/cert-manager/v0.6.2/deploy/manifests/cert-manager.yaml --validate=false
+```
+
+- Grant `cluster admin` role to the `cert-manager` SA
+```bash
+oc adm policy add-cluster-role-to-user cluster-admin -z cert-manager -n cert-manager
 ```
 
 ## Getting a TLS certificate using Let's encrypt staging
