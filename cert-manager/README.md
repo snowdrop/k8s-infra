@@ -24,7 +24,7 @@ oc apply -f https://raw.githubusercontent.com/jetstack/cert-manager/v0.6.2/deplo
 
 - Create an `issuer CRD` for `letsencrypt` which represents the CA authority able to generate a certificate
 ```
-oc apply -f letsencrypt-staging.yml
+oc apply -f http01/letsencrypt-staging.yml
 ```
 
 **Remark**: The previous command will generate a Private Key Secret which is referenced by the secret `snowdrop-issuert-key`
@@ -67,7 +67,7 @@ Events:                    <none>
 - Next, send a `Certificate` request to `letscrypt` using this `Certificate CRD`
 
 ```bash
-oc apply -f certificate.yml
+oc apply -f http01/certificate.yml
 ```
 
 - Verify what has been created
