@@ -1,0 +1,12 @@
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Issuer
+metadata:
+  name: letsencrypt-issuer
+spec:
+  acme:
+    email: cmoulliard@redhat.com
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: snowdrop-issuer-key
+    # Enable the HTTP01 challenge mechanism for this Issuer
+    http01: {}
