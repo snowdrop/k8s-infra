@@ -199,5 +199,56 @@ Events:
 
 - You can then go on to run `oc describe challenge snowdrop-me-593892605-0` to further debug the progress of the Order.
 
+## Register a TXT Record needed to use ACME DNS
 
+Trick : https://serverfault.com/questions/750902/how-to-use-lets-encrypt-dns-challenge-validation
+
+- First issue a certbot command to get the TXR record using this manual command
+```bash
+sudo certbot -d www.snowdrop.me --manual --preferred-challenges dns certonly
+Saving debug log to /var/log/letsencrypt/letsencrypt.log
+Plugins selected: Authenticator manual, Installer None
+Obtaining a new certificate
+Performing the following challenges:
+dns-01 challenge for www.snowdrop.me
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+NOTE: The IP of this machine will be publicly logged as having requested this
+certificate. If you're running certbot in manual mode on a machine that is not
+your server, please ensure you're okay with that.
+
+Are you OK with your IP being logged?
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(Y)es/(N)o: Y
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Please deploy a DNS TXT record under the name
+_acme-challenge.www.snowdrop.me with the following value:
+
+xpoFlS36qRFLjO01mBnKRBn9ZRCT9LUbiEOJVXfgv6Y
+
+Before continuing, verify the record is deployed.
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Press Enter to Continue
+Waiting for verification...
+Cleaning up challenges
+Failed authorization procedure. www.snowdrop.me (dns-01): urn:ietf:params:acme:error:dns :: DNS problem: NXDOMAIN looking up TXT for _acme-challenge.www.snowdrop.me
+
+IMPORTANT NOTES:
+ - The following errors were reported by the server:
+
+   Domain: www.snowdrop.me
+   Type:   None
+   Detail: DNS problem: NXDOMAIN looking up TXT for
+   _acme-challenge.www.snowdrop.me
+```
+
+- Or using the command where questions are already answered
+```bash
+sudo certbot --text --agree-tos --email cmoulliard@redhat.com -d www.snowdrop.me --manual --preferred-challenges dns --expand --renew-by-default  --manual-public-ip-logging-ok certonly
+```
+
+## Godaddy
+
+https://tryingtobeawesome.com/encryptdaddy/
 
