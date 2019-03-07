@@ -1,0 +1,85 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+    project: snowdrop-site-angular
+    provider: nodeshift
+  name: snowdrop-site-angular
+spec:
+  host: snowdrop.me
+  port:
+    targetPort: 8080
+  tls:
+    certificate: |
+      -----BEGIN CERTIFICATE-----
+      MIIGNDCCBRygAwIBAgIIOK+bA1Xt0iYwDQYJKoZIhvcNAQELBQAwgbQxCzAJBgNV
+      BAYTAlVTMRAwDgYDVQQIEwdBcml6b25hMRMwEQYDVQQHEwpTY290dHNkYWxlMRow
+      GAYDVQQKExFHb0RhZGR5LmNvbSwgSW5jLjEtMCsGA1UECxMkaHR0cDovL2NlcnRz
+      LmdvZGFkZHkuY29tL3JlcG9zaXRvcnkvMTMwMQYDVQQDEypHbyBEYWRkeSBTZWN1
+      cmUgQ2VydGlmaWNhdGUgQXV0aG9yaXR5IC0gRzIwHhcNMTkwMzA0MTcwNjE0WhcN
+      MjAwMzA0MTcwNjE0WjA5MSEwHwYDVQQLExhEb21haW4gQ29udHJvbCBWYWxpZGF0
+      ZWQxFDASBgNVBAMTC3Nub3dkcm9wLm1lMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8A
+      MIIBCgKCAQEAlbn0vWsv3ysUTG4dgW3zNWaTPMYAlpxFniyedq6WeDqSH8YSOujI
+      K6Y7a7sFPzbfXRgsMzYeKE1DJIXs/tyWmFo0SWlLGspx8xJZ055YL/Xa4VoL5UUO
+      XEVbnNggBHxc2695kHDt5meIGZV+omniYU+7azZcqZhqRH8OlQupLRax8ryXYssu
+      17mHVonW5wFrgOm3FE1H66GMuPbLI0cASNz0C6JAWRNYBBF22k9Q2vFoNJmsh+aa
+      fpm4gIeBdC2E2Z2B4U330YAji5XbU/U1MTloVxn2k+x7jZD83hn23w6aWgfwXqyG
+      TXNMEx1M6WVAv9c0gmISuuQmX/1HVrCWGwIDAQABo4ICwjCCAr4wDAYDVR0TAQH/
+      BAIwADAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwDgYDVR0PAQH/BAQD
+      AgWgMDcGA1UdHwQwMC4wLKAqoCiGJmh0dHA6Ly9jcmwuZ29kYWRkeS5jb20vZ2Rp
+      ZzJzMS05NjEuY3JsMF0GA1UdIARWMFQwSAYLYIZIAYb9bQEHFwEwOTA3BggrBgEF
+      BQcCARYraHR0cDovL2NlcnRpZmljYXRlcy5nb2RhZGR5LmNvbS9yZXBvc2l0b3J5
+      LzAIBgZngQwBAgEwdgYIKwYBBQUHAQEEajBoMCQGCCsGAQUFBzABhhhodHRwOi8v
+      b2NzcC5nb2RhZGR5LmNvbS8wQAYIKwYBBQUHMAKGNGh0dHA6Ly9jZXJ0aWZpY2F0
+      ZXMuZ29kYWRkeS5jb20vcmVwb3NpdG9yeS9nZGlnMi5jcnQwHwYDVR0jBBgwFoAU
+      QMK9J47MNIMwojPX+2yz8LQsgM4wJwYDVR0RBCAwHoILc25vd2Ryb3AubWWCD3d3
+      dy5zbm93ZHJvcC5tZTAdBgNVHQ4EFgQUv/2bTYcFT+br9fI2qiD+jNGsfdkwggEE
+      BgorBgEEAdZ5AgQCBIH1BIHyAPAAdwCkuQmQtBhYFIe7E6LMZ3AKPDWYBPkb37jj
+      d80OyA3cEAAAAWlJq5aLAAAEAwBIMEYCIQDgBpTRaYXBtbqurxMVO9Yjuz2gr8vs
+      e51qcpuVBSd3DwIhAJiXPEHAivj3BsMtWS0xxPUeBnoxowR/mvXlC9WpM3LzAHUA
+      Xqdz+d9WwOe1Nkh90EngMnqRmgyEoRIShBh1loFxRVgAAAFpSaubXQAABAMARjBE
+      AiAvt+4EKFoaaJ920jhTj/fgh3hTnHlnb4covr/YiomBtQIgSSwqbGCBV8gpKnQW
+      Cu3LSpQ8cm2YC4d7Gu+GCo3PB3cwDQYJKoZIhvcNAQELBQADggEBAFy8EIZyuMdn
+      dwuVgBBxS+ZOlHdN1DpkgXh61D9ldywAwOOYLkHDAYwaPeokgBttL/i8jNwH+Nxx
+      036FLMNj1e6aNI7Hs3tQdP0OlqxIyUOwILT6BlfmB7FoiIbRmpHNLqAPIzRmfvSd
+      3oEKNOlwk7NerHewmSX739YBrrJthIaOoC8dD3d2Xfih0+ng9T8SISX/1rGTyeDR
+      GnpvPsUeZQGzW22xE/lao5CsdcjoR6CX2yTKgYQqU/neolNSsShkGC57vGe13hpo
+      p6ORY3bxmexXsk5Y6Q2pvJWhy28DxVyVppo+Nd+EZdoIbXni7Tf8aJsb2AMQ8lBB
+      QXr8W7SAlVU=
+      -----END CERTIFICATE-----
+    insecureEdgeTerminationPolicy: Allow
+    key: |
+      -----BEGIN PRIVATE KEY-----
+      MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCVufS9ay/fKxRM
+      bh2BbfM1ZpM8xgCWnEWeLJ52rpZ4OpIfxhI66MgrpjtruwU/Nt9dGCwzNh4oTUMk
+      hez+3JaYWjRJaUsaynHzElnTnlgv9drhWgvlRQ5cRVuc2CAEfFzbr3mQcO3mZ4gZ
+      lX6iaeJhT7trNlypmGpEfw6VC6ktFrHyvJdiyy7XuYdWidbnAWuA6bcUTUfroYy4
+      9ssjRwBI3PQLokBZE1gEEXbaT1Da8Wg0mayH5pp+mbiAh4F0LYTZnYHhTffRgCOL
+      ldtT9TUxOWhXGfaT7HuNkPzeGfbfDppaB/BerIZNc0wTHUzpZUC/1zSCYhK65CZf
+      /UdWsJYbAgMBAAECggEAF0cJ9nmXv4rg2ixpGD+3RtnpJygjXEb0Xdh9qbblPCY4
+      TzSfOJsLJRoayoS7a+4EgOKABgAyZRKfTyombnht+JwBiAOU18KZ6kUz7j4DuNpw
+      tTCngR/2Jms+sx44sBSDkpXv1isbGViG5MSvTjccU65ZKscQqz8/ujbEq3Bc1LOh
+      1yP6b9o/D0zrtd9BZq/L0fNQwgX2kvZuBwrfo3aAHh5f4niKrA8rRUQk5hrKkGmE
+      GBzWDXGVxvrws+j1LAXelEQRLtBO9TyIrHtV6Ff0Iul+pfmXQVEnH3pgaH9hHS22
+      rjmbqgxWrrzpn55JSn+uPcO0i6YY3drPbmwqz8npeQKBgQDIf7DT7D6TY2DLAxnO
+      6B/TJA6hPKqNeJ4gqmTW6gXKgNUOSEhg9ADojy7qg/cIkYCAVb2mO9sEUVnF8QoP
+      VE0C7Ofh2xLN4sUdIt6RB783OWU9sgMVa5He1Ui+nTjep2MjPupV0SfvHXbAvD5U
+      U0/zFmi8vMiBuGGrRK1Xoi2uCQKBgQC/LEnhW71oTlpkxug4hdvszJ6D1ErnWbly
+      1DXNL9VV8XnDIJGVvr/DmGTIRa+fdpXfprjtrfbk9eBBpq9sMgQ+/J5faJsw5Tdw
+      zHBklTiJ4yJ0zb6v8GKKcjPvrBl5OLeCFDYf9hpanb/OiFumhOGdNN34r7Qcd1bK
+      /eAM884sAwKBgG+ZE1WCA3qKMBAPk8fk0AH36eS5Hb1My8cm0KYG8F48w1oFxbOh
+      XPgU6mpCNbghNMM59iuW2VtX5H4WoiDSLWNZdd/yzk6m0ExdYkCbbUVRvxZOBQVh
+      MHo1gR4H6OWVicrOdCR8HJwtbDHvFUpebPvDF10mPvxlIofv3AQRExfxAoGAShVq
+      qAd6NhKvGwCt+0F8gZ6mCyZYxKDTqfksxFA2FzEV45UadfJOtAi5fZbrwRseZ2Zf
+      odPZqs7R0f87We1kEdipswWBpogdXPwMzh25pE2+C4+zxtCcD1TEZavGz2A4VRNq
+      Cia//b/GFc5n3fb+y4IyRu4oGSPyIYYSrlJI4msCgYBCx+U7zAW9LUqtJK5HMVnD
+      GE4zYDYCllSPnDEZKW0XBSpDRhZkTJlCR8H/as2xwrx+dxOmn8AC9BceGYwW8e0G
+      9gNRp994PWibHWdYEkPByKhMQAq68I3/80NfOmZAT6ijY9xsWOxnxVzHsN8rgTe4
+      SjjC7w0FdBYbU7CYggnUfg==
+      -----END PRIVATE KEY-----
+    termination: edge
+  to:
+    kind: Service
+    name: snowdrop-site-angular
+    weight: 100
+  wildcardPolicy: None

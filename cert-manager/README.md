@@ -199,6 +199,100 @@ Events:
 
 - You can then go on to run `oc describe challenge snowdrop-me-593892605-0` to further debug the progress of the Order.
 
+## All in one 
+
+```bash
+oc apply -f http01/letsencrypt-staging.yml
+```
+
+## Cleanup
+
+```bash
+oc delete issuer letsencrypt-issuer
+oc delete certificate snowdrop-me
+oc delete secret snowdrop-issuer-key
+oc delete secret snowdrop-me-tls
+```
+
+## Using lego go tool
+
+- Install the letsencrypt go tool
+
+```bash
+go get -u github.com/xenolf/lego/cmd/lego
+```
+- To get help about dns provider and display the list available
+```bash
+lego dnshelp
+godaddy: GODADDY_POLLING_INTERVAL, GODADDY_PROPAGATION_TIMEOUT, GODADDY_TTL, GODADDY_HTTP_TIMEOUT, GODADDY_SEQUENCE_INTERVAL
+```
+
+- Generate a certificate using the Goddady DNS provider
+```bash
+GODADDY_API_KEY=dLDD4PTjgyQb_42gN8UyVYLpwjfo74iapcz GODADDY_API_SECRET=42gS8sJHGdHX7X8Nio6MJi lego -a -k rsa2048 --pem --dns godaddy --email="cmoulliard@redhat.com" --domains="snowdrop.dev"  --cert.timeout 200 run
+```
+
+**Remarks**: We added the options `--pem` to generate a .pem file by concatenating the .key and .crt files together, `-a` to indicate that we accept the current Let's Encrypt terms of service
+
+- Rename the `.lego` folder using as suffix the domain name
+```bash
+mkdir -p snowdrop-dev
+mv .lego snowdrop-dev/.lego
+```
+- Check certificate content created
+```bash
+openssl x509 -in snowdrop-dev/.lego/certificates/snowdrop.dev.crt -text -noout 
+```
+
+- To list the certificate created
+```bash
+lego --path snowdrop-dev/.lego list        
+Found the following certs:
+  Certificate Name: snowdrop.dev
+    Domains: snowdrop.dev
+    Expiry Date: 2019-06-05 06:49:18 +0000 UTC
+    Certificate Path: snowdrop-dev/.lego/certificates/snowdrop.dev.crt
+```
+
+- Next, create an `Openshift Edge TLS` route where you will copy/paste the Cert, CA Cert parts from the pem file.
+```bash
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+    service: snowdrop-site-angular
+  name: snowdrop-dev
+spec:
+  host: snowdrop.dev
+  port:
+    targetPort: '8080'
+  tls:
+    caCertificate: |-
+      -----BEGIN CERTIFICATE-----
+      COPY 2nd CERTIFICATE from the file snowdrop.dev.pem
+      -----END CERTIFICATE-----
+    certificate: |-
+      -----BEGIN CERTIFICATE-----
+      COPY 1st CERTIFICATE from the file snowdrop.dev.pem
+      -----END CERTIFICATE-----
+    insecureEdgeTerminationPolicy: Allow
+    key: |-
+      -----BEGIN RSA PRIVATE KEY-----
+      COPY private key  from the file snowdrop.dev.pem
+      -----END RSA PRIVATE KEY-----
+    termination: edge
+  to:
+    kind: Service
+    name: snowdrop-dev-site
+    weight: 100
+  wildcardPolicy: None
+```
+
+- To renew the certificate
+```bash
+GODADDY_API_KEY=dLDD4PTjgyQb_42gN8UyVYLpwjfo74iapcz GODADDY_API_SECRET=42gS8sJHGdHX7X8Nio6MJi lego --path snowdrop-dev/.lego --email="cmoulliard@redhat.com" --domains="snowdrop.dev" --dns godaddy renew --days 360
+```
+
 ## Register a TXT Record needed to use ACME DNS
 
 Trick : https://serverfault.com/questions/750902/how-to-use-lets-encrypt-dns-challenge-validation
@@ -248,7 +342,42 @@ IMPORTANT NOTES:
 sudo certbot --text --agree-tos --email cmoulliard@redhat.com -d www.snowdrop.me --manual --preferred-challenges dns --expand --renew-by-default  --manual-public-ip-logging-ok certonly
 ```
 
-## Godaddy
+## How to use GoDaddy + Letsencrypt
 
 https://tryingtobeawesome.com/encryptdaddy/
+
+https://cromwell-intl.com/open-source/letsencrypt-tls-cert-godaddy.html
+
+```bash
+ROOTDIR=$HOME/Temp/letsencrypt
+mkdir -p $ROOTDIR
+cd $ROOTDIR
+
+# get letsencrypt.sh
+git clone https://github.com/lukas2511/dehydrated
+# get le-godaddy-dns
+git clone https://github.com/josteink/le-godaddy-dns
+
+cd $ROOTDIR/le-godaddy-dns
+python3 -m pip install -r requirements.txt --user
+
+# Add your domains
+cd $ROOTDIR/dehydrated
+subl domains.txt
+snowdrop.me www.snowdrop.me start.snowdrop.me
+
+HOOK_CHAIN (optional)
+subl $ROOTDIR/dehydrated/config
+
+# Configure Godaddy
+export GD_KEY=dLDD4PTjgyQb_42gN8UyVYLpwjfo74iapcz
+export GD_SECRET=42gS8sJHGdHX7X8Nio6MJi
+
+./dehydrated --challenge dns-01 -k $ROOTDIR/le-godaddy-dns/godaddy.py -c
+./dehydrated --register --accept-terms
+
+# Cert is created within the account dir
+find . -name account_key.pem -exec openssl x509 -in '{}' -text -noout \;
+find . -name account_key.pem -exec openssl x509 -in '{}' -subject -noout \;
+```
 

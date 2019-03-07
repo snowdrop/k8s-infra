@@ -1,0 +1,5 @@
+{
+	"domain": "www.snowdrop.me",
+	"certUrl": "https://acme-staging-v02.api.letsencrypt.org/acme/cert/fae1d3e6d0f08c57c68e0505bf6d5e4ac1a3",
+	"certStableUrl": "https://acme-staging-v02.api.letsencrypt.org/acme/cert/fae1d3e6d0f08c57c68e0505bf6d5e4ac1a3"
+}
