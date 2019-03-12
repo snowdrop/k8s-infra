@@ -224,7 +224,9 @@ godaddy: GODADDY_POLLING_INTERVAL, GODADDY_PROPAGATION_TIMEOUT, GODADDY_TTL, GOD
 
 - Generate a certificate using the Goddady DNS provider
 ```bash
-GODADDY_API_KEY=dLDD4PTjgyQb_42gN8UyVYLpwjfo74iapcz GODADDY_API_SECRET=42gS8sJHGdHX7X8Nio6MJi lego -a -k rsa2048 --pem --dns godaddy --email="cmoulliard@redhat.com" --domains="snowdrop.dev"  --cert.timeout 200 run
+DOMAINS="snowdrop.dev"
+EMAIL="cmoulliard@redhat.com"
+GODADDY_API_KEY=dLDD4PTjgyQb_42gN8UyVYLpwjfo74iapcz GODADDY_API_SECRET=42gS8sJHGdHX7X8Nio6MJi lego -a -k rsa2048 --pem --dns godaddy --email=${EMAIL} --domains=${DOMAINS} --cert.timeout 200 run
 ```
 
 **Remarks**: We added the options `--pem` to generate a .pem file by concatenating the .key and .crt files together, `-a` to indicate that we accept the current Let's Encrypt terms of service
