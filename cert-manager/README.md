@@ -1,7 +1,16 @@
-# Procedure to use k8s cert-manager & let's encrypt
+## Procedure to use k8s cert-manager & let's encrypt
 
+Some cool infos are available here :
 - Blog article : https://www.nearform.com/blog/how-to-run-a-public-docker-registry-in-kubernetes/
 - Cert-manager project: https://docs.cert-manager.io/
+
+Table of Content
+
+   * [How to install the k8s cert-manager](#how-to-install-the-k8s-cert-manager)
+   * [Getting a TLS certificate using Let's encrypt staging and HTTP-01](#getting-a-tls-certificate-using-lets-encrypt-staging-and-http-01)
+   * [All in one](#all-in-one)
+   * [Cleanup](#cleanup)
+   * [Using the lego go tool to create a certificate with GoDaddy](#using-the-lego-go-tool-to-create-a-certificate-with-godaddy)
 
 ## How to install the k8s cert-manager
 
