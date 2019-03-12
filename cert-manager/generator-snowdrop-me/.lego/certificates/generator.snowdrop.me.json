@@ -1,0 +1,5 @@
+{
+	"domain": "generator.snowdrop.me",
+	"certUrl": "https://acme-v02.api.letsencrypt.org/acme/cert/03042bebf427aa3a9cf7851153e7e734583b",
+	"certStableUrl": "https://acme-v02.api.letsencrypt.org/acme/cert/03042bebf427aa3a9cf7851153e7e734583b"
+}

@@ -234,7 +234,7 @@ GODADDY_API_KEY=dLDD4PTjgyQb_42gN8UyVYLpwjfo74iapcz GODADDY_API_SECRET=42gS8sJHG
 - Rename the `.lego` folder using as suffix the domain name
 ```bash
 mkdir -p snowdrop-dev
-mv .lego snowdrop-dev/.lego
+mv .lego snowdrop-dev
 ```
 - Check certificate content created
 ```bash
