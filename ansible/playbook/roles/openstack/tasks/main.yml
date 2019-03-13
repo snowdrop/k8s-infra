@@ -44,7 +44,7 @@
       msg: "VM Public IP : {{ openstack_output.server.accessIPv4 }} / VM Private IP: {{ openstack_output.server.private_v4 }}"
 
   - set_fact:
-      private_key_in_inventory: inventory/id_openstack.rsa
+      private_key_in_inventory: "{{ lookup('env', 'PWD') }}/inventory/id_openstack.rsa"
       login_username: centos
 
   - name: Copy private key to inventory
