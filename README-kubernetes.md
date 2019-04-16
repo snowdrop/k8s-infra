@@ -1,10 +1,12 @@
-### Info
+### How to setup a kubermnetes cluster on Centos7
 
-https://kubernetes.io/docs/setup/independent/create-cluster-kubeadm/#master-isolation
-https://powerodit.ch/2017/10/29/all-in-one-kubernetes-cluster-with-kubeadm/
-https://kubernetes.io/docs/setup/independent/install-kubeadm/
-https://kubernetes.io/docs/concepts/cluster-administration/addons/
-https://ichbinblau.github.io/2017/09/20/Setup-Kubernetes-Cluster-on-Centos-7-3-with-Kubeadm/
+Useful links
+
+- https://kubernetes.io/docs/setup/independent/create-cluster-kubeadm/#master-isolation
+- https://powerodit.ch/2017/10/29/all-in-one-kubernetes-cluster-with-kubeadm/
+- https://kubernetes.io/docs/setup/independent/install-kubeadm/
+- https://kubernetes.io/docs/concepts/cluster-administration/addons/
+- https://ichbinblau.github.io/2017/09/20/Setup-Kubernetes-Cluster-on-Centos-7-3-with-Kubeadm/
 
 ### Add yum repo & install kubelet, kubeadm and kubectl
 ```
