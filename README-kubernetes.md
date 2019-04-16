@@ -397,6 +397,35 @@ If TLS is enabled for the Ingress, a Secret containing the certificate and key m
   type: kubernetes.io/tls
 ```
 
+## Install ServiceBroker and OAB
+
+Get and install helm chart of the k8s service-catalog
+```bash
+helm repo add svc-cat https://svc-catalog-charts.storage.googleapis.com
+helm install svc-cat/catalog --name catalog --namespace catalog
+```
+
+Install OAB
+
+```bash
+kubectl apply -f https://raw.githubusercontent.com/cmoulliard/cloud-native/master/oab/install.yml
+```
+
+**REMARK** : OAB can also be configured to contain the Helm's charts imported from `https://kubernetes-charts.storage.googleapis.com`. Then, install it using this command
+`kubectl apply -f https://raw.githubusercontent.com/cmoulliard/cloud-native/master/oab/install-helm.yml`
+
+# Install The Component Operator
+
+```bash
+kubectl config use-context component-operator
+export operator_project=$GOPATH/src/github.com/snowdrop/component-operator
+
+kubectl create -f $operator_project/deploy/sa.yaml
+kubectl create -f $operator_project/deploy/cluster-rbac.yaml
+kubectl create -f $operator_project/deploy/crd.yaml
+kubectl create -f $operator_project/deploy/operator.yaml
+```
+
 ### Tear down
 
 ```
@@ -406,4 +435,60 @@ kubectl delete node cloud
 Then, on the node being removed, reset all kubeadm installed state:
 ```
 kubeadm reset
+```
+
+### Install golang on Centos7
+
+```bash
+rpm --import https://mirror.go-repo.io/centos/RPM-GPG-KEY-GO-REPO
+curl -s https://mirror.go-repo.io/centos/go-repo.repo | tee /etc/yum.repos.d/go-repo.repo
+yum install golang
+
+mkdir -p ~/go/{bin,pkg,src}
+echo 'export GOPATH="$HOME/go"' >> ~/.bashrc
+echo 'export PATH="$PATH:${GOPATH//://bin:}/bin"' >> ~/.bashrc
+source ~/.bashrc
+```
+
+### Install Nodejs, yarn
+
+On CentOS, Fedora and RHEL, you can install Yarn via a RPM package repository.
+```bash
+curl --silent --location https://dl.yarnpkg.com/rpm/yarn.repo | sudo tee /etc/yum.repos.d/yarn.repo
+```
+If you do not already have Node.js installed, you should also configure the NodeSource repository:
+
+```bash
+curl --silent --location https://rpm.nodesource.com/setup_8.x | sudo bash -
+```
+
+Then you can simply:
+```bash
+sudo yum install yarn
+```
+
+### To use OpenShift console
+
+Prerequisites: Nodejs, yarn and go are installed
+
+```bash
+go get github.com/openshift/console && cd $GOPATH/src/github.com/openshift/console
+./build.sh 
+
+export KUBECONFIG=$HOME/.kube/config
+source ./contrib/environment.sh
+./bin/bridge
+```
+
+### Install the Component Operator
+
+```bash
+go get github.com/snowdrop/component-operator
+export operator_project=$GOPATH/src/github.com/snowdrop/component-operator
+
+kubectl create ns operators
+kubectl create -f $operator_project/deploy/sa.yaml -n operators
+kubectl create -f $operator_project/deploy/cluster-rbac.yaml -n operators
+kubectl create -f $operator_project/deploy/crd.yaml -n operators
+kubectl create -f $operator_project/deploy/operator.yaml -n operators
 ```
