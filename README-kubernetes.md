@@ -191,7 +191,7 @@ See: https://stackoverflow.com/questions/46664104/how-to-sign-in-kubernetes-dash
 Create a `ClusterRoleBinding` to grant the Dashboard `serviceaccount` the role `cluster-admin`
 
 ```bash
-[root@cloud ~]# cat <<EOF | kubectl create -f -
+cat <<EOF | kubectl create -f -
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
 metadata:
@@ -240,6 +240,161 @@ spec:
 ### Start the proxy to access the dashboard remotely
 ```bash
 kubectl proxy --address=192.168.99.50 --accept-hosts '.*'
+```
+
+### Setup ingress using helm
+
+[See](https://kubernetes.github.io/ingress-nginx/deploy/)
+
+Create first a `ClusterRoleBinding` for the `Tiller` serviceaccount
+
+```bash
+cat <<EOF | kubectl create -f - 
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tiller
+  namespace: kube-system
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: tiller-clusterrolebinding
+subjects:
+- kind: ServiceAccount
+  name: tiller
+  namespace: kube-system
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: ""
+EOF
+```
+And now install helm
+
+```bash
+curl https://raw.githubusercontent.com/helm/helm/master/scripts/get > get_helm.sh
+chmod 700 get_helm.sh
+./get_helm.sh
+Downloading https://kubernetes-helm.storage.googleapis.com/helm-v2.13.1-linux-amd64.tar.gz
+Preparing to install helm and tiller into /usr/local/bin
+helm installed into /usr/local/bin/helm
+tiller installed into /usr/local/bin/tiller
+Run 'helm init' to configure helm.
+```
+
+Initialize helm client and Tiller server
+```bash
+helm init --service-account tiller
+Creating /root/.helm
+Creating /root/.helm/repository
+Creating /root/.helm/repository/cache
+Creating /root/.helm/repository/local
+Creating /root/.helm/plugins
+Creating /root/.helm/starters
+Creating /root/.helm/cache/archive
+Creating /root/.helm/repository/repositories.yaml
+Adding stable repo with URL: https://kubernetes-charts.storage.googleapis.com
+Adding local repo with URL: http://127.0.0.1:8879/charts
+$HELM_HOME has been configured at /root/.helm.
+
+Tiller (the Helm server-side component) has been installed into your Kubernetes Cluster.
+
+Please note: by default, Tiller is deployed with an insecure 'allow unauthenticated users' policy.
+To prevent this, run `helm init` with the --tiller-tls-verify flag.
+For more information on securing your installation see: https://docs.helm.sh/using_helm/#securing-your-helm-installation
+Happy Helming!
+```
+
+Install ingress using the helm chart
+```bash
+helm install stable/nginx-ingress --name my-nginx --set rbac.create=true
+NAME:   my-nginx
+LAST DEPLOYED: Tue Apr 16 07:51:06 2019
+NAMESPACE: default
+STATUS: DEPLOYED
+
+RESOURCES:
+==> v1/ConfigMap
+NAME                               DATA  AGE
+my-nginx-nginx-ingress-controller  1     1s
+
+==> v1/Pod(related)
+NAME                                                     READY  STATUS             RESTARTS  AGE
+my-nginx-nginx-ingress-controller-5455d75d7f-qwkpk       0/1    ContainerCreating  0         1s
+my-nginx-nginx-ingress-default-backend-5b8d7cb696-vvgfn  0/1    ContainerCreating  0         1s
+
+==> v1/Service
+NAME                                    TYPE          CLUSTER-IP      EXTERNAL-IP  PORT(S)                     AGE
+my-nginx-nginx-ingress-controller       LoadBalancer  10.104.162.250  <pending>    80:30924/TCP,443:31742/TCP  1s
+my-nginx-nginx-ingress-default-backend  ClusterIP     10.103.73.175   <none>       80/TCP                      1s
+
+==> v1/ServiceAccount
+NAME                    SECRETS  AGE
+my-nginx-nginx-ingress  1        1s
+
+==> v1beta1/ClusterRole
+NAME                    AGE
+my-nginx-nginx-ingress  1s
+
+==> v1beta1/ClusterRoleBinding
+NAME                    AGE
+my-nginx-nginx-ingress  1s
+
+==> v1beta1/Deployment
+NAME                                    READY  UP-TO-DATE  AVAILABLE  AGE
+my-nginx-nginx-ingress-controller       0/1    1           0          1s
+my-nginx-nginx-ingress-default-backend  0/1    1           0          1s
+
+==> v1beta1/Role
+NAME                    AGE
+my-nginx-nginx-ingress  1s
+
+==> v1beta1/RoleBinding
+NAME                    AGE
+my-nginx-nginx-ingress  1s
+
+
+NOTES:
+The nginx-ingress controller has been installed.
+It may take a few minutes for the LoadBalancer IP to be available.
+You can watch the status by running 'kubectl --namespace default get services -o wide -w my-nginx-nginx-ingress-controller'
+
+An example Ingress that makes use of the controller:
+
+  apiVersion: extensions/v1beta1
+  kind: Ingress
+  metadata:
+    annotations:
+      kubernetes.io/ingress.class: nginx
+    name: example
+    namespace: foo
+  spec:
+    rules:
+      - host: www.example.com
+        http:
+          paths:
+            - backend:
+                serviceName: exampleService
+                servicePort: 80
+              path: /
+    # This section is only required if TLS is to be enabled for the Ingress
+    tls:
+        - hosts:
+            - www.example.com
+          secretName: example-tls
+
+If TLS is enabled for the Ingress, a Secret containing the certificate and key must also be provided:
+
+  apiVersion: v1
+  kind: Secret
+  metadata:
+    name: example-tls
+    namespace: foo
+  data:
+    tls.crt: <base64 encoded cert>
+    tls.key: <base64 encoded key>
+  type: kubernetes.io/tls
 ```
 
 ### Tear down
