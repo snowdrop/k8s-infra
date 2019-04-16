@@ -309,96 +309,45 @@ roleRef:
 EOF
 ```
 
-Install ingress using the helm chart
+Install ingress using the minikube addons ingress resources (as helm chart do not work)
 ```bash
-helm install stable/nginx-ingress --name my-nginx --set rbac.create=true
-NAME:   my-nginx
-LAST DEPLOYED: Tue Apr 16 07:51:06 2019
-NAMESPACE: default
-STATUS: DEPLOYED
-
-RESOURCES:
-==> v1/ConfigMap
-NAME                               DATA  AGE
-my-nginx-nginx-ingress-controller  1     1s
-
-==> v1/Pod(related)
-NAME                                                     READY  STATUS             RESTARTS  AGE
-my-nginx-nginx-ingress-controller-5455d75d7f-qwkpk       0/1    ContainerCreating  0         1s
-my-nginx-nginx-ingress-default-backend-5b8d7cb696-vvgfn  0/1    ContainerCreating  0         1s
-
-==> v1/Service
-NAME                                    TYPE          CLUSTER-IP      EXTERNAL-IP  PORT(S)                     AGE
-my-nginx-nginx-ingress-controller       LoadBalancer  10.104.162.250  <pending>    80:30924/TCP,443:31742/TCP  1s
-my-nginx-nginx-ingress-default-backend  ClusterIP     10.103.73.175   <none>       80/TCP                      1s
-
-==> v1/ServiceAccount
-NAME                    SECRETS  AGE
-my-nginx-nginx-ingress  1        1s
-
-==> v1beta1/ClusterRole
-NAME                    AGE
-my-nginx-nginx-ingress  1s
-
-==> v1beta1/ClusterRoleBinding
-NAME                    AGE
-my-nginx-nginx-ingress  1s
-
-==> v1beta1/Deployment
-NAME                                    READY  UP-TO-DATE  AVAILABLE  AGE
-my-nginx-nginx-ingress-controller       0/1    1           0          1s
-my-nginx-nginx-ingress-default-backend  0/1    1           0          1s
-
-==> v1beta1/Role
-NAME                    AGE
-my-nginx-nginx-ingress  1s
-
-==> v1beta1/RoleBinding
-NAME                    AGE
-my-nginx-nginx-ingress  1s
-
-
-NOTES:
-The nginx-ingress controller has been installed.
-It may take a few minutes for the LoadBalancer IP to be available.
-You can watch the status by running 'kubectl --namespace default get services -o wide -w my-nginx-nginx-ingress-controller'
-
-An example Ingress that makes use of the controller:
-
-  apiVersion: extensions/v1beta1
-  kind: Ingress
-  metadata:
-    annotations:
-      kubernetes.io/ingress.class: nginx
-    name: example
-    namespace: foo
-  spec:
-    rules:
-      - host: www.example.com
-        http:
-          paths:
-            - backend:
-                serviceName: exampleService
-                servicePort: 80
-              path: /
-    # This section is only required if TLS is to be enabled for the Ingress
-    tls:
-        - hosts:
-            - www.example.com
-          secretName: example-tls
-
-If TLS is enabled for the Ingress, a Secret containing the certificate and key must also be provided:
-
-  apiVersion: v1
-  kind: Secret
-  metadata:
-    name: example-tls
-    namespace: foo
-  data:
-    tls.crt: <base64 encoded cert>
-    tls.key: <base64 encoded key>
-  type: kubernetes.io/tls
+kubectl create -f https://raw.githubusercontent.com/snowdrop/openshift-infra/master/kubernetes/ingress/ingress-configmap.yaml
+kubectl create -f https://raw.githubusercontent.com/snowdrop/openshift-infra/master/kubernetes/ingress/ingress-rbac.yaml
+kubectl create -f https://raw.githubusercontent.com/snowdrop/openshift-infra/master/kubernetes/ingress/ingress-svc.yaml
+kubectl create -f https://raw.githubusercontent.com/snowdrop/openshift-infra/master/kubernetes/ingress/ingress-dp.yaml
 ```
+
+Check if the pod is running correctly
+```bash
+ubectl logs pod/nginx-ingress-controller-586cdc477c-vv7m5 -n kube-system
+-------------------------------------------------------------------------------
+NGINX Ingress controller
+  Release:    0.23.0
+  Build:      git-be1329b22
+  Repository: https://github.com/kubernetes/ingress-nginx
+-------------------------------------------------------------------------------
+W0416 15:16:32.487382       6 flags.go:213] SSL certificate chain completion is disabled (--enable-ssl-chain-completion=false)
+nginx version: nginx/1.15.9
+W0416 15:16:32.494176       6 client_config.go:549] Neither --kubeconfig nor --master was specified.  Using the inClusterConfig.  This might not work.
+I0416 15:16:32.495832       6 main.go:200] Creating API client for https://10.96.0.1:443
+I0416 15:16:32.505274       6 main.go:244] Running in Kubernetes cluster version v1.14 (v1.14.1) - git (clean) commit b7394102d6ef778017f2ca4046abbaa23b88c290 - platform linux/amd64
+I0416 15:16:32.507276       6 main.go:102] Validated kube-system/default-http-backend as the default backend.
+I0416 15:16:32.999477       6 nginx.go:261] Starting NGINX Ingress controller
+I0416 15:16:33.012601       6 event.go:221] Event(v1.ObjectReference{Kind:"ConfigMap", Namespace:"kube-system", Name:"nginx-load-balancer-conf", UID:"c60d2ddf-6057-11e9-935a-080027a95fa5", APIVersion:"v1", ResourceVersion:"45758", FieldPath:""}): type: 'Normal' reason: 'CREATE' ConfigMap kube-system/nginx-load-balancer-conf
+I0416 15:16:33.012898       6 event.go:221] Event(v1.ObjectReference{Kind:"ConfigMap", Namespace:"kube-system", Name:"tcp-services", UID:"c60de178-6057-11e9-935a-080027a95fa5", APIVersion:"v1", ResourceVersion:"45759", FieldPath:""}): type: 'Normal' reason: 'CREATE' ConfigMap kube-system/tcp-services
+I0416 15:16:33.015383       6 event.go:221] Event(v1.ObjectReference{Kind:"ConfigMap", Namespace:"kube-system", Name:"udp-services", UID:"c60ee9b6-6057-11e9-935a-080027a95fa5", APIVersion:"v1", ResourceVersion:"45760", FieldPath:""}): type: 'Normal' reason: 'CREATE' ConfigMap kube-system/udp-services
+I0416 15:16:34.103349       6 event.go:221] Event(v1.ObjectReference{Kind:"Ingress", Namespace:"demo", Name:"fruit-client-sb", UID:"32c70e71-603f-11e9-bb5b-080027a95fa5", APIVersion:"extensions/v1beta1", ResourceVersion:"31128", FieldPath:""}): type: 'Normal' reason: 'CREATE' Ingress demo/fruit-client-sb
+I0416 15:16:34.200848       6 nginx.go:282] Starting NGINX process
+I0416 15:16:34.201242       6 leaderelection.go:205] attempting to acquire leader lease  kube-system/ingress-controller-leader-nginx...
+W0416 15:16:34.206185       6 controller.go:371] Service "kube-system/default-http-backend" does not have any active Endpoint
+I0416 15:16:34.206456       6 controller.go:172] Configuration changes detected, backend reload required.
+I0416 15:16:34.221100       6 leaderelection.go:214] successfully acquired lease kube-system/ingress-controller-leader-nginx
+I0416 15:16:34.221215       6 status.go:148] new leader elected: nginx-ingress-controller-586cdc477c-vv7m5
+I0416 15:16:34.231576       6 status.go:388] updating Ingress demo/fruit-client-sb status from [{ }] to [{192.168.99.50 }]
+I0416 15:16:34.239931       6 event.go:221] Event(v1.ObjectReference{Kind:"Ingress", Namespace:"demo", Name:"fruit-client-sb", UID:"32c70e71-603f-11e9-bb5b-080027a95fa5", APIVersion:"extensions/v1beta1", ResourceVersion:"47354", FieldPath:""}): type: 'Normal' reason: 'UPDATE' Ingress demo/fruit-client-sb
+I0416 15:16:34.320183       6 controller.go:190] Backend successfully reloaded.
+```
+
 
 ### Enable persistent volume
 
@@ -573,36 +522,15 @@ git clone https://github.com/snowdrop/component-operator-demo.git && cd componen
 mvn package
 ```
 
-Install for each service its Component or runtime definition
+Install for each service its Component, link, service
 ```bash
 kubectl apply -f fruit-client-sb/target/classes/META-INF/ap4k/component.yml -n demo
 kubectl apply -f fruit-backend-sb/target/classes/META-INF/ap4k/component.yml -n demo
 ```
 
-Push the code
-```bash
-./scripts/push_start.sh fruit-client sb
-./scripts/push_start.sh fruit-backend sb
-```
-
-route_address=$(oc get route/fruit-client-sb -o jsonpath='{.spec.host}')
-curl http://$route_address/api/client
-http -s solarized http://$route_address/api/client
-http -s solarized http://$route_address/api/client/1
-http -s solarized http://$route_address/api/client/2
-http -s solarized http://$route_address/api/client/3
-
-oc patch cp fruit-backend-sb -p '{"spec":{"deploymentMode":"outerloop"}}' --type=merge
-...
-
-http -s solarized http://$route_address/api/client
-http -s solarized http://$route_address/api/client/1
-http -s solarized http://$route_address/api/client/2
-http -s solarized http://$route_address/api/client/3
-```
-
 ### Play with the component
-```
+
+```bash
 # Access shell of the backend pod to display the env vars
 ./scripts/k8s_cmd.sh fruit-backend-sb env | grep DB
 
@@ -618,5 +546,10 @@ http -s solarized http://$route_address/api/client/3
 
 # Call the Rest endpoints (client or fruits)
 curl --resolve fruit-client-sb:8080:192.168.99.50 -k http://fruit-client-sb:8080/api/client 
-curl --resolve fruit-backend-sb:80:192.168.99.50 -k http://fruit-backend-sb/api/fruits 
+curl --resolve fruit-backend-sb:80:192.168.99.50 -k http://fruit-backend-sb/api/fruits
+```
+
+Patch the `Component` CR to switch from `innerloop` to `outerloop`
+```bash
+kubectl patch cp fruit-backend-sb -p '{"spec":{"deploymentMode":"outerloop"}}' --type=merge
 ```
