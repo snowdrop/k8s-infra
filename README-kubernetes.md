@@ -244,33 +244,7 @@ kubectl proxy --address=192.168.99.50 --accept-hosts '.*'
 
 ### Setup ingress using helm
 
-[See](https://kubernetes.github.io/ingress-nginx/deploy/)
-
-Create first a `ClusterRoleBinding` for the `Tiller` serviceaccount
-
-```bash
-cat <<EOF | kubectl create -f - 
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: tiller
-  namespace: kube-system
----
-kind: ClusterRoleBinding
-apiVersion: rbac.authorization.k8s.io/v1beta1
-metadata:
-  name: tiller-clusterrolebinding
-subjects:
-- kind: ServiceAccount
-  name: tiller
-  namespace: kube-system
-roleRef:
-  kind: ClusterRole
-  name: cluster-admin
-  apiGroup: ""
-EOF
-```
-And now install helm
+Download helm
 
 ```bash
 curl https://raw.githubusercontent.com/helm/helm/master/scripts/get > get_helm.sh
@@ -304,6 +278,35 @@ Please note: by default, Tiller is deployed with an insecure 'allow unauthentica
 To prevent this, run `helm init` with the --tiller-tls-verify flag.
 For more information on securing your installation see: https://docs.helm.sh/using_helm/#securing-your-helm-installation
 Happy Helming!
+```
+
+Configure and install ingress
+
+[See](https://kubernetes.github.io/ingress-nginx/deploy/)
+
+Create first a `ClusterRoleBinding` for the `Tiller` serviceaccount
+
+```bash
+cat <<EOF | kubectl create -f - 
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tiller
+  namespace: kube-system
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: tiller-clusterrolebinding
+subjects:
+- kind: ServiceAccount
+  name: tiller
+  namespace: kube-system
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: ""
+EOF
 ```
 
 Install ingress using the helm chart
@@ -397,6 +400,59 @@ If TLS is enabled for the Ingress, a Secret containing the certificate and key m
   type: kubernetes.io/tls
 ```
 
+### Enable persistent volume
+
+```bash
+cat <<EOF | kubectl create -f - 
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv001
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 3Gi
+  hostPath:
+    path: /tmp/pv001
+    type: ""
+  persistentVolumeReclaimPolicy: Recycle
+EOF
+
+cat <<EOF | kubectl create -f - 
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv002
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 3Gi
+  hostPath:
+    path: /tmp/pv001
+    type: ""
+  persistentVolumeReclaimPolicy: Recycle
+EOF
+
+cat <<EOF | kubectl create -f - 
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv003
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 3Gi
+  hostPath:
+    path: /tmp/pv001
+    type: ""
+  persistentVolumeReclaimPolicy: Recycle
+EOF
+
+```
+
 ## Install ServiceBroker and OAB
 
 Get and install helm chart of the k8s service-catalog
@@ -450,7 +506,7 @@ echo 'export PATH="$PATH:${GOPATH//://bin:}/bin"' >> ~/.bashrc
 source ~/.bashrc
 ```
 
-### Install Nodejs, yarn
+### Install Nodejs, yarn, jq
 
 On CentOS, Fedora and RHEL, you can install Yarn via a RPM package repository.
 ```bash
@@ -467,9 +523,16 @@ Then you can simply:
 sudo yum install yarn
 ```
 
+To install jq on centos
+```bash
+wget -O jq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64
+chmod +x ./jq
+mv jq /usr/bin
+```
+
 ### To use OpenShift console
 
-Prerequisites: Nodejs, yarn and go are installed
+Prerequisites: Nodejs, yarn, jq and go are installed
 
 ```bash
 go get github.com/openshift/console && cd $GOPATH/src/github.com/openshift/console
@@ -489,6 +552,71 @@ export operator_project=$GOPATH/src/github.com/snowdrop/component-operator
 kubectl create ns operators
 kubectl create -f $operator_project/deploy/sa.yaml -n operators
 kubectl create -f $operator_project/deploy/cluster-rbac.yaml -n operators
-kubectl create -f $operator_project/deploy/crd.yaml -n operators
+kubectl create -f $operator_project/deploy/crds/crd.yaml -n operators
 kubectl create -f $operator_project/deploy/operator.yaml -n operators
+```
+
+### Test component operator
+
+Prerequisite: Install JDK, Apache Maven and Httpie tool
+
+```bash
+wget http://repos.fedorapeople.org/repos/dchen/apache-maven/epel-apache-maven.repo -O /etc/yum.repos.d/epel-apache-maven.repo
+yum install apache-maven
+yum install httpie
+```
+
+Clone the `component-operator-demo` project and build it
+
+```bash
+git clone https://github.com/snowdrop/component-operator-demo.git && cd component-operator-demo
+mvn package
+```
+
+Install for each service its Component or runtime definition
+```bash
+kubectl apply -f fruit-client-sb/target/classes/META-INF/ap4k/component.yml -n demo
+kubectl apply -f fruit-backend-sb/target/classes/META-INF/ap4k/component.yml -n demo
+```
+
+Push the code
+```bash
+./scripts/push_start.sh fruit-client sb
+./scripts/push_start.sh fruit-backend sb
+```
+
+route_address=$(oc get route/fruit-client-sb -o jsonpath='{.spec.host}')
+curl http://$route_address/api/client
+http -s solarized http://$route_address/api/client
+http -s solarized http://$route_address/api/client/1
+http -s solarized http://$route_address/api/client/2
+http -s solarized http://$route_address/api/client/3
+
+oc patch cp fruit-backend-sb -p '{"spec":{"deploymentMode":"outerloop"}}' --type=merge
+...
+
+http -s solarized http://$route_address/api/client
+http -s solarized http://$route_address/api/client/1
+http -s solarized http://$route_address/api/client/2
+http -s solarized http://$route_address/api/client/3
+```
+
+### Play with the component
+```
+# Access shell of the backend pod to display the env vars
+./scripts/k8s_cmd.sh fruit-backend-sb env | grep DB
+
+./scripts/k8s_push_start.sh fruit-backend sb demo
+./scripts/k8s_push_start.sh fruit-client sb demo
+
+# look if the app jar has been upload
+./scripts/k8s_cmd.sh fruit-backend-sb 'ls /deployments'
+
+# Check the logs
+./scripts/k8s_logs.sh fruit-backend-sb demo
+./scripts/k8s_logs.sh fruit-client-sb demo
+
+# Call the Rest endpoints (client or fruits)
+curl --resolve fruit-client-sb:8080:192.168.99.50 -k http://fruit-client-sb:8080/api/client 
+curl --resolve fruit-backend-sb:80:192.168.99.50 -k http://fruit-backend-sb/api/fruits 
 ```
