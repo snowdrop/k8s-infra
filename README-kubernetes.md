@@ -1,4 +1,4 @@
-### How to setup a kubermnetes cluster on Centos7
+### How to setup a kubernetes cluster on Centos7
 
 Useful links
 
