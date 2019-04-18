@@ -161,7 +161,7 @@ helm repo add svc-cat https://svc-catalog-charts.storage.googleapis.com
 helm install svc-cat/catalog --name catalog --namespace catalog
 
 echo "####################################"
-echo # Wait until the catalog is ready before moving on"
+echo " Wait until the catalog is ready before moving on"
 echo "####################################"
 until kubectl get pods -n catalog -l app=catalog-catalog-apiserver | grep 2/2; do sleep 1; done
 until kubectl get pods -n catalog -l app=catalog-catalog-controller-manager | grep 1/1; do sleep 1; done
