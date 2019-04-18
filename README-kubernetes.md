@@ -442,6 +442,11 @@ Then, on the node being removed, reset all kubeadm installed state:
 kubeadm reset
 ```
 
+Finally, delete the `kube config file`
+```bash
+rm -rf $HOME/.kube/config
+```
+
 ### Install golang on Centos7
 
 ```bash
