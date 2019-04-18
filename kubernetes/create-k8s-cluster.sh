@@ -3,7 +3,7 @@
 # To install k8s within the centos machine, execute this remote shell command
 # ssh -o StrictHostKeyChecking=no root@192.168.99.50 'bash -s' < ./kubernetes/create-k8s-cluster.sh 1.12.7
 
-version=${1:-1.14.0}
+version=${1:-1.14.1}
 ip=${2:-192.168.99.50}
 host=${3:-cloud}
 
@@ -54,15 +54,15 @@ mkdir -p $HOME/.kube
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
-echo "####################################"
-echo "Taint the Cloud node"
-echo "####################################"
-kubectl taint nodes --all node-role.kubernetes.io/master-
-
 echo "#####################################################"
 echo "Install Flannel Virtual Network for pod communication"
 echo "#####################################################"
 kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/a70459be0084506e4ec919aa1c114638878db11b/Documentation/kube-flannel.yml
+
+echo "####################################"
+echo "Taint the Cloud node"
+echo "####################################"
+kubectl taint nodes --all node-role.kubernetes.io/master-
 
 echo "#####################################################"
 echo "Install K8 dashboard where the dashboard service account has the cluster role"
