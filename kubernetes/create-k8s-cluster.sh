@@ -26,8 +26,9 @@ systemctl start kubelet
 # Setting SELinux in permissive mode by running setenforce 0 and sed ... effectively disables it.
 # This is required to allow containers to access the host filesystem, which is needed by pod networks for example.
 # You have to do this until SELinux support is improved in the kubelet.
-setenforce 0
+sudo setenforce 0
 sed -i 's/^SELINUX=enforcing$/SELINUX=disabled/' /etc/selinux/config
+getenforce
 
 # Some users on RHEL/CentOS 7 have reported issues with traffic being routed incorrectly due to iptables being bypassed.
 # You should ensure net.bridge.bridge-nf-call-iptables is set to 1 in your sysctl config, e.g.
@@ -57,6 +58,7 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 echo "#####################################################"
 echo "Install Flannel Virtual Network for pod communication"
 echo "#####################################################"
+kubectl -n kube-system get deployment coredns -o yaml |   sed 's/allowPrivilegeEscalation: false/allowPrivilegeEscalation: true/g' |   kubectl apply -f -
 kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/a70459be0084506e4ec919aa1c114638878db11b/Documentation/kube-flannel.yml
 
 echo "####################################"
@@ -237,3 +239,5 @@ spec:
       imagePullPolicy: IfNotPresent
   restartPolicy: Never
 EOF
+
+echo "K8s cluster is running. You can now play with it "
