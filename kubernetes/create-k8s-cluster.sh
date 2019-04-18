@@ -2,6 +2,9 @@
 
 # To install k8s within the centos machine, execute this remote shell command
 # ssh -o StrictHostKeyChecking=no root@192.168.99.50 'bash -s' < ./kubernetes/create-k8s-cluster.sh 1.12.7
+#
+# touch create-k8s-cluster.sh && chmod +x create-k8s-cluster.sh
+#
 
 version=${1:-1.14.1}
 ip=${2:-192.168.99.50}
