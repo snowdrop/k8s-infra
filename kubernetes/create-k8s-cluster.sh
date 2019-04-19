@@ -26,7 +26,8 @@ gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cl
 exclude=kube*
 EOF
 
-yum install kubeadm-${version} kubectl-${version} kubelet-${version} --disableexcludes=kubernetes -y 
+yum install kubeadm-${version} kubectl-${version} kubelet-${version} --disableexcludes=kubernetes -y
+yum install git -y
 
 # For OpenStack only
 # Add host and ip address
