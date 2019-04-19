@@ -22,7 +22,9 @@ ssh -o StrictHostKeyChecking=no -i inventory/id_openstack.rsa -t centos@10.8.250
 
 - Create K8s cluster using the eth0 ip address of the VM. This is not the external IP address !!
 ```bash
-ssh -o StrictHostKeyChecking=no -i inventory/id_openstack.rsa -t centos@10.8.250.104 sudo 'bash -s' -- < ../kubernetes/create-k8s-cluster.sh 1.14.1 172.16.195.15 n114-test true 10.8.250.104
+ip=$(ssh -o StrictHostKeyChecking=no -i inventory/id_openstack.rsa centos@10.8.250.104 sudo ip -o -4  address show  | awk ' NR==2 { gsub(/\/.*/, "", $4); print $4 } ')
+external_ip=10.8.250.104
+ssh -o StrictHostKeyChecking=no -i inventory/id_openstack.rsa -t centos@10.8.250.104 sudo 'bash -s' -- < ../kubernetes/create-k8s-cluster.sh 1.14.1 ${ip} n114-test true ${external_ip}
 ...
 kubeadm join 172.16.195.15:6443 --token m3imk1.syzt7dj2s3wrpwpr \
     --discovery-token-ca-cert-hash sha256:ecedb846b8d263fdfbb6ab6591e41896c08e4f3ce04f522e649b42ba7763c22b 
@@ -31,6 +33,31 @@ kubeadm join 172.16.195.15:6443 --token m3imk1.syzt7dj2s3wrpwpr \
 ```bash
 ssh -o StrictHostKeyChecking=no -i inventory/id_openstack.rsa -t centos@10.8.250.104 sudo 'bash -s' -- < ../kubernetes/test-component-operator.sh
 ssh -o StrictHostKeyChecking=no -i inventory/id_openstack.rsa -t centos@10.8.250.104 sudo kubectl get all,serviceinstance,servicebinding,secrets -n demo
+```
+
+- To use the k8s cluster from your local machine, execute this script and save the result locally
+```bash
+ssh -o StrictHostKeyChecking=no -i inventory/id_openstack.rsa -t centos@10.8.250.104 sudo 'bash -s' -- < ../kubernetes/get-k8s-config.sh > remote-k8s.cfg
+export KUBECONFIG=remote-k8s.cfg 
+kubectl get all -A
+kubectl get pods -A
+NAMESPACE               NAME                                                  READY   STATUS      RESTARTS   AGE
+automation-broker-apb   automation-broker-apb                                 0/1     Completed   0          6m33s
+automation-broker       automation-broker-f64d55f77-qftt7                     2/2     Running     0          6m
+catalog                 catalog-catalog-apiserver-68b964b5cc-ghjx7            2/2     Running     0          7m20s
+catalog                 catalog-catalog-controller-manager-6b6cfc4899-p46hv   1/1     Running     0          7m20s
+kube-system             coredns-6765558d84-vkz2s                              1/1     Running     0          7m48s
+kube-system             coredns-6765558d84-vvb6g                              1/1     Running     0          7m48s
+kube-system             default-http-backend-6864bbb7db-vjvcw                 1/1     Running     0          7m22s
+kube-system             etcd-n114-test.localdomain                            1/1     Running     0          6m43s
+kube-system             kube-apiserver-n114-test.localdomain                  1/1     Running     0          6m54s
+kube-system             kube-controller-manager-n114-test.localdomain         1/1     Running     0          7m2s
+kube-system             kube-flannel-ds-amd64-b69s2                           1/1     Running     0          7m47s
+kube-system             kube-proxy-92qwn                                      1/1     Running     0          7m47s
+kube-system             kube-scheduler-n114-test.localdomain                  1/1     Running     0          6m50s
+kube-system             kubernetes-dashboard-5b4b76869b-htnl8                 1/1     Running     0          7m48s
+kube-system             nginx-ingress-controller-586cdc477c-rs2gb             1/1     Running     0          7m22s
+kube-system             tiller-deploy-8458f6c667-thn6l                        1/1     Running     0          7m48s
 ```
 
 - To use the new OpenShift console, install nodejs, go, yarn, jq tools
