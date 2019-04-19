@@ -8,6 +8,8 @@
 # ssh -o StrictHostKeyChecking=no root@192.168.99.50 'bash -s' -- < ./kubernetes/test-component-operator.sh
 # ssh -o StrictHostKeyChecking=no root@192.168.99.50 'kubectl get all,serviceinstance,servicebinding,secrets -n demo'
 
+# set -x
+
 version=${1:-1.14.1}
 ip=${2:-192.168.99.50}
 host=${3:-cloud}
@@ -61,14 +63,8 @@ kubeadm config images pull
 echo "####################################"
 echo "Initialising k8s cluster"
 echo "####################################"
-if $is_openstack
-then
-  echo "kubeadm init --pod-network-cidr=10.244.0.0/16"
-  kubeadm init --pod-network-cidr=10.244.0.0/16
-else
-  echo "kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address=${ip}"
-  kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address=${ip}
-fi
+echo "kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address=${ip}"
+kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address=${ip}
 
 echo "####################################"
 echo "Create kube config file"
