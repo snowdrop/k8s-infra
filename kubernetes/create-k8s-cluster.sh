@@ -14,6 +14,7 @@ version=${1:-1.14.1}
 ip=${2:-192.168.99.50}
 host=${3:-cloud}
 is_openstack=${4:-false}
+external_ip=${5:-10.8.250.104}
 
 cat <<EOF > /etc/yum.repos.d/kubernetes.repo
 [kubernetes]
@@ -66,8 +67,13 @@ kubeadm config images pull
 echo "####################################"
 echo "Initialising k8s cluster"
 echo "####################################"
-echo "kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address=${ip}"
-kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address=${ip}
+if $is_openstack ; then
+  echo "kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address=${ip} --apiserver-cert-extra-sans=${external_ip}"
+  kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address=${ip} --apiserver-cert-extra-sans=${external_ip}
+else
+  echo "kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address=${ip}"
+  kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address=${ip}
+fi
 
 echo "####################################"
 echo "Create kube config file"
