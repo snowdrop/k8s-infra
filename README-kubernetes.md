@@ -22,7 +22,7 @@ ssh -o StrictHostKeyChecking=no -i inventory/id_openstack.rsa -t centos@10.8.250
 
 - Create K8s cluster using the eth0 ip address of the VM. This is not the external IP address !!
 ```bash
-ssh -o StrictHostKeyChecking=no -i inventory/id_openstack.rsa -t centos@10.8.250.104 sudo 'bash -s' -- < ../kubernetes/create-k8s-cluster.sh 1.14.1 172.16.195.15 n114-test true
+ssh -o StrictHostKeyChecking=no -i inventory/id_openstack.rsa -t centos@10.8.250.104 sudo 'bash -s' -- < ../kubernetes/create-k8s-cluster.sh 1.14.1 172.16.195.15 n114-test true 10.8.250.104
 ...
 kubeadm join 172.16.195.15:6443 --token m3imk1.syzt7dj2s3wrpwpr \
     --discovery-token-ca-cert-hash sha256:ecedb846b8d263fdfbb6ab6591e41896c08e4f3ce04f522e649b42ba7763c22b 
