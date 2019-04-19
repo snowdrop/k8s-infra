@@ -8,6 +8,38 @@ Useful links
 - https://kubernetes.io/docs/concepts/cluster-administration/addons/
 - https://ichbinblau.github.io/2017/09/20/Setup-Kubernetes-Cluster-on-Centos-7-3-with-Kubeadm/
 
+## OpenStack
+
+- Create a VM using ansible playbook
+```bash
+git clone https://github.com/snowdrop/openshift-infra.git && cd openshift-infra/ansible
+ansible-playbook playbook/openstack.yml -e '{"state": "present", "hostname": "n114-test", "openstack": {"os_username": "spring-boot-jenkins", "os_password": "Y4zh73d9", "os_auth_url": "https://ci-rhos.centralci.eng.rdu2.redhat.com:13000/v2.0/", "vm": {"flavor": "m5.large"}}}'
+
+```
+- Install Docker using the bash script
+```bash
+ssh -o StrictHostKeyChecking=no -i inventory/id_openstack.rsa -t centos@10.8.250.104 sudo 'bash -s' -- < ../kubernetes/install-docker-systemd.sh
+```   
+
+- Create K8s cluster using the eth0 ip address of the VM. This is not the external IP address !!
+```bash
+ssh -o StrictHostKeyChecking=no -i inventory/id_openstack.rsa -t centos@10.8.250.104 sudo 'bash -s' -- < ../kubernetes/create-k8s-cluster.sh 1.14.1 172.16.195.12 n114-test true
+...
+kubeadm join 172.16.195.7:6443 --token skkfl5.yme6xcrn2inuc3tf \
+    --discovery-token-ca-cert-hash sha256:513f8e188a7c0ce0a04fa1381e6cff78108254c7deecbf5ccd27f31305261595
+```
+
+- TO BE VERIFIED
+
+```bash
+sudo sed -i 's/0/1/g' /usr/lib/sysctl.d/00-system.conf
+```
+
+To ssh
+```bash
+ssh -i ansible/inventory/id_openstack.rsa centos@10.8.250.104
+```
+
 ### Add yum repo & install kubelet, kubeadm and kubectl
 ```
 cat <<EOF > /etc/yum.repos.d/kubernetes.repo
