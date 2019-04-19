@@ -28,5 +28,4 @@ current-context: default-context
 users:
 - name: default-user
   user:
-    token: ${TOKEN}
-"
+    token: ${TOKEN}"
