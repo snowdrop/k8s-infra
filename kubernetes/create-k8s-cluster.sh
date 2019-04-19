@@ -45,6 +45,8 @@ sudo setenforce 0
 sed -i 's/^SELINUX=enforcing$/SELINUX=disabled/' /etc/selinux/config
 getenforce
 
+# To append new parameters such as cgroupdriver
+# sed -i 's#Environment="KUBELET_KUBECONFIG_ARGS=-.*#Environment="KUBELET_KUBECONFIG_ARGS=--kubeconfig=/etc/kubernetes/kubelet.conf --cgroup-driver=systemd"#g' /usr/lib/systemd/system/kubelet.service.d/10-kubeadm.conf
 systemctl enable kubelet.service
 systemctl start kubelet
 
