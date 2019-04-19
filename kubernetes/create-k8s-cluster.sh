@@ -11,6 +11,7 @@
 version=${1:-1.14.1}
 ip=${2:-192.168.99.50}
 host=${3:-cloud}
+is_openstack=${4:-false}
 
 cat <<EOF > /etc/yum.repos.d/kubernetes.repo
 [kubernetes]
@@ -25,8 +26,14 @@ EOF
 
 yum install kubeadm-${version} kubectl-${version} kubelet-${version} --disableexcludes=kubernetes -y 
 
-systemctl enable kubelet.service
-systemctl start kubelet
+# For OpenStack only
+# Add host and ip address
+if $is_openstack ; then
+  echo "#########################################################"
+  echo "Add host and IP address to /etc/hosts - Openstack vm only"
+  echo "#########################################################"
+  echo "${ip} ${host} ${host}.localdomain" >> /etc/hosts
+fi
 
 # Setting SELinux in permissive mode by running setenforce 0 and sed ... effectively disables it.
 # This is required to allow containers to access the host filesystem, which is needed by pod networks for example.
@@ -34,6 +41,9 @@ systemctl start kubelet
 sudo setenforce 0
 sed -i 's/^SELINUX=enforcing$/SELINUX=disabled/' /etc/selinux/config
 getenforce
+
+systemctl enable kubelet.service
+systemctl start kubelet
 
 # Some users on RHEL/CentOS 7 have reported issues with traffic being routed incorrectly due to iptables being bypassed.
 # You should ensure net.bridge.bridge-nf-call-iptables is set to 1 in your sysctl config, e.g.
@@ -51,7 +61,14 @@ kubeadm config images pull
 echo "####################################"
 echo "Initialising k8s cluster"
 echo "####################################"
-kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address=${ip}
+if $is_openstack
+then
+  echo "kubeadm init --pod-network-cidr=10.244.0.0/16"
+  kubeadm init --pod-network-cidr=10.244.0.0/16
+else
+  echo "kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address=${ip}"
+  kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address=${ip}
+fi
 
 echo "####################################"
 echo "Create kube config file"
@@ -63,7 +80,7 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 echo "#####################################################"
 echo "Install Flannel Virtual Network for pod communication"
 echo "#####################################################"
-kubectl -n kube-system get deployment coredns -o yaml |   sed 's/allowPrivilegeEscalation: false/allowPrivilegeEscalation: true/g' |   kubectl apply -f -
+kubectl -n kube-system get deployment coredns -o yaml |   sed 's/allowPrivilegeEscalation: false/allowPrivilegeEscalation: true/g' | kubectl apply -f -
 kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/a70459be0084506e4ec919aa1c114638878db11b/Documentation/kube-flannel.yml
 
 echo "####################################"
