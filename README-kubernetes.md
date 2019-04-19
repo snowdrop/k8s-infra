@@ -33,6 +33,15 @@ ssh -o StrictHostKeyChecking=no -i inventory/id_openstack.rsa -t centos@10.8.250
 ssh -o StrictHostKeyChecking=no -i inventory/id_openstack.rsa -t centos@10.8.250.104 sudo kubectl get all,serviceinstance,servicebinding,secrets -n demo
 ```
 
+- To use the new OpenShift console, install nodejs, go, yarn, jq tools
+```bash
+ssh -o StrictHostKeyChecking=no -i inventory/id_openstack.rsa -t centos@10.8.250.104 sudo 'bash -s' -- < ../kubernetes/install-tools-openshift-console.sh
+```
+- And next launch it
+```bash
+ssh -o StrictHostKeyChecking=no -i inventory/id_openstack.rsa -t centos@10.8.250.104 sudo 'bash -s' -- < ../kubernetes/launch-console.sh
+```
+
 ### Add yum repo & install kubelet, kubeadm and kubectl
 ```
 cat <<EOF > /etc/yum.repos.d/kubernetes.repo
