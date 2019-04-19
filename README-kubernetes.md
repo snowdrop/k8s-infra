@@ -69,6 +69,10 @@ ssh -o StrictHostKeyChecking=no -i inventory/id_openstack.rsa -t centos@10.8.250
 ssh -o StrictHostKeyChecking=no -i inventory/id_openstack.rsa -t centos@10.8.250.104 sudo 'bash -s' -- < ../kubernetes/launch-console.sh
 ```
 
+## Manual instructions
+
+The following section details the instructions tested before the creation of the scripts.
+
 ### Add yum repo & install kubelet, kubeadm and kubectl
 ```
 cat <<EOF > /etc/yum.repos.d/kubernetes.repo
