@@ -18,4 +18,4 @@ fi
 cd $console_dir
 export KUBECONFIG=/root/.kube/config
 source ./contrib/environment.sh
-nohup ./bin/bridge
+nohup ./bin/bridge &>/dev/null &
