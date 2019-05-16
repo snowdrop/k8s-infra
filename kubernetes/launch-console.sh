@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 mkdir -p ~/go/{bin,pkg,src}
-echo 'export GOPATH="$HOME/go"' >> ~/.bashrc
+echo 'export GOPATH="/home/centos/go"' >> ~/.bashrc
 echo 'export PATH="$PATH:${GOPATH//://bin:}/bin"' >> ~/.bashrc
 source ~/.bashrc
 sudo chown -R centos:centos /home/centos
