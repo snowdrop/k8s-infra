@@ -6,7 +6,7 @@ Install the s2i jdk8 task
 kubectl apply -f tasks/clone-build.yml
 ```
 
-Next, execute this task to git clone a SpringBoot git repo, build it using s2i tool and openjdk8 s2i image
+Next, execute this task to git clone a SpringBoot repo, build it using s2i tool and openjdk8 s2i image
 
 ```bash
 kubectl apply -f runtasks/springboot-example.yml
