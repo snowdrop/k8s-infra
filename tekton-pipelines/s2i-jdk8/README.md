@@ -148,6 +148,44 @@ Storing signatures
 Successfully pushed //quay.io/snowdrop/spring-boot-example:latest@sha256:cf99b4a9218c76547d3a7c9eca201776e70c8d1592e3fa17d4167fffce281a49
 ```
 
+To test the Spring Boot Application using the image created, then install using this list of resources
+```bash
+kubectl create namespace demo
+kubectl apply -f resources/deployment.yaml -n demo
+```
+
+and check the log of the pod created
+```bash
+kubectl logs -l app=spring-boot-rest-http -n demo
+Starting the Java application using /opt/jboss/container/java/run/run-java.sh ...
+INFO exec  java -javaagent:/opt/jboss/container/jolokia/jolokia.jar=config=/opt/jboss/container/jolokia/etc/jolokia.properties -XX:+UseParallelOldGC -XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=20 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -XX:MaxMetaspaceSize=100m -XX:+ExitOnOutOfMemoryError -cp "." -jar /deployments/spring-boot-rest-http-2.1.3-2.jar  
+OpenJDK 64-Bit Server VM warning: If the number of processors is expected to increase from one, then you should configure the number of parallel GC threads appropriately using -XX:ParallelGCThreads=N
+SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::        (v2.1.3.RELEASE)
+
+I> No access restrictor found, access to any MBean is allowed
+Jolokia: Agent started with URL https://10.244.0.65:8778/jolokia/
+May 21, 2019 7:39:52 PM org.apache.catalina.core.StandardService startInternal
+INFO: Starting service [Tomcat]
+May 21, 2019 7:39:52 PM org.apache.catalina.core.StandardEngine startInternal
+INFO: Starting Servlet engine: [Apache Tomcat/9.0.16]
+May 21, 2019 7:39:52 PM org.apache.catalina.core.AprLifecycleListener lifecycleEvent
+INFO: The APR based Apache Tomcat Native library which allows optimal performance in production environments was not found on the java.library.path: [/usr/java/packages/lib/amd64:/usr/lib64:/lib64:/lib:/usr/lib]
+May 21, 2019 7:39:52 PM org.apache.catalina.core.ApplicationContext log
+INFO: Initializing Spring embedded WebApplicationContext
+May 21, 2019 7:40:06 PM org.apache.catalina.core.ApplicationContext log
+INFO: Initializing Spring DispatcherServlet 'dispatcherServlet'
+```
+
 ## Clean up
 ```bash
 kubectl delete taskruns --all
