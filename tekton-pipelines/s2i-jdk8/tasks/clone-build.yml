@@ -5,6 +5,8 @@ metadata:
 spec:
   inputs:
     params:
+      - name: GIT_URL
+        default: https://github.com/snowdrop/rest-http-example
       - name: BUILDER_IMAGE
         description: The location of the builder image.
         default: docker.io/kbaig/s2i
@@ -17,15 +19,6 @@ spec:
       - name: TLSVERIFY
         description: Verify the TLS on the registry endpoint (for push/pull to a non-TLS registry)
         default: "true"
-    resources:
-      - name: git-repo
-        resourceSpec:
-          type: git
-          params:
-            - name: revision
-              value: sb-2.1.x
-            - name: url
-              value: https://github.com/snowdrop/rest-http-example
   outputs:
     resources:
       - name: buildImage
@@ -42,7 +35,7 @@ spec:
       - s2i
       args:
       - build
-      - ${inputs.resources.git-repo.url}
+      - ${inputs.params.GIT_URL}
       - ${inputs.params.S2I_IMAGE}
       - ${outputs.resources.buildImage.url}
       volumeMounts:
