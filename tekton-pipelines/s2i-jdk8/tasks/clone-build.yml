@@ -40,6 +40,9 @@ spec:
       volumeMounts:
         - name: varlibcontainers
           mountPath: /var/lib/containers
+        - name: docker-sock-volume
+          mountPath: /var/run/docker.sock
+
       securityContext:
         privileged: true
 
@@ -62,3 +65,6 @@ spec:
   volumes:
     - name: varlibcontainers
       emptyDir: {}
+    - name: docker-sock-volume
+      hostPath:
+        path: /var/run/docker.sock
