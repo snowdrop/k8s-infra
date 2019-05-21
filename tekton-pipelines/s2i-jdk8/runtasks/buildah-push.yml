@@ -19,6 +19,8 @@ spec:
       resourceSpec:
         type: git
         params:
+        - name: revision
+          value: 2.1.3-2
         - name: url
           value: https://github.com/snowdrop/rest-http-example
   outputs:
@@ -28,5 +30,5 @@ spec:
         type: image
         params:
         - name: url
-          value: quay.io/snowdrop/spring-boot-example
+          value: quay.io/snowdrop/spring-boot-example:2.1.3-2
 
