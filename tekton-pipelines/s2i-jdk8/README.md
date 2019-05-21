@@ -23,7 +23,9 @@ kc delete taskrun.tekton.dev/s2i-springboot-example
 kc delete task.tekton.dev/s2i-jdk8
 ```
 
-## Errors reported
+## Errors
+
+### TaskRun
 
 ```
 Name:         s2i-springboot-example
@@ -109,8 +111,7 @@ Events:
   Warning  Failed  4m39s  taskrun-controller  "build-step-build" exited with code 255 (image: "docker-pullable://kbaig/s2i@sha256:70b5e09f4eac317053ae92be3b1127dbde7eeac3b37a1ff730509086f1e87e73"); for logs run: kubectl -n kube-system logs s2i-springboot-example-pod-e66cf8 -c build-step-build
 ```
 
-Pod Log
-
+### Build pod log
 ```bash
 kubectl -n kube-system logs s2i-springboot-example-pod-e66cf8 -c build-step-build
 F0521 07:23:17.028412 00011 main.go:140] Unable to connect to Docker daemon. Please set the DOCKER_HOST or make sure the Docker socket "unix:///var/run/docker.sock" exists
