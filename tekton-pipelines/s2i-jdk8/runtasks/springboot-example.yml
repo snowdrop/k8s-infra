@@ -12,7 +12,7 @@ spec:
           type: git
           params:
             - name: revision
-              value: master
+              value: sb-2.1.x
             - name: url
               value: https://github.com/snowdrop/rest-http-example
   outputs:

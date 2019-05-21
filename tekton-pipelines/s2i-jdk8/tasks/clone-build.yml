@@ -11,6 +11,7 @@ spec:
       - name: BUILDER_IMAGE
         description: The location of the builder image.
         default: docker.io/kbaig/s2i
+        # default: quay.io/chmouel/source-to-image:latest
       - name: S2I_IMAGE
         description: The location of the s2i builder image.
         default: registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift
@@ -27,19 +28,16 @@ spec:
         type: image
 
   steps:
-    - name: build
+    - name: s2ibuild
       image: ${inputs.params.BUILDER_IMAGE}
-      workingdir: /workspace/git-repo
       command:
       - s2i
       args:
       - build
-      - .
+      - ${inputs.resources.git-repo.url}
       - ${inputs.params.S2I_IMAGE}
       - ${outputs.resources.image.url}
       volumeMounts:
-      #- name: varlibcontainers
-      #  mountPath: /var/lib/containers
       - name: docker-sock-volume
         mountPath: /var/run/docker.sock
       securityContext:
@@ -58,14 +56,10 @@ spec:
       volumeMounts:
       - name: docker-sock-volume
         mountPath: /var/run/docker.sock
-      #- name: varlibcontainers
-      #  mountPath: /var/lib/containers
       securityContext:
         privileged: true
 
   volumes:
-    - name: varlibcontainers
-      emptyDir: {}
     - name: docker-sock-volume
       hostPath:
         path: /var/run/docker.sock
