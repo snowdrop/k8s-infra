@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1alpha1
 kind: TaskRun
 metadata:
-  name: s2i-springboot-example
+  name: s2i-springboot
 spec:
   serviceAccount: build-bot
   taskRef:
