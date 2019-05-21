@@ -1,0 +1,59 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: s2i-buildah
+spec:
+  inputs:
+    resources:
+      - name: workspace-git
+        targetPath: /
+        type: git
+    params:
+      - name: verifyTLS
+        description: Verify registry certificates
+        default: "true"
+      - name: contextFolder
+        description: The path of the context to build
+        default: .
+      - name: baseImage
+        description: s2i base image
+  outputs:
+    resources:
+      - name: image
+        type: image
+  steps:
+    - name: generate
+      image: quay.io/openshift-pipeline/s2i-buildah:latest
+      args:
+        - ${inputs.params.contextFolder}
+        - ${inputs.params.baseImage}
+        - ${outputs.resources.image.url}
+      workingDir: /sources
+      volumeMounts:
+        - name: generatedsources
+          mountPath: /sources
+    - name: build
+      image: quay.io/openshift-pipeline/buildah:testing
+      command:
+        - buildah
+      args:
+        - bud
+        - --layers
+        - --tls-verify=${inputs.params.verifyTLS}
+        - -f
+        - Dockerfile
+        - -t
+        - ${outputs.resources.image.url}
+        - /sources
+      volumeMounts:
+        - name: libcontainers
+          mountPath: /var/lib/containers
+        - name: generatedsources
+          mountPath: /sources
+      securityContext:
+        privileged: true
+  volumes:
+    - name: generatedsources
+      emptyDir: {}
+    - name: libcontainers
+      emptyDir: {}
