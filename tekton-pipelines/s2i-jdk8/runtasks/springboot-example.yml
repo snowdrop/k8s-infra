@@ -6,3 +6,22 @@ spec:
   serviceAccount: build-bot
   taskRef:
     name: s2i-jdk8
+  inputs:
+    resources:
+      - name: git-repo
+        resourceSpec:
+          type: git
+          params:
+            - name: revision
+              value: sb-2.1.x
+            - name: url
+              value: https://github.com/snowdrop/rest-http-example
+  outputs:
+    resources:
+      - name: image
+        resourceSpec:
+          type: image
+          params:
+            - name: url
+              value: quay.io/snowdrop/spring-boot-example
+

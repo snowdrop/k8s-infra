@@ -37,13 +37,14 @@ kubectl apply -f runtasks/springboot-example.yml
 
 Look to the status of the task running
 ```bash
-kc describe taskrun.tekton.dev/s2i-springboot-example 
+kc describe taskrun.tekton.dev/s2i-springboot-example
 ```
 
 and check the status of the build, push tasks
 
 ```bash
-
+kubectl logs -n kube-system -l tekton.dev/task=s2i-jdk8 -c build-step-s2ibuild
+kubectl logs -n kube-system -l tekton.dev/task=s2i-jdk8 -c build-step-docker-push
 ```
 
 Clean up

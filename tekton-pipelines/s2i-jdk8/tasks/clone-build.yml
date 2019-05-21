@@ -5,8 +5,6 @@ metadata:
 spec:
   inputs:
     params:
-      - name: GIT_URL
-        default: https://github.com/snowdrop/rest-http-example
       - name: BUILDER_IMAGE
         description: The location of the builder image.
         default: docker.io/kbaig/s2i
@@ -16,24 +14,29 @@ spec:
       - name: BUILDAH_IMAGE
         description: The location of the s2i builder image.
         default: quay.io/openshift-pipeline/buildah
-      - name: DOCKER_IMAGE
-        description: The location of the docker client image.
-        default: gcr.io/cloud-builders/docker
       - name: TLSVERIFY
         description: Verify the TLS on the registry endpoint (for push/pull to a non-TLS registry)
         default: "true"
-      - name: BUILD_IMAGE
-        default: quay.io/snowdrop/spring-boot-example
+    resources:
+      - name: git-repo
+        type: git
+  outputs:
+    resources:
+      - name: image
+        type: image
   steps:
     - name: s2ibuild
       image: ${inputs.params.BUILDER_IMAGE}
       command:
       - s2i
+      # image: quay.io/chmouel/source-to-image:latest
+      # command:
+      # - /usr/local/bin/s2i
       args:
       - build
-      - ${inputs.params.GIT_URL}
+      - ${inputs.resources.git-repo.url}
       - ${inputs.params.S2I_IMAGE}
-      - ${inputs.params.BUILD_IMAGE}
+      - ${outputs.resources.image.url}
       volumeMounts:
       - name: docker-sock-volume
         mountPath: /var/run/docker.sock
@@ -41,10 +44,10 @@ spec:
         privileged: true
 
     - name: docker-push
-      image: ${inputs.params.DOCKER_IMAGE}
+      image: gcr.io/cloud-builders/docker
       args:
       - push
-      - ${inputs.params.BUILD_IMAGE}
+      - ${outputs.resources.image.url}
       volumeMounts:
       - name: docker-sock-volume
         mountPath: /var/run/docker.sock
