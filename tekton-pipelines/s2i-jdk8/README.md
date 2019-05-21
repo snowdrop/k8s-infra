@@ -20,8 +20,10 @@ Create on Quay.io a repository and grant the Robot user account to have write pe
 Install the k8s resources
 ```bash
 kubectl apply -f resources/docker-secret.yml
-kubectl apply -f resources/sa.yml
+kubectl apply -f resources/sa-secret.yml
 ```
+
+### S2i build with docker
 
 Install the s2i jdk8 task
 
@@ -45,6 +47,22 @@ and check the status of the build, push tasks
 ```bash
 kubectl logs -n kube-system -l tekton.dev/task=s2i-jdk8 -c build-step-s2ibuild
 kubectl logs -n kube-system -l tekton.dev/task=s2i-jdk8 -c build-step-docker-push
+```
+
+### S2i using Buildah
+
+Scenario:
+- step 1: git clone 
+- step 2: s2i build as dockerfile
+- step 3: buildah bud using dockerfile
+- step 4: buildah push to quay
+
+```bash
+kubectl apply -f resources/docker-secret.yml
+kubectl apply -f resources/sa-secret.yml
+
+kubectl apply -f tasks/buildah-push.yml
+kubectl apply -f runtasks/buildah-push.yml
 ```
 
 Clean up
