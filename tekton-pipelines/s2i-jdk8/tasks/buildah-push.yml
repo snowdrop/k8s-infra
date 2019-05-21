@@ -54,6 +54,20 @@ spec:
           mountPath: /sources
       securityContext:
         privileged: true
+
+    - name: push
+      image: quay.io/openshift-pipeline/buildah:testing
+      command:
+        - buildah
+      args:
+        - push
+        - --tls-verify=${inputs.params.verifyTLS}
+        - ${outputs.resources.image.url}
+      volumeMounts:
+        - name: libcontainers
+          mountPath: /var/lib/containers
+      securityContext:
+        privileged: true
   volumes:
     - name: generatedsources
       emptyDir: {}
