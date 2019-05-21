@@ -19,11 +19,21 @@ spec:
         default: "true"
     resources:
       - name: git-repo
-        type: git
+        resourceSpec:
+          type: git
+          params:
+            - name: revision
+              value: sb-2.1.x
+            - name: url
+              value: https://github.com/snowdrop/rest-http-example
   outputs:
     resources:
-      - name: image
-        type: image
+      - name: buildImage
+        resourceSpec:
+          type: image
+          params:
+            - name: url
+              value: quay.io/snowdrop/spring-boot-example
 
   steps:
     - name: s2ibuild
@@ -34,7 +44,7 @@ spec:
       - build
       - ${inputs.resources.git-repo.url}
       - ${inputs.params.S2I_IMAGE}
-      - ${outputs.resources.image.url}
+      - ${outputs.resources.buildImage.url}
       volumeMounts:
       - name: docker-sock-volume
         mountPath: /var/run/docker.sock
@@ -45,7 +55,7 @@ spec:
       image: gcr.io/cloud-builders/docker
       args:
       - push
-      - ${outputs.resources.image.url}
+      - ${outputs.resources.buildImage.url}
       volumeMounts:
       - name: docker-sock-volume
         mountPath: /var/run/docker.sock
