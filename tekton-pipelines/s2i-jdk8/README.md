@@ -25,94 +25,19 @@ kc delete task.tekton.dev/s2i-jdk8
 
 ## Errors
 
-### TaskRun
-
-```
-Name:         s2i-springboot-example
-Namespace:    kube-system
-Labels:       tekton.dev/task=s2i-jdk8
-Annotations:  kubectl.kubernetes.io/last-applied-configuration:
-                {"apiVersion":"tekton.dev/v1alpha1","kind":"TaskRun","metadata":{"annotations":{},"name":"s2i-springboot-example","namespace":"kube-system...
-API Version:  tekton.dev/v1alpha1
-Kind:         TaskRun
-Metadata:
-  Creation Timestamp:  2019-05-21T07:22:49Z
-  Generation:          1
-  Resource Version:    615204
-  Self Link:           /apis/tekton.dev/v1alpha1/namespaces/kube-system/taskruns/s2i-springboot-example
-  UID:                 3cd0e530-7b99-11e9-8956-fa163e29fc69
-Spec:
-  Inputs:
-    Resources:
-      Name:  git-repo
-      Resource Ref:
-      Resource Spec:
-        Params:
-          Name:   revision
-          Value:  master
-          Name:   url
-          Value:  https://github.com/snowdrop/rest-http-example
-        Type:     git
-  Outputs:
-    Resources:
-      Name:  image
-      Resource Ref:
-      Resource Spec:
-        Params:
-          Name:   url
-          Value:  quay.io/snowdrop/spring-boot-example
-        Type:     image
-  Task Ref:
-    Kind:  Task
-    Name:  s2i-jdk8
-  Trigger:
-    Type:  
-Status:
-  Completion Time:  2019-05-21T07:23:33Z
-  Conditions:
-    Last Transition Time:  2019-05-21T07:23:33Z
-    Message:               "build-step-build" exited with code 255 (image: "docker-pullable://kbaig/s2i@sha256:70b5e09f4eac317053ae92be3b1127dbde7eeac3b37a1ff730509086f1e87e73"); for logs run: kubectl -n kube-system logs s2i-springboot-example-pod-e66cf8 -c build-step-build
-    Status:                False
-    Type:                  Succeeded
-  Pod Name:                s2i-springboot-example-pod-e66cf8
-  Start Time:              2019-05-21T07:22:49Z
-  Steps:
-    Name:  build
-    Terminated:
-      Container ID:  docker://0eed4aaecc006ed7713d49b7512e394f7ed8160d981303aefb4284b0105b24e0
-      Exit Code:     255
-      Finished At:   2019-05-21T07:23:17Z
-      Reason:        Error
-      Started At:    2019-05-21T07:23:17Z
-    Name:            git-source-git-repo-b7qr2
-    Terminated:
-      Container ID:  docker://6de7e07082c7b03998adacab0641c010bf01f57959191f3f77dd2f84c5782ef1
-      Exit Code:     0
-      Finished At:   2019-05-21T07:22:51Z
-      Reason:        Completed
-      Started At:    2019-05-21T07:22:51Z
-    Name:            push
-    Terminated:
-      Container ID:  docker://eea548553ea426e790de5b87ef951647f5ee854d4def9c1e6d809699018529f9
-      Exit Code:     0
-      Finished At:   2019-05-21T07:23:33Z
-      Reason:        Completed
-      Started At:    2019-05-21T07:23:33Z
-    Name:            nop
-    Terminated:
-      Container ID:  docker://4070c0953a61f7181ef2ebe0b0303a0cc656ade6170cdc3ad25fedb80864f580
-      Exit Code:     0
-      Finished At:   2019-05-21T07:23:33Z
-      Reason:        Completed
-      Started At:    2019-05-21T07:23:33Z
-Events:
-  Type     Reason  Age    From                Message
-  ----     ------  ----   ----                -------
-  Warning  Failed  4m39s  taskrun-controller  "build-step-build" exited with code 255 (image: "docker-pullable://kbaig/s2i@sha256:70b5e09f4eac317053ae92be3b1127dbde7eeac3b37a1ff730509086f1e87e73"); for logs run: kubectl -n kube-system logs s2i-springboot-example-pod-e66cf8 -c build-step-build
-```
-
-### Build pod log
+### Build Container log
 ```bash
-kubectl -n kube-system logs s2i-springboot-example-pod-e66cf8 -c build-step-build
-F0521 07:23:17.028412 00011 main.go:140] Unable to connect to Docker daemon. Please set the DOCKER_HOST or make sure the Docker socket "unix:///var/run/docker.sock" exists
+kubectl logs -n kube-system -l tekton.dev/task=s2i-jdk8  -c build-step-git-source-git-repo-nrrml
+{"level":"warn","ts":1558428355.6925228,"logger":"fallback-logger","caller":"logging/config.go:65","msg":"Fetch GitHub commit ID from kodata failed: \"ref: refs/heads/master\" is not a valid GitHub commit ID"}
+{"level":"info","ts":1558428356.0517735,"logger":"fallback-logger","caller":"git/git.go:105","msg":"Successfully cloned https://github.com/snowdrop/rest-http-example @ master in path /workspace/git-repo"}
+
+kubectl logs -n kube-system -l tekton.dev/task=s2i-jdk8  -c build-step-build                    
+I0521 08:45:56.124218 00013 clone.go:32] Downloading "file:///workspace/git-repo" ...
+E0521 08:45:56.132973 00013 git.go:410] Clone failed: source file:///workspace/git-repo, target /tmp/s2i874395392/upload/src,  with output fatal: attempt to fetch/clone from a shallow repository
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+E0521 08:45:56.133264 00013 main.go:352] An error occurred: exit status 128
+
 ```
