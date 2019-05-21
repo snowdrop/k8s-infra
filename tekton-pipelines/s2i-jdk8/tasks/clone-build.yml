@@ -16,18 +16,14 @@ spec:
       - name: BUILDAH_IMAGE
         description: The location of the s2i builder image.
         default: quay.io/openshift-pipeline/buildah
+      - name: DOCKER_IMAGE
+        description: The location of the docker client image.
+        default: gcr.io/cloud-builders/docker
       - name: TLSVERIFY
         description: Verify the TLS on the registry endpoint (for push/pull to a non-TLS registry)
         default: "true"
-  outputs:
-    resources:
-      - name: buildImage
-        resourceSpec:
-          type: image
-          params:
-            - name: url
-              value: quay.io/snowdrop/spring-boot-example
-
+      - name: BUILD_IMAGE
+        default: quay.io/snowdrop/spring-boot-example
   steps:
     - name: s2ibuild
       image: ${inputs.params.BUILDER_IMAGE}
@@ -37,7 +33,7 @@ spec:
       - build
       - ${inputs.params.GIT_URL}
       - ${inputs.params.S2I_IMAGE}
-      - ${outputs.resources.buildImage.url}
+      - ${inputs.params.BUILD_IMAGE}
       volumeMounts:
       - name: docker-sock-volume
         mountPath: /var/run/docker.sock
@@ -45,10 +41,10 @@ spec:
         privileged: true
 
     - name: docker-push
-      image: gcr.io/cloud-builders/docker
+      image: ${inputs.params.DOCKER_IMAGE}
       args:
       - push
-      - ${outputs.resources.buildImage.url}
+      - ${inputs.params.BUILD_IMAGE}
       volumeMounts:
       - name: docker-sock-volume
         mountPath: /var/run/docker.sock

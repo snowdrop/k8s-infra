@@ -29,7 +29,7 @@ Install the s2i jdk8 task
 kubectl apply -f tasks/clone-build.yml
 ```
 
-Next, execute this task to git clone a SpringBoot repo as defined using the Git Resource [- see here](https://github.com/snowdrop/openshift-infra/blob/master/tekton-pipelines/s2i-jdk8/runtasks/springboot-example.yml#L18), build it using s2i tool and openjdk8 s2i image
+Next, execute this task to git clone a SpringBoot repo as defined using the Git Resource [- see here](https://github.com/snowdrop/openshift-infra/blob/master/tekton-pipelines/s2i-jdk8/tasks/clone-build.yml#L9), build it using s2i tool and openjdk8 s2i image
 
 ```bash
 kubectl apply -f runtasks/springboot-example.yml
