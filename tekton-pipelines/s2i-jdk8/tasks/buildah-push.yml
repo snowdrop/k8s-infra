@@ -22,7 +22,8 @@ spec:
       - name: image
         type: image
   steps:
-    - name: generate
+    - # Generate a Dockerfile using the s2i tool
+      name: generate
       image: quay.io/openshift-pipeline/s2i-buildah:latest
       args:
         - ${inputs.params.contextFolder}
@@ -34,7 +35,8 @@ spec:
       volumeMounts:
         - name: generatedsources
           mountPath: /sources
-    - name: build
+    - # Build a Container image using the dockerfile created previously
+      name: build
       image: quay.io/openshift-pipeline/buildah:testing
       command:
         - buildah
@@ -55,7 +57,9 @@ spec:
       securityContext:
         privileged: true
 
-    - name: push
+    - # Push the image created to quay.io using as credentials the secret mounted within
+      # the service account
+      name: push
       image: quay.io/openshift-pipeline/buildah:testing
       command:
         - buildah
