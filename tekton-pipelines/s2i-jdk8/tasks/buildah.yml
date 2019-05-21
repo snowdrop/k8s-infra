@@ -28,6 +28,8 @@ spec:
         - ${inputs.params.contextFolder}
         - ${inputs.params.baseImage}
         - ${outputs.resources.image.url}
+        -  --image-scripts-url
+        - image:///usr/local/s2i
       workingDir: /sources
       volumeMounts:
         - name: generatedsources
