@@ -1,0 +1,52 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: s2i-jdk8
+spec:
+  inputs:
+    resources:
+      - name: git-repo
+        type: git
+    params:
+      - name: BUILDER_IMAGE
+        description: The location of the builder image.
+        default: docker.io/kbaig/s2i
+      - name: S2I_IMAGE
+        description: The location of the s2i builder image.
+        default: registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift
+      - name: BUILDAH_IMAGE
+        description: The location of the s2i builder image.
+        default: quay.io/openshift-pipeline/buildah
+      - name: TLSVERIFY
+        description: Verify the TLS on the registry endpoint (for push/pull to a non-TLS registry)
+        default: "true"
+
+  outputs:
+    resources:
+      - name: image
+        type: image
+
+  steps:
+    - name: build
+      image: ${inputs.params.BUILDER_IMAGE}
+      workingdir: /workspace/source
+      command: ['s2i', 'build', '.', '${inputs.params.S2I_IMAGE}', '${outputs.resources.image.url}']
+      volumeMounts:
+        - name: varlibcontainers
+          mountPath: /var/lib/containers
+      securityContext:
+        privileged: true
+
+    - name: push
+      image: ${inputs.params.BUILDAH_IMAGE}
+      workingdir: /workspace/source
+      command: ['buildah', 'push', '--tls-verify=${inputs.params.TLSVERIFY}', '${outputs.resources.image.url}', 'docker://${outputs.resources.image.url}']
+      volumeMounts:
+        - name: varlibcontainers
+          mountPath: /var/lib/containers
+      securityContext:
+        privileged: true
+
+  volumes:
+    - name: varlibcontainers
+      emptyDir: {}
