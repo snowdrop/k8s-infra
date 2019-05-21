@@ -30,7 +30,13 @@ spec:
     - name: build
       image: ${inputs.params.BUILDER_IMAGE}
       workingdir: /workspace/source
-      command: ['s2i', 'build', '.', '${inputs.params.S2I_IMAGE}', '${outputs.resources.image.url}']
+      command:
+      - s2i
+      args:
+      - build
+      - .
+      - ${inputs.params.S2I_IMAGE}
+      - ${outputs.resources.image.url}
       volumeMounts:
         - name: varlibcontainers
           mountPath: /var/lib/containers
@@ -40,7 +46,13 @@ spec:
     - name: push
       image: ${inputs.params.BUILDAH_IMAGE}
       workingdir: /workspace/source
-      command: ['buildah', 'push', '--tls-verify=${inputs.params.TLSVERIFY}', '${outputs.resources.image.url}', 'docker://${outputs.resources.image.url}']
+      command:
+      - buildah
+      args:
+      - push
+      - --tls-verify=${inputs.params.TLSVERIFY}
+      - ${outputs.resources.image.url}
+      - docker://${outputs.resources.image.url}
       volumeMounts:
         - name: varlibcontainers
           mountPath: /var/lib/containers
