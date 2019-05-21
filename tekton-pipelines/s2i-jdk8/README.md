@@ -87,7 +87,12 @@ kubectl logs -n kube-system -l tekton.dev/task=s2i-buildah-push -c build-step-bu
 
 End of the process, you should been able to see that your image has been pushed
 ```bash
-
+...
+Copying config sha256:ce632a123e14d37f484ad8d3c3fe778012cb6e9841113fda602354b61fc2320b
+Writing manifest to image destination
+Writing manifest to image destination
+Storing signatures
+Successfully pushed //quay.io/snowdrop/spring-boot-example:latest@sha256:cf99b4a9218c76547d3a7c9eca201776e70c8d1592e3fa17d4167fffce281a49
 ```
 
 ## Clean up
