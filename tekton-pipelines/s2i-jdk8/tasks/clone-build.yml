@@ -29,7 +29,7 @@ spec:
   steps:
     - name: build
       image: ${inputs.params.BUILDER_IMAGE}
-      workingdir: /workspace/source
+      workingdir: /workspace/git-repo
       command:
       - s2i
       args:
@@ -38,17 +38,16 @@ spec:
       - ${inputs.params.S2I_IMAGE}
       - ${outputs.resources.image.url}
       volumeMounts:
-        - name: varlibcontainers
-          mountPath: /var/lib/containers
-        - name: docker-sock-volume
-          mountPath: /var/run/docker.sock
-
+      #- name: varlibcontainers
+      #  mountPath: /var/lib/containers
+      - name: docker-sock-volume
+        mountPath: /var/run/docker.sock
       securityContext:
         privileged: true
 
     - name: push
       image: ${inputs.params.BUILDAH_IMAGE}
-      workingdir: /workspace/source
+      workingdir: /workspace/git-repo
       command:
       - buildah
       args:
@@ -57,8 +56,10 @@ spec:
       - ${outputs.resources.image.url}
       - docker://${outputs.resources.image.url}
       volumeMounts:
-        - name: varlibcontainers
-          mountPath: /var/lib/containers
+      - name: docker-sock-volume
+        mountPath: /var/run/docker.sock
+      #- name: varlibcontainers
+      #  mountPath: /var/lib/containers
       securityContext:
         privileged: true
 
