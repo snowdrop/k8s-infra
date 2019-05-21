@@ -1,5 +1,19 @@
 ## S2I JDK8
 
+Create a kubernetes secret of type `kubernetes.io/basic-auth` in order to been authenticated with the `quay.io` registry
+
+```bash
+sed -e 's/QUAY_ROBOT_USER/<QUAY_ROBOT_USER>/g' -e 's/QUAY_ROBOT_PWD/<QUAY_ROBOT_PWD>/g' resources/docker-secret.yml.tmpl > resources/docker-secret.yml
+```
+
+Create on Quay.io a repository and grant the Robot user account to have write permissions
+
+Install the k8s resources
+```bash
+kubectl apply -f resources/docker-secret.yml
+kubectl apply -f resources/sa.yml
+```
+
 Install the s2i jdk8 task
 
 ```bash

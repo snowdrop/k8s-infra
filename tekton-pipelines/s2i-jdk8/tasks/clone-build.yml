@@ -4,14 +4,10 @@ metadata:
   name: s2i-jdk8
 spec:
   inputs:
-    resources:
-      - name: git-repo
-        type: git
     params:
       - name: BUILDER_IMAGE
         description: The location of the builder image.
         default: docker.io/kbaig/s2i
-        # default: quay.io/chmouel/source-to-image:latest
       - name: S2I_IMAGE
         description: The location of the s2i builder image.
         default: registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift
@@ -21,7 +17,9 @@ spec:
       - name: TLSVERIFY
         description: Verify the TLS on the registry endpoint (for push/pull to a non-TLS registry)
         default: "true"
-
+    resources:
+      - name: git-repo
+        type: git
   outputs:
     resources:
       - name: image
@@ -43,21 +41,29 @@ spec:
       securityContext:
         privileged: true
 
-    - name: push
-      image: ${inputs.params.BUILDAH_IMAGE}
-      workingdir: /workspace/git-repo
-      command:
-      - buildah
+    - name: docker-push
+      image: gcr.io/cloud-builders/docker
       args:
       - push
-      - --tls-verify=${inputs.params.TLSVERIFY}
       - ${outputs.resources.image.url}
-      - docker://${outputs.resources.image.url}
       volumeMounts:
       - name: docker-sock-volume
         mountPath: /var/run/docker.sock
-      securityContext:
-        privileged: true
+
+    # - name: buildah-push
+    #   image: ${inputs.params.BUILDAH_IMAGE}
+    #   command:
+    #   - buildah
+    #   args:
+    #   - push
+    #   - --tls-verify=${inputs.params.TLSVERIFY}
+    #   - ${outputs.resources.image.url}
+    #   - docker://${outputs.resources.image.url}
+    #   volumeMounts:
+    #   - name: docker-sock-volume
+    #     mountPath: /var/run/docker.sock
+    #   securityContext:
+    #     privileged: true
 
   volumes:
     - name: docker-sock-volume
