@@ -59,6 +59,59 @@ Scenario:
 - step 3: buildah bud using dockerfile
 - step 4: buildah push to quay
 
+Here is a snippet 
+```yaml
+    - name: step 2 - generate
+      image: quay.io/openshift-pipeline/s2i-buildah:latest
+      args:
+        - ${inputs.params.contextFolder}
+        - ${inputs.params.baseImage}
+        - ${outputs.resources.image.url}
+        -  --image-scripts-url
+        - image:///usr/local/s2i
+      workingDir: /sources
+      volumeMounts:
+        - name: generatedsources
+          mountPath: /sources
+          
+    - name: step 3 - build
+      image: quay.io/openshift-pipeline/buildah:testing
+      command:
+        - buildah
+      args:
+        - bud
+        - --layers
+        - --tls-verify=${inputs.params.verifyTLS}
+        - -f
+        - Dockerfile
+        - -t
+        - ${outputs.resources.image.url}
+        - /sources
+      volumeMounts:
+        - name: libcontainers
+          mountPath: /var/lib/containers
+        - name: generatedsources
+          mountPath: /sources
+      securityContext:
+        privileged: true
+
+    - name: step 4 - push to quay.io
+      image: quay.io/openshift-pipeline/buildah:testing
+      command:
+        - buildah
+      args:
+        - push
+        - --tls-verify=${inputs.params.verifyTLS}
+        - ${outputs.resources.image.url}
+      volumeMounts:
+        - name: libcontainers
+          mountPath: /var/lib/containers
+      securityContext:
+        privileged: true
+```
+
+Deploy the resources on the cluster
+
 ```bash
 kubectl apply -f resources/docker-secret.yml
 kubectl apply -f resources/sa-secret.yml
