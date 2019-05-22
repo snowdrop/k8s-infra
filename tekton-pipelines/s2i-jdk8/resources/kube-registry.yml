@@ -1,4 +1,8 @@
-# See : https://robertbrem.github.io/Microservices_with_Kubernetes/03_Docker_registry/01_Setup_a_docker_registry/
+# See :
+# https://aws-labs.com/private-docker-registry-kubernetes/
+# https://mtpereira.com/2016/10/15/local-development-k8s/
+# https://robertbrem.github.io/Microservices_with_Kubernetes/03_Docker_registry/01_Setup_a_docker_registry/
+---
 apiVersion: v1
 kind: ReplicationController
 metadata:
@@ -65,7 +69,7 @@ metadata:
 spec:
   containers:
     - name: kube-registry-proxy
-      image: gcr.io/google_containers/kube-registry-proxy:0.3
+      image: gcr.io/google_containers/kube-registry-proxy:0.4
       resources:
         limits:
           cpu: 100m
