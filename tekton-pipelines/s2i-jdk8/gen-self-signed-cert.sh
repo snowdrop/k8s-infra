@@ -68,6 +68,14 @@ EOF
 sudo kubectl --kubeconfig=${KUBECONFIG} certificate approve  ${SERVICE_NAME}.${NAMESPACE}
 sudo kubectl --kubeconfig=${KUBECONFIG} get csr ${SERVICE_NAME}.${NAMESPACE} -o jsonpath='{.status.certificate}' | base64 --decode > server.crt
 
+echo "Append the CA Certificate to the generated"
+sudo cat  /etc/kubernetes/pki/ca.crt >> server.crt
+
+echo "Add the ${CLUSTER_IP} certificate to the certificates supported by the docker daemon"
+sudo mkdir -p /etc/docker/certs.d/${CLUSTER_IP}:5000/
+sudo cp server.crt /etc/docker/certs.d/${CLUSTER_IP}:5000/
+
+echo "Copy the self signed Certificate and Private keys under the folder that we will mount within the docker registry"
 sudo mkdir -p /root/docker-certs
 sudo cp server.crt /root/docker-certs
 sudo cp server-key.pem /root/docker-certs
