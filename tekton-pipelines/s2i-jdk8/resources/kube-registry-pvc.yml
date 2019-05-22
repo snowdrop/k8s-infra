@@ -63,8 +63,8 @@ spec:
           persistentVolumeClaim:
             claimName: kube-registry-pvc
         - name: certs
-            hostPath:
-              path: /root/docker-certs
+          hostPath:
+            path: /root/docker-certs
 ---
 apiVersion: v1
 kind: Service
