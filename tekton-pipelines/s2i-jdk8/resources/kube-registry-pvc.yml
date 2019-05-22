@@ -76,7 +76,7 @@ metadata:
     kubernetes.io/cluster-service: "true"
     kubernetes.io/name: "KubeRegistry"
 spec:
-# type: NodePort
+  type: ClusterIP
   selector:
     k8s-app: kube-registry
   ports:

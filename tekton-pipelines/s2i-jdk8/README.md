@@ -6,7 +6,7 @@ First, install `Tekton pipelines CRDs and Controller` on the k8s/openshift clust
 
 ```bash
 export KUBECONFIG=remote-k8s.cfg
-kubectl apply --filename https://storage.googleapis.com/tekton-releases/latest/release.yaml
+kubectl apply -f https://storage.googleapis.com/tekton-releases/latest/release.yaml
 ```
 
 When the Tekton controller is ready, then perform the following steps
@@ -185,6 +185,10 @@ INFO: Initializing Spring embedded WebApplicationContext
 May 21, 2019 7:40:06 PM org.apache.catalina.core.ApplicationContext log
 INFO: Initializing Spring DispatcherServlet 'dispatcherServlet'
 ```
+
+### OpenShift
+
+
 
 ## Clean up
 ```bash
