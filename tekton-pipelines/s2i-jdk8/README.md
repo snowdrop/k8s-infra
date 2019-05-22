@@ -224,7 +224,6 @@ Verify if the Spring Boot application has been started
 **WARNING**: Change the IP address ofthe docker registry `image: 172.30.1.1:5000/demo/spring-boot-example` within the `deployment.yaml` file before to install the resource
 
 ```bash
-oc new-project demo
 oc apply -f resources/deployment.yaml -n demo
 ```
 
