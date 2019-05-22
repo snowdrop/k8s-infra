@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-
 kubectl delete taskruns --all -n demo
 kubectl delete tasks --all -n demo
 

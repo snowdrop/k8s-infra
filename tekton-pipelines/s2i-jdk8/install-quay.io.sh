@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
-oc delete taskruns --all
-oc delete tasks --all
-oc delete serviceaccount --all
-oc delete deploymemt --all
+kubectl delete taskruns --all -n demo
+kubectl delete tasks --all -n demo
+kubectl delete serviceaccount --all -n demo
+kubectl delete deploymemt --all -n demo
 
 # s2i build as dockerfile -> buildah bud -> buildah push
 # Using external quay.io registry
