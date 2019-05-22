@@ -221,6 +221,10 @@ Install the docker registry
 kubectl apply -f resources/kube-registry-pvc.yml
 ```
 
+Test the spring Boot application deployed
+
+**WARNING**: We are getting this error when the image is pulled by the pod a `access private registry: x509: certificate signed by unknown authority`. Maybe a solution : https://stackoverflow.com/questions/53212149/x509-certificate-signed-by-unknown-authority-kubeadm
+
 ## Clean up
 
 ```bash

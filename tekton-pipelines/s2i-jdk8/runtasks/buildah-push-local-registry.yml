@@ -30,6 +30,6 @@ spec:
         type: image
         params:
         - name: url
-          # value: kube-registry.kube-system.svc.cluster.local:5000/demo/spring-boot-example
+          # value: kube-registry.kube-system.svc:5000/demo/spring-boot-example
           value: docker-registry.default.svc.cluster.local:5000/demo/spring-boot-example
 
