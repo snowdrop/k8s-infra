@@ -189,7 +189,8 @@ oc apply -f runtasks/buildah-push-local-registry.yml
 
 Verify if the Spring Boot application has been started
 
-**WARNING**: Change the IP address ofthe docker registry `image: 172.30.1.1:5000/demo/spring-boot-example` within the `deployment.yaml` file before to install the resource
+**WARNING**: Change the IP address of the docker registry `image: 172.30.1.1:5000/demo/spring-boot-example` within the `deployment.yaml` file before to install the resource. An alternative is to create a DNS entry 
+within the file `/etc/hosts` of the VM to match the name `docker-registry` to the Cluster IP address and next to use it as described [here](https://stackoverflow.com/questions/52675900/kubernetes-pull-images-from-internal-registry-with-on-premise-deployment)
 
 ```bash
 oc apply -f resources/deployment-local.yaml -n demo

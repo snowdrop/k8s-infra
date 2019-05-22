@@ -1,14 +1,9 @@
 #!/usr/bin/env bash
 
 
-kubectl delete taskrun.tekton.dev/s2i-springboot-example
-kubectl delete taskrun.tekton.dev/s2i-buildah-springboot
-kubectl delete taskrun.tekton.dev/s2i-buildah-push-springboot
+kubectl delete taskruns --all -n demo
+kubectl delete tasks --all -n demo
 
-kubectl delete task.tekton.dev/s2i-jdk8
-kubectl delete task.tekton.dev/s2i-jdk8-push
-kubectl delete task.tekton.dev/s2i-buildah
-kubectl delete task.tekton.dev/s2i-buildah-push
-
-kubectl delete secret/basic-user-pass
-kubectl delete sa/build-bot
+kubectl delete secret --all -n demo
+kubectl delete sa --all -n demo
+kubectl delete deployment --all -n demo
