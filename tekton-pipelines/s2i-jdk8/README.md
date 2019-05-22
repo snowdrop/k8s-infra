@@ -19,39 +19,7 @@ sed -e 's/QUAY_ROBOT_USER/<QUAY_ROBOT_USER>/g' -e 's/QUAY_ROBOT_PWD/<QUAY_ROBOT_
 
 Create on `Quay.io` a repository and grant the `Robot user account` to have write permissions
 
-### S2i build with docker
-
-Install the k8s resources such as the `serviceaccount` and `secret` created
-```bash
-kubectl apply -f resources/docker-secret.yml
-kubectl apply -f resources/sa-secret.yml
-```
-
-Install next the `s2i-jdk8` tekton `task`
-
-```bash
-kubectl apply -f tasks/build-push.yml
-```
-
-Next, execute this task to git clone a SpringBoot repo as defined using the Git Resource [- see here](https://github.com/snowdrop/openshift-infra/blob/master/tekton-pipelines/s2i-jdk8/tasks/clone-build.yml#L9), build it using s2i tool and openjdk8 s2i image
-
-```bash
-kubectl apply -f runtasks/build-push.yml
-```
-
-Look to the status of the task running
-```bash
-kc describe taskrun.tekton.dev/s2i-push-springboot
-```
-
-and check the status of the build, push tasks
-
-```bash
-kubectl logs -n kube-system -l tekton.dev/task=s2i-jdk8 -c build-step-s2ibuild
-kubectl logs -n kube-system -l tekton.dev/task=s2i-jdk8 -c build-step-docker-push
-```
-
-### S2i using Buildah
+### K8s : S2i Buildah using Quay.io
 
 Scenario:
 - step 1: git clone 
@@ -117,12 +85,12 @@ kubectl apply -f resources/docker-secret.yml
 kubectl apply -f resources/sa-secret.yml
 
 kubectl apply -f tasks/buildah-push.yml
-kubectl apply -f runtasks/buildah-push.yml
+kubectl apply -f runtasks/buildah-push-quay.io.yml
 ```
 
 Look to the status of the task running
 ```bash
-kubectl describe taskrun.tekton.dev/s2i-buildah-push-springboot
+kubectl describe taskrun.tekton.dev/s2i-buildah-push
 ```
 
 and check the status of the steps of the build:
@@ -151,7 +119,7 @@ Successfully pushed //quay.io/snowdrop/spring-boot-example:latest@sha256:cf99b4a
 To test the Spring Boot Application using the image created, then install using this list of resources
 ```bash
 kubectl create namespace demo
-kubectl apply -f resources/deployment.yaml -n demo
+kubectl apply -f resources/deployment-quayio.yaml -n demo
 ```
 
 and check the log of the pod created
@@ -186,7 +154,7 @@ May 21, 2019 7:40:06 PM org.apache.catalina.core.ApplicationContext log
 INFO: Initializing Spring DispatcherServlet 'dispatcherServlet'
 ```
 
-### OpenShift
+### OpenShift : S2i - Buildah with local docker registry
 
 Scenario:
 - step 1: git clone 
@@ -198,17 +166,17 @@ Scenario:
 
 Change the SCC of the serviceaccount to give it the `priveleged` role
 ```bash
-echo  Add-on '#{addon-name}' changed the default security context constraints to allow pods to run as any user.
-echo  Per default OpenShift runs containers using an arbitrarily assigned user ID.
-echo  Refer to https://docs.okd.io/latest/architecture/additional_concepts/authorization.html#security-context-constraints and
-echo  https://docs.okd.io/latest/creating_images/guidelines.html#openshift-origin-specific-guidelines for more information.
+# echo  Add-on '#{addon-name}' changed the default security context constraints to allow pods to run as any user.
+# echo  Per default OpenShift runs containers using an arbitrarily assigned user ID.
+# echo  Refer to https://docs.okd.io/latest/architecture/additional_concepts/authorization.html#security-context-constraints and
+# echo  https://docs.okd.io/latest/creating_images/guidelines.html#openshift-origin-specific-guidelines for more information.
 
-oc adm policy add-scc-to-group anyuid system:authenticated
+# oc adm policy add-scc-to-group anyuid system:authenticated
+# oc adm policy add-scc-to-user anyuid system:serviceaccount:build-bot:tekton-pipelines-controller
 
-#oc apply -f resources/sa.yml
-#oc adm policy add-scc-to-user anyuid system:serviceaccount:build-bot:tekton-pipelines-controller
-#oc adm policy add-scc-to-user privileged -z build-bot
-#oc adm policy add-role-to-user edit -z build-bot
+oc apply -f resources/sa.yml
+oc adm policy add-scc-to-user privileged -z build-bot
+oc adm policy add-role-to-user edit -z build-bot
 ```
 
 Execute the following commands in order to deploy the task and task to be executed (aka taksrun)
@@ -224,10 +192,11 @@ Verify if the Spring Boot application has been started
 **WARNING**: Change the IP address ofthe docker registry `image: 172.30.1.1:5000/demo/spring-boot-example` within the `deployment.yaml` file before to install the resource
 
 ```bash
-oc apply -f resources/deployment.yaml -n demo
+oc apply -f resources/deployment-local.yaml -n demo
 ```
 
 ## Clean up
+
 ```bash
 kubectl delete taskruns --all
 kubectl delete tasks --all
