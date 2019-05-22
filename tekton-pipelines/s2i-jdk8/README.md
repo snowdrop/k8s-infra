@@ -188,7 +188,45 @@ INFO: Initializing Spring DispatcherServlet 'dispatcherServlet'
 
 ### OpenShift
 
+Scenario:
+- step 1: git clone 
+- step 2: s2i build as dockerfile
+- step 3: buildah bud using dockerfile
+- step 4: buildah push to private local docker registry
 
+**Warning**: Change the `image url` within the file `runtasks/buildah-push-local-registry.yml` in order to use your project's namespace !
+
+Change the SCC of the serviceaccount to give it the `priveleged` role
+```bash
+echo  Add-on '#{addon-name}' changed the default security context constraints to allow pods to run as any user.
+echo  Per default OpenShift runs containers using an arbitrarily assigned user ID.
+echo  Refer to https://docs.okd.io/latest/architecture/additional_concepts/authorization.html#security-context-constraints and
+echo  https://docs.okd.io/latest/creating_images/guidelines.html#openshift-origin-specific-guidelines for more information.
+
+oc adm policy add-scc-to-group anyuid system:authenticated
+
+#oc apply -f resources/sa.yml
+#oc adm policy add-scc-to-user anyuid system:serviceaccount:build-bot:tekton-pipelines-controller
+#oc adm policy add-scc-to-user privileged -z build-bot
+#oc adm policy add-role-to-user edit -z build-bot
+```
+
+Execute the following commands in order to deploy the task and task to be executed (aka taksrun)
+
+```yaml
+oc new-project demo
+oc apply -f tasks/buildah-push.yml
+oc apply -f runtasks/buildah-push-local-registry.yml
+```
+
+Verify if the Spring Boot application has been started
+
+**WARNING**: Change the IP address ofthe docker registry `image: 172.30.1.1:5000/demo/spring-boot-example` within the `deployment.yaml` file before to install the resource
+
+```bash
+oc new-project demo
+oc apply -f resources/deployment.yaml -n demo
+```
 
 ## Clean up
 ```bash

@@ -56,7 +56,6 @@ spec:
           mountPath: /sources
       securityContext:
         privileged: true
-
     - # Push the image created to quay.io using as credentials the secret mounted within
       # the service account
       name: push

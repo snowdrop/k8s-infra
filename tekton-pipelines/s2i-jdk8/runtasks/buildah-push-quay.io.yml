@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1alpha1
 kind: TaskRun
 metadata:
-  name: s2i-buildah-push-springboot
+  name: s2i-buildah-push
 spec:
   serviceAccount: build-bot
   taskRef:

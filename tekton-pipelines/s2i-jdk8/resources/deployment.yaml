@@ -49,8 +49,7 @@ spec:
             fieldRef:
               fieldPath: metadata.namespace
         #image: quay.io/snowdrop/spring-boot-example:2.1.3-2
-        #image: docker-registry.default.svc.cluster.local:5000/snowdrop/spring-boot-example
-        image: docker-registry.default.svc.cluster.local:5000/snowdrop/spring-boot-example
+        image: 172.30.1.1:5000/demo/spring-boot-example
         imagePullPolicy: IfNotPresent
         name: spring-boot
         ports:

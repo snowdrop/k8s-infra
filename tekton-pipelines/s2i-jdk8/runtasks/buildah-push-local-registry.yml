@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1alpha1
 kind: TaskRun
 metadata:
-  name: s2i-buildah-push-springboot
+  name: s2i-buildah-push
 spec:
   serviceAccount: build-bot
   taskRef:
@@ -30,6 +30,6 @@ spec:
         type: image
         params:
         - name: url
-          # value: kube-registry.kube-system.svc.cluster.local:5000/snowdrop/spring-boot-example
-          value: docker-registry.default.svc.cluster.local:5000/snowdrop/spring-boot-example
+          # value: kube-registry.kube-system.svc.cluster.local:5000/demo/spring-boot-example
+          value: docker-registry.default.svc.cluster.local:5000/demo/spring-boot-example
 
