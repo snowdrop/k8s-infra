@@ -14,4 +14,3 @@ kubectl create namespace demo
 kubectl apply -f resources/sa.yml -n demo
 kubectl apply -f tasks/buildah-push.yml -n demo
 kubectl apply -f runtasks/buildah-push-local-registry.yml -n demo
-
