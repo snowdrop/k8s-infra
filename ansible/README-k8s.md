@@ -18,12 +18,16 @@ cd ansible
 ansible-playbook -i inventory/simple_host playbook/k8s.yml 
 ```
 
-**Remark**: The simple host file contains the following information to let Ansible to access your VM
+## Post installations steps
 
-`
-[masters]
-192.168.99.50 public_ip_address=192.168.99.50 ansible_user=root
-`
+If you want to configure your cluster with additional features, then you can install them using the following
+roles
+
+### Tekton Pipelines
+
+  ```bash
+  ansible-playbook -i inventory/cloud_host playbook/k8s.yml --tags tekton_pipelines
+  ```
 
 ## TODO
 

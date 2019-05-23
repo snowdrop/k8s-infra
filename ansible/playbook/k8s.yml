@@ -7,3 +7,4 @@
 
   roles:
     - { role: 'create_k8s_cluster',   tags: 'create_cluster'}
+    - { role: 'tekton_pipelines',   tags: 'tekton_pipelines'}
