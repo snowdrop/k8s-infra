@@ -29,6 +29,7 @@ kc apply -f taskDeployKubectl.yml -n tutorial
 kc apply -f pipeline.yml -n tutorial
 kc apply -f pipelineRun.yml -n tutorial
 kc get pipelineRuns/tutorial-pipeline-run-1 -n tutorial -o yaml
+kc delete pipelineRuns/tutorial-pipeline-run-1 -n tutorial
 ```
 
 
