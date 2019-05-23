@@ -26,7 +26,7 @@ roles
 ### Tekton Pipelines
 
   ```bash
-  ansible-playbook -i inventory/cloud_host playbook/k8s.yml --tags tekton_pipelines
+  ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags tekton_pipelines
   ```
 
 ## TODO
