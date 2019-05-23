@@ -462,21 +462,8 @@ As the vm is now running and the docker daemon is up, you can install `OpenShift
 
 ## Kubernetes Installation
 
-If you have a Virtual Machine which has been created as described for the option 2), 3) and 4) of the `Provision OpenShift section`, you can then use the following playbook to install
-a Kubernetes cluster using the `kubeadmin` tool. This cluster will be configured with : 
-
-- Kubernetes Dashboard
-- Helm Tiller
-- Kubernetes ServiceCatalog and OpenShift Ansible Broker
-
-```bash
-cd ansible
-ansible-playbook -i inventory/simple_host playbook/k8s.yml 
-```
-
-**Remark**: The simple host file contains the following information to let ansuble to access your VM
-`[masters]
- 192.168.99.50 public_ip_address=192.168.99.50 ansible_user=root`
+If you have a Virtual Machine which has been created as described for the option 2) and 4) of the `Provision OpenShift section`, you can then use the following [instructions](ansible/README-k8s.md) to install
+a Kubernetes cluster using the `kubeadmin` tool.
 
 # Turn on your OpenShift machine into a Cloud Native Dev environment 
 
