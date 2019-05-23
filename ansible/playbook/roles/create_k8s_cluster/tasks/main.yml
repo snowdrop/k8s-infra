@@ -174,3 +174,11 @@
 
 - name: Apply Openshift Ansible Broker files
   command: "kubectl apply -f /tmp/oab.yml"
+
+- include_tasks: save_config.yml
+
+- name: Print kubernetes dashboard URK
+  debug:
+    msg:
+      - "You can also view the kubernetes dashaboard at"
+      - "http://{{ public_ip_address }}:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/"
