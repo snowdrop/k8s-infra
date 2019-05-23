@@ -7,7 +7,7 @@
 
 ## Instructions
 
-This cluster that the playbook will create will be created using `Kubeadmin` and where we will install
+This cluster that the following playbook will setup will be created using `Kubeadmin` and will be provisioned with
 
 - Kubernetes Dashboard
 - Helm Tiller
