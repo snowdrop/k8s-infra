@@ -24,6 +24,16 @@ kc get tekton-pipelines
 ```
 
 ## Pipeline project
+
+Before to execute the following commands, create a configMap in order to mount as volume the root CA certificate of the k8s API server.
+This is [needed by the Docker client](https://github.com/GoogleContainerTools/kaniko/pull/169) to pull/push images from the private docker registry
+
+```bash
+kubectl create configmap ca-certificates --from-file=/etc/kubernetes/pki/ca.crt -n tutorial
+```
+
+Next, install the tasks, pipeline
+
 ```bash
 kc apply -f taskDeployKubectl.yml -n tutorial
 kc apply -f pipeline.yml -n tutorial

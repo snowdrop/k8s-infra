@@ -33,3 +33,10 @@ spec:
         - --dockerfile=${inputs.params.pathToDockerFile}
         - --destination=${outputs.resources.builtImage.url}
         - --context=${inputs.params.pathToContext}
+      volumeMounts:
+      - name: ca-certificates
+        mountPath: /kaniko/ssl/certs
+  volumes:
+  - name: ca-certificates
+    configMap:
+      name: ca-certificates
