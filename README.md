@@ -16,7 +16,7 @@ Table of Contents
          * [Option 3 : Public Cloud Provider - Hetzner](#option-3--public-cloud-provider---hetzner)
          * [Option 4 : Private Cloud Provider - Openstack](#option-4--private-cloud-provider---openstack)
          * [OpenShift Deployment](#openshift-deployment)
-      * [ Kubernetes Installation](#kubernetes-installation)
+   * [Instructions to create a Kubernetes cluster](#kubernetes-installation)
    * [Turn on your OpenShift machine into a Cloud Native Dev environment](#turn-on-your-openshift-machine-into-a-cloud-native-dev-environment)
       * [Bash script (minishift only)](#bash-script-minishift-only)
       * [Ansible playbooks](#ansible-playbooks)
@@ -460,7 +460,7 @@ As the vm is now running and the docker daemon is up, you can install `OpenShift
 - Simple using the `oc` binary tool and the command [oc cluster up](https://github.com/openshift/origin/blob/master/docs/cluster_up_down.md) within the vm
 - More elaborated using `Ansible` tool with our `cluster` [role](ansible/README-oc.md) or with the `openshift-ansible` all-in-one playbook as described [here](ansible/README-cloud.md)
 
-## Kubernetes Installation
+# Kubernetes Installation
 
 If you have a Virtual Machine which has been created as described for the option 2) and 4) of the `Provision OpenShift section`, you can then use the following [instructions](ansible/README-k8s.md) to install
 a Kubernetes cluster using the `kubeadmin` tool.
