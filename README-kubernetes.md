@@ -37,7 +37,7 @@ kubeadm join 172.16.195.15:6443 --token m3imk1.syzt7dj2s3wrpwpr \
 In that case you can create the Kubernetes cluster using:
 
 ```
-ansible-playbook -i inventory/simple_host playbook/cluster.yml 
+ansible-playbook -i inventory/simple_host playbook/k8s.yml 
 ```
 
 Note that you will need Ansible 2.8+ for the above command to work.
