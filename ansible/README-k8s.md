@@ -28,6 +28,12 @@ roles
   ```bash
   ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags tekton_pipelines
   ```
+  
+  To uninstall the `tekton pipelines`, execute this command where you pass the parameter `install=false`
+  ```bash
+  ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags tekton_pipelines -e remove=true
+  ```
+  
 
 ## TODO
 

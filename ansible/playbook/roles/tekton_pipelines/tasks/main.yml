@@ -1,3 +1,9 @@
 - name: Install Tekton Pipelines
+  when: not remove | default(false) | bool
   shell: |
     {{ client_tool }} apply -f https://storage.googleapis.com/tekton-releases/latest/release.yaml
+
+- name: Uninstall Tekton Pipelines
+  when: remove | default(false) | bool
+  shell: |
+    {{ client_tool }} delete -f https://storage.googleapis.com/tekton-releases/latest/release.yaml
