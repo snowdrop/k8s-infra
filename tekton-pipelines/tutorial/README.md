@@ -28,7 +28,7 @@ kc get tekton-pipelines
 kc apply -f taskDeployKubectl.yml -n tutorial
 kc apply -f pipeline.yml -n tutorial
 kc apply -f pipelineRun.yml -n tutorial
-kc get pipelineRuns -n tutorial
+kc get pipelineRuns/tutorial-pipeline-run-1 -n tutorial -o yaml
 ```
 
 
