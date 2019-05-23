@@ -16,7 +16,7 @@ Table of Contents
          * [Option 3 : Public Cloud Provider - Hetzner](#option-3--public-cloud-provider---hetzner)
          * [Option 4 : Private Cloud Provider - Openstack](#option-4--private-cloud-provider---openstack)
          * [OpenShift Deployment](#openshift-deployment)
-         * [Kubernetes Deployment](#okubernetes-deployment)
+      * [ Kubernetes Installation](#kubernetes-installation)
    * [Turn on your OpenShift machine into a Cloud Native Dev environment](#turn-on-your-openshift-machine-into-a-cloud-native-dev-environment)
       * [Bash script (minishift only)](#bash-script-minishift-only)
       * [Ansible playbooks](#ansible-playbooks)
@@ -460,9 +460,23 @@ As the vm is now running and the docker daemon is up, you can install `OpenShift
 - Simple using the `oc` binary tool and the command [oc cluster up](https://github.com/openshift/origin/blob/master/docs/cluster_up_down.md) within the vm
 - More elaborated using `Ansible` tool with our `cluster` [role](ansible/README-oc.md) or with the `openshift-ansible` all-in-one playbook as described [here](ansible/README-cloud.md)
 
-### Kubernetes Deployment
+## Kubernetes Installation
 
-TODO
+If you have a Virtual Machine which has been created as described for the option 2), 3) and 4) of the `Provision OpenShift section`, you can then use the following playbook to install
+a Kubernetes cluster using the `kubeadmin` tool. This cluster will be configured with : 
+
+- Kubernetes Dashboard
+- Helm Tiller
+- Kubernetes ServiceCatalog and OpenShift Ansible Broker
+
+```bash
+cd ansible
+ansible-playbook -i inventory/simple_host playbook/k8s.yml 
+```
+
+**Remark**: The simple host file contains the following information to let ansuble to access your VM
+`[masters]
+ 192.168.99.50 public_ip_address=192.168.99.50 ansible_user=root`
 
 # Turn on your OpenShift machine into a Cloud Native Dev environment 
 
