@@ -1,5 +1,12 @@
----
-# do any asserts here
+- name: Set release url for non latest
+  set_fact:
+    prefix: "previous/{{ tekton_release_version }}"
+  when: tekton_release_version != "latest"
+
+- name: Set release url for latest
+  set_fact:
+    prefix: latest
+  when: tekton_release_version == "latest"
 
 - include_tasks: install.yml
   when: not remove | default(false) | bool

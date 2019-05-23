@@ -34,6 +34,10 @@ roles
   ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags tekton_pipelines -e remove=true
   ```
   
+  You can specify the version to be installed. If not defined, the latest release will be installed
+  ```bash
+  ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags tekton_pipelines -e tekton_release_version=v0.3.1
+  ```
 
 ## TODO
 
