@@ -1,0 +1,9 @@
+---
+- hosts: masters
+  gather_facts: True
+
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+
+  roles:
+    - { role: 'create_k8s_cluster',   tags: 'create_cluster'}

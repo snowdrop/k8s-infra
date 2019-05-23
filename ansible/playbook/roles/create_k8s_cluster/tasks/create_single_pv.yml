@@ -1,0 +1,20 @@
+- set_fact:
+    pv_mount_directory: /tmp/{{ volume_name }}
+    pv_definition_file: /tmp/{{ volume_name }}-def.yml
+
+- name: Create internal mount directory
+  shell: |
+    mkdir -p {{ pv_mount_directory }}
+    chmod -R 777 {{ pv_mount_directory }}
+    chmod -R a+w {{ pv_mount_directory }}
+    chcon -Rt svirt_sandbox_file_t {{ pv_mount_directory }}
+  ignore_errors: true
+
+
+- name: Copy pv file to master
+  template:
+    src: "pv.yml.j2"
+    dest: "{{ pv_definition_file }}"
+
+- name: Create pv {{ pv_name }}
+  command: "kubectl apply -f {{ pv_definition_file }}"
