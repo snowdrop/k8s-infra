@@ -15,6 +15,9 @@ Useful links
 git clone https://github.com/snowdrop/openshift-infra.git && cd openshift-infra/ansible
 ansible-playbook playbook/openstack.yml -e '{"state": "present", "hostname": "n114-test", "openstack": {"os_username": "spring-boot-jenkins", "os_password": "Y4zh73d9", "os_auth_url": "https://ci-rhos.centralci.eng.rdu2.redhat.com:13000/v2.0/", "vm": {"flavor": "m5.large"}}}'
 ```
+
+## Common tasks
+
 - Install Docker using the bash script
 ```bash
 ssh -o StrictHostKeyChecking=no -i inventory/id_openstack.rsa -t centos@10.8.250.104 sudo 'bash -s' -- < ../kubernetes/install-docker-systemd.sh
