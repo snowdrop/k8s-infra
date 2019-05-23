@@ -32,6 +32,17 @@ ssh -o StrictHostKeyChecking=no -i inventory/id_openstack.rsa -t centos@10.8.250
 kubeadm join 172.16.195.15:6443 --token m3imk1.syzt7dj2s3wrpwpr \
     --discovery-token-ca-cert-hash sha256:ecedb846b8d263fdfbb6ab6591e41896c08e4f3ce04f522e649b42ba7763c22b 
 ```
+
+**Note**: The above installation of Docker and Kubernetes can be simplified when working with a VM created with VirtualBox from [this](https://github.com/snowdrop/openshift-infra#create-vm-on-virtualbox) section.
+In that case you can create the Kubernetes cluster using:
+
+```
+ansible-playbook -i inventory/simple_host playbook/cluster.yml 
+```
+
+Note that you will need Ansible 2.8+ for the above command to work.
+
+
 - To test if the Component Operator is working with the `OABroker, ServiceCatalog`, install it with an example of `Component CR` and check the pods created
 ```bash
 ssh -o StrictHostKeyChecking=no -i inventory/id_openstack.rsa -t centos@10.8.250.104 sudo 'bash -s' -- < ../kubernetes/test-component-operator.sh
