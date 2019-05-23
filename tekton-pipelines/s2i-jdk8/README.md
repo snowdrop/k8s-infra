@@ -189,48 +189,19 @@ oc apply -f runtasks/buildah-push-local-registry.yml
 
 Verify if the Spring Boot application has been started
 
-**WARNING**: Change the IP address of the docker registry `image: 172.30.1.1:5000/demo/spring-boot-example` within the `deployment.yaml` file before to install the resource. An alternative is to create a DNS entry 
+**WARNING**: Change the IP address of the docker registry `image: 172.30.1.1:5000/demo/spring-boot-example` within the `deployment.yaml` file before to install the resource.
+
+**Remak**: An alternative is to create a DNS entry 
 within the file `/etc/hosts` of the VM to match the name `docker-registry` to the Cluster IP address and next to use it as described [here](https://stackoverflow.com/questions/52675900/kubernetes-pull-images-from-internal-registry-with-on-premise-deployment)
 
 ```bash
 oc apply -f resources/deployment-local.yaml -n demo
 ```
 
-## Configure K8s Docker registry
-
-Create first the `Kube Docker registry` to get the `ClusterIP` address needed to create the selfsigned certificate
-
-```bash
-kubectl apply -f resources/kube-registry-svc.yml
-kc get service/kube-registry
-NAME            TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)    AGE
-kube-registry   ClusterIP   10.101.25.6   <none>        5000/TCP   25s
-```
-
-**Remark**: The External IP address to be passed as parameter too is the Eth0 IP address of the machine
-
-First, use the following bash script responsible to create a private key, CSR and next call the K8s API in order to sign the certificate and next approve it
-```bash
-ssh -o StrictHostKeyChecking=no -i ../../ansible/inventory/id_openstack.rsa -t centos@10.8.250.104 sudo 'bash -s' -- < gen-self-signed-cert.sh 10.101.25.6 10.8.250.104
-```
-
-The files generated will become available under the folder `/root/docker-certs` and will been used to configure the docker registry.
-
-Install the docker registry
-```bash
-kubectl apply -f resources/kube-registry-pvc.yml
-```
-
-Test the build and deployment of the Spring Boot application using the taskRun
+Test the build and deployment of the Spring Boot application using this bash script
 
 ```bash
 ./install-k8s-local.sh
-```
-
-**WARNING**: Change the IP address of the docker registry `image: 10.101.25.6:5000/demo/spring-boot-example` within the `deployment.yaml` file before to install the resource. 
-
-```bash
-kubectl apply -f resources/deployment-local.yaml -n demo
 ```
 
 ## Clean up
