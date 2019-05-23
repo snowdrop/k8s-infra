@@ -92,6 +92,7 @@ The files generated will become available under the folder `/root/docker-certs` 
 Install the docker registry
 ```bash
 kubectl apply -f ../kubernetes/docker-registry/registry-pvc.yml
+```
 
 ## Manual instructions
 
