@@ -5,6 +5,10 @@
   environment:
     KUBECONFIG: /etc/kubernetes/admin.conf
 
+  # Define default values for variables that are common between roles
+  vars:
+    client_tool: kubectl
+
   roles:
     - { role: 'create_k8s_cluster',   tags: 'create_cluster'}
     - { role: 'tekton_pipelines',   tags: 'tekton_pipelines'}
