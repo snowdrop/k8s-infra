@@ -1,8 +1,8 @@
 - name: Remove Component resources
   shell: |
-    oc {{ openshift_env.oc_admin_kubeconfig_arg }} delete sa {{ component_operator_name }} -n {{ component_operator_namespace }}
-    oc {{ openshift_env.oc_admin_kubeconfig_arg }} delete deployment {{ component_operator_name }} -n {{ component_operator_namespace }}
-    oc {{ openshift_env.oc_admin_kubeconfig_arg }} delete clusterrole {{ component_operator_name }}
-    oc {{ openshift_env.oc_admin_kubeconfig_arg }} delete clusterrolebinding {{ component_operator_name }}--role-binding
-    oc {{ openshift_env.oc_admin_kubeconfig_arg }} delete crd components.component.k8s.io
+    {{ client_tool }} delete sa {{ component_operator_name }} -n {{ component_operator_namespace }}
+    {{ client_tool }} delete deployment {{ component_operator_name }} -n {{ component_operator_namespace }}
+    {{ client_tool }} delete clusterrole {{ component_operator_name }}
+    {{ client_tool }} delete clusterrolebinding {{ component_operator_name }}--role-binding
+    {{ client_tool }} delete crd components.component.k8s.io
   ignore_errors: true

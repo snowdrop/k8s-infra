@@ -21,21 +21,27 @@
     src: cluster-rbac.j2
     dest: /tmp/cluster-rbac.yml
 
-- name: Create namespace for the component operator
-  command: oc {{ openshift_env.oc_admin_kubeconfig_arg }} new-project {{ component_operator_namespace }}
+- name: Create Openshift project for the component operator
+  command: "{{ client_tool }} new-project {{ component_operator_namespace }}"
   ignore_errors: true
+  when: isOpenshift | bool
+
+- name: Create Kubernetes namespace for the component operator
+  command: "{{ client_tool }} create namespace {{ component_operator_namespace }}"
+  ignore_errors: true
+  when: not isOpenshift | bool
 
 - name: Install serviceaccount, customresourcedefinition resources (static files from mktemp dir)
   command: |
-    oc {{ openshift_env.oc_admin_kubeconfig_arg }} apply -f "{{ mktemp.stdout }}" -n {{ component_operator_namespace }}
+    {{ client_tool }} apply -f "{{ mktemp.stdout }}" -n {{ component_operator_namespace }}
 
 - name: Install rbac, operator
   shell: |
-    oc {{ openshift_env.oc_admin_kubeconfig_arg }} apply -f /tmp/cluster-rbac.yml -n {{ component_operator_namespace }}
-    oc {{ openshift_env.oc_admin_kubeconfig_arg }} apply -f /tmp/operator.yml -n {{ component_operator_namespace }}
+    {{ client_tool }} apply -f /tmp/cluster-rbac.yml -n {{ component_operator_namespace }}
+    {{ client_tool }} apply -f /tmp/operator.yml -n {{ component_operator_namespace }}
 
 - name: Wait for the Component CRD to be created
-  command: oc {{ openshift_env.oc_admin_kubeconfig_arg }} get crd components.component.k8s.io
+  command: "{{ client_tool }} get crd components.component.k8s.io"
   register: crd
   until: crd.rc == 0
   delay: 5

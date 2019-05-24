@@ -1,3 +1,5 @@
+client_tool: oc {{ openshift_env.oc_admin_kubeconfig_arg }}
+
 component_crd_operator_install: true
 component_crd_operator_remove: false
 
