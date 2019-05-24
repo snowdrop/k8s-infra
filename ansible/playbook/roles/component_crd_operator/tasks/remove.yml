@@ -4,5 +4,7 @@
     {{ client_tool }} delete deployment {{ component_operator_name }} -n {{ component_operator_namespace }}
     {{ client_tool }} delete clusterrole {{ component_operator_name }}
     {{ client_tool }} delete clusterrolebinding {{ component_operator_name }}--role-binding
-    {{ client_tool }} delete crd components.component.k8s.io
+    {{ client_tool }} delete crd components.devexp.runtime.redhat.com
+    {{ client_tool }} delete crd capabilities.devexp.runtime.redhat.com
+    {{ client_tool }} delete crd links.devexp.runtime.redhat.com
   ignore_errors: true

@@ -7,6 +7,12 @@ metadata:
     rbac.authorization.k8s.io/aggregate-to-admin: "true"
     rbac.authorization.k8s.io/aggregate-to-edit: "true"
 rules:
-- apiGroups: ["component.k8s.io"]
-  resources: ["components"]
-  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: ["devexp.runtime.redhat.com"]
+    resources: ["components"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: ["devexp.runtime.redhat.com"]
+    resources: ["links"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: ["devexp.runtime.redhat.com"]
+    resources: ["capabilities"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
