@@ -9,7 +9,7 @@
   when: tekton_release_version == "latest"
 
 - include_tasks: install.yml
-  when: not remove | default(false) | bool
+  when: not remove | bool
 
 - include_tasks: remove.yml
-  when: remove | default(false) | bool
+  when: remove | bool

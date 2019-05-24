@@ -1,3 +1,3 @@
 ---
 dependencies:
-  - { role: openshift_env, when: isOpenshift | default(false) | bool }
+  - { role: openshift_env, when: isOpenshift | bool }
