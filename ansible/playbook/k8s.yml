@@ -13,4 +13,4 @@
     - { role: 'create_k8s_cluster',   tags: 'create_cluster'}
     - { role: 'docker_registry',   tags: 'docker_registry'}
     - { role: 'tekton_pipelines',   tags: 'tekton_pipelines'}
-    - { role: 'install_component_crd_operator',  tags: 'component_crd_operator'}
+    - { role: 'component_crd_operator',  tags: 'component_crd_operator'}
