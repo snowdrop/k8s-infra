@@ -41,7 +41,7 @@
     {{ client_tool }} apply -f /tmp/operator.yml -n {{ component_operator_namespace }}
 
 - name: Wait for the Component CRD to be created
-  command: "{{ client_tool }} get crd components.component.k8s.io"
+  command: "{{ client_tool }} get crd components.devexp.runtime.redhat.com"
   register: crd
   until: crd.rc == 0
   delay: 5
