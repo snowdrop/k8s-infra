@@ -46,6 +46,8 @@ roles
   ```  
   
   To remove the Component CRD and its operator, pass then the following variable `-e remove=true`
+  
+  To use a different version of the image, then use `-e component_operator_docker_image_version=master`
 
 ## TODO
 

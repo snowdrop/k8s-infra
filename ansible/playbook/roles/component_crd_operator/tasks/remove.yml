@@ -8,3 +8,8 @@
     {{ client_tool }} delete crd capabilities.devexp.runtime.redhat.com
     {{ client_tool }} delete crd links.devexp.runtime.redhat.com
   ignore_errors: true
+
+- name: Remove Component operator namespace
+  command: "{{ client_tool }} delete namespace {{ component_operator_namespace }}"
+  ignore_errors: true
+  when: not isOpenshift | bool
