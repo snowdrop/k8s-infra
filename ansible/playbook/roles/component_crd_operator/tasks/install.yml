@@ -24,12 +24,12 @@
 - name: Create Openshift project for the component operator
   command: "{{ client_tool }} new-project {{ component_operator_namespace }}"
   ignore_errors: true
-  when: isOpenshift | bool
+  when: isOpenshift | default(true) | bool
 
 - name: Create Kubernetes namespace for the component operator
   command: "{{ client_tool }} create namespace {{ component_operator_namespace }}"
   ignore_errors: true
-  when: not isOpenshift | bool
+  when: not isOpenshift | default(true) | bool
 
 - name: Install serviceaccount, customresourcedefinition resources (static files from mktemp dir)
   command: |
