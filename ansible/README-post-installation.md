@@ -135,6 +135,17 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
   
   To use a different version of the image, then use `-e component_operator_docker_image_version=master`
 
+### Tekton Pipelines
+
+  ```bash
+  ansible-playbook -i inventory/cloud_host playbook/post_installation.yml \
+    --tags tekton_pipelines
+  ```
+  
+  To uninstall the `tekton pipelines`, execute this command where you pass the parameter `-e remove=true`
+  
+  You can specify the version to be installed. If not defined, the latest release will be installed using the parameter `-e tekton_release_version=v0.3.1`
+
 ### Command install_nexus
 
   The nexus server will be installed under the project `infra` and will contain the Red Hat proxy servers

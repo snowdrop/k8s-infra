@@ -6,6 +6,7 @@
   vars:
     openshift_admin_user: admin
     openshift_admin_pwd: ''
+    client_tool: oc
   roles:
     - { role: 'persistence',          tags: 'persistence'}          # When Minishift or oc cluster up is NOT used
     - { role: 'identity_provider',    tags: 'identity_provider'}    # Use HTPasswdPasswordIdentityProvider as Identity Provider -> more secure
@@ -23,3 +24,4 @@
     - { role: 'uninstall_launcher',   tags: 'uninstall-launcher'}
     - { role: 'component_crd_operator',  tags: 'component_crd_operator'}
     - { role: 'deploy_snowdrop_site',  tags: 'snowdrop'}
+    - { role: 'tekton_pipelines',   tags: 'tekton_pipelines'}
