@@ -45,10 +45,6 @@ cat <<EOF | ./cfssl genkey - | ./cfssljson -bare server
 }
 EOF
 
-#echo "Mover them under certs folder"
-#mv server.csr certs
-#mv server-key.pem certs
-
 echo "Generate a CSR yaml blob and send it to the apiserver by running the following command:"
 cat <<EOF | sudo kubectl --kubeconfig=${KUBECONFIG} apply -f -
 apiVersion: certificates.k8s.io/v1beta1
