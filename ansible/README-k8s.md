@@ -42,8 +42,10 @@ roles
 ### Component Operator
 
   ```bash
-  ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags component_crd_operator  -e isOpenshift=false
+  ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags component_crd_operator -e isOpenshift=false
   ```  
+  
+  To remove the Component CRD and its operator, pass then the following variable `-e remove=true`
 
 ## TODO
 

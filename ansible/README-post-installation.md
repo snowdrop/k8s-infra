@@ -131,7 +131,7 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
     --tags component_crd_operator
   ```
   
-  To remove the Component CRD and its operator, pass then the following variable `-e component_crd_operator_remove=true -e component_crd_operator_install=false`
+  To remove the Component CRD and its operator, pass then the following variable `-e remove=true`
 
 ### Command install_nexus
 
