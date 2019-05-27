@@ -1,48 +1,7 @@
-# - name: Install wget
-#   shell: |
-#     rpm --import https://mirror.go-repo.io/centos/RPM-GPG-KEY-GO-REPO
-#     curl -s https://mirror.go-repo.io/centos/go-repo.repo | tee /etc/yum.repos.d/go-repo.repo
-#     yum -y install wget golang
+- name: Generate Deployment file
+  template:
+    src: deployment.yml.j2
+    dest: /tmp/deployment.yml
 
-- name: Install wget
-  connection: local
-  command: yum -y install wget
-
-- name: Install Galaxy role Golang
-  command: ansible-galaxy install gantsign.golang
-
-- name: Include Golang role
-  include_role:
-    name: gantsign.golang
-
-
-# - name: Install yarn, nodejs, jq
-#   shell: |
-#     curl --silent --location https://dl.yarnpkg.com/rpm/yarn.repo | sudo tee /etc/yum.repos.d/yarn.repo
-#     curl --silent --location https://rpm.nodesource.com/setup_8.x | sudo bash -
-#     yum -y install yarn
-#     wget -O jq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64
-#     chmod +x ./jq
-#     mv jq /usr/bin
-#
-# - name: Launch it
-#   shell: |
-#     mkdir -p ~/go/{bin,pkg,src}
-#     echo 'export GOPATH="/home/centos/go"' >> ~/.bashrc
-#     echo 'export PATH="$PATH:${GOPATH//://bin:}/bin"' >> ~/.bashrc
-#     source ~/.bashrc
-#     sudo chown -R centos:centos /home/centos
-#
-#     console_dir=/home/centos/go/src/github.com/openshift/console
-#     if [[ ! -e $console_dir ]]; then
-#         mkdir -p $console_dir
-#         git clone https://github.com/openshift/console.git /home/centos/go/src/github.com/openshift/console && cd /home/centos/go/src/github.com/openshift/console
-#         ./build.sh
-#     else
-#         echo "Directory exists. No need to clone again the Openshift Console"
-#     fi
-#
-#     cd $console_dir
-#     export KUBECONFIG=/root/.kube/config
-#     source ./contrib/environment.sh
-#     nohup ./bin/bridge &>/dev/null &
+- name: Deploy ocp4 console
+  command: kubectl apply -f /tmp/deployment.yml

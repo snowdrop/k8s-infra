@@ -1,0 +1,89 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: ocp4-console-rbac
+subjects:
+  - kind: ServiceAccount
+    # Reference to upper's `metadata.name`
+    name: default
+    # Reference to upper's `metadata.namespace`
+    namespace: default
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ocp4-console
+  namespace: default
+  labels:
+    app: ocp4-console
+spec:
+  type: ClusterIP
+  selector:
+    app: ocp4-console
+  ports:
+    - name: ocp4-console
+      port: 9000
+      targetPort: 9000
+      protocol: TCP
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  labels:
+    app: kubernetes-dashboard
+  name: k8s-dashboard
+  namespace: default
+spec:
+  rules:
+  - host: 192.168.99.50.nip.io
+    http:
+      paths:
+      - backend:
+          serviceName: ocp4-console
+          servicePort: 9000
+        path: /
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: ocp4-console
+  name: ocp4-console
+  namespace: default
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: ocp4-console
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: ocp4-console
+    spec:
+      containers:
+      - image: quay.io/openshift/origin-console
+        imagePullPolicy: Always
+        name: ocp4-console
+        ports:
+        - containerPort: 9000
+          name: ocp4-console
+          protocol: TCP
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30

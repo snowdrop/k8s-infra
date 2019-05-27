@@ -41,6 +41,8 @@ roles
   
 ### New ocp4 console
 
+  To install the new ocp4 console on the port `0.0.0.0:9000`, then execute the following command
+  
   ```bash
   ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags ocp4_console
   ```    
