@@ -5,14 +5,15 @@
 #     yum -y install wget golang
 
 - name: Install wget
+  connection: local
   command: yum -y install wget
 
 - name: Install Galaxy role Golang
   command: ansible-galaxy install gantsign.golang
 
-- include_role:
+- name: Include Golang role
+  include_role:
     name: gantsign.golang
-    golang_gopath: '$HOME/go'
 
 
 # - name: Install yarn, nodejs, jq
