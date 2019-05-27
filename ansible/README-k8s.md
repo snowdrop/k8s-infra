@@ -39,6 +39,12 @@ roles
   ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags docker_registry
   ```  
   
+### New ocp4 console
+
+  ```bash
+  ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags ocp4_console
+  ```    
+  
 ### K8s Service Catalog and OABroker
 
   ```bash
@@ -77,13 +83,4 @@ roles
 ```bash
 ssh -o StrictHostKeyChecking=no -i inventory/id_openstack.rsa -t centos@10.8.250.104 sudo 'bash -s' -- < ../kubernetes/test-component-operator.sh
 ssh -o StrictHostKeyChecking=no -i inventory/id_openstack.rsa -t centos@10.8.250.104 sudo kubectl get all,serviceinstance,servicebinding,secrets -n demo
-```
-
-- To use the new OpenShift console, install nodejs, go, yarn, jq tools
-```bash
-ssh -o StrictHostKeyChecking=no -i inventory/id_openstack.rsa -t centos@10.8.250.104 sudo 'bash -s' -- < ../kubernetes/install-tools-openshift-console.sh
-```
-- And next launch it
-```bash
-ssh -o StrictHostKeyChecking=no -i inventory/id_openstack.rsa -t centos@10.8.250.104 sudo 'bash -s' -- < ../kubernetes/launch-console.sh
 ```
