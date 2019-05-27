@@ -1,0 +1,20 @@
+- name: Get Service ClusterIP
+  command: kubectl get service/kubernetes-dashboard -n kube-system -o jsonpath='{.spec.clusterIP}'
+  register: clusterIP
+
+- name: Display service
+  debug:
+    var: clusterIP.stdout
+
+- name: Generate Service file
+  template:
+    src: service.yml.j2
+    dest: /tmp/service.yml
+
+- name: Get file
+  command: cat /tmp/service.yml
+  register: file
+
+- name: Display file
+  debug:
+    var: file.stdout

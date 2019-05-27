@@ -1,0 +1,5 @@
+- include_tasks: install2.yml
+  when: not remove | bool
+
+- include_tasks: remove.yml
+  when: remove | bool
