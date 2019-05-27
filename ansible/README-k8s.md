@@ -23,6 +23,16 @@ ansible-playbook -i inventory/simple_host playbook/k8s.yml
 If you want to configure your cluster with additional features, then you can install them using the following
 roles
 
+### Create K8s Config Yml
+
+  ```bash
+  ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags k8s_config
+  ```
+  
+  This role will generate the file `remote-k8s-config.yml` within the inventory folder. You can then use it if you export the `KUBECONFIG` env var
+  
+  e.g. export KUBECONFIG=inventory/remote-k8s-config.yml
+
 ### Tekton Pipelines
 
   ```bash
