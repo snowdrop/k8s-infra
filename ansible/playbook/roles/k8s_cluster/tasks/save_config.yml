@@ -44,4 +44,4 @@
   debug:
     msg:
       - "You can use the following Kubernetes config file to interact with remote cluster via kubectl"
-      - "{{ inventory_location }}/remote-config.yml"
+      - "{{ inventory_location }}/remote-k8s-config.yml"
