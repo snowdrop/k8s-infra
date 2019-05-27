@@ -1,5 +1,18 @@
+- name: Install cfssl tool
+  include_role:
+    name: cfssl_tool
+
+- name: Get Service ClusterIP
+  command: kubectl get service/kubernetes-dashboard -n kube-system -o jsonpath='{.spec.clusterIP}'
+  register: cluster_ip_address
+
+- name: Set fact
+  set_fact:
+    ip_cluster: cluster_ip_address.stdout
+
 - name: Delete any previous CSR send to k8s
-  command: kubectl delete csr ${SERVICE_NAME}.${NAMESPACE}
+  command: kubectl delete csr {{ registry.service_name}}.{{ registry.namespace }}
+  ignore_errors: true
 
 - name: Copy cfssljson file with the Hosts names and IP addresses to be certified
   template:
@@ -10,34 +23,55 @@
   shell: |
     cat /tmp/cfssl.json | cfssl genkey - | cfssljson -bare server
 
+- name: Convert Self Signed Certificate to base64 string
+  shell: |
+    cat server.csr | base64 | tr -d '\n'
+  register: csr_base64
+
 - name: Copy CertificateSigningRequest file
   template:
     src: "csr.yml.j2"
     dest: /tmp/csr.yml
+
+# - name: Display file
+#   command: cat /tmp/csr.yml
+#   register: result
+#
+# - name: Show result
+#   debug:
+#     var: result.stdout
 
 - name: Create a CertificateSigningRequest on the k8s cluster
   shell: |
     kubectl apply -f /tmp/csr.yml
 
 - name: Approve the CSR request
-  command:  kubectl certificate approve ${SERVICE_NAME}.${NAMESPACE}
+  command:  kubectl certificate approve {{ registry.service_name}}.{{ registry.namespace }}
 
 - name: Get the server certificate
   shell: |
-    kubectl get csr ${SERVICE_NAME}.${NAMESPACE} -o jsonpath='{.status.certificate}' | base64 --decode > server.crt
+    kubectl get csr {{ registry.service_name}}.{{ registry.namespace }} -o jsonpath='{.status.certificate}' | base64 --decode > server.crt
 
 - name: Append the CA Certificate to the Server crt"
   shell: |
     cat /etc/kubernetes/pki/ca.crt >> server.crt
 
-- name: Add the ${CLUSTER_IP} certificate to the certificates supported by the docker daemon
+- name: "Creates Docker cert directory for the cluster : {{ cluster_ip_address.stdout }}:5000"
+  file:
+    path: /etc/docker/certs.d/{{ cluster_ip_address.stdout }}:5000
+    state: directory
+
+- name: Creates Registry docker Certs that we will mount
+  file:
+    path: /root/docker-certs
+    state: directory
+
+- name: "Add the certificate populated for the cluster {{ cluster_ip_address.stdout }} to the certificates supported by the docker daemon"
   shell: |
-    sudo mkdir -p /etc/docker/certs.d/${CLUSTER_IP}:5000/
-    sudo cp server.crt /etc/docker/certs.d/${CLUSTER_IP}:5000/
+    cp server.crt /etc/docker/certs.d/{{ cluster_ip_address.stdout }}:5000/
 
 - name: Copy the self signed Certificate and Private keys under the folder that we will mount within the docker registry
   shell: |
-    sudo mkdir -p /root/docker-certs
-    sudo cp server.crt /root/docker-certs
-    sudo cp server-key.pem /root/docker-certs
+    cp server.crt /root/docker-certs
+    cp server-key.pem /root/docker-certs
 

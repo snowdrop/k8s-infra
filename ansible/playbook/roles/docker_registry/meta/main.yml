@@ -1,3 +1,0 @@
----
-dependencies:
-  - { role: openshift_env, when: not isK8s | bool }

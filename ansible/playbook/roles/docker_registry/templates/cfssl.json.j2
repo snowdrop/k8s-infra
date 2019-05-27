@@ -1,11 +1,11 @@
 {
   "hosts": [
-    "${SERVICE_NAME}.${NAMESPACE}.svc",
-    "${SERVICE_NAME}.${NAMESPACE}.svc.cluster.local",
-    "${CLUSTER_IP}",
-    "IP Address: ${CLUSTER_IP}"
+    "{{ registry.service_name}}.{{ registry.namespace }}.svc",
+    "{{ registry.service_name}}.{{ registry.namespace }}.svc.cluster.local",
+    "{{ cluster_ip_address }}",
+    "IP Address: {{ cluster_ip_address }}"
   ],
-  "CN": "${CLUSTER_IP}",
+  "CN": "{{ cluster_ip_address }}",
   "key": {
     "algo": "ecdsa",
     "size": 256
