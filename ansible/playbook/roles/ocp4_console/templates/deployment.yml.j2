@@ -40,7 +40,7 @@ metadata:
   namespace: default
 spec:
   rules:
-  - host: {{ external_ip_address }}.nip.io
+  - host: {{ ingress_host }}
     http:
       paths:
       - backend:
