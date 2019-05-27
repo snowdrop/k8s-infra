@@ -1,1 +1,2 @@
 k8s_version: 1.14.1
+ingress_host: "{{ public_ip_address }}.nip.io"
