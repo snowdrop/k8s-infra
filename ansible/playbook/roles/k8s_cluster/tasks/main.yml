@@ -175,7 +175,9 @@
 - name: Apply Openshift Ansible Broker files
   command: "kubectl apply -f /tmp/oab.yml"
 
-- include_tasks: save_config.yml
+- name: save_config.yml
+  include_role:
+    name: k8s_config
 
 - name: Print kubernetes dashboard URK
   debug:
