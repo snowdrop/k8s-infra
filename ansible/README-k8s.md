@@ -38,6 +38,12 @@ roles
   ```bash
   ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags docker_registry
   ```  
+  
+### K8s Service Catalog and OABroker
+
+  ```bash
+  ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags k8s_service_broker
+  ```    
 
 ### Tekton Pipelines
 
