@@ -9,7 +9,7 @@ metadata:
   namespace: kube-system
 spec:
   rules:
-  - host: {{ ingress_host }}
+  - host: k8s-console.{{ ingress_host }}
     http:
       paths:
       - backend:

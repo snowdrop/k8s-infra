@@ -40,7 +40,7 @@ metadata:
   namespace: default
 spec:
   rules:
-  - host: {{ ingress_host }}
+  - host: ocp4-console.{{ ingress_host }}
     http:
       paths:
       - backend:

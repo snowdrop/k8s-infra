@@ -5,3 +5,9 @@
 
 - name: Deploy ocp4 console
   command: kubectl apply -f /tmp/deployment.yml
+
+- name: Print ocp4 dashboard URL
+  debug:
+    msg:
+      - "You can view the ocp4 console at this address"
+      - "http://ocp4-console.{{ ingress_host }}/"

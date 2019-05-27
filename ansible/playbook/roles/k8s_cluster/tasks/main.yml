@@ -181,4 +181,4 @@
   debug:
     msg:
       - "You can also view the kubernetes dashboard at"
-      - "http://{{ ingress_host }}/#!/overview?namespace=default"
+      - "http://k8s-console.{{ ingress_host }}/"
