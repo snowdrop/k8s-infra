@@ -1,0 +1,42 @@
+- name: Delete any previous CSR send to k8s
+  command: kubectl delete csr ${SERVICE_NAME}.${NAMESPACE}
+
+- name: Copy cfssljson file with the Hosts names and IP addresses to be certified
+  template:
+    src: "cfssl.json.j2"
+    dest: /tmp/cfssl.json
+
+- name: Generate the pem and csr files
+  shell: |
+    cat /tmp/cfssl.json | cfssl genkey - | cfssljson -bare server
+
+- name: Copy CertificateSigningRequest file
+  template:
+    src: "csr.yml.j2"
+    dest: /tmp/csr.yml
+
+- name: Create a CertificateSigningRequest on the k8s cluster
+  shell: |
+    kubectl apply -f /tmp/csr.yml
+
+- name: Approve the CSR request
+  command:  kubectl certificate approve ${SERVICE_NAME}.${NAMESPACE}
+
+- name: Get the server certificate
+  shell: |
+    kubectl get csr ${SERVICE_NAME}.${NAMESPACE} -o jsonpath='{.status.certificate}' | base64 --decode > server.crt
+
+- name: Append the CA Certificate to the Server crt"
+  shell: |
+    cat /etc/kubernetes/pki/ca.crt >> server.crt
+
+- name: Add the ${CLUSTER_IP} certificate to the certificates supported by the docker daemon
+  shell: |
+    sudo mkdir -p /etc/docker/certs.d/${CLUSTER_IP}:5000/
+    sudo cp server.crt /etc/docker/certs.d/${CLUSTER_IP}:5000/
+
+- name: Copy the self signed Certificate and Private keys under the folder that we will mount within the docker registry
+  shell: |
+    sudo mkdir -p /root/docker-certs
+    sudo cp server.crt /root/docker-certs
+    sudo cp server-key.pem /root/docker-certs
