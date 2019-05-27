@@ -1,2 +1,3 @@
-home_dir: /home/centos
+remove: false
 external_ip_address: 192.168.99.50
+ingress_host: "{{external_ip_address}}.nip.io"

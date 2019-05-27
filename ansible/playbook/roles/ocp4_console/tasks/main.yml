@@ -1,7 +1,5 @@
-- name: Generate Deployment file
-  template:
-    src: deployment.yml.j2
-    dest: /tmp/deployment.yml
+- include_tasks: install.yml
+  when: not remove | bool
 
-- name: Deploy ocp4 console
-  command: kubectl apply -f /tmp/deployment.yml
+- include_tasks: remove.yml
+  when: remove | bool

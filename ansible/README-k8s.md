@@ -51,6 +51,8 @@ roles
   You can next access it at the address `http://external_ip_address.nip.io`.
   The External IP address exposing the console can be changed using the following parameter `-e external_ip_address=192.168.99.50`
   
+  To uninstall the `ocp4 console`, execute this command where you pass the parameter `-e remove=true`
+  
   
 ### K8s Service Catalog and OABroker
 

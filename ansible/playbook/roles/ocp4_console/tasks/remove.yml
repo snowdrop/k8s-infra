@@ -1,0 +1,6 @@
+- name: Remove ocp4 console
+  shell: |
+    kubectl delete clusterrolebinding/ocp4-console-rbac
+    kubectl delete service/ocp4-console -n default
+    kubectl delete ingress/ocp4-console -n default
+    kubectl delete Deployment/ocp4-console -n default
