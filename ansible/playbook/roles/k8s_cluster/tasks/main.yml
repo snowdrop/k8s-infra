@@ -157,24 +157,6 @@
     volume_name: "pv{{ item }}"
   with_sequence: start=1 count=5 format=%03d
 
-- name: Install Service Broker
-  shell: |
-    helm repo add svc-cat https://svc-catalog-charts.storage.googleapis.com
-    helm install svc-cat/catalog --name catalog --namespace catalog
-
-- name: Wait for service catalog to be ready
-  shell: |
-    until kubectl get pods -n catalog -l app=catalog-catalog-apiserver | grep 2/2; do sleep 1; done
-    until kubectl get pods -n catalog -l app=catalog-catalog-controller-manager | grep 1/1; do sleep 1; done
-
-- name: Copy Openshift Ansible Broker files
-  template:
-    src: "oab.yml.j2"
-    dest: /tmp/oab.yml
-
-- name: Apply Openshift Ansible Broker files
-  command: "kubectl apply -f /tmp/oab.yml"
-
 - name: save_config.yml
   include_role:
     name: k8s_config
