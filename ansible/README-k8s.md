@@ -63,7 +63,7 @@ roles
 ### Tekton Pipelines
 
   ```bash
-  ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags tekton_pipelines
+  ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags tekton_pipelines -e isOpenshift=false
   ```
   
   To uninstall the `tekton pipelines`, execute this command where you pass the parameter `remove=true`
@@ -73,7 +73,7 @@ roles
   
   You can specify the version to be installed. If not defined, the latest release will be installed
   ```bash
-  ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags tekton_pipelines -e tekton_release_version=v0.3.1  -e isOpenshift=false
+  ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags tekton_pipelines -e tekton_release_version=v0.3.1 -e isOpenshift=false
   ```
   
 ### Component Operator
