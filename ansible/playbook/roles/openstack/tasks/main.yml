@@ -11,6 +11,8 @@
       project_name: "{{ openstack.os_project_name }}"
       username: "{{ openstack.os_username }}"
       password: "{{ openstack.os_password }}"
+      user_domain_name: "{{ openstack.os_domain }}"
+      project_domain_name: "{{ openstack.os_domain }}"
       auth_url: "{{ openstack.os_auth_url }}"
     name: "{{ openstack.vm.name }}"
     image: "{{ openstack.vm.image }}"
@@ -29,6 +31,8 @@
       project_name: "{{ openstack.os_project_name }}"
       username: "{{ openstack.os_username }}"
       password: "{{ openstack.os_password }}"
+      user_domain_name: "{{ openstack.os_domain }}"
+      project_domain_name: "{{ openstack.os_domain }}"
       auth_url: "{{ openstack.os_auth_url }}"
     name: "{{ openstack.sshkey_name }}"
   when: state == "absent"
@@ -41,7 +45,7 @@
 
   - name: Show IP addresses
     debug:
-      msg: "VM Public IP : {{ openstack_output.server.accessIPv4 }} / VM Private IP: {{ openstack_output.server.private_v4 }}"
+      msg: "VM IP : {{ openstack_output.server.accessIPv4 }}"
 
   - set_fact:
       private_key_in_inventory: "{{ lookup('env', 'PWD') }}/inventory/id_openstack.rsa"
@@ -57,7 +61,6 @@
       name: generate_inventory
     vars:
       ip_address: "{{ openstack_output.server.accessIPv4  }}"
-      private_ip_address: "{{ openstack_output.server.private_v4  }}"
       username: "{{ login_username }}"
       keyfile: "{{ private_key_in_inventory }}"
       hostname: "{{ openstack.vm.name }}"

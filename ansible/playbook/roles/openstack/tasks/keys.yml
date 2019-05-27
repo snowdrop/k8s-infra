@@ -31,6 +31,8 @@
       username: "{{ openstack.os_username }}"
       password: "{{ openstack.os_password }}"
       auth_url: "{{ openstack.os_auth_url }}"
+      user_domain_name: "{{ openstack.os_domain }}"
+      project_domain_name: "{{ openstack.os_domain }}"
     name: "{{ openstack.sshkey_name }}"
     public_key_file: "{{ key_path }}.pub"
   ignore_errors: true
