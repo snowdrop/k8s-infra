@@ -1,0 +1,13 @@
+{
+  "hosts": [
+    "${SERVICE_NAME}.${NAMESPACE}.svc",
+    "${SERVICE_NAME}.${NAMESPACE}.svc.cluster.local",
+    "${CLUSTER_IP}",
+    "IP Address: ${CLUSTER_IP}"
+  ],
+  "CN": "${CLUSTER_IP}",
+  "key": {
+    "algo": "ecdsa",
+    "size": 256
+  }
+}
