@@ -37,7 +37,6 @@
     name: docker
     enabled: yes
 
-
 - name: Add kubernetes repository
   yum_repository:
     name: kubernetes
@@ -88,11 +87,10 @@
   command: "sysctl --system"
 
 - name: Pull k8s linux images for version {{ k8s_version }}
-  command: kubeadm config images pull
+  command: kubeadm config images pull --kubernetes-version {{ k8s_version }}
 
-# TODO take into account external IP
 - name: Initialize cluster
-  command: "kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address={{ public_ip_address }}"
+  command: "kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address={{ public_ip_address }}  --kubernetes-version {{ k8s_version }}"
 
 - name: Install Flannel Virtual Network for pod communicatio
   shell: |
@@ -110,17 +108,20 @@
 - name: Apply Dashboard RBAC files
   command: "kubectl apply -f /tmp/dashboard-rbac.yml"
 
+- name: Copy Ingress Dashboard file
+  template:
+    src: "ingress-dashboard.yml.j2"
+    dest: /tmp/ingress-dashboard.yml
+
+- name: Apply Ingress route
+  command: "kubectl apply -f /tmp/ingress-dashboard.yml"
+
 - name: Install Dashboard
   command: "kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/master/aio/deploy/recommended/kubernetes-dashboard.yaml"
 
 - name: Disable dashboard login
   shell: |
     kubectl -n kube-system patch deploy kubernetes-dashboard --type='json' -p='[{"op": "add", "path": "/spec/template/spec/containers/0/args/-", "value": "--enable-skip-login"}]'
-
-- name: Start kube proxy # since kube proxy needs to be actively running, we use the async hack
-  shell: kubectl proxy --address={{ public_ip_address }} --accept-hosts '.*'
-  async: 315576000 #this will run for 10 years
-  poll: 0
 
 - name: Install Helm
   shell: |
@@ -139,17 +140,32 @@
 - name: Initialize Heml
   command: "helm init --wait --service-account tiller"
 
-- name: Copy Kubernetes directory
-  copy:
-    src: "{{ role_path }}/../../../../kubernetes"
-    dest: /tmp
+- name: Copy Ingress Configmap
+  template:
+    src: "ingress-configmap.yml.j2"
+    dest: /tmp/ingress-configmap.yml
+
+- name: Copy Ingress Deployment
+  template:
+    src: "ingress-dp.yml.j2"
+    dest: /tmp/ingress-dp.yml
+
+- name: Copy Ingress Service
+  template:
+    src: "ingress-svc.yml.j2"
+    dest: /tmp/ingress-svc.yml
+
+- name: Copy Ingress RBAC
+  template:
+    src: "ingress-rbac.yml.j2"
+    dest: /tmp/ingress-rbac.yml
 
 - name: Install Ingress
   shell: |
-    kubectl create -f /tmp/kubernetes/ingress/ingress-configmap.yaml
-    kubectl create -f /tmp/kubernetes/ingress/ingress-rbac.yaml
-    kubectl create -f /tmp/kubernetes/ingress/ingress-svc.yaml
-    kubectl create -f /tmp/kubernetes/ingress/ingress-dp.yaml
+    kubectl apply -f /tmp/ingress-configmap.yml
+    kubectl apply -f /tmp/ingress-rbac.yml
+    kubectl apply -f /tmp/ingress-svc.yml
+    kubectl apply -f /tmp/ingress-dp.yml
 
 - name: Create persistence volume
   include_tasks: create_single_pv.yml
@@ -165,4 +181,4 @@
   debug:
     msg:
       - "You can also view the kubernetes dashboard at"
-      - "http://{{ public_ip_address }}:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/"
+      - "http://{{ ingress_host }}/#!/overview?namespace=default"
