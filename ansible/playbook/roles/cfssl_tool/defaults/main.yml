@@ -1,0 +1,18 @@
+---
+# Specifies the version of CFSSL toolkit we want to download and use
+cfssl_version: "R1.2"
+# Checksum of "cfssl" binary
+cfssl_checksum: "sha256:eb34ab2179e0b67c29fd55f52422a94fe751527b06a403a79325fed7cf0145bd"
+# Checksum of "cfssljson" binary
+cfssljson_checksum: "sha256:1c9e628c3b86c3f2f8af56415d474c9ed4c8f9246630bd21c3418dbe5bf6401e"
+# The directory where CFSSL binaries will be installed
+cfssl_bin_directory: "/usr/local/bin"
+# Owner of "cfssl/cfssljson" binary
+cfssl_owner: "root"
+# Group of "cfssl/cfssljson" binary
+cfssl_group: "root"
+# Operarting system on which "cfssl/cfssljson" should run on
+cfssl_os: "linux" # use "darwin" for MacOS X, "windows" for Windows
+# Processor architecture "cfssl/cfssljson" should run on
+cfssl_arch: "amd64" # other possible values: "386","arm64"
+
