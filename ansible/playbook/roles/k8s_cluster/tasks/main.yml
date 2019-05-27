@@ -179,8 +179,8 @@
   include_role:
     name: k8s_config
 
-- name: Print kubernetes dashboard URK
+- name: Print kubernetes dashboard URL
   debug:
     msg:
-      - "You can also view the kubernetes dashaboard at"
+      - "You can also view the kubernetes dashboard at"
       - "http://{{ public_ip_address }}:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/"
