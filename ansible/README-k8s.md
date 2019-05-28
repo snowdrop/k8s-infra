@@ -27,7 +27,7 @@ roles
 ### Create K8s Config Yml
 
   ```bash
-  ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags k8s_config
+  ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags k8s_config --become
   ```
   
   This role will generate the file `remote-k8s-config.yml` within the inventory folder. You can then use it if you export the `KUBECONFIG` env var
