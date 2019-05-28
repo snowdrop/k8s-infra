@@ -39,6 +39,7 @@
     src: "k8s-config.yml.j2"
     dest: "{{ inventory_location }}/remote-k8s-config.yml"
   delegate_to: localhost
+  become: no
 
 - name: Print kubernetes config file location
   debug:
