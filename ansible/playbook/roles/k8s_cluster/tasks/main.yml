@@ -2,7 +2,8 @@
   yum:
     name: docker,docker-client,docker-client-latest,docker-common,docker-latest,docker-latest-logrotate,docker-logrotate,docker-engine
     state: absent
-    lock_timeout: 1000
+    # THIS OPTION OLY WORKS WITH ANSIBLE 2.8
+    # lock_timeout: 1000
 
 - name: Install dependencies needed by docker
   yum:
@@ -63,8 +64,6 @@
       - kubeadm-{{k8s_version}}
       - kubectl-{{k8s_version}}
       - kubelet-{{k8s_version}}
-
-# TODO add to /etc/hosts if needed
 
 - name: Disable selinux
   shell: |
