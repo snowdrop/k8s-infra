@@ -2,11 +2,9 @@
 .DS_Store
 **/openshift-ansible/
 **/.vagrant/
-**/inventory/cloud_host
 **/user-data
 **/*.retry
-/ansible/inventory/simple_host
-/ansible/inventory/cloud_host
+/ansible/inventory/*
 
 # Testing purposes
 sandbox/cluster_up/test.sh
