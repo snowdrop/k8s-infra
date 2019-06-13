@@ -1,0 +1,16 @@
+- name: Remove Service Broker
+  shell: |
+    helm del --purge catalog
+  ignore_errors: true
+
+- name: Copy Openshift Ansible Broker files
+  template:
+    src: "oab.yml.j2"
+    dest: /tmp/oab.yml
+
+- name: Delete Resources created under namespace automation-broker
+  command: "kubectl delete all --all -n automation-broker"
+
+- name: Delete Openshift Ansible Broker resources using oab yml files
+  command: "kubectl delete -f /tmp/oab.yml"
+  ignore_errors: true

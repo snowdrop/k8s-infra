@@ -61,6 +61,11 @@ roles
   ```bash
   ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags k8s_service_broker
   ```    
+  
+  To uninstall the `Service Catalog and OABroker`, execute this command where you pass the parameter `remove=true`
+  ```bash
+  ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags k8s_service_broker -e remove=true
+  ```
 
 ### Tekton Pipelines
 
