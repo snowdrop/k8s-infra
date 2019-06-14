@@ -10,13 +10,13 @@ oc delete tasks --all
 oc delete serviceaccount --all
 oc delete deploymemt --all
 
+oc new-project demo
 oc adm policy add-scc-to-group anyuid system:authenticated
 oc apply -f resources/sa.yml
 # oc adm policy add-scc-to-user anyuid system:serviceaccount:build-bot:tekton-pipelines-controller
 oc adm policy add-scc-to-user privileged -z build-bot
 oc adm policy add-role-to-user edit -z build-bot
 
-oc new-project demo
 oc apply -f tasks/buildah-push.yml
 oc apply -f runtasks/buildah-push-local-registry.yml
 
