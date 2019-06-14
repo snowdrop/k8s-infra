@@ -83,6 +83,11 @@ roles
   ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags tekton_pipelines -e tekton_release_version=v0.3.1 -e isOpenshift=false
   ```
   
+  To install it using the oc client installed within the VM, then execute this command
+  ```bash
+  ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags tekton_pipelines -e isOpenshift=true -e client_tool=oc
+  ```
+  
 ### Component Operator
 
   ```bash

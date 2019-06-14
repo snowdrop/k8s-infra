@@ -1,3 +1,9 @@
-- name: Install Tekton Pipelines
+- name: Install Tekton Pipelines on OpenShift
+  shell: |
+    {{ client_tool }} {{ openshift_env.oc_admin_kubeconfig_arg }} apply -f https://storage.googleapis.com/tekton-releases/{{ prefix }}/release.yaml
+  when: isOpenshift
+
+- name: Install Tekton Pipelines on K8s
   shell: |
     {{ client_tool }} apply -f https://storage.googleapis.com/tekton-releases/{{ prefix }}/release.yaml
+  when: not isOpenshift
