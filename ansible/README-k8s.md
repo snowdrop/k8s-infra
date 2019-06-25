@@ -35,6 +35,11 @@ roles
   e.g. export KUBECONFIG=inventory/remote-k8s-config.yml
   
   If you need to use the sudo root user on the target vm, then pass the parameter `--become`
+  
+  To export the configuration using a different file name within the inventory folder, pass the parameter `-e k8s_config_filename`
+  ```bash
+  ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags k8s_config -e k8s_config_filename=node_k8s_config.yml
+  ```  
 
 ### Docker Registry
 

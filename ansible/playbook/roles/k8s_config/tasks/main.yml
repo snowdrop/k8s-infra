@@ -37,7 +37,7 @@
 - name: Save config
   template:
     src: "k8s-config.yml.j2"
-    dest: "{{ inventory_location }}/remote-k8s-config.yml"
+    dest: "{{ inventory_location }}/{{ k8s_config_filename }}"
   delegate_to: localhost
   become: no
 
@@ -45,4 +45,4 @@
   debug:
     msg:
       - "You can use the following Kubernetes config file to interact with remote cluster via kubectl"
-      - "{{ inventory_location }}/remote-k8s-config.yml"
+      - "{{ inventory_location }}/{{ k8s_config_filename }}"
