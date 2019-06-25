@@ -59,7 +59,17 @@ roles
   The External IP address exposing the console can be changed using the following parameter `-e external_ip_address=192.168.99.50`
   
   To uninstall the `ocp4 console`, execute this command where you pass the parameter `-e remove=true`
+
+### KubeDB Operator
+
+  ```bash
+  ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags kubedb
+  ```    
   
+  To uninstall the `KubeDB operator and catalog of the availbale databases`, execute this command where you pass the parameter `remove=true`
+  ```bash
+  ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags kubedb -e remove=true
+  ```  
   
 ### K8s Service Catalog and OABroker
 
