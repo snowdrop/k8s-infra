@@ -1,0 +1,3 @@
+kubedb_version: 0.12.0
+kubedb_namespace: kubedb
+remove: false

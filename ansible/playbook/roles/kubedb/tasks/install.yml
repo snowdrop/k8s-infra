@@ -1,0 +1,15 @@
+# - name: Install KubeDB Helm chart
+#   shell: |
+#     helm init --client-only
+
+- name: Install KubeDB Helm chart
+  shell: |
+    helm repo add appscode https://charts.appscode.com/stable/
+    helm repo update
+    helm install appscode/kubedb --name kubedb-operator --version {{ kubedb_version }} \
+      --namespace {{ kubedb_namespace }}
+
+- name: Install KubeDB catalog
+  shell: |
+    helm install appscode/kubedb-catalog --name kubedb-catalog --version {{ kubedb_version }} \
+      --namespace {{ kubedb_namespace }}

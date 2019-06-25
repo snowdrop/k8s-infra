@@ -1,0 +1,5 @@
+- name: Remove DB catalog
+  shell: |
+    helm del --purge kubedb-catalog
+    helm del --purge kubedb-operator
+    {{ client_tool }} delete ns {{ kubedb_namespace }}
