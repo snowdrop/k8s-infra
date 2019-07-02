@@ -14,4 +14,4 @@ openstack:
     network: default_network
     security_group: default_security_group
     volumes: []
-    boot_volume: ""
+    boot_from_volume: false
