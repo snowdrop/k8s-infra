@@ -13,3 +13,4 @@ openstack:
     flavor: m1.xlarge
     network: default_network
     security_group: default_security_group
+    volumes: []

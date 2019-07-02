@@ -22,6 +22,7 @@
     auto_floating_ip: yes
     network: "{{ openstack.vm.network }}"
     security_groups: "{{ openstack.vm.security_group }}"
+    volumes: "{{ openstack.vm.volumes }}"
   register: openstack_output
 
 - name: Delete key {{ openstack.sshkey_name }} from server
