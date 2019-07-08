@@ -7,7 +7,7 @@
     helm repo add appscode https://charts.appscode.com/stable/
     helm repo update
     helm install appscode/kubedb --name kubedb-operator --version {{ kubedb_version }} \
-      --namespace {{ kubedb_namespace }}
+      --namespace {{ kubedb_namespace }} --set apiserver.enableValidatingWebhook=false,apiserver.enableMutatingWebhook=false
 
 - name: Install KubeDB catalog
   shell: |
