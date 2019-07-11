@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   centos:
     docker:
-      - image: quay.io/snowdrop/centos-circleci
+      - image: quay.io/snowdrop/centos-circleci:latest
 
     environment:
       ANSIBLE_BIN_DIR=/home/circleci/.local/bin
@@ -20,7 +20,7 @@ jobs:
                 -c local \
                 --tags k8s_cluster \
                 --become  \
-                -e install_docker=false -vv
+                -e install_docker=false
 
   ubuntu:
     docker:
