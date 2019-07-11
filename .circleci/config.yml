@@ -20,5 +20,5 @@ jobs:
       - run:
           name: Create Ansible Playbook
           command: |
-            $ANSIBLE_BIN_DIR/ansible-playbook sandbox/helloworld.yml
+            $ANSIBLE_BIN_DIR/ansible-playbook sandbox/helloworld.yml -i sandbox/circle_hosts
 
