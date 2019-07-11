@@ -11,12 +11,13 @@ jobs:
       - run:
           name: Install Ansible using pip3
           command: |
-            set -x
             sudo apt install -yqq python3-pip
             pip3 install ansible
 
       - run:
           name: Create Ansible Playbook
           command: |
+            ls -la /usr/local/bin
+            ls -la /usr/local/lib/
             ansible-playbook sandbox/helloworld.yml
 
