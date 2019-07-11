@@ -15,7 +15,7 @@ jobs:
           name: Install Ansible using pip3
           command: |
             sudo apt install -yqq python3-pip tree
-            pip3 install ansible -vv
+            pip3 install ansible
 
       - run:
           name: Install k8s
