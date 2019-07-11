@@ -9,15 +9,15 @@ jobs:
       - checkout
 
       - run:
-        name: Install Ansible using pip3
-        command: |
-          sudo apt install -yqq python3-pip
-          curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-          python get-pip.py --user
-          pip3 install --user ansible
+          name: Install Ansible using pip3
+          command: |
+            sudo apt install -yqq python3-pip
+            curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+            python get-pip.py --user
+            pip3 install --user ansible
 
       - run:
-        name: Create Ansible Playbook
-        command: |
-          ansible-playbook sandbox/helloworld.yml
+          name: Create Ansible Playbook
+          command: |
+            ansible-playbook sandbox/helloworld.yml
 
