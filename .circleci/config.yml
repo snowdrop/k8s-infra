@@ -17,6 +17,6 @@ jobs:
       - run:
           name: Create Ansible Playbook
           command: |
-            ls -la /usr/local/lib/python3.5
+            tree /usr/local/lib/python3.5
             ansible-playbook sandbox/helloworld.yml
 
