@@ -1,5 +1,5 @@
 - include_tasks: docker.yml
-  when: not install_docker | bool
+  when: install_docker | bool
 
 - name: Add kubernetes repository
   yum_repository:
