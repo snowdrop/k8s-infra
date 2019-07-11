@@ -1,7 +1,7 @@
 version: 2.1
 
 jobs:
-  build:
+  ubuntu:
     docker:
       - image: circleci/golang:latest
 
@@ -22,4 +22,10 @@ jobs:
           command: |
             PB_DIR=sandbox/k8s
             $ANSIBLE_BIN_DIR/ansible-playbook $PB_DIR/main.yml -i $PB_DIR/circle_hosts --limit circleci -c local --tags k8s_cluster --become
+
+workflows:
+  version: 2
+  k8s-ubuntu:
+    jobs:
+      - ubuntu:
 
