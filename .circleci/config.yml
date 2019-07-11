@@ -11,6 +11,10 @@ jobs:
       - run:
           name: Install Ansible
           command: |
-            sudo apt-get -yqq install software-properties-common
-            sudo apt-add-repository -y --update ppa:ansible/ansible
-            sudo apt-get -yqq install ansible
+            #sudo apt update
+            #sudo apt -yqq install software-properties-common
+            #sudo apt-add-repository -y --update ppa:ansible/ansible
+            #sudo apt -yqq install ansible
+            curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+            python get-pip.py --user
+            pip install --user ansible
