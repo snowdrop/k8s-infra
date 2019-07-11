@@ -13,4 +13,4 @@ jobs:
           command: |
             sudo apt install software-properties-common
             sudo apt-add-repository ppa:ansible/ansible
-            sudo apt -y install ansible
+            sudo apt --y install ansible
