@@ -1,5 +1,6 @@
 ---
-- gather_facts: True
+- hosts: masters
+  gather_facts: True
 
   environment:
     KUBECONFIG: /etc/kubernetes/admin.conf
