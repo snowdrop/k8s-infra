@@ -1,0 +1,19 @@
+---
+- gather_facts: True
+
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+
+  # Define default values for variables that are common between roles
+  vars:
+    client_tool: kubectl
+
+  roles:
+    - { role: 'k8s_cluster',   tags: 'k8s_cluster'}
+    - { role: 'k8s_config',   tags: 'k8s_config'}
+    - { role: 'kubedb',   tags: 'kubedb'}
+    - { role: 'k8s_service_broker',   tags: 'k8s_service_broker'}
+    - { role: 'docker_registry',   tags: 'docker_registry'}
+    - { role: 'tekton_pipelines',   tags: 'tekton_pipelines'}
+    - { role: 'component_crd_operator',  tags: 'component_crd_operator'}
+    - { role: 'ocp4_console',   tags: 'ocp4_console'}

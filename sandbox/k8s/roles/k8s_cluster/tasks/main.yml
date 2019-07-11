@@ -1,0 +1,183 @@
+- name: Ensure no old docker version is installed
+  yum:
+    name: docker,docker-client,docker-client-latest,docker-common,docker-latest,docker-latest-logrotate,docker-logrotate,docker-engine
+    state: absent
+    # THIS OPTION OLY WORKS WITH ANSIBLE 2.8
+    # lock_timeout: 1000
+
+- name: Install dependencies needed by docker
+  yum:
+    name: yum-utils,device-mapper-persistent-data,lvm2
+    state: present
+
+- name: Add docker repository
+  yum_repository:
+    name: docker
+    description: Docker
+    baseurl: https://download.docker.com/linux/centos/7/$basearch/stable
+    enabled: 1
+    gpgcheck: 1
+    gpgkey: https://download.docker.com/linux/centos/gpg
+
+- name: Install docker
+  yum:
+    name: docker-ce-18.06.2.ce
+    state: present
+
+- name: Ensures /etc/docker dir exists
+  file: path=/etc/docker state=directory
+
+- name: Copy docker daemon.json file
+  template:
+    src: "daemon.json.j2"
+    dest: /etc/docker/daemon.json
+
+- name: Start docker
+  systemd:
+    state: restarted
+    name: docker
+    enabled: yes
+
+- name: Add kubernetes repository
+  yum_repository:
+    name: kubernetes
+    description: Kubernetes
+    baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+    gpgcheck: true
+    repo_gpgcheck: true
+    gpgkey: https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+    exclude: kube*
+
+- name: Install kubeadm
+  yum:
+    name: kubeadm-{{k8s_version}}
+    state: present
+    disable_excludes: kubernetes
+
+- name: Install Kubernetes packages
+  yum:
+    name: "{{ packages }}"
+    state: present
+    disable_excludes: kubernetes
+  vars:
+    packages:
+      - kubeadm-{{k8s_version}}
+      - kubectl-{{k8s_version}}
+      - kubelet-{{k8s_version}}
+
+- name: Disable selinux
+  shell: |
+    setenforce 0
+    sed -i 's/^SELINUX=.*/SELINUX=disabled/g' /etc/selinux/config
+    getenforce
+
+- name: Start kubelet
+  systemd:
+    state: started
+    name: kubelet
+    enabled: yes
+
+- name: Create k8s conf file
+  template:
+    src: "k8s.conf.j2"
+    dest: /etc/sysctl.d/k8s.conf
+
+- name: Make k8s conf file take effect
+  command: "sysctl --system"
+
+- name: Pull k8s linux images for version {{ k8s_version }}
+  command: kubeadm config images pull --kubernetes-version {{ k8s_version }}
+
+- name: Initialize cluster
+  command: "kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address={{ public_ip_address }}  --kubernetes-version {{ k8s_version }}"
+
+- name: Install Flannel Virtual Network for pod communicatio
+  shell: |
+    kubectl -n kube-system get deployment coredns -o yaml | sed 's/allowPrivilegeEscalation: false/allowPrivilegeEscalation: true/g' | kubectl apply -f -
+    kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/a70459be0084506e4ec919aa1c114638878db11b/Documentation/kube-flannel.yml
+
+- name: Taint the node
+  command: "kubectl taint nodes --all node-role.kubernetes.io/master-"
+
+- name: Copy Dashboard RBAC files
+  template:
+    src: "dashboard-rbac.yml.j2"
+    dest: /tmp/dashboard-rbac.yml
+
+- name: Apply Dashboard RBAC files
+  command: "kubectl apply -f /tmp/dashboard-rbac.yml"
+
+- name: Copy Ingress Dashboard file
+  template:
+    src: "ingress-dashboard.yml.j2"
+    dest: /tmp/ingress-dashboard.yml
+
+- name: Apply Ingress route
+  command: "kubectl apply -f /tmp/ingress-dashboard.yml"
+
+- name: Install Dashboard
+  command: "kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/master/aio/deploy/recommended/kubernetes-dashboard.yaml"
+
+- name: Disable dashboard login
+  shell: |
+    kubectl -n kube-system patch deploy kubernetes-dashboard --type='json' -p='[{"op": "add", "path": "/spec/template/spec/containers/0/args/-", "value": "--enable-skip-login"}]'
+
+- name: Install Helm
+  shell: |
+    curl -LO https://git.io/get_helm.sh
+    chmod 700 get_helm.sh
+    ./get_helm.sh
+
+- name: Copy Tiller RBAC files
+  template:
+    src: "tiller-rbac.yml.j2"
+    dest: /tmp/tiller-rbac.yml
+
+- name: Apply Tiller RBAC files
+  command: "kubectl apply -f /tmp/tiller-rbac.yml"
+
+- name: Initialize Heml
+  command: "helm init --wait --service-account tiller"
+
+- name: Copy Ingress Configmap
+  template:
+    src: "ingress-configmap.yml.j2"
+    dest: /tmp/ingress-configmap.yml
+
+- name: Copy Ingress Deployment
+  template:
+    src: "ingress-dp.yml.j2"
+    dest: /tmp/ingress-dp.yml
+
+- name: Copy Ingress Service
+  template:
+    src: "ingress-svc.yml.j2"
+    dest: /tmp/ingress-svc.yml
+
+- name: Copy Ingress RBAC
+  template:
+    src: "ingress-rbac.yml.j2"
+    dest: /tmp/ingress-rbac.yml
+
+- name: Install Ingress
+  shell: |
+    kubectl apply -f /tmp/ingress-configmap.yml
+    kubectl apply -f /tmp/ingress-rbac.yml
+    kubectl apply -f /tmp/ingress-svc.yml
+    kubectl apply -f /tmp/ingress-dp.yml
+
+- name: Create persistence volume
+  include_tasks: create_single_pv.yml
+  vars:
+    volume_name: "pv{{ item }}"
+  with_sequence: start=1 count=5 format=%03d
+
+- name: save_config.yml
+  include_role:
+    name: k8s_config
+
+- name: Print kubernetes dashboard URL
+  debug:
+    msg:
+      - "You can also view the kubernetes dashboard at"
+      - "http://k8s-console.{{ ingress_host }}/"

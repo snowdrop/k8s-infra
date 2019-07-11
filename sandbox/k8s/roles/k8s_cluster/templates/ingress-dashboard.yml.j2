@@ -1,0 +1,18 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+  labels:
+    app: kubernetes-dashboard
+  name: k8s-dashboard
+  namespace: kube-system
+spec:
+  rules:
+  - host: k8s-console.{{ ingress_host }}
+    http:
+      paths:
+      - backend:
+          serviceName: kubernetes-dashboard
+          servicePort: 443
+        path: /

@@ -18,7 +18,8 @@ jobs:
             pip3 install ansible -vv
 
       - run:
-          name: Create Ansible Playbook
+          name: Install k8s
           command: |
-            $ANSIBLE_BIN_DIR/ansible-playbook sandbox/helloworld.yml -i sandbox/circle_hosts
+            PB_DIR=sandbox/k8s
+            $ANSIBLE_BIN_DIR/ansible-playbook $PB_DIR/main.yml --tags k8s_cluster
 
