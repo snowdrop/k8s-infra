@@ -18,6 +18,6 @@ jobs:
           name: Create Ansible Playbook
           command: |
             tree /usr/local/lib/python3.5/dist-packages
-            tree /home/circleci/.cache/pip
+            tree  ~/.local/bin
             ansible-playbook sandbox/helloworld.yml
 
