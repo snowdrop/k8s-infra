@@ -9,9 +9,5 @@ jobs:
       - checkout
 
       - run:
-          name: Greeting
-          command: echo Hello, world.
-
-      - run:
-          name: Print the Current Time
-          command: date
+          name: Install Ansible
+          command: sudo apt install ansible
