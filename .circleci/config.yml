@@ -16,9 +16,9 @@ jobs:
             #sudo apt-add-repository -y --update ppa:ansible/ansible
             #sudo apt -yqq install ansible
 
-            sudo apt -yqq install software-properties-common
-            sudo add-apt-repository -y ppa:deadsnakes/ppa
-            sudo apt install python3.7
+            #sudo apt -yqq install software-properties-common
+            #sudo add-apt-repository -y ppa:deadsnakes/ppa
+            sudo apt install -yqq python3-pip
             curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
             python get-pip.py --user
             pip install --user ansible
