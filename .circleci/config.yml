@@ -49,8 +49,8 @@ workflows:
   version: 2
   k8s-centos:
     jobs:
-    - centos:
+      - centos
   # k8s-ubuntu:
   #   jobs:
-  #   - ubuntu:
+  #     - ubuntu
 
