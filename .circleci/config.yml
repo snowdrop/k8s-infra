@@ -12,7 +12,7 @@ jobs:
           name: Install Ansible using pip3
           command: |
             sudo apt install -yqq python3-pip
-            pip3 install --user ansible
+            pip3 install ansible
 
       - run:
           name: Create Ansible Playbook
