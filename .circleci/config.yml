@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   centos:
     docker:
-      - image: scholzj/circleci-centos-golang
+      - image: quay.io/snowdrop/centos-circleci
 
     environment:
       ANSIBLE_BIN_DIR=/home/circleci/.local/bin
