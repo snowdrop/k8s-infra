@@ -1,5 +1,5 @@
 ---
-- hosts: masters
+- hosts: circleci
   gather_facts: True
 
   environment:
@@ -18,3 +18,4 @@
     - { role: '../../ansible/playbook/roles/tekton_pipelines',        tags: 'tekton_pipelines'}
     - { role: '../../ansible/playbook/roles/component_crd_operator',  tags: 'component_crd_operator'}
     - { role: '../../ansible/playbook/roles/ocp4_console',            tags: 'ocp4_console'}
+ -m

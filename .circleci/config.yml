@@ -21,5 +21,5 @@ jobs:
           name: Install k8s
           command: |
             PB_DIR=sandbox/k8s
-            $ANSIBLE_BIN_DIR/ansible-playbook $PB_DIR/main.yml -i $PB_DIR/circle_hosts --tags k8s_cluster
+            $ANSIBLE_BIN_DIR/ansible-playbook $PB_DIR/main.yml -i $PB_DIR/circle_hosts --limit circleci --tags k8s_cluster
 
