@@ -12,12 +12,6 @@ jobs:
       - checkout
 
       - run:
-          name: Install Ansible
-          command: |
-            sudo yum install -y epel-release
-            sudo yum install -y ansible
-
-      - run:
           name: Install k8s
           command: |
             PB_DIR=sandbox/k8s
