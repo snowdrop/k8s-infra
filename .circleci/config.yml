@@ -11,6 +11,6 @@ jobs:
       - run:
           name: Install Ansible
           command: |
-            sudo apt install software-properties-common
-            sudo apt-add-repository ppa:ansible/ansible
-            sudo apt -yqq install ansible
+            apt -yqq install software-properties-common
+            apt-add-repository ppa:ansible/ansible
+            apt -yqq install ansible
