@@ -6,7 +6,7 @@ jobs:
       - image: circleci/golang:latest
 
     environment:
-      ANSIBLE_BIN_DIR= ~/.local/bin
+      ANSIBLE_BIN_DIR=/home/circleci/.local/bin
 
     steps:
       - checkout
