@@ -16,6 +16,7 @@ jobs:
           command: |
             env
             ls -la /go/{src,bin}
+            ls -la /usr/local/bin/dep
             go env
             GO111MODULE="on" go get sigs.k8s.io/kind@v0.4.0
       - run:
