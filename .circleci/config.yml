@@ -29,10 +29,11 @@ jobs:
             mkdir -p $HOME/.kube
             cp -i $(kind get kubeconfig-path --name=$CLUSTER_NAME) $HOME/.kube/config
             sudo chown $(id -u):$(id -g) $HOME/.kube/config
+            cat /home/circleci/.kube/kind-config-$CLUSTER_NAME
       - run:
           name: Check cluster-info
           command: |
-            kubectl cluster-info
+            kubectl cluster-info dump
 
   centos:
     docker:
