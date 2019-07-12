@@ -11,8 +11,6 @@ jobs:
       GO_VERSION: 1.12.7
       GOPATH: /go
       KIND_VERSION: v0.4.0
-      BIN_DIR: $(mktemp -d)
-      KIND: ${BIN_DIR}/kind
 
     steps:
       # - checkout
@@ -25,13 +23,16 @@ jobs:
       #       mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH"
       #       export PATH=$GOPATH/bin:/usr/local/go/bin:$PATH
       - run:
-          name: Install k8s
+          name: Install Kind
           command: |
             # GO111MODULE="on" go get sigs.k8s.io/kind@v0.4.0
+            export BIN_DIR=$(mktemp -d) >> $BASH_ENV
+            export KIND= ${BIN_DIR}/kind >> $BASH_ENV
 
             KIND_BINARY_URL="https://github.com/kubernetes-sigs/kind/releases/download/${KIND_VERSION}/kind-linux-amd64"
             wget -O "${KIND}" "${KIND_BINARY_URL}"
-            chmod +x "${KIND}"
+            chmod +x ${KIND}
+
       - run:
           name: Create Kind cluster
           command: |
