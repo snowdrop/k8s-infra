@@ -11,6 +11,9 @@ jobs:
       GO_VERSION=1.12.7
       GOPATH=/go
       PATH=$GOPATH/bin:/usr/local/go/bin:$PATH
+      KIND_VERSION=0.4.0
+      BIN_DIR="$(mktemp -d)"
+      KIND="${BIN_DIR}/kind"
 
     steps:
       - checkout
@@ -24,17 +27,20 @@ jobs:
       - run:
           name: Install k8s
           command: |
-            GO111MODULE="on" go get sigs.k8s.io/kind@v0.4.0
+            # GO111MODULE="on" go get sigs.k8s.io/kind@v0.4.0
+            KIND_BINARY_URL="https://github.com/kubernetes-sigs/kind/releases/download/${KIND_VERSION}/kind-linux-amd64"
+            wget -O "${KIND}" "${KIND_BINARY_URL}"
+            chmod +x "${KIND}"
       - run:
           name: Create Kind cluster
           command: |
-            kind create cluster --image=kindest/node:v1.14.3 --name $CLUSTER_NAME --loglevel=debug
+            ${KIND} create cluster --image=kindest/node:v1.14.3 --name $CLUSTER_NAME --loglevel=debug
       - run:
           name: Setup kubeconfig file
           command: |
-            kind get kubeconfig-path --name=$CLUSTER_NAME
+            ${KIND} get kubeconfig-path --name=$CLUSTER_NAME
             mkdir -p $HOME/.kube
-            cp -i $(kind get kubeconfig-path --name=$CLUSTER_NAME) $HOME/.kube/config
+            cp -i $(${KIND} get kubeconfig-path --name=$CLUSTER_NAME) $HOME/.kube/config
             sudo chown $(id -u):$(id -g) $HOME/.kube/config
             cat /home/circleci/.kube/kind-config-$CLUSTER_NAME
       - run:
