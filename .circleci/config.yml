@@ -18,7 +18,7 @@ jobs:
       - run:
           name: Create Kibnd cluster
           command: |
-            docker ps
+            which kind
             kind create cluster --image=kindest/node:v1.14.3 --name circleci --loglevel=debug
             export KUBECONFIG="$(kind get kubeconfig-path)"
 
