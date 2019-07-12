@@ -7,6 +7,9 @@ jobs:
       #- image: circleci/golang:1.12.7
       - image: quay.io/snowdrop/centos-circleci:latest
 
+    environment:
+      CLUSTER_NAME=circleci
+
     working_directory: /go/src/github.com/{{ORG_NAME}}/{{REPO_NAME}}
     steps:
       - checkout
@@ -16,18 +19,21 @@ jobs:
           command: |
             GO111MODULE="on" go get sigs.k8s.io/kind@v0.4.0
       - run:
-          name: Create Kibnd cluster
+          name: Create Kind cluster
           command: |
-            kind create cluster --image=kindest/node:v1.14.3 --name circleci --loglevel=debug
+            kind create cluster --image=kindest/node:v1.14.3 --name $CLUSTER_NAME --loglevel=debug
       - run:
           name: Setup kubeconfig file
           command: |
+            kind get kubeconfig-path --name=$CLUSTER_NAME
             mkdir -p $HOME/.kube
-            cp -i $(kind get kubeconfig-path) $HOME/.kube/config
-            sudo chown $(id -u):$(id -g) $HOME/.kube/config
+            # cp -i $(kind get kubeconfig-path) $HOME/.kube/config
+            # sudo chown $(id -u):$(id -g) $HOME/.kube/config
       - run:
           name: Check cluster-info
-          command: kubectl cluster-info
+          command: |
+            export KUBECONFIG="$(kind get kubeconfig-path --name=$CLUSTER_NAME)"
+            kubectl cluster-info
 
   centos:
     docker:
