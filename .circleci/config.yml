@@ -13,6 +13,7 @@ jobs:
       - run:
           name: Install k8s
           command: |
+            go env
             GO111MODULE="on" go get sigs.k8s.io/kind@v0.4.0
       - run:
           name: Create Kibnd cluster
@@ -20,6 +21,11 @@ jobs:
             docker ps
             kind create cluster --image=kindest/node:v1.14.3 --name circleci --loglevel=debug
             export KUBECONFIG="$(kind get kubeconfig-path)"
+
+            mkdir -p $HOME/.kube
+            sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+            sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
             kubectl cluster-info
 
   centos:
