@@ -11,6 +11,7 @@ jobs:
       GO_VERSION: 1.12.7
       GOPATH: /go
       KIND_VERSION: v0.4.0
+      KUBECTL_VERSION: v1.14.0
 
     steps:
       # - checkout
@@ -23,33 +24,38 @@ jobs:
       #       mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH"
       #       export PATH=$GOPATH/bin:/usr/local/go/bin:$PATH
       - run:
+          name: Install kubectl
+          command: |
+            curl -LO https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl
+            chmod +x ./kubectl
+            sudo mv ./kubectl /usr/local/bin/kubectl
+
+      - run:
           name: Install Kind
           command: |
             set -x
             # GO111MODULE="on" go get sigs.k8s.io/kind@v0.4.0
-            echo 'export KIND="$HOME/kind"' >> $BASH_ENV
-            source $BASH_ENV
 
             KIND_BINARY_URL="https://github.com/kubernetes-sigs/kind/releases/download/${KIND_VERSION}/kind-linux-amd64"
-            wget -O "${KIND}" "${KIND_BINARY_URL}"
-            chmod +x "${KIND}"
+            wget -O kind "${KIND_BINARY_URL}"
+            chmod +x ./kind
+            sudo mv ./kind /usr/local/bin/kind
 
       - run:
           name: Create Kind cluster
           command: |
             set -x
-            echo "${KIND}"
-            ls -la ${KIND}
-            "${KIND}" create cluster --image=kindest/node:v1.14.3 --name $CLUSTER_NAME --loglevel=debug
+            kind create cluster --image=kindest/node:v1.14.3 --name $CLUSTER_NAME --loglevel=debug
 
       - run:
           name: Setup kubeconfig file
           command: |
-            ${KIND} get kubeconfig-path --name=$CLUSTER_NAME
+            kind get kubeconfig-path --name=$CLUSTER_NAME
             mkdir -p $HOME/.kube
-            cp -i $(${KIND} get kubeconfig-path --name=$CLUSTER_NAME) $HOME/.kube/config
+            cp -i $(kind get kubeconfig-path --name=$CLUSTER_NAME) $HOME/.kube/config
             sudo chown $(id -u):$(id -g) $HOME/.kube/config
             cat /home/circleci/.kube/kind-config-$CLUSTER_NAME
+
       - run:
           name: Check cluster-info
           command: |
