@@ -27,12 +27,11 @@ jobs:
           command: |
             kind get kubeconfig-path --name=$CLUSTER_NAME
             mkdir -p $HOME/.kube
-            # cp -i $(kind get kubeconfig-path) $HOME/.kube/config
-            # sudo chown $(id -u):$(id -g) $HOME/.kube/config
+            cp -i $(kind get kubeconfig-path --name=$CLUSTER_NAME) $HOME/.kube/config
+            sudo chown $(id -u):$(id -g) $HOME/.kube/config
       - run:
           name: Check cluster-info
           command: |
-            export KUBECONFIG="$(kind get kubeconfig-path --name=$CLUSTER_NAME)"
             kubectl cluster-info
 
   centos:
