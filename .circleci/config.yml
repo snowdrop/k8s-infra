@@ -39,7 +39,7 @@ jobs:
           name: Create Kind cluster
           command: |
             set -x
-            ls -la ${BIN_DIR}
+            echo "${KIND}"
             ls -la ${KIND}
             "${KIND}" create cluster --image=kindest/node:v1.14.3 --name $CLUSTER_NAME --loglevel=debug
 
