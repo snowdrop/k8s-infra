@@ -9,6 +9,8 @@ jobs:
     environment:
       CLUSTER_NAME=circleci
       GO_VERSION=1.12.7
+      GOPATH=/go
+      PATH=$GOPATH/bin:/usr/local/go/bin:$PATH
 
     steps:
       - checkout
@@ -16,9 +18,9 @@ jobs:
       - run:
           name: Install Go
           command: |
-            sudo rm -rf /usr/local/go && sudo mkdir -p /usr/local/go
-            curl -O https://dl.google.com/go/go"${GO_VERSION}".linux-amd64.tar.gz
-            sudo tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz
+            wget https://dl.google.com/go/go$GO_VERSION.linux-amd64.tar.gz && \
+                tar -C /usr/local -xzf go$GO_VERSION.linux-amd64.tar.gz
+            mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH"
       - run:
           name: Install k8s
           command: |
