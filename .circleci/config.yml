@@ -88,6 +88,10 @@ jobs:
               done
             helm install appscode/kubedb-catalog --name kubedb-catalog --version ${KUBEDB_VERSION} \
               --namespace kubedb --set catalog.postgres=true,catalog.elasticsearch=false,catalog.etcd=false,catalog.memcached=false,catalog.mongo=false,catalog.mysql=false,catalog.redis=false
+      - run:
+          name: Install Ingress using Helm
+         command: |
+           helm install stable/nginx-ingress
 
       - run:
           name: Deploy Component Operator
