@@ -5,7 +5,9 @@ jobs:
   kind:
     #docker:
     #  - image: quay.io/snowdrop/centos-circleci:latest
-    machine: true
+    machine:
+      enabled: true
+      docker_layer_caching: true
     environment:
       CLUSTER_NAME: circleci
       GO_VERSION: 1.12.7
@@ -33,9 +35,6 @@ jobs:
       - run:
           name: Install Kind
           command: |
-            set -x
-            # GO111MODULE="on" go get sigs.k8s.io/kind@v0.4.0
-
             KIND_BINARY_URL="https://github.com/kubernetes-sigs/kind/releases/download/${KIND_VERSION}/kind-linux-amd64"
             wget -O kind "${KIND_BINARY_URL}"
             chmod +x ./kind
@@ -57,14 +56,26 @@ jobs:
             cat /home/circleci/.kube/kind-config-$CLUSTER_NAME
 
       - run:
-          name: Check cluster-info
+          name: Check Cluster state
           command: |
-            kubectl cluster-info dump
-      # - run:
-      #     name:
-      #     command: |
-      #       "${KIND}" delete cluster || true
-      #       rm -rf "${BIN_DIR}"
+            #kubectl cluster-info
+            kubectl wait -n kube-system --timeout=320s --for condition=Ready -l k8s-app=calico-node pods
+            kubectl get nodes -o wide
+            kubectl get pods --all-namespaces -o wide
+            kubectl get services --all-namespaces -o wide
+
+      - run:
+          name: Run e2e tests
+          no_output_timeout: 200m
+          command: |
+            # Fake google.com
+            kubectl apply -f .circleci/fake-google-com.yaml
+            kubectl wait --timeout=60s --for condition=Ready -l run=my-google pods
+            kubectl wait -n kube-system --for=condition=Ready -l k8s-app=kube-dns pods
+
+            # Run e2e tests
+            e2e.test --provider=local --kubeconfig=$(kind get kubeconfig-path --name="kind") --ginkgo.focus "\[Conformance\]" --ginkgo.skip "Alpha|Kubectl|\[(Disruptive|Feature:[^\]]+|Flaky)\]"
+
 
   centos:
     docker:
