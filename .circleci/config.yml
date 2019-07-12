@@ -27,11 +27,9 @@ jobs:
           command: |
             set -x
             # GO111MODULE="on" go get sigs.k8s.io/kind@v0.4.0
-            BIN_DIR="$(mktemp -d)"
-            KIND=${BIN_DIR}/kind
-
-            echo 'export ${BIN_DIR}' >> $BASH_ENV
-            echo 'export ${KIND}' >> $BASH_ENV
+            echo 'export BIN_DIR=$(mktemp -d)' >> $BASH_ENV
+            echo 'export KIND=${BIN_DIR}/kind' >> $BASH_ENV
+            source $BASH_ENV
 
             KIND_BINARY_URL="https://github.com/kubernetes-sigs/kind/releases/download/${KIND_VERSION}/kind-linux-amd64"
             wget -O "${KIND}" "${KIND_BINARY_URL}"
@@ -40,7 +38,8 @@ jobs:
       - run:
           name: Create Kind cluster
           command: |
-            ${KIND} create cluster --image=kindest/node:v1.14.3 --name $CLUSTER_NAME --loglevel=debug
+            set -x
+            "${KIND}" create cluster --image=kindest/node:v1.14.3 --name $CLUSTER_NAME --loglevel=debug
 
       - run:
           name: Setup kubeconfig file
