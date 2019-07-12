@@ -1,6 +1,27 @@
 version: 2.1
 
 jobs:
+
+  kind:
+    docker:
+      - image: circleci/golang:1.12.7
+
+    working_directory: /go/src/github.com/{{ORG_NAME}}/{{REPO_NAME}}
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Install k8s
+          command: |
+            GO111MODULE="on" go get sigs.k8s.io/kind@v0.4.0
+      - run:
+          name: Create Kibnd cluster
+          command: |
+            docker ps
+            kind create cluster --image=kindest/node:v1.14.3 --name circleci --loglevel=debug
+            export KUBECONFIG="$(kind get kubeconfig-path)"
+            kubectl cluster-info
+
   centos:
     docker:
       - image: quay.io/snowdrop/centos-circleci:latest
@@ -48,8 +69,9 @@ workflows:
   version: 2
   k8s-centos:
     jobs:
-      - centos
-  # k8s-ubuntu:
-  #   jobs:
-  #     - ubuntu
+      - kind
+      # - centos
+      # k8s-ubuntu:
+      #   jobs:
+      #     - ubuntu
 
