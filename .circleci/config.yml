@@ -14,7 +14,7 @@ jobs:
       KIND_VERSION: v0.4.0
 
     steps:
-      - checkout
+      # - checkout
       # - setup_remote_docker
       # - run:
       #     name: Install Go
