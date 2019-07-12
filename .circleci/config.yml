@@ -28,8 +28,10 @@ jobs:
             set -x
             # GO111MODULE="on" go get sigs.k8s.io/kind@v0.4.0
             BIN_DIR="$(mktemp -d)"
-            echo 'export ${BIN_DIR}'>> $BASH_ENV
-            echo 'export KIND=${BIN_DIR}/kind' >> $BASH_ENV
+            KIND=${BIN_DIR}/kind
+
+            echo 'export ${BIN_DIR}' >> $BASH_ENV
+            echo 'export ${KIND}' >> $BASH_ENV
 
             KIND_BINARY_URL="https://github.com/kubernetes-sigs/kind/releases/download/${KIND_VERSION}/kind-linux-amd64"
             wget -O "${KIND}" "${KIND_BINARY_URL}"
