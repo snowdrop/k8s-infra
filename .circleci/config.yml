@@ -12,6 +12,7 @@ jobs:
       GOPATH: /go
       KIND_VERSION: v0.4.0
       KUBECTL_VERSION: v1.14.0
+      KUBEDB_VERSION: 0.12.0
 
     steps:
       - run:
@@ -72,7 +73,39 @@ jobs:
           command: |
             kubectl apply -f https://storage.googleapis.com/tekton-releases/previous/v0.4.0/release.yaml
 
+      - run:
+          name: Setup KubeDB
+          command: |
+            helm repo add appscode https://charts.appscode.com/stable/
+            helm repo update
+            helm install appscode/kubedb --name kubedb-operator --version ${KUBEDB_VERSION} \
+              --namespace kubedb --set apiserver.enableValidatingWebhook=false,apiserver.enableMutatingWebhook=false
 
+            TIMER=0
+              until kubectl get crd elasticsearchversions.catalog.kubedb.com memcachedversions.catalog.kubedb.com mongodbversions.catalog.kubedb.com mysqlversions.catalog.kubedb.com postgresversions.catalog.kubedb.com redisversions.catalog.kubedb.com || [[ ${TIMER} -eq 60 ]]; do
+                sleep 5
+                TIMER=$((TIMER + 1))
+              done
+            helm install appscode/kubedb-catalog --name kubedb-catalog --version ${KUBEDB_VERSION} \
+              --namespace kubedb --set catalog.postgres=true,catalog.elasticsearch=false,catalog.etcd=false,catalog.memcached=false,catalog.mongo=false,catalog.mysql=false,catalog.redis=false
+
+      - run:
+          name: Deploy Component Operator
+          command: |
+            git clone https://github.com/snowdrop/component-operator.git && cd component-operator
+            kubectl create ns operators
+            kubectl apply -n operators -f deploy/sa.yaml
+            kubectl apply -f deploy/cluster-role.yaml
+            kubectl apply -f deploy/user-rbac.yaml
+            kubectl apply -f deploy/cluster-role-binding.yaml
+            kubectl apply -f deploy/crds/capability_v1alpha2.yaml
+            kubectl apply -f deploy/crds/component_v1alpha2.yaml
+            kubectl apply -f deploy/crds/link_v1alpha2.yaml
+            kubectl apply -n operators -f deploy/operator.yaml
+
+            until oc get pods -n operators -l name=component-operator | grep 1/1; do sleep 1; done
+            pod_id=$(oc get pods -n operators -l name=component-operator -o=name)
+            oc logs $pod_id -n operators
   centos:
     docker:
       - image: quay.io/snowdrop/centos-circleci:latest
