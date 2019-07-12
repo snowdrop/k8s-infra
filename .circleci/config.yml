@@ -90,7 +90,7 @@ jobs:
               --namespace kubedb --set catalog.postgres=true,catalog.elasticsearch=false,catalog.etcd=false,catalog.memcached=false,catalog.mongo=false,catalog.mysql=false,catalog.redis=false
       - run:
           name: Install Ingress using Helm
-         command: |
+          command: |
            helm install stable/nginx-ingress
 
       - run:
