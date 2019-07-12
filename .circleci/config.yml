@@ -4,7 +4,8 @@ jobs:
 
   kind:
     docker:
-      - image: circleci/golang:1.12.7
+      #- image: circleci/golang:1.12.7
+      - image: quay.io/snowdrop/centos-circleci:latest
 
     working_directory: /go/src/github.com/{{ORG_NAME}}/{{REPO_NAME}}
     steps:
