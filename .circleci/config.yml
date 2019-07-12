@@ -1,10 +1,8 @@
 version: 2.1
 
 jobs:
-
+  # Job installing the kubernetes-sigs/kind tool able to install a k8s cluster using docker
   kind:
-    #docker:
-    #  - image: quay.io/snowdrop/centos-circleci:latest
     machine:
       enabled: true
       docker_layer_caching: true
@@ -16,15 +14,6 @@ jobs:
       KUBECTL_VERSION: v1.14.0
 
     steps:
-      # - checkout
-      # - setup_remote_docker
-      # - run:
-      #     name: Install Go
-      #     command: |
-      #       wget https://dl.google.com/go/go$GO_VERSION.linux-amd64.tar.gz && \
-      #           tar -C /usr/local -xzf go$GO_VERSION.linux-amd64.tar.gz
-      #       mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH"
-      #       export PATH=$GOPATH/bin:/usr/local/go/bin:$PATH
       - run:
           name: Install kubectl
           command: |
@@ -63,6 +52,26 @@ jobs:
             kubectl get nodes -o wide
             kubectl get pods --all-namespaces -o wide
             kubectl get services --all-namespaces -o wide
+
+      - run:
+          name: Install Helm
+          command: |
+            curl -LO https://git.io/get_helm.sh
+            chmod 700 get_helm.sh
+            ./get_helm.sh
+
+      - run:
+          name: Init Helm
+          command: |
+            helm init
+            until kubectl get pods -n kube-system -l name=tiller | grep 1/1; do sleep 1; done
+            kubectl create clusterrolebinding tiller-cluster-admin --clusterrole=cluster-admin --serviceaccount=kube-system:default
+
+      - run:
+          name: Deploy Tekton
+          command: |
+            kubectl apply -f https://storage.googleapis.com/tekton-releases/previous/v0.4.0/release.yaml
+
 
   centos:
     docker:
