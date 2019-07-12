@@ -92,7 +92,7 @@ jobs:
       - run:
           name: Deploy Component Operator
           command: |
-            git clone https://github.com/snowdrop/component-operator.git && cd component-operator
+            git clone https://github.com/snowdrop/component-operator.git component-operator && cd component-operator
             kubectl create ns operators
             kubectl apply -n operators -f deploy/sa.yaml
             kubectl apply -f deploy/cluster-role.yaml
@@ -110,7 +110,7 @@ jobs:
       - run:
           name: Run e2e test in development mode
           command: |
-            cd demo
+            cd component-operator/demo
             ./mvnw package
             cd ..
             ./demo/scripts/end-to-end_fruit_demo.sh 127.0.0.1 test dev
