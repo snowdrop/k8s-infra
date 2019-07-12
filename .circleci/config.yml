@@ -26,8 +26,9 @@ jobs:
           name: Install Kind
           command: |
             # GO111MODULE="on" go get sigs.k8s.io/kind@v0.4.0
-            export BIN_DIR="$(mktemp -d)" >> $BASH_ENV
-            export KIND= ${BIN_DIR}/kind >> $BASH_ENV
+            BIN_DIR="$(mktemp -d)"
+            echo 'export $BIN_DIR'>> $BASH_ENV
+            echo 'export KIND=${BIN_DIR}/kind' >> $BASH_ENV
 
             KIND_BINARY_URL="https://github.com/kubernetes-sigs/kind/releases/download/${KIND_VERSION}/kind-linux-amd64"
             wget -O "${KIND}" "${KIND_BINARY_URL}"
