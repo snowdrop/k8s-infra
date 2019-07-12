@@ -14,6 +14,8 @@ jobs:
       - run:
           name: Install k8s
           command: |
+            env
+            ls -la /usr/local/bin
             go env
             GO111MODULE="on" go get sigs.k8s.io/kind@v0.4.0
       - run:
