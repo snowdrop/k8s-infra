@@ -7,21 +7,21 @@ jobs:
     #  - image: quay.io/snowdrop/centos-circleci:latest
     machine: true
     environment:
-      CLUSTER_NAME=circleci
-      GO_VERSION=1.12.7
-      GOPATH=/go
-      PATH=$GOPATH/bin:/usr/local/go/bin:$PATH
-      KIND_VERSION=0.4.0
+      CLUSTER_NAME: circleci
+      GO_VERSION: 1.12.7
+      GOPATH: /go
+      PATH: $GOPATH/bin:/usr/local/go/bin:$PATH
+      KIND_VERSION: v0.4.0
 
     steps:
       - checkout
       # - setup_remote_docker
-      - run:
-          name: Install Go
-          command: |
-            wget https://dl.google.com/go/go$GO_VERSION.linux-amd64.tar.gz && \
-                tar -C /usr/local -xzf go$GO_VERSION.linux-amd64.tar.gz
-            mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH"
+      # - run:
+      #     name: Install Go
+      #     command: |
+      #       wget https://dl.google.com/go/go$GO_VERSION.linux-amd64.tar.gz && \
+      #           tar -C /usr/local -xzf go$GO_VERSION.linux-amd64.tar.gz
+      #       mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH"
       - run:
           name: Install k8s
           command: |
