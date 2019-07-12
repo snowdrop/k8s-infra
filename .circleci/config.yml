@@ -59,7 +59,7 @@ jobs:
           name: Check Cluster state
           command: |
             #kubectl cluster-info
-            kubectl wait -n kube-system --timeout=320s --for condition=Ready -l k8s-app=calico-node pods
+            #kubectl wait -n kube-system --timeout=320s --for condition=Ready -l k8s-app=calico-node pods
             kubectl get nodes -o wide
             kubectl get pods --all-namespaces -o wide
             kubectl get services --all-namespaces -o wide
