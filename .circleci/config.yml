@@ -39,6 +39,8 @@ jobs:
           name: Create Kind cluster
           command: |
             set -x
+            ls -la ${BIN_DIR}
+            ls -la ${KIND}
             "${KIND}" create cluster --image=kindest/node:v1.14.3 --name $CLUSTER_NAME --loglevel=debug
 
       - run:
@@ -53,6 +55,11 @@ jobs:
           name: Check cluster-info
           command: |
             kubectl cluster-info dump
+      # - run:
+      #     name:
+      #     command: |
+      #       "${KIND}" delete cluster || true
+      #       rm -rf "${BIN_DIR}"
 
   centos:
     docker:
