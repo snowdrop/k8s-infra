@@ -10,7 +10,6 @@ jobs:
       CLUSTER_NAME=circleci
       GO_VERSION=1.12.7
 
-    working_directory: /go/src/github.com/{{ORG_NAME}}/{{REPO_NAME}}
     steps:
       - checkout
       # - setup_remote_docker
