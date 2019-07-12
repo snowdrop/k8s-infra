@@ -19,16 +19,15 @@ jobs:
           name: Create Kibnd cluster
           command: |
             kind create cluster --image=kindest/node:v1.14.3 --name circleci --loglevel=debug
-            kind get kubeconfig-path
-            export KUBECONFIG="$(kind get kubeconfig-path)"
-            ls -la $HOME
-            ls -la /etc
-            ls -la /etc/kubernetes
+      - run:
+          name: Setup kubeconfig file
+          command: |
             mkdir -p $HOME/.kube
-            sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+            cp -i $(kind get kubeconfig-path) $HOME/.kube/config
             sudo chown $(id -u):$(id -g) $HOME/.kube/config
-
-            kubectl cluster-info
+      - run:
+          name: Check cluster-info
+          command: kubectl cluster-info
 
   centos:
     docker:
