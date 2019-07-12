@@ -103,9 +103,9 @@ jobs:
             kubectl apply -f deploy/crds/link_v1alpha2.yaml
             kubectl apply -n operators -f deploy/operator.yaml
 
-            until oc get pods -n operators -l name=component-operator | grep 1/1; do sleep 1; done
-            pod_id=$(oc get pods -n operators -l name=component-operator -o=name)
-            oc logs $pod_id -n operators
+            until kubectl get pods -n operators -l name=component-operator | grep 1/1; do sleep 1; done
+            pod_id=$(kubectl get pods -n operators -l name=component-operator -o=name)
+            kubectl logs $pod_id -n operators
   centos:
     docker:
       - image: quay.io/snowdrop/centos-circleci:latest
