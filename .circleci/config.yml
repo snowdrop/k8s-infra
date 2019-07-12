@@ -14,15 +14,10 @@ jobs:
       - run:
           name: Install k8s
           command: |
-            env
-            ls -la /go/{src,bin}
-            ls -la /usr/local/bin/dep
-            go env
             GO111MODULE="on" go get sigs.k8s.io/kind@v0.4.0
       - run:
           name: Create Kibnd cluster
           command: |
-            which kind
             kind create cluster --image=kindest/node:v1.14.3 --name circleci --loglevel=debug
             export KUBECONFIG="$(kind get kubeconfig-path)"
 
