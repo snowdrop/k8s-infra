@@ -46,7 +46,7 @@
   command: kubeadm config images pull --kubernetes-version {{ k8s_version }}
 
 - name: Initialize cluster
-  command: "kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address={{ public_ip_address }}  --kubernetes-version {{ k8s_version }}"
+  command: "kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address={{ public_ip_address }} --kubernetes-version {{ k8s_version }}"
 
 - name: Install Flannel Virtual Network for pod communicatio
   shell: |
@@ -55,73 +55,6 @@
 
 - name: Taint the node
   command: "kubectl taint nodes --all node-role.kubernetes.io/master-"
-
-- name: Copy Dashboard RBAC files
-  template:
-    src: "dashboard-rbac.yml.j2"
-    dest: /tmp/dashboard-rbac.yml
-
-- name: Apply Dashboard RBAC files
-  command: "kubectl apply -f /tmp/dashboard-rbac.yml"
-
-- name: Copy Ingress Dashboard file
-  template:
-    src: "ingress-dashboard.yml.j2"
-    dest: /tmp/ingress-dashboard.yml
-
-- name: Apply Ingress route
-  command: "kubectl apply -f /tmp/ingress-dashboard.yml"
-
-- name: Install Dashboard
-  command: "kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/master/aio/deploy/recommended.yaml"
-
-- name: Disable dashboard login
-  shell: |
-    kubectl -n kube-system patch deploy kubernetes-dashboard --type='json' -p='[{"op": "add", "path": "/spec/template/spec/containers/0/args/-", "value": "--enable-skip-login"}]'
-
-- name: Install Helm
-  shell: |
-    curl -LO https://git.io/get_helm.sh
-    chmod 700 get_helm.sh
-    ./get_helm.sh
-
-- name: Copy Tiller RBAC files
-  template:
-    src: "tiller-rbac.yml.j2"
-    dest: /tmp/tiller-rbac.yml
-
-- name: Apply Tiller RBAC files
-  command: "kubectl apply -f /tmp/tiller-rbac.yml"
-
-- name: Initialize Heml
-  command: "helm init --wait --service-account tiller"
-
-- name: Copy Ingress Configmap
-  template:
-    src: "ingress-configmap.yml.j2"
-    dest: /tmp/ingress-configmap.yml
-
-- name: Copy Ingress Deployment
-  template:
-    src: "ingress-dp.yml.j2"
-    dest: /tmp/ingress-dp.yml
-
-- name: Copy Ingress Service
-  template:
-    src: "ingress-svc.yml.j2"
-    dest: /tmp/ingress-svc.yml
-
-- name: Copy Ingress RBAC
-  template:
-    src: "ingress-rbac.yml.j2"
-    dest: /tmp/ingress-rbac.yml
-
-- name: Install Ingress
-  shell: |
-    kubectl apply -f /tmp/ingress-configmap.yml
-    kubectl apply -f /tmp/ingress-rbac.yml
-    kubectl apply -f /tmp/ingress-svc.yml
-    kubectl apply -f /tmp/ingress-dp.yml
 
 - name: Create persistence volume
   include_tasks: create_single_pv.yml
@@ -132,6 +65,13 @@
 - name: save_config.yml
   include_role:
     name: k8s_config
+
+- name: Create user's k8s config file
+  command: |
+    mkdir -p .kube
+    sudo cp /etc/kubernetes/admin.conf .kube/config
+    sudo chown centos:centos -R .kube/
+    chmod 644 .kube/config
 
 - name: Print kubernetes dashboard URL
   debug:
