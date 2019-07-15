@@ -4,12 +4,20 @@
 
 - name: Install KubeDB Helm chart
   shell: |
-    helm repo add appscode https://charts.appscode.com/stable/
-    helm repo update
-    helm install appscode/kubedb --name kubedb-operator --version {{ kubedb_version }} \
+    helm --kubeconfig=$HOME/.kube/config repo add appscode https://charts.appscode.com/stable/
+    helm --kubeconfig=$HOME/.kube/config repo update
+    helm --kubeconfig=$HOME/.kube/config install appscode/kubedb --name kubedb-operator --version {{ kubedb_version }} \
       --namespace {{ kubedb_namespace }} --set apiserver.enableValidatingWebhook=false,apiserver.enableMutatingWebhook=false
+
+- name: Wait till CRDs are installed
+  shell: |
+    TIMER=0
+    until kubectl --kubeconfig=$HOME/.kube/config get crd elasticsearchversions.catalog.kubedb.com memcachedversions.catalog.kubedb.com mongodbversions.catalog.kubedb.com mysqlversions.catalog.kubedb.com postgresversions.catalog.kubedb.com redisversions.catalog.kubedb.com || [[ ${TIMER} -eq 60 ]]; do
+      sleep 5
+      TIMER=$((TIMER + 1))
+    done
 
 - name: Install KubeDB catalog
   shell: |
-    helm install appscode/kubedb-catalog --name kubedb-catalog --version {{ kubedb_version }} \
+    helm --kubeconfig=$HOME/.kube/config install appscode/kubedb-catalog --name kubedb-catalog --version {{ kubedb_version }} \
       --namespace {{ kubedb_namespace }}
