@@ -11,12 +11,6 @@
     gpgkey: https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
     exclude: kube*
 
-- name: Install kubeadm
-  yum:
-    name: kubeadm-{{k8s_version}}
-    state: present
-    disable_excludes: kubernetes
-
 - name: Install Kubernetes packages
   yum:
     name: "{{ packages }}"
