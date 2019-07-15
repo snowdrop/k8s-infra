@@ -24,6 +24,12 @@ You can specify the version of kubernetes to be installed using this parameter `
 If you want to configure your cluster with additional features, then you can install them using the following
 roles
 
+### Install Ingress Router
+
+  ```bash
+  ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags ingress
+  ``` 
+
 ### Install Helm
 
   ```bash

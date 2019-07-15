@@ -12,6 +12,7 @@
   roles:
     - { role: 'k8s_cluster',   tags: 'k8s_cluster'}
     - { role: 'k8s_config',   tags: 'k8s_config'}
+    - { role: 'ingress',   tags: 'ingress'}
     - { role: 'helm',   tags: 'helm'}
     - { role: 'kubedb',   tags: 'kubedb'}
     - { role: 'k8s_service_broker',   tags: 'k8s_service_broker'}

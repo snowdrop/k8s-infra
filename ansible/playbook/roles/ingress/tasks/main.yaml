@@ -1,0 +1,26 @@
+- name: Copy Ingress Configmap
+  template:
+    src: "ingress-configmap.yml.j2"
+    dest: /tmp/ingress-configmap.yml
+
+- name: Copy Ingress Deployment
+  template:
+    src: "ingress-dp.yml.j2"
+    dest: /tmp/ingress-dp.yml
+
+- name: Copy Ingress Service
+  template:
+    src: "ingress-svc.yml.j2"
+    dest: /tmp/ingress-svc.yml
+
+- name: Copy Ingress RBAC
+  template:
+    src: "ingress-rbac.yml.j2"
+    dest: /tmp/ingress-rbac.yml
+
+- name: Install Ingress
+  shell: |
+    kubectl --kubeconfig=$HOME/.kube/config apply -f /tmp/ingress-configmap.yml
+    kubectl --kubeconfig=$HOME/.kube/config apply -f /tmp/ingress-rbac.yml
+    kubectl --kubeconfig=$HOME/.kube/config apply -f /tmp/ingress-svc.yml
+    kubectl --kubeconfig=$HOME/.kube/config apply -f /tmp/ingress-dp.yml
