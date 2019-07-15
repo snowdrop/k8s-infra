@@ -3,7 +3,7 @@
     name: cfssl_tool
 
 - name: Get Service ClusterIP
-  command: kubectl get service/kubernetes-dashboard -n kube-system -o jsonpath='{.spec.clusterIP}'
+  command: kubectl get service/kubernetes -n default -o jsonpath='{.spec.clusterIP}'
   register: cluster_ip_address
 
 - name: Set fact
@@ -21,7 +21,7 @@
 
 - name: Generate the pem and csr files
   shell: |
-    cat /tmp/cfssl.json | cfssl genkey - | cfssljson -bare server
+    cat /tmp/cfssl.json | /usr/local/bin/cfssl genkey - | /usr/local/bin/cfssljson -bare server
 
 - name: Convert Self Signed Certificate to base64 string
   shell: |
