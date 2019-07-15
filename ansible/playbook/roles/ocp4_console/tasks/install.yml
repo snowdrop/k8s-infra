@@ -4,7 +4,7 @@
     dest: /tmp/deployment.yml
 
 - name: Deploy ocp4 console
-  command: kubectl apply -f /tmp/deployment.yml
+  command: kubectl --kubeconfig=$HOME/.kube/config apply -f /tmp/deployment.yml
 
 - name: Print ocp4 dashboard URL
   debug:
