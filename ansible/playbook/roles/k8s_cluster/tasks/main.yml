@@ -73,7 +73,7 @@
   command: "kubectl apply -f /tmp/ingress-dashboard.yml"
 
 - name: Install Dashboard
-  command: "kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/master/aio/deploy/recommended/kubernetes-dashboard.yaml"
+  command: "kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/master/aio/deploy/recommended.yaml"
 
 - name: Disable dashboard login
   shell: |
