@@ -24,6 +24,12 @@ You can specify the version of kubernetes to be installed using this parameter `
 If you want to configure your cluster with additional features, then you can install them using the following
 roles
 
+### Install Helm
+
+  ```bash
+  ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags helm
+  ``` 
+
 ### Create K8s Config Yml
 
   ```bash

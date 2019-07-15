@@ -10,7 +10,11 @@
     dest: /tmp/tiller-rbac.yml
 
 - name: Apply Tiller RBAC files
-  command: "kubectl apply -f /tmp/tiller-rbac.yml"
+  command: |
+    kubectl --kubeconfig=$HOME/.kube/config apply -f /tmp/tiller-rbac.yml
 
 - name: Initialize Heml and deploy Tiller
-  command: "helm init --wait --tiller-namespace {{ helm_namespace }} --service-account tiller"
+  command: |
+    helm init --kubeconfig=$HOME/.kube/config \
+     --wait --tiller-namespace {{ helm_namespace }} \
+     --service-account tiller
