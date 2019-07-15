@@ -27,18 +27,18 @@
   when: isOpenshift | default(true) | bool
 
 - name: Create Kubernetes namespace for the component operator
-  command: "{{ client_tool }} create namespace {{ component_operator_namespace }}"
+  command: "{{ client_tool }} create --kubeconfig=$HOME/.kube/config namespace {{ component_operator_namespace }}"
   ignore_errors: true
   when: not isOpenshift | default(true) | bool
 
 - name: Install serviceaccount, customresourcedefinition resources (static files from mktemp dir)
   command: |
-    {{ client_tool }} apply -f "{{ mktemp.stdout }}" -n {{ component_operator_namespace }}
+    {{ client_tool }} --kubeconfig=$HOME/.kube/config apply -f "{{ mktemp.stdout }}" -n {{ component_operator_namespace }}
 
 - name: Install rbac, operator
   shell: |
-    {{ client_tool }} apply -f /tmp/cluster-rbac.yml -n {{ component_operator_namespace }}
-    {{ client_tool }} apply -f /tmp/operator.yml -n {{ component_operator_namespace }}
+    {{ client_tool }} --kubeconfig=$HOME/.kube/config apply -f /tmp/cluster-rbac.yml -n {{ component_operator_namespace }}
+    {{ client_tool }} --kubeconfig=$HOME/.kube/config apply -f /tmp/operator.yml -n {{ component_operator_namespace }}
 
 - name: Wait for the Component CRD to be created
   command: "{{ client_tool }} get crd components.devexp.runtime.redhat.com"

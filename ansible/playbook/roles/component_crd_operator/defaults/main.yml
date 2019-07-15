@@ -4,7 +4,7 @@ remove: false
 component_crd_operator_install: true
 component_crd_operator_remove: false
 
-component_operator_docker_image_version: 0.0.1
+component_operator_docker_image_version: latest
 component_operator_watch_namespace: ""
-component_operator_namespace: "component-operator"
+component_operator_namespace: "operators"
 component_operator_name: "component-operator"
