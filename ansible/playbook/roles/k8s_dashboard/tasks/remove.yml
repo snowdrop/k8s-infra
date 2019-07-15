@@ -1,0 +1,3 @@
+- name: Remove Dashboard
+  shell: |
+    helm --kubeconfig=$HOME/.kube/config  delete {{ dashboard_name }}

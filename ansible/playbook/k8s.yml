@@ -14,6 +14,7 @@
     - { role: 'k8s_config',   tags: 'k8s_config'}
     - { role: 'ingress',   tags: 'ingress'}
     - { role: 'helm',   tags: 'helm'}
+    - { role: 'k8s_dashboard',   tags: 'k8s_dashboard'}
     - { role: 'kubedb',   tags: 'kubedb'}
     - { role: 'k8s_service_broker',   tags: 'k8s_service_broker'}
     - { role: 'docker_registry',   tags: 'docker_registry'}

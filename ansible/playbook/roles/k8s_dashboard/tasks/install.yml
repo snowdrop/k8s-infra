@@ -1,0 +1,28 @@
+#- name: Copy Dashboard RBAC files
+#  template:
+#    src: "dashboard-rbac.yml.j2"
+#    dest: /tmp/dashboard-rbac.yml
+#
+#- name: Apply Dashboard RBAC files
+#  command: "kubectl apply -f /tmp/dashboard-rbac.yml"
+#
+#- name: Copy Ingress Dashboard file
+#  template:
+#    src: "ingress-dashboard.yml.j2"
+#    dest: /tmp/ingress-dashboard.yml
+#
+#- name: Apply Ingress route
+#  command: "kubectl apply -f /tmp/ingress-dashboard.yml"
+#
+#- name: Install Dashboard
+#  command: "kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/master/aio/deploy/recommended.yaml"
+#
+#- name: Disable dashboard login
+#  shell: |
+#    kubectl -n kube-system patch deploy kubernetes-dashhtailboard --type='json' -p='[{"op": "add", "path": "/spec/template/spec/containers/0/args/-", "value": "--enable-skip-login"}]'
+
+
+- name: Install Dashboard
+  shell: |
+    helm --kubeconfig=$HOME/.kube/config install stable/kubernetes-dashboard --name {{ dashboard_name }} \
+        --set=enableSkipLogin=true

@@ -28,13 +28,23 @@ roles
 
   ```bash
   ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags ingress
-  ``` 
+  ```  
 
 ### Install Helm
 
   ```bash
   ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags helm
   ``` 
+  
+### Install K8s Dashboard
+
+  ```bash
+  ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags k8s_dashboard
+  ```   
+  
+    To uninstall the `helm k8s chart console`, execute this command where you pass the parameter `-e remove=true` 
+  
+  **Warning**: Helm must be installed !
 
 ### Create K8s Config Yml
 
