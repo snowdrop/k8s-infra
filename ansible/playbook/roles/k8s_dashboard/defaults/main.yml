@@ -1,1 +1,2 @@
 dashboard_name: k8s-console
+ingress_host: "{{ public_ip_address }}.nip.io"

@@ -21,8 +21,12 @@
 #  shell: |
 #    kubectl -n kube-system patch deploy kubernetes-dashhtailboard --type='json' -p='[{"op": "add", "path": "/spec/template/spec/containers/0/args/-", "value": "--enable-skip-login"}]'
 
+- name: Copy Ingress Dashboard file
+  template:
+    src: "values.j2"
+    dest: /tmp/values.yml
 
 - name: Install Dashboard
   shell: |
     helm --kubeconfig=$HOME/.kube/config install stable/kubernetes-dashboard --name {{ dashboard_name }} \
-        --set=enableSkipLogin=true
+         -f /tmp/values.yml
