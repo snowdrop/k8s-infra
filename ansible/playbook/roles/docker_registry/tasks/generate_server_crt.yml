@@ -3,7 +3,7 @@
     name: cfssl_tool
 
 - name: Get Kube Registry Service ClusterIP
-  command: kubectl get service/kubernetes -n default -o jsonpath='{.spec.clusterIP}'
+  command: kubectl get service/kube-registry -n kube-system -o jsonpath='{.spec.clusterIP}'
   register: registry_ip_address
 
 - name: Set fact
@@ -83,14 +83,6 @@
     cp server.crt /root/docker-certs
     cp server-key.pem /root/docker-certs
 
-#- name: Try to replace the line if it exists of the IP address of the Registry
-#  replace:
-#    dest: /etc/hosts
-#    regexp: '^{{ registry_ip_address }}'
-#    replace: '{{ registry_ip_address }} {{ registry.service_name}}.{{ registry.namespace }} {{ registry.service_name}}.{{ registry.namespace }}.svc {{ registry.service_name}}.{{ registry.namespace }}.svc.cluster {{ registry.service_name}}.{{ registry.namespace }}.cluster.local'
-#    backup: yes
-#  register: tryToReplace
-
 - name: Add IP address of the Registry to the /etc/hosts/file
   lineinfile:
     path: /etc/hosts
@@ -99,7 +91,4 @@
     state: present
     backup: yes
   register: etchostsupdate
-#    regexp: ''
-#    insertafter: EOF
-#  when: tryToReplace.changed == false
 

@@ -3,3 +3,4 @@
     {{ client_tool }} delete ReplicationController/{{ registry.service_name}} -n {{ registry.namespace }}
     {{ client_tool }} delete pvc/{{ registry.service_name}}-pvc               -n {{ registry.namespace }}
     {{ client_tool }} delete svc/{{ registry.service_name}}                   -n {{ registry.namespace }}
+  ignore_errors: true

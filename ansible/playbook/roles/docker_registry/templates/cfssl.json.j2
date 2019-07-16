@@ -3,7 +3,7 @@
     "{{ registry.service_name }}.{{ registry.namespace }}.svc",
     "{{ registry.service_name }}.{{ registry.namespace }}.svc.cluster",
     "{{ registry.service_name }}.{{ registry.namespace }}.svc.cluster.local",
-    "{{ registry_ip_address }}"
+    "{{ registry_ip_address.stdout }}"
   ],
   "CN": "{{ registry.service_name}}",
   "key": {
