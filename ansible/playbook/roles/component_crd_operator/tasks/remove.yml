@@ -1,15 +1,16 @@
 - name: Remove Component resources
   shell: |
-    {{ client_tool }} delete sa {{ component_operator_name }} -n {{ component_operator_namespace }}
-    {{ client_tool }} delete deployment {{ component_operator_name }} -n {{ component_operator_namespace }}
-    {{ client_tool }} delete clusterrole {{ component_operator_name }}
-    {{ client_tool }} delete clusterrolebinding {{ component_operator_name }}--role-binding
-    {{ client_tool }} delete crd components.devexp.runtime.redhat.com
-    {{ client_tool }} delete crd capabilities.devexp.runtime.redhat.com
-    {{ client_tool }} delete crd links.devexp.runtime.redhat.com
+    {{ client_tool }} --kubeconfig=$HOME/.kube/config delete sa {{ component_operator_name }} -n {{ component_operator_namespace }}
+    {{ client_tool }} --kubeconfig=$HOME/.kube/config delete deployment {{ component_operator_name }} -n {{ component_operator_namespace }}
+    {{ client_tool }} --kubeconfig=$HOME/.kube/config delete clusterrole {{ component_operator_name }}
+    {{ client_tool }} --kubeconfig=$HOME/.kube/config delete clusterrole aggregate-component-admin-edit
+    {{ client_tool }} --kubeconfig=$HOME/.kube/config delete clusterrolebinding {{ component_operator_name }}--role-binding
+    {{ client_tool }} --kubeconfig=$HOME/.kube/config delete crd components.devexp.runtime.redhat.com
+    {{ client_tool }} --kubeconfig=$HOME/.kube/config delete crd capabilities.devexp.runtime.redhat.com
+    {{ client_tool }} --kubeconfig=$HOME/.kube/config delete crd links.devexp.runtime.redhat.com
   ignore_errors: true
 
 - name: Remove Component operator namespace
-  command: "{{ client_tool }} delete namespace {{ component_operator_namespace }}"
+  command: "{{ client_tool }} --kubeconfig=$HOME/.kube/config delete namespace {{ component_operator_namespace }}"
   ignore_errors: true
   when: not isOpenshift | default(true) | bool
