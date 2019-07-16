@@ -2,13 +2,13 @@
   include_role:
     name: cfssl_tool
 
-- name: Get Service ClusterIP
+- name: Get Kube Registry Service ClusterIP
   command: kubectl get service/kubernetes -n default -o jsonpath='{.spec.clusterIP}'
-  register: cluster_ip_address
+  register: registry_ip_address
 
 - name: Set fact
   set_fact:
-    ip_cluster: cluster_ip_address.stdout
+    registry_ip: registry_ip_address.stdout
 
 - name: Delete any previous CSR send to k8s
   command: kubectl delete csr {{ registry.service_name}}.{{ registry.namespace }}
@@ -18,6 +18,14 @@
   template:
     src: "cfssl.json.j2"
     dest: /tmp/cfssl.json
+
+- name: Display cfssl file generated
+  command: cat /tmp/cfssl.json
+  register: result
+
+- name: Show result
+  debug:
+    var: result.stdout
 
 - name: Generate the pem and csr files
   shell: |
@@ -56,9 +64,9 @@
   shell: |
     cat /etc/kubernetes/pki/ca.crt >> server.crt
 
-- name: "Creates Docker cert directory for the cluster : {{ cluster_ip_address.stdout }}:5000"
+- name: "Creates Docker cert directory for the registry : {{ registry.service_name}}.{{ registry.namespace }}.svc:5000"
   file:
-    path: /etc/docker/certs.d/{{ cluster_ip_address.stdout }}:5000
+    path: /etc/docker/certs.d/{{ registry.service_name}}.{{ registry.namespace }}.svc:5000
     state: directory
 
 - name: Creates Registry docker Certs that we will mount
@@ -66,12 +74,32 @@
     path: /root/docker-certs
     state: directory
 
-- name: "Add the certificate populated for the cluster {{ cluster_ip_address.stdout }} to the certificates supported by the docker daemon"
+- name: "Add the certificate populated for the registry to the certificates supported by the docker daemon"
   shell: |
-    cp server.crt /etc/docker/certs.d/{{ cluster_ip_address.stdout }}:5000/
+    cp server.crt /etc/docker/certs.d/{{ registry.service_name}}.{{ registry.namespace }}.svc:5000/
 
 - name: Copy the self signed Certificate and Private keys under the folder that we will mount within the docker registry
   shell: |
     cp server.crt /root/docker-certs
     cp server-key.pem /root/docker-certs
+
+#- name: Try to replace the line if it exists of the IP address of the Registry
+#  replace:
+#    dest: /etc/hosts
+#    regexp: '^{{ registry_ip_address }}'
+#    replace: '{{ registry_ip_address }} {{ registry.service_name}}.{{ registry.namespace }} {{ registry.service_name}}.{{ registry.namespace }}.svc {{ registry.service_name}}.{{ registry.namespace }}.svc.cluster {{ registry.service_name}}.{{ registry.namespace }}.cluster.local'
+#    backup: yes
+#  register: tryToReplace
+
+- name: Add IP address of the Registry to the /etc/hosts/file
+  lineinfile:
+    path: /etc/hosts
+    regexp: '{{ registry_ip_address.stdout }} {{ registry.service_name}}.{{ registry.namespace }} {{ registry.service_name}}.{{ registry.namespace }}.svc {{ registry.service_name}}.{{ registry.namespace }}.svc.cluster {{ registry.service_name}}.{{ registry.namespace }}.cluster.local'
+    line: '{{ registry_ip_address.stdout }} {{ registry.service_name}}.{{ registry.namespace }} {{ registry.service_name}}.{{ registry.namespace }}.svc {{ registry.service_name}}.{{ registry.namespace }}.svc.cluster {{ registry.service_name}}.{{ registry.namespace }}.cluster.local'
+    state: present
+    backup: yes
+  register: etchostsupdate
+#    regexp: ''
+#    insertafter: EOF
+#  when: tryToReplace.changed == false
 

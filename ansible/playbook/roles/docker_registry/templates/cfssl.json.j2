@@ -1,13 +1,20 @@
 {
   "hosts": [
-    "{{ registry.service_name}}.{{ registry.namespace }}.svc",
-    "{{ registry.service_name}}.{{ registry.namespace }}.svc.cluster.local",
-    "{{ cluster_ip_address }}",
-    "IP Address: {{ cluster_ip_address }}"
+    "{{ registry.service_name }}.{{ registry.namespace }}.svc",
+    "{{ registry.service_name }}.{{ registry.namespace }}.svc.cluster",
+    "{{ registry.service_name }}.{{ registry.namespace }}.svc.cluster.local",
+    "{{ registry_ip_address }}"
   ],
-  "CN": "{{ cluster_ip_address }}",
+  "CN": "{{ registry.service_name}}",
   "key": {
     "algo": "ecdsa",
     "size": 256
-  }
+  },
+  "names": [{
+    "C": "BE",
+    "ST": "Namur",
+    "L": "Florennes",
+    "O": "Red Hat Middleware",
+    "OU": "Snowdrop"
+  }]
 }
