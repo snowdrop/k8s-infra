@@ -1,13 +1,16 @@
-# - name: Install KubeDB Helm chart
-#   shell: |
-#     helm init --client-only
+- name: Generate Helm values file
+  template:
+    src: "values.yml.j2"
+    dest: /tmp/values.yml
 
 - name: Install KubeDB Helm chart
   shell: |
-    helm --kubeconfig=$HOME/.kube/config repo add appscode https://charts.appscode.com/stable/
-    helm --kubeconfig=$HOME/.kube/config repo update
-    helm --kubeconfig=$HOME/.kube/config install appscode/kubedb --name kubedb-operator --version {{ kubedb_version }} \
-      --namespace {{ kubedb_namespace }} --set apiserver.enableValidatingWebhook=false,apiserver.enableMutatingWebhook=false
+    /usr/local/bin/helm --kubeconfig=$HOME/.kube/config repo add appscode https://charts.appscode.com/stable/
+    /usr/local/bin/helm --kubeconfig=$HOME/.kube/config repo update
+    /usr/local/bin/helm --kubeconfig=$HOME/.kube/config install appscode/kubedb --name kubedb-operator \
+      -f /tmp/values.yml \
+      --version {{ kubedb_version }} \
+      --namespace {{ kubedb_namespace }}
 
 - name: Wait till CRDs are installed
   shell: |
@@ -19,5 +22,6 @@
 
 - name: Install KubeDB catalog
   shell: |
-    helm --kubeconfig=$HOME/.kube/config install appscode/kubedb-catalog --name kubedb-catalog --version {{ kubedb_version }} \
+    /usr/local/bin/helm --kubeconfig=$HOME/.kube/config install appscode/kubedb-catalog --name kubedb-catalog \
+      --version {{ kubedb_version }} \
       --namespace {{ kubedb_namespace }}

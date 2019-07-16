@@ -90,6 +90,8 @@ roles
   ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags kubedb -e remove=true
   ```  
   
+  You can, during the installation of the kubedb operator install and enable their mutating and validating webhooks using this parameter `-e kubedb_enablewebhook=true`
+  
 ### K8s Service Catalog and OABroker
 
   ```bash
