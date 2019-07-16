@@ -4,7 +4,7 @@
 
 - name: Get secret name
   shell: |
-    kubectl -n kube-system get secret | grep default-token | awk '{print $1}'
+    kubectl --kubeconfig=$HOME/.kube/config -n kube-system get secret | grep default-token | awk '{print $1}'
   register: get_secret_out
 
 - set_fact:
@@ -12,7 +12,7 @@
 
 - name: Get CA
   shell: |
-    kubectl -n kube-system get secret/{{ k8s_secret_name }} -o jsonpath='{.data.ca\.crt}'
+    kubectl --kubeconfig=$HOME/.kube/config -n kube-system get secret/{{ k8s_secret_name }} -o jsonpath='{.data.ca\.crt}'
   register: get_ca_out
 
 - set_fact:
@@ -20,7 +20,7 @@
 
 - name: Get token
   shell: |
-    kubectl -n kube-system get secret/{{ k8s_secret_name }} -o jsonpath='{.data.token}' | base64 -d
+    kubectl --kubeconfig=$HOME/.kube/config -n kube-system get secret/{{ k8s_secret_name }} -o jsonpath='{.data.token}' | base64 -d
   register: get_token_out
 
 - set_fact:
@@ -28,7 +28,7 @@
 
 - name: Get namespace
   shell: |
-    kubectl -n kube-system get secret/{{ k8s_secret_name }} -o jsonpath='{.data.namespace}' | base64 -d
+    kubectl --kubeconfig=$HOME/.kube/config -n kube-system get secret/{{ k8s_secret_name }} -o jsonpath='{.data.namespace}' | base64 -d
   register: get_namespace_out
 
 - set_fact:

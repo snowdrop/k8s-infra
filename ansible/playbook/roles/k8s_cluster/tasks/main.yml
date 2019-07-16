@@ -56,6 +56,15 @@
 - name: Taint the node
   command: "kubectl taint nodes --all node-role.kubernetes.io/master-"
 
+- name: Generate ClusterRole file for the sa default and namespace kube-system
+  template:
+    src: "clusterrole-admin.j2"
+    dest: /tmp/clusterrole-admin.yml
+
+- name: Grant Cluster Admin role to the serviceaccount default of kube-system
+  shell: |
+    kubectl apply -f /tmp/clusterrole-admin.yml
+
 - name: Create persistence volume
   include_tasks: create_single_pv.yml
   vars:
