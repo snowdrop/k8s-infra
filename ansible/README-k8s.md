@@ -52,13 +52,13 @@ roles
   
 ### Install K8s Dashboard
 
+  **Prerequisite**: Helm must be installed. Run the playbook command where you pass to `playbook/k8s.yml`, the tag `--tags helm`
+
   ```bash
   ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags k8s_dashboard
   ```   
   
     To uninstall the `helm k8s chart console`, execute this command where you pass the parameter `-e remove=true` 
-  
-  **Warning**: Helm must be installed !
 
 ### Docker Registry
 
@@ -81,6 +81,8 @@ roles
 
 ### KubeDB Operator
 
+  **Prerequisite**: Helm must be installed. Run the playbook command where you pass to `playbook/k8s.yml`, the tag `--tags helm`
+
   ```bash
   ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags kubedb
   ```    
@@ -90,7 +92,8 @@ roles
   ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags kubedb -e remove=true
   ```  
   
-  You can, during the installation of the kubedb operator install and enable their mutating and validating webhooks using this parameter `-e kubedb_enablewebhook=true`
+  You can, during the installation of the kubedb operator, install and enable their mutating and validating webhooks using this parameter `-e kubedb_enablewebhook=true`. By default, webhooks are not enabled.
+  The namespace where kudedb should be installed can be specified using `-e kubedb_namespace=my-kudeb`. By default, it is `kubedb`
   
 ### K8s Service Catalog and OABroker
 
