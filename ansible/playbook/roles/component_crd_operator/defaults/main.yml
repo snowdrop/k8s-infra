@@ -8,3 +8,4 @@ component_operator_docker_image_version: latest
 component_operator_watch_namespace: ""
 component_operator_namespace: "operators"
 component_operator_name: "component-operator"
+component_operator_zap_encoder: "console"

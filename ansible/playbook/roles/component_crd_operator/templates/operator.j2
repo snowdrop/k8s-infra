@@ -21,6 +21,9 @@ spec:
             name: metrics
           command:
           - component-operator
+          args:
+            - --zap-encoder
+            - $(ZAP_ENCODER)
           imagePullPolicy: Always
           env:
             - name: WATCH_NAMESPACE
@@ -31,3 +34,5 @@ spec:
                   fieldPath: metadata.name
             - name: OPERATOR_NAME
               value: {{ component_operator_name }}
+            - name: ZAP_ENCODER
+              value: {{ component_operator_zap_encoder }}
