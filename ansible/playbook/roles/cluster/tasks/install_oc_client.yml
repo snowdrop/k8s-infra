@@ -40,9 +40,14 @@
     remote_src: yes
   when: "'tar.gz' in asset_name"
 
+- name: List output dir
+  command: ls -la {{ temp_output.stdout }}
+
 - name: Set path to the extracted folder for tar.gz archive
   set_fact:
-    archive_path: "{{ asset_name | regex_replace('\\.(tar\\.gz|\\zip)', '') }}/"
+    # ISSUE: Fails on Centos7 -> error: bad escape \z at position 11
+    # archive_path: "{{ asset_name | regex_replace('\\.(tar\\.gz|\\zip)', '') }}"
+    archive_path: ""
   when: "'tar.gz' in asset_name"
 
 - name: Set path to the extracted folder for zip archive
