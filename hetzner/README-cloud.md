@@ -1,78 +1,48 @@
-# Using oc cluster up
+# Hetzner Cloud
+
+The following guide details how to provision a Hetzner VM using the [Hetzner Cloud APi](https://docs.hetzner.cloud/#overview) or the  [Hetzner Cloud client](https://github.com/hetznercloud/cli) that you can install using the 
+following brew command `brew install hcloud`
+To getting started, you must get a Token for your API as described [here](https://docs.hetzner.cloud/#overview-getting-started).
+
+In order to create a vm and next access it, you must first import your ssh public key using this command
+```bash
+hcloud ssh-key create --name USER_KEY_NAME --public-key-from-file ~/.ssh/id_rsa.pub
+```
+
+## Using oc cluster up
+
+In order to configure and install different software and to deploy openshift using `oc cluster up`,
+you must execute locally the bash script `./scripts/create-user-data.sh` responsible to populate the `user-data` file
+that cloud-init will use on the remote vm during the creation of the vm.
+
+```bash
+./scripts/create-user-data.sh
+```
+
+Next create a Hetzner cloud vm using as parameters the `user-data` file created previously and your public key imported
+
+```bash
 hcloud server delete dabou1
-hcloud server create --name dabou1 --type cx41 --image centos-7 --ssh-key snowdrop  --user-data-from-file ../virtualbox/build-centos-iso/user-data
+hcloud server create --name dabou1 --type cx41 --image centos-7 --ssh-key USER_KEY_NAME  --user-data-from-file ./scripts/user-data
+```
+
+You can ssh to the newly created vm using the following command
+```bash
 IP_HETZNER=$(hcloud server describe dabou1 -o json | jq -r .public_net.ipv4.ip)
 ssh-keygen -R $IP_HETZNER
 sleep 20s
 ssh root@$IP_HETZNER
+```
 
-cat /var/log/cloud-init.log | more
- 
+## Using openshift ansible playbook
 
-PUBLIC_IP=$(ifconfig eth0 | sed -En 's/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p')
-version=3.11
-mkdir -p /var/lib/origin/openshift.local.clusterup
-echo -e '{ \n   "insecure-registries" : [ "172.30.0.0/16" ],\n   "hosts" : [ "unix://", "tcp://0.0.0.0:2376" ]\n}' > /etc/docker/daemon.json
-systemctl restart docker
-
-wget https://github.com/openshift/origin/releases/download/v3.11.0/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit.tar.gz
-tar -vxf openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit.tar.gz
-sudo cp openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/oc /usr/local/bin
-
-# oc cluster up --tag=v${version} \
-#   --base-dir="/var/lib/origin/openshift.local.clusterup" \
-#   --public-hostname=${PUBLIC_IP} \
-#   --skip-registry-check=true \
-#   --enable=[-sample-templates]
-# oc cluster down
-  
-hcloud server create-image --description "oc client" --type snapshot dabou1 
-Image 7050052 created from server 3162121
-
-ID_IMAGE=$(hcloud image list | grep "oc client" | cut -d" " -f 1)
-hcloud server delete dabou1
-hcloud server create --name dabou1 --type cx41 --image $ID_IMAGE --ssh-key snowdrop
-
-IP_HETZNER=$(hcloud server describe dabou1 -o json | jq -r .public_net.ipv4.ip)
-ssh root@$IP_HETZNER
-
-PUBLIC_IP=$(ifconfig eth0 | sed -En 's/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p')
-version=3.11
-mkdir -p /var/lib/origin/openshift.local.clusterup
-echo -e '{ \n   "insecure-registries" : [ "172.30.0.0/16" ],\n   "hosts" : [ "unix://", "tcp://0.0.0.0:2376" ]\n}' > /etc/docker/daemon.json
-systemctl restart docker
-
-wget https://github.com/openshift/origin/releases/download/v3.11.0/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit.tar.gz
-tar -vxf openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit.tar.gz
-sudo cp openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit/oc /usr/local/bin
-
-STARTTIME=$(date +%s)
-oc cluster up \
-  --tag=v${version} \
-  --base-dir="/var/lib/origin/openshift.local.clusterup" \
-  --public-hostname=${PUBLIC_IP} \
-  --skip-registry-check=true \
-  --enable=[-sample-templates]
-ENDTIME=$(date +%s)
-echo "It took $(($ENDTIME - $STARTTIME)) seconds to complete this task..."
-
-#ansible-playbook playbook/generate_inventory.yml -e ip_address=$IPCloud -e type=simple
-#ansible-playbook -i inventory/simple_host playbook/cluster.yml --tags "up" -e ansible_os_family=RedHat -e openshift_release_tag_name=v3.11.0
-#ansible-playbook -i inventory/simple_host playbook/post_installation.yml -e openshift_admin_pwd=admin --tags "enable_cluster_role"
-  
-DON'T WORK
-https://docs.okd.io/latest/getting_started/administrators.html#running-in-a-docker-container  
-
-
-# Using openshift ansible playbook
-
+```bash
 hcloud floating-ip create --type ipv4 --server dabou1
 Floating IP 91243 created
 
 hcloud server delete dabou1
 hcloud server create --name dabou1 --type cx31 --image centos-7 --ssh-key snowdrop --user-data-from-file ../virtualbox/build-centos-iso/user-data
 IP_HETZNER=$(hcloud server describe dabou1 -o json | jq -r .public_net.ipv4.ip)
-
 
 ansible-playbook playbook/generate_inventory.yml -e ip_address=$IP_HETZNER
 ansible-playbook -i inventory/cloud_host openshift-ansible/playbooks/prerequisites.yml
@@ -86,3 +56,4 @@ IP_HETZNER=$(hcloud server describe dabou1 -o json | jq -r .public_net.ipv4.ip)
 open https://$IP_HETZNER:8443/console
 
 ssh centos@$IP_HETZNER
+```
