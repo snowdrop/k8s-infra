@@ -6,10 +6,15 @@ hostIP=$(hostname -I | awk '{print $1}')
 echo "Install needed yum packages"
 yum install -y docker git wget ansible net-tools NetworkManager
 
-echo "Wait till yum process is over"
-while kill -0 $(cat /run/yum.pid) 2> /dev/null; do echo "Wait till /run/yum.pid is over"; sleep 10; done
+while kill -0 $(cat /run/yum.pid) 2> /dev/null; do echo "Wait till /run/yum.pid is over"; sleep 10; done;
 
-echo "Wait till docker is running"
+echo "Enable docker and Network manager"
+systemctl enable NetworkManager
+systemctl start NetworkManager
+
+systemctl enable docker
+systemctl start docker
+
 until [ "$(systemctl is-active docker)" = "active" ]; do echo "Wait till docker daemon is running"; sleep 10; done;
 
 echo "Cloning Snowdrop Infra Playbook"

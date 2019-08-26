@@ -25,7 +25,5 @@ users:
       - SSH_PUBLIC_KEY
 
 runcmd:
-  - systemctl enable NetworkManager
-  - systemctl start NetworkManager
   - timedatectl set-timezone TIMEZONE
 
