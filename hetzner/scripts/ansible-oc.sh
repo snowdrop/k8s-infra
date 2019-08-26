@@ -9,7 +9,7 @@ git clone https://github.com/snowdrop/openshift-infra.git /tmp/infra 2>&1
 echo "Creating Ansible inventory file"
 echo -e "[masters]\nlocalhost ansible_connection=local ansible_user=root" > /tmp/infra/ansible/inventory/hetzner_vm
 
-echo "Pulling docker images"
+echo "Pulling Origin docker images for version v${version}"
 sudo docker pull quay.io/openshift/origin-node:v${version}
 sudo docker pull quay.io/openshift/origin-control-plane:v${version}
 sudo docker pull quay.io/openshift/origin-haproxy-router:v${version}
