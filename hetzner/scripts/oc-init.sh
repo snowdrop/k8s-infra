@@ -1,8 +1,8 @@
 #!/bin/bash
-set +e
 
 version=3.11
 hostIP=$(hostname -I | awk '{print $1}')
+
 echo -e '{ \n   "insecure-registries" : [ "172.30.0.0/16" ],\n   "hosts" : [ "unix://", "tcp://0.0.0.0:2376" ]\n}' > /etc/docker/daemon.json
 rm -rf /etc/docker/certs.d/registry.access.redhat.com
 systemctl enable docker
@@ -22,5 +22,15 @@ oc cluster up \
   --enable=[-sample-templates] \
   --v=5 \
   2>&1
+
+sleep 15s
+
+echo "==============================="
+echo "Grant cluster-admin role to admin's user"
+echo "==============================="
+oc login -u system:admin
+oc adm policy add-cluster-role-to-user cluster-admin admin
+oc adm policy add-scc-to-group hostmount-anyuid system:serviceaccounts
+oc login -u admin -p admin
 
 exit 0
