@@ -16,7 +16,7 @@ packages:
   - net-tools
   - NetworkManager
   - python-rhsm-certificates
-  - atomic
+  # - atomic
 
 users:
   - name: centos

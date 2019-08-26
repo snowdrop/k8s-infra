@@ -7,7 +7,7 @@ echo "Cloning Snowdrop Infra Playbook"
 git clone https://github.com/snowdrop/openshift-infra.git /tmp/infra 2>&1
 
 echo "Creating Ansible inventory file"
-echo -e "[masters]\n ${hostIP} public_ip_address==${hostIP} ansible_user=root" > /tmp/infra/ansible/inventory/hetzner_vm
+echo -e "localhost ansible_connection=local ansible_user=root" > /tmp/infra/ansible/inventory/hetzner_vm
 
 echo "Starting playbook"
 cd /tmp/infra/ansible
