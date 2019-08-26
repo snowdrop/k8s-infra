@@ -24,7 +24,7 @@ cluster_skip_registry_check: true
 
 openshift_up_options: '
   --base-dir={{ cluster_base_dir }}
-  --tag={{ cluster_tag_version }} \
+  --tag=v{{ cluster_tag_version }} \
   --public-hostname={{ cluster_ip_address }}
   --routing-suffix={{ cluster_ip_address }}.nip.io
   --server-loglevel={{ cluster_server_log_level }}
