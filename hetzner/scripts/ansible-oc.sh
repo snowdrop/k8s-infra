@@ -17,4 +17,9 @@ ansible-playbook -i ./inventory/hetzner_vm playbook/cluster.yml \
     --tags "up" \
     2>&1
 
+echo "Enable cluster-admin role for admin user"
+ansible-playbook -i ./inventory/hetzner_vm playbook/post_installation.yml \
+     -e openshift_admin_pwd=admin \
+     --tags "enable_cluster_role"
+
 exit 0
