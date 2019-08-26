@@ -17,6 +17,7 @@ oc cluster up \
   --tag="v${version}" \
   --base-dir="/var/lib/origin/openshift.local.clusterup" \
   --public-hostname="${hostIP}" \
+  --routing-suffix="${hostIP}.nip.io" \
   --skip-registry-check=true \
   --enable=[-sample-templates] \
   --v=5 \
