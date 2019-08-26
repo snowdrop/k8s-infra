@@ -43,5 +43,5 @@ runcmd:
   - systemctl enable NetworkManager
   - timedatectl set-timezone TIMEZONE
   - echo "$(hostname -I | cut -d" " -f 1) $HOSTNAME" >> /etc/hosts
-  - curl https://raw.githubusercontent.com/snowdrop/openshift-infra/5e716a15d6c02d8bd019249fd6e96d13855ce55a/virtualbox/build-centos-iso/oc-init.sh | bash
+  - curl https://raw.githubusercontent.com/snowdrop/openshift-infra/master/hetzner/scripts/oc-init.sh | bash
 
