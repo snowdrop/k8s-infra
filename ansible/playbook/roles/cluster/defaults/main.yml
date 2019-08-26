@@ -29,6 +29,5 @@ openshift_up_options: '
   --routing-suffix={{ cluster_ip_address }}.nip.io
   --server-loglevel={{ cluster_server_log_level }}
   --write-config={{ cluster_write_config }}
-  --skip-registry-check={{ cluster_skip_registry_check }}
   --v={{ cluster_cmd_log_level }}'
 
