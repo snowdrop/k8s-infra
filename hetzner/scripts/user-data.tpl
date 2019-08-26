@@ -15,8 +15,6 @@ packages:
   - ansible
   - net-tools
   - NetworkManager
-  - python-rhsm-certificates
-  # - atomic
 
 users:
   - name: centos
@@ -43,6 +41,4 @@ runcmd:
   - export LANGUAGE=en_US.UTF-8
   - export LC_COLLATE=C
   - export LC_CTYPE=en_US.UTF-8
-  # - echo "$(hostname -I | cut -d" " -f 1) $HOSTNAME" >> /etc/hosts
-  # - curl https://raw.githubusercontent.com/snowdrop/openshift-infra/master/hetzner/scripts/oc-init.sh | bash
 
