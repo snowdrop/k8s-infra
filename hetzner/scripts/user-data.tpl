@@ -33,8 +33,8 @@ users:
       - SSH_PUBLIC_KEY
 
 runcmd:
-  - systemctl start NetworkManager
   - systemctl enable NetworkManager
+  - systemctl start NetworkManager
   - timedatectl set-timezone TIMEZONE
   - export LANG=en_US.UTF-8
   - export LANGUAGE=en_US.UTF-8
