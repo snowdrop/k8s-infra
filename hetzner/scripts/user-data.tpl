@@ -33,7 +33,6 @@ users:
       - SSH_PUBLIC_KEY
 
 runcmd:
-  - yum install -y NetworkManager
   - systemctl start NetworkManager
   - systemctl enable NetworkManager
   - timedatectl set-timezone TIMEZONE
