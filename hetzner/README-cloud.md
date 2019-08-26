@@ -55,5 +55,7 @@ hcloud server create --name VM_NAME --type cx41 --image centos-7 --ssh-key USER_
 IP_HETZNER=$(hcloud server describe VM_NAME -o json | jq -r .public_net.ipv4.ip)
 sleep 90s
 ssh-keygen -R $IP_HETZNER
+while ! nc -z $IP_HETZNER 22; do echo "Wait till we can ssh..."; sleep 10; done
+ssh -o StrictHostKeyChecking=no root@$IP_HETZNER 'while kill -0 $(cat /run/yum.pid) 2> /dev/null; do echo "Wait till yum process is released"; sleep 10; done;'
 ssh -o StrictHostKeyChecking=no root@$IP_HETZNER 'curl https://raw.githubusercontent.com/snowdrop/openshift-infra/master/hetzner/scripts/ansible-oc.sh | bash'
 ```
