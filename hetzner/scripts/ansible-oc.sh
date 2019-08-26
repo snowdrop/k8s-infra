@@ -8,6 +8,7 @@ git clone https://github.com/snowdrop/openshift-infra.git /tmp/infra 2>&1
 
 echo "Creating Ansible inventory file"
 echo -e "[masters]\nlocalhost ansible_connection=local ansible_user=root" > /tmp/infra/ansible/inventory/hetzner_vm
+cat /tmp/infra/ansible/inventory/hetzner_vm
 
 echo "Starting playbook"
 cd /tmp/infra/ansible
