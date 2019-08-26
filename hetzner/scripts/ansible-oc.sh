@@ -9,18 +9,21 @@ git clone https://github.com/snowdrop/openshift-infra.git /tmp/infra 2>&1
 echo "Creating Ansible inventory file"
 echo -e "[masters]\nlocalhost ansible_connection=local ansible_user=root" > /tmp/infra/ansible/inventory/hetzner_vm
 
+echo "Wait till docker is running"
+until [ "$(systemctl is-active docker)" = "active" ]; do echo "Wait till docker daemon is running"; sleep 10; done;
+
 echo "Pulling Origin docker images for version v${version}"
-sudo docker pull quay.io/openshift/origin-node:v${version}
-sudo docker pull quay.io/openshift/origin-control-plane:v${version}
-sudo docker pull quay.io/openshift/origin-haproxy-router:v${version}
-sudo docker pull quay.io/openshift/origin-hyperkube:v${version}
-sudo docker pull quay.io/openshift/origin-deployer:v${version}
-sudo docker pull quay.io/openshift/origin-pod:v${version}
-sudo docker pull quay.io/openshift/origin-hypershift:v${version}
-sudo docker pull quay.io/openshift/origin-cli:v${version}
-sudo docker pull quay.io/openshift/origin-docker-registry:v${version}
-sudo docker pull quay.io/openshift/origin-web-console:v${version}
-sudo docker pull quay.io/openshift/origin-service-serving-cert-signer:v${version}
+docker pull quay.io/openshift/origin-node:v${version}
+docker pull quay.io/openshift/origin-control-plane:v${version}
+docker pull quay.io/openshift/origin-haproxy-router:v${version}
+docker pull quay.io/openshift/origin-hyperkube:v${version}
+docker pull quay.io/openshift/origin-deployer:v${version}
+docker pull quay.io/openshift/origin-pod:v${version}
+docker pull quay.io/openshift/origin-hypershift:v${version}
+docker pull quay.io/openshift/origin-cli:v${version}
+docker pull quay.io/openshift/origin-docker-registry:v${version}
+docker pull quay.io/openshift/origin-web-console:v${version}
+docker pull quay.io/openshift/origin-service-serving-cert-signer:v${version}
 
 echo "Starting playbook"
 cd /tmp/infra/ansible
