@@ -5,7 +5,7 @@ openshift_github_name: origin
 openshift_github_url: https://api.github.com/repos
 
 # Openshift parameters
-openshift_release_tag_name: "v3.10.0"
+openshift_release_tag_name: "v3.11.0"
 
 openshift_client_dest: /usr/local/bin
 openshift_force_client_install: false
@@ -14,17 +14,21 @@ openshift_recreate: yes
 
 # Cluster configuration
 cluster_ip_address: "{{ public_ip_address }}" # Re use the inventory ip address
+cluster_tag_version: "3.11"
 cluster_use_existing_config: true
 cluster_server_log_level: 1
 cluster_base_dir: "/var/lib/origin/openshift.local.clusterup"
 cluster_write_config: false
 cluster_cmd_log_level: 0
+cluster_skip_registry_check: true
 
 openshift_up_options: '
   --base-dir={{ cluster_base_dir }}
+  --tag={{ cluster_tag_version }} \
   --public-hostname={{ cluster_ip_address }}
   --routing-suffix={{ cluster_ip_address }}.nip.io
   --server-loglevel={{ cluster_server_log_level }}
   --write-config={{ cluster_write_config }}
+  --skip-registry-check={{ cluster_skip_registry_check }}
   --v={{ cluster_cmd_log_level }}'
 
