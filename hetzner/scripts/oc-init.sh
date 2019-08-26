@@ -19,17 +19,17 @@ oc cluster up \
   --public-hostname="${hostIP}" \
   --routing-suffix="${hostIP}.nip.io" \
   --skip-registry-check=true \
-  --v=5 \
+  --v=2 \
   2>&1
 
 sleep 15s
 
-echo "========================================"
-echo "Copy .kube/config file to the home user"
-echo "========================================"
-mkdir -p /home/centos/.kube
-sudo cp /.kube/config /home/centos/.kube/config
-sudo chown centos:centos /home/centos/.kube/config
+# echo "========================================"
+# echo "Copy .kube/config file to the home user"
+# echo "========================================"
+# mkdir -p /home/centos/.kube
+# sudo cp /.kube/config /home/centos/.kube/config
+# sudo chown centos:centos /home/centos/.kube/config
 
 echo "========================================"
 echo "Grant cluster-admin role to admin's user"

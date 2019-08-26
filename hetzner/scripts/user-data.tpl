@@ -36,12 +36,12 @@ users:
 
 runcmd:
   - yum install -y NetworkManager
-  - rm -rf /etc/docker/certs.d/registry.access.redhat.com
-  - systemctl enable docker
-  - systemctl restart docker
+  #- rm -rf /etc/docker/certs.d/registry.access.redhat.com
+  #- systemctl enable docker
+  #- systemctl restart docker
   - systemctl start NetworkManager
   - systemctl enable NetworkManager
   - timedatectl set-timezone TIMEZONE
-  - echo "$(hostname -I | cut -d" " -f 1) $HOSTNAME" >> /etc/hosts
-  - curl https://raw.githubusercontent.com/snowdrop/openshift-infra/master/hetzner/scripts/oc-init.sh | bash
+  # - echo "$(hostname -I | cut -d" " -f 1) $HOSTNAME" >> /etc/hosts
+  # - curl https://raw.githubusercontent.com/snowdrop/openshift-infra/master/hetzner/scripts/oc-init.sh | bash
 
