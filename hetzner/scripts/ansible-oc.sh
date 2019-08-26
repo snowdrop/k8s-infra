@@ -3,8 +3,8 @@
 version=3.11
 hostIP=$(hostname -I | awk '{print $1}')
 
-echo "Install needed yum packages"
-yum install -y -q docker git wget ansible net-tools NetworkManager
+echo "Install needed yum packages: docker git wget ansible NetworkManager"
+yum install -y -q docker git wget ansible NetworkManager
 
 echo "Enable docker and Network manager"
 systemctl enable NetworkManager
