@@ -14,9 +14,9 @@ sudo cp openshift-origin-client-tools-v${version}.0-0cbc58b-linux-64bit/oc /usr/
 
 echo "Launching oc startup using version 3.11"
 oc cluster up \
-  --tag=v$version \
+  --tag="v${version}" \
   --base-dir="/var/lib/origin/openshift.local.clusterup" \
-  --public-hostname=$hostIP \
+  --public-hostname="${hostIP}" \
   --skip-registry-check=true \
   --enable=[-sample-templates] \
   --v=5 \
