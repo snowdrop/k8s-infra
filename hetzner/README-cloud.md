@@ -22,13 +22,13 @@ that cloud-init will use on the remote vm during the creation of the vm.
 Next create a Hetzner cloud vm using as parameters the `user-data` file created previously and your public key imported
 
 ```bash
-hcloud server delete dabou1
-hcloud server create --name dabou1 --type cx41 --image centos-7 --ssh-key USER_KEY_NAME  --user-data-from-file ./scripts/user-data
+hcloud server delete VM_NAME
+hcloud server create --name VM_NAME --type cx41 --image centos-7 --ssh-key USER_KEY_NAME  --user-data-from-file ./scripts/user-data
 ```
 
 You can ssh to the newly created vm using the following command
 ```bash
-IP_HETZNER=$(hcloud server describe dabou1 -o json | jq -r .public_net.ipv4.ip)
+IP_HETZNER=$(hcloud server describe VM_NAME -o json | jq -r .public_net.ipv4.ip)
 ssh-keygen -R $IP_HETZNER
 sleep 20s
 ssh root@$IP_HETZNER
@@ -36,24 +36,24 @@ ssh root@$IP_HETZNER
 
 ## Using openshift ansible playbook
 
+We can provision the VM using ansible playbook by importing this project within the VM and next by executing this playbook as defined
+within the bash script
+
 ```bash
-hcloud floating-ip create --type ipv4 --server dabou1
-Floating IP 91243 created
+ansible-playbook -i ./inventory/hetzner_vm playbook/cluster.yml \
+    -e openshift_release_tag_name=v3.11.0 \
+    -e public_ip_address="${hostIP}" \
+    --tags "up" \
+    2>&1
+```
 
-hcloud server delete dabou1
-hcloud server create --name dabou1 --type cx31 --image centos-7 --ssh-key snowdrop --user-data-from-file ../virtualbox/build-centos-iso/user-data
-IP_HETZNER=$(hcloud server describe dabou1 -o json | jq -r .public_net.ipv4.ip)
+The scenario to create a VM and next to ssh the bash ansible script is the following: 
 
-ansible-playbook playbook/generate_inventory.yml -e ip_address=$IP_HETZNER
-ansible-playbook -i inventory/cloud_host openshift-ansible/playbooks/prerequisites.yml
-ansible-playbook -i inventory/cloud_host openshift-ansible/playbooks/deploy_cluster.yml -e openshift_install_examples=false
-ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e openshift_admin_pwd=admin --tags "enable_cluster_role" 
-hcloud server create-image --description "ocp3 created with openshift-ansible" --type snapshot dabou1 
-ID_IMAGE=$(hcloud image list | grep "ocp3 cluster" | cut -d" " -f 1)
-hcloud server create --name dabou1 --type cx31 --image $ID_IMAGE --ssh-key snowdrop
-
-IP_HETZNER=$(hcloud server describe dabou1 -o json | jq -r .public_net.ipv4.ip)
-open https://$IP_HETZNER:8443/console
-
-ssh centos@$IP_HETZNER
+```bash
+./scripts/create-user-data.sh
+hcloud server create --name VM_NAME --type cx41 --image centos-7 --ssh-key USER_KEY_NAME --user-data-from-file ./scripts/user-data
+IP_HETZNER=$(hcloud server describe VM_NAME -o json | jq -r .public_net.ipv4.ip)
+sleep 90s
+ssh-keygen -R $IP_HETZNER
+ssh -o StrictHostKeyChecking=no root@$IP_HETZNER 'curl https://raw.githubusercontent.com/snowdrop/openshift-infra/master/hetzner/scripts/ansible-oc.sh | bash'
 ```
