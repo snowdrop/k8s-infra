@@ -3,14 +3,20 @@
 version=3.11
 hostIP=$(hostname -I | awk '{print $1}')
 
+echo "Install needed yum packages"
+yum install -y docker git wget ansible net-tools NetworkManager
+
+echo "Wait till yum process is over"
+while kill -0 $(cat /run/yum.pid) 2> /dev/null; do echo "Wait till /run/yum.pid is over"; sleep 10; done
+
+echo "Wait till docker is running"
+until [ "$(systemctl is-active docker)" = "active" ]; do echo "Wait till docker daemon is running"; sleep 10; done;
+
 echo "Cloning Snowdrop Infra Playbook"
 git clone https://github.com/snowdrop/openshift-infra.git /tmp/infra 2>&1
 
 echo "Creating Ansible inventory file"
 echo -e "[masters]\nlocalhost ansible_connection=local ansible_user=root" > /tmp/infra/ansible/inventory/hetzner_vm
-
-echo "Wait till docker is running"
-until [ "$(systemctl is-active docker)" = "active" ]; do echo "Wait till docker daemon is running"; sleep 10; done;
 
 echo "Pulling Origin docker images for version v${version}"
 docker pull quay.io/openshift/origin-node:v${version}

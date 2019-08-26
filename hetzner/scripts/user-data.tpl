@@ -8,14 +8,6 @@ disable_root: false
 
 package_upgrade: false
 
-packages:
-  - docker
-  - git
-  - wget
-  - ansible
-  - net-tools
-  - NetworkManager
-
 users:
   - name: centos
     gecos: Centos User
@@ -36,8 +28,4 @@ runcmd:
   - systemctl enable NetworkManager
   - systemctl start NetworkManager
   - timedatectl set-timezone TIMEZONE
-  - export LANG=en_US.UTF-8
-  - export LANGUAGE=en_US.UTF-8
-  - export LC_COLLATE=C
-  - export LC_CTYPE=en_US.UTF-8
 
