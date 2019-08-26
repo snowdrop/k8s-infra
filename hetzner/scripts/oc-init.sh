@@ -19,15 +19,21 @@ oc cluster up \
   --public-hostname="${hostIP}" \
   --routing-suffix="${hostIP}.nip.io" \
   --skip-registry-check=true \
-  --enable=[-sample-templates] \
   --v=5 \
   2>&1
 
 sleep 15s
 
-echo "==============================="
+echo "========================================"
+echo "Copy .kube/config file to the home user"
+echo "========================================"
+mkdir -p /home/centos/.kube
+sudo cp /.kube/config ~/.kube/config
+sudo chown centos:centos /home/centos/.kube/config
+
+echo "========================================"
 echo "Grant cluster-admin role to admin's user"
-echo "==============================="
+echo "========================================"
 oc login -u system:admin
 oc adm policy add-cluster-role-to-user cluster-admin admin
 oc adm policy add-scc-to-group hostmount-anyuid system:serviceaccounts
