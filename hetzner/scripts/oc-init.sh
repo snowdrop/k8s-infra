@@ -28,7 +28,7 @@ echo "========================================"
 echo "Copy .kube/config file to the home user"
 echo "========================================"
 mkdir -p /home/centos/.kube
-sudo cp /.kube/config ~/.kube/config
+sudo cp /.kube/config /home/centos/.kube/config
 sudo chown centos:centos /home/centos/.kube/config
 
 echo "========================================"
