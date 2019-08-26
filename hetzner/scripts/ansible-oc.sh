@@ -39,6 +39,7 @@ cd /tmp/infra/ansible
 ansible-playbook -i ./inventory/hetzner_vm playbook/cluster.yml \
     -e openshift_release_tag_name="v${version}.0" \
     -e public_ip_address="${hostIP}" \
+    -e cluster_cmd_log_level=2 \
     --tags "up" \
     2>&1
 
