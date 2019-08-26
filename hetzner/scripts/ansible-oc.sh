@@ -6,8 +6,6 @@ hostIP=$(hostname -I | awk '{print $1}')
 echo "Install needed yum packages"
 yum install -y docker git wget ansible net-tools NetworkManager
 
-while kill -0 $(cat /run/yum.pid) 2> /dev/null; do echo "Wait till /run/yum.pid is over"; sleep 10; done;
-
 echo "Enable docker and Network manager"
 systemctl enable NetworkManager
 systemctl start NetworkManager
