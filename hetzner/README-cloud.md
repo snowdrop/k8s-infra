@@ -80,8 +80,9 @@ EOF
 
 ### Locally
 
-You can also if you prefer execute from this project the ansible playbook. The command to be executed is :
+You can also if you prefer execute from this project the Ansible playbook. The commands to be executed are described here after
 
+- Create a Hetzner cloud vm and wait till we can ssh
 ```bash
 cd hetzner
 ./scripts/create-user-data.sh
@@ -89,7 +90,14 @@ hcloud server create --name VM_NAME --type cx41 --image centos-7 --ssh-key USER_
 IP_HETZNER=$(hcloud server describe VM_NAME -o json | jq -r .public_net.ipv4.ip)
 ssh-keygen -R $IP_HETZNER
 while ! nc -z $IP_HETZNER 22; do echo "Wait till we can ssh..."; sleep 10; done
+```
+- Execute the post installation script to install docker loike git, wget
+```bash
 ssh -o StrictHostKeyChecking=no root@$IP_HETZNER 'bash -s' < ./scripts/post-installation.sh
+```
+
+- Move to the ansible directory, generate the inventory file and run the playbook able to perform a `oc cluster up`
+```bash
 cd ../ansible
 ansible-playbook playbook/generate_inventory.yml -e ip_address=$IP_HETZNER -e type=hetzner
 ansible-playbook -i inventory/hetzner_host playbook/cluster.yml \

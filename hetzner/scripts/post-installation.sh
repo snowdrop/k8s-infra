@@ -13,7 +13,7 @@ else
   yum install -y -q docker git wget ansible
 fi
 
-# echo "Enable docker and Network manager"
+# echo "Enable Network manager"
 # yum install -y -q NetworkManager
 # systemctl enable NetworkManager
 # systemctl start NetworkManager
