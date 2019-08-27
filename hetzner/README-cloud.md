@@ -97,7 +97,8 @@ ssh-keygen -R $IP_HETZNER
 while ! nc -z $IP_HETZNER 22; do echo "Wait till we can ssh..."; sleep 10; done
 ssh -o StrictHostKeyChecking=no root@$IP_HETZNER 'bash -s' < ./scripts/post-installation.sh
 cd ../ansible
-ansible-playbook -i inventory/hetzner_cloud_hosts playbook/cluster.yml \
+ansible-playbook playbook/generate_inventory.yml -e ip_address=$IP_HETZNER -e type=hetzner
+ansible-playbook -i inventory/hetzner_host playbook/cluster.yml \
    -e public_ip_address=$(hcloud server describe VM_NAME -o json | jq -r .public_net.ipv4.ip) \
    -e ansible_os_family="RedHat" \
    --tags "up"

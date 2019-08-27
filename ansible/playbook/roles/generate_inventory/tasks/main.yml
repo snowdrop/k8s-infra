@@ -1,5 +1,5 @@
 - set_fact:
-    file_name: "{{ 'simple' if type is defined and type == 'simple' else 'cloud'}}"
+    file_name: "{{ type | default('simple') }}"
 
 - name: Create Ansible Host file
   template:
