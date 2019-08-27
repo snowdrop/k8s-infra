@@ -14,7 +14,7 @@ openshift_recreate: yes
 
 # Cluster configuration
 cluster_ip_address: "{{ public_ip_address }}" # Re use the inventory ip address
-cluster_tag_version: "v3.11"
+cluster_tag_version: "v3.11.0"
 cluster_use_existing_config: true
 cluster_server_log_level: 1
 cluster_base_dir: "/var/lib/origin/openshift.local.clusterup"
@@ -24,7 +24,7 @@ cluster_skip_registry_check: true
 
 openshift_up_options: '
   --base-dir={{ cluster_base_dir }}
-  --tag={{ cluster_tag_version }} \
+  --tag={{ cluster_tag_version }}
   --public-hostname={{ cluster_ip_address }}
   --routing-suffix={{ cluster_ip_address }}.nip.io
   --server-loglevel={{ cluster_server_log_level }}
