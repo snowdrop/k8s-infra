@@ -86,7 +86,12 @@ You can also if you prefer execute from this project the Ansible playbook. The c
 ```bash
 cd hetzner
 ./scripts/create-user-data.sh
-hcloud server create --name VM_NAME --type cx41 --image centos-7 --ssh-key USER_KEY_NAME --user-data-from-file ./scripts/user-data
+hcloud server create \
+  --name VM_NAME \
+  --type cx41 \
+  --image centos-7 \
+  --ssh-key USER_KEY_NAME \
+  --user-data-from-file ./scripts/user-data
 IP_HETZNER=$(hcloud server describe VM_NAME -o json | jq -r .public_net.ipv4.ip)
 ssh-keygen -R $IP_HETZNER
 while ! nc -z $IP_HETZNER 22; do echo "Wait till we can ssh..."; sleep 10; done
@@ -99,7 +104,9 @@ ssh -o StrictHostKeyChecking=no root@$IP_HETZNER 'bash -s' < ./scripts/post-inst
 - Move to the ansible directory, generate the inventory file and run the playbook able to perform a `oc cluster up`
 ```bash
 cd ../ansible
-ansible-playbook playbook/generate_inventory.yml -e ip_address=$IP_HETZNER -e type=hetzner
+ansible-playbook playbook/generate_inventory.yml \
+  -e ip_address=$IP_HETZNER \
+  -e type=hetzner
 ansible-playbook -i inventory/hetzner_host playbook/cluster.yml \
    -e public_ip_address=$(hcloud server describe VM_NAME -o json | jq -r .public_net.ipv4.ip) \
    -e ansible_os_family="RedHat" \
