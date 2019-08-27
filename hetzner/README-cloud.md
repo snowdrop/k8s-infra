@@ -36,6 +36,8 @@ ssh root@$IP_HETZNER
 
 ## Using openshift ansible playbook
 
+### Remote
+
 We can provision the VM using ansible playbook by importing this project within the VM and next by executing this playbook as defined
 within the bash script
 
@@ -76,20 +78,12 @@ exit 0
 EOF
 ```
 
-or locally if you have created an inventory file `hetzner_cloud_hosts` containing the ip address of the remote machine and your private ssh key
-location
- 
-```bash
-[masters]
-116.203.215.139 # IP of the Hetzner cloud vm -> hcloud server describe VM_NAME -o json | jq -r .public_net.ipv4.ip
-[masters:vars]
-ansible_user=root
-ansible_ssh_private_key_file=~/.ssh/id_rsa
-```
+### Locally
 
-Command to be executed:
+You can also if you prefer execute from this project the ansible playbook. The command to be executed is :
 
 ```bash
+cd hetzner
 ./scripts/create-user-data.sh
 hcloud server create --name VM_NAME --type cx41 --image centos-7 --ssh-key USER_KEY_NAME --user-data-from-file ./scripts/user-data
 IP_HETZNER=$(hcloud server describe VM_NAME -o json | jq -r .public_net.ipv4.ip)
