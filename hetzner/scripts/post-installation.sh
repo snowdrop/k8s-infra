@@ -1,24 +1,34 @@
 #!/bin/bash
 
-version=3.11
-hostIP=$(hostname -I | awk '{print $1}')
+# Command
+# ./scripts/post-installation.sh true
+# where boolean is used to specify if we run Ansible locally or remotely
 
-echo "Install needed yum packages: docker git wget ansible NetworkManager"
-yum install -y -q docker git wget ansible NetworkManager
+IS_ANSIBLE_LOCAL=${1:-true}
 
-echo "Enable docker and Network manager"
-systemctl enable NetworkManager
-systemctl start NetworkManager
+echo "Install needed yum packages: docker git wget ..."
+if [ "$IS_ANSIBLE_LOCAL" = true ]; then
+  yum install -y -q docker git wget
+else
+  yum install -y -q docker git wget ansible
+fi
+
+# echo "Enable docker and Network manager"
+# yum install -y -q NetworkManager
+# systemctl enable NetworkManager
+# systemctl start NetworkManager
 
 systemctl enable docker
 systemctl start docker
 
 until [ "$(systemctl is-active docker)" = "active" ]; do echo "Wait till docker daemon is running"; sleep 10; done;
 
-echo "Cloning Snowdrop Infra Playbook"
-git clone https://github.com/snowdrop/openshift-infra.git /tmp/infra 2>&1
+if [ "$IS_ANSIBLE_LOCAL" = false ] ; then
+  echo "Cloning Snowdrop Infra Playbook"
+  git clone https://github.com/snowdrop/openshift-infra.git /tmp/infra 2>&1
 
-echo "Creating Ansible inventory file"
-echo -e "[masters]\nlocalhost ansible_connection=local ansible_user=root" > /tmp/infra/ansible/inventory/hetzner_vm
+  echo "Creating Ansible inventory file"
+  echo -e "[masters]\nlocalhost ansible_connection=local ansible_user=root" > /tmp/infra/ansible/inventory/hetzner_vm
+fi
 
 exit 0
