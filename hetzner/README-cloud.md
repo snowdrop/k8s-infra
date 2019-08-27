@@ -57,5 +57,21 @@ sleep 90s
 ssh-keygen -R $IP_HETZNER
 while ! nc -z $IP_HETZNER 22; do echo "Wait till we can ssh..."; sleep 10; done
 ssh -o StrictHostKeyChecking=no root@$IP_HETZNER 'while kill -0 $(cat /run/yum.pid) 2> /dev/null; do echo "Wait till yum process is released"; sleep 10; done;'
-ssh -o StrictHostKeyChecking=no root@$IP_HETZNER 'curl https://raw.githubusercontent.com/snowdrop/openshift-infra/master/hetzner/scripts/ansible-oc.sh | bash'
+ssh -o StrictHostKeyChecking=no root@$IP_HETZNER 'bash -s' < ./scripts/post-installation.sh
+ssh -o StrictHostKeyChecking=no root@$IP_HETZNER << EOF
+hostIP=$(hostname -I | awk '{print $1}')
+cd /tmp/infra/ansible
+ansible-playbook -i ./inventory/hetzner_vm playbook/cluster.yml \
+    -e openshift_release_tag_name="v${version}.0" \
+    -e public_ip_address="${hostIP}" \
+    --tags "up" \
+    2>&1
+
+echo "Enable cluster-admin role for admin user"
+ansible-playbook -i ./inventory/hetzner_vm playbook/post_installation.yml \
+     -e openshift_admin_pwd=admin \
+     --tags "enable_cluster_role"
+
+exit 0
+EOF
 ```
