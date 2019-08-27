@@ -1,0 +1,22 @@
+- name: Generate Helm values file
+  template:
+    src: "values.yml.j2"
+    dest: /tmp/values.yml
+
+- name: Install Kind
+  shell: |
+    KIND_BINARY_URL="https://github.com/kubernetes-sigs/kind/releases/download/{{ kind_version }}/kind-linux-amd64"
+    wget -O kind "${KIND_BINARY_URL}"
+    chmod +x ./kind
+    sudo mv ./kind /usr/local/bin/kind
+
+- name: Create Cluster
+  shell: |
+    kind create cluster --image=kindest/node:{{ kind_k8s_version }} --name {{ kind_cluster_name }} --loglevel=debug
+
+- name: Setup kube config
+  shell: |
+    kind get kubeconfig-path --name={{ kind_cluster_name }}
+    mkdir -p $HOME/.kube
+    cp -i $(kind get kubeconfig-path --name={{ kind_cluster_name }}) $HOME/.kube/config
+    sudo chown $(id -u):$(id -g) $HOME/.kube/config

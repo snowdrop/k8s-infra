@@ -11,6 +11,7 @@
 
   roles:
     - { role: 'k8s_cluster',   tags: 'k8s_cluster'}
+    - { role: 'kind',   tags: 'kind'}
     - { role: 'k8s_config',   tags: 'k8s_config'}
     - { role: 'ingress',   tags: 'ingress'}
     - { role: 'helm',   tags: 'helm'}

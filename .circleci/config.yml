@@ -111,13 +111,13 @@ jobs:
             pod_id=$(kubectl get pods -n operators -l name=component-operator -o=name)
             kubectl logs $pod_id -n operators
 
-      - run:
-          name: Run e2e test in development mode
-          command: |
-            cd component-operator/demo
-            ./mvnw package
-            cd ..
-            ./demo/scripts/end-to-end_fruit_demo.sh 127.0.0.1 test dev
+      #- run:
+      #    name: Run e2e test in development mode
+      #    command: |
+      #      cd component-operator/demo
+      #      ./mvnw package
+      #      cd ..
+      #      ./demo/scripts/end-to-end_fruit_demo.sh 127.0.0.1 test dev
 
   centos:
     docker:
