@@ -75,3 +75,21 @@ ansible-playbook -i ./inventory/hetzner_vm playbook/post_installation.yml \
 exit 0
 EOF
 ```
+
+or locally if you have created an inventory file containing the ip address of the remote machine and your private ssh key
+ 
+```bash
+[masters]
+116.203.215.139 # IP of the Hetzner cloud vm -> hcloud server describe VM_NAME -o json | jq -r .public_net.ipv4.ip
+[masters:vars]
+ansible_user=root
+ansible_ssh_private_key_file=~/.ssh/id_rsa
+```
+
+Command to be executed:
+
+```bash
+ansible-playbook -i inventory/hetzner_cloud_hosts playbook/cluster.yml \
+   -e public_ip_address=$(hcloud server describe VM_NAME -o json | jq -r .public_net.ipv4.ip) \
+   --tags "up"
+```
