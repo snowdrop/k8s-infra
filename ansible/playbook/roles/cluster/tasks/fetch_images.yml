@@ -1,0 +1,13 @@
+- name: Pulling Origin images for version {{ cluster_tag_version }}
+  shell: |
+    docker pull quay.io/openshift/origin-node:{{ cluster_tag_version }}
+    docker pull quay.io/openshift/origin-control-plane:{{ cluster_tag_version }}
+    docker pull quay.io/openshift/origin-haproxy-router:{{ cluster_tag_version }}
+    docker pull quay.io/openshift/origin-hyperkube:{{ cluster_tag_version }}
+    docker pull quay.io/openshift/origin-deployer:{{ cluster_tag_version }}
+    docker pull quay.io/openshift/origin-pod:{{ cluster_tag_version }}
+    docker pull quay.io/openshift/origin-hypershift:{{ cluster_tag_version }}
+    docker pull quay.io/openshift/origin-cli:{{ cluster_tag_version }}
+    docker pull quay.io/openshift/origin-docker-registry:{{ cluster_tag_version }}
+    docker pull quay.io/openshift/origin-web-console:{{ cluster_tag_version }}
+    docker pull quay.io/openshift/origin-service-serving-cert-signer:{{ cluster_tag_version }}

@@ -26,9 +26,12 @@
 - name: Install the oc binary client
   include_tasks: install_oc_client.yml
   when: not oc_client.stat.exists or openshift_force_client_install
-  
+
 - name: Check if running
   include_tasks: isrunning.yml
+
+- name: Pull cluster images
+  include_tasks: fetch_images.yml
 
 - name: Config to start the all in one Openshift cluster using command 'oc cluster up'
   debug:
