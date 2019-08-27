@@ -48,6 +48,9 @@
   debug:
     var: clusterupout.stdout_lines
 
+- name: Grant cluster admin role to admin user
+  include_tasks: grant_cluster_role.yml
+
 - block:
   - debug:
       msg: "Enabling ASB"

@@ -76,7 +76,8 @@ exit 0
 EOF
 ```
 
-or locally if you have created an inventory file containing the ip address of the remote machine and your private ssh key
+or locally if you have created an inventory file `hetzner_cloud_hosts` containing the ip address of the remote machine and your private ssh key
+location
  
 ```bash
 [masters]
@@ -95,7 +96,7 @@ IP_HETZNER=$(hcloud server describe VM_NAME -o json | jq -r .public_net.ipv4.ip)
 ssh-keygen -R $IP_HETZNER
 while ! nc -z $IP_HETZNER 22; do echo "Wait till we can ssh..."; sleep 10; done
 ssh -o StrictHostKeyChecking=no root@$IP_HETZNER 'bash -s' < ./scripts/post-installation.sh
-../ansible
+cd ../ansible
 ansible-playbook -i inventory/hetzner_cloud_hosts playbook/cluster.yml \
    -e public_ip_address=$(hcloud server describe VM_NAME -o json | jq -r .public_net.ipv4.ip) \
    -e ansible_os_family="RedHat" \
