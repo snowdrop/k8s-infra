@@ -89,7 +89,15 @@ ansible_ssh_private_key_file=~/.ssh/id_rsa
 Command to be executed:
 
 ```bash
+./scripts/create-user-data.sh
+hcloud server create --name VM_NAME --type cx41 --image centos-7 --ssh-key USER_KEY_NAME --user-data-from-file ./scripts/user-data
+IP_HETZNER=$(hcloud server describe VM_NAME -o json | jq -r .public_net.ipv4.ip)
+ssh-keygen -R $IP_HETZNER
+while ! nc -z $IP_HETZNER 22; do echo "Wait till we can ssh..."; sleep 10; done
+ssh -o StrictHostKeyChecking=no root@$IP_HETZNER 'bash -s' < ./scripts/post-installation.sh
+../ansible
 ansible-playbook -i inventory/hetzner_cloud_hosts playbook/cluster.yml \
    -e public_ip_address=$(hcloud server describe VM_NAME -o json | jq -r .public_net.ipv4.ip) \
+   -e ansible_os_family="RedHat" \
    --tags "up"
 ```
