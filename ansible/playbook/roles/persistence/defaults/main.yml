@@ -1,4 +1,4 @@
-number_of_volumes: 10
+number_of_volumes: 20
 first_volume_offset: 1
 
 volume_name_prefix: pv
