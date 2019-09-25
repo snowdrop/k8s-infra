@@ -105,6 +105,16 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
 | user | The user to which to grant the cluster role | admin  
 | openshift_admin_pwd | The password of the admin user |   
   
+### Command halkyon
+
+  ```bash
+  ansible-playbook -i inventory/hetzner_host playbook/post_installation.yml \
+    --tags halkyon \
+    -e ACTION=create
+  ``` 
+
+  To remove halkyon, pass as parameter `-e ACTION=remove` 
+  
 ### Command Persistence
 
   ```bash
