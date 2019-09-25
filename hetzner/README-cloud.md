@@ -112,3 +112,8 @@ ansible-playbook -i inventory/hetzner_host playbook/cluster.yml \
    -e ansible_os_family="RedHat" \
    --tags "up"
 ```
+
+The following bash_script is playing the different commands all in one to delete/create a new VM and next start `oc cluster up`
+```bash
+ ./scripts/vm-ocp.sh 
+```
