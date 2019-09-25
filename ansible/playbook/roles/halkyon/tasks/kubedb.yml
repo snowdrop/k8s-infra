@@ -1,3 +1,7 @@
+- name: Patch master to allow webhooks
+  include_tasks:
+    file: ./patch_master.yml
+
 - name: Generate Helm values file
   template:
     src: "values.yml.j2"
