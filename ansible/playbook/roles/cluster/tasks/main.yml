@@ -51,6 +51,9 @@
 - name: Grant cluster admin role to admin user
   include_tasks: grant_cluster_role.yml
 
+- name: Enable okd as systemctl service
+  include_tasks: enable_systemctl.yml
+
 - block:
   - debug:
       msg: "Enabling ASB"
