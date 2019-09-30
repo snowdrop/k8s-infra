@@ -8,6 +8,9 @@ disable_root: false
 
 package_upgrade: false
 
+packages:
+  - ansible
+
 users:
   - name: centos
     gecos: Centos User

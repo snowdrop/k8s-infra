@@ -34,11 +34,11 @@ sleep 20s
 ssh root@$IP_HETZNER
 ```
 
-## Using openshift ansible playbook
+## Using OpenShift Ansible playbook
 
 ### Remote
 
-We can provision the VM using ansible playbook by importing this project within the VM and next by executing this playbook as defined
+We can provision the VM using Ansible playbook by importing this project within the VM and next by executing this playbook as defined
 within the bash script
 
 ```bash
