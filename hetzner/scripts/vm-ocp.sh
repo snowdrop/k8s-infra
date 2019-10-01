@@ -27,6 +27,7 @@ ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_hetzner_snowdrop root@$IP_HETZNER '
 # - Create oc cluster up and register it as systemctl okd service
 cd ../ansible
 ansible-playbook playbook/generate_inventory.yml \
+   -e ssh_private_key_path=~/.ssh/id_hetzner_snowdrop \
    -e ip_address=$IP_HETZNER \
    -e type=hetzner
 ansible-playbook -i inventory/hetzner_host playbook/cluster.yml \
