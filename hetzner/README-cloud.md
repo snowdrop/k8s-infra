@@ -115,5 +115,6 @@ ansible-playbook -i inventory/hetzner_host playbook/cluster.yml \
 
 The following bash_script is playing the different commands all in one to delete/create a new VM and next start `oc cluster up`
 ```bash
- ./scripts/vm-ocp.sh 
+
+./scripts/vm-ocp.sh 
 ```
