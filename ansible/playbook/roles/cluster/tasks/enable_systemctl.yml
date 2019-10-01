@@ -2,6 +2,7 @@
   copy:
     src: "{{ item }}"
     dest: "/var/lib/origin/{{ item | basename }}"
+    mode: '0755'
   with_fileglob:
     - "files/*.sh"
 
