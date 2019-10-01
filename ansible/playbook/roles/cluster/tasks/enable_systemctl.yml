@@ -5,20 +5,18 @@
   with_fileglob:
     - "files/*.sh"
 
-- name: Copy systemctl okd.service file to
+- name: Copy systemctl okd.service file to /etc/systemd/system
   copy:
     src: "{{ item }}"
     dest: "/etc/systemd/system/{{ item | basename }}"
   with_fileglob:
     - "files/*.service"
 
-- name: Reload systemctl daemon
-  command: systemctl daemon-reload
-
-- name: Register okd service
-  command: systemctl enable okd.service
-
-- name: Start okd service
-  command: systemctl start okd.service
+- name: Register okd.service to make it available when VM boots
+  systemd:
+    name: okd.service
+    enabled: yes
+    daemon_reload: yes
+  register: start_result
 
 
