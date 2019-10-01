@@ -20,7 +20,7 @@ hcloud server create --name $VM_NAME --type cx41 --image centos-7 --ssh-key snow
 IP_HETZNER=$(hcloud server describe $VM_NAME  -o json | jq -r .public_net.ipv4.ip)
 ssh-keygen -R $IP_HETZNER
 while ! nc -z $IP_HETZNER 22; do echo "Wait till we can ssh to the $VM_NAME vm ..."; sleep 10; done
-ssh -o StrictHostKeyChecking=no root@$IP_HETZNER 'bash -s' < ./scripts/post-installation.sh
+ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_hetzner_snowdrop root@$IP_HETZNER 'bash -s' < ./scripts/post-installation.sh
 
 # Execute playbooks to :
 # - Generate inventory file with IP address
