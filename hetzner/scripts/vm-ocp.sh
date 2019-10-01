@@ -8,7 +8,7 @@ VM_NAME=halkyon
 # Delete cloud server and key
 hcloud server delete $VM_NAME
 hcloud ssh-key delete snowdrop
-hcloud ssh-key create --name snowdrop --public-key-from-file ~/.ssh/id_rsa.pub
+hcloud ssh-key create --name snowdrop --public-key-from-file ~/.ssh/id_hetzner_snowdrop.pub
 
 # Create the cloud init file using user private key
 ./scripts/create-user-data.sh
