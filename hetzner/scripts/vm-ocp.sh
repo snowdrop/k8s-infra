@@ -30,6 +30,6 @@ ansible-playbook playbook/generate_inventory.yml \
    -e ip_address=$IP_HETZNER \
    -e type=hetzner
 ansible-playbook -i inventory/hetzner_host playbook/cluster.yml \
-   -e public_ip_address=$(hcloud server describe $VM_NAME -o json | jq -r .public_net.ipv4.ip) \
+   -e public_ip_address=$IP_HETZNER \
    -e ansible_os_family="RedHat" \
    --tags "up"
