@@ -9,7 +9,6 @@ disable_root: false
 package_upgrade: false
 
 packages:
-  - docker
   - ansible
 
 users:
