@@ -1,14 +1,14 @@
 - name: Copy bash files to /var/lib/origin directory
   copy:
     src: "{{ item }}"
-    dest: "/var/lib/origin/{{ item }}"
+    dest: "/var/lib/origin/{{ item | basename }}"
   with_fileglob:
     - "files/*.sh"
 
 - name: Copy systemctl okd.service file to
   copy:
     src: "{{ item }}"
-    dest: "/etc/systemd/system/{{ item }}"
+    dest: "/etc/systemd/system/{{ item | basename }}"
   with_fileglob:
     - "files/*.service"
 
