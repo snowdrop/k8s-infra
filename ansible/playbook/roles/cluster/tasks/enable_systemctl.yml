@@ -17,6 +17,7 @@
   systemd:
     name: okd.service
     enabled: yes
+    state: restarted
     daemon_reload: yes
   register: start_result
 

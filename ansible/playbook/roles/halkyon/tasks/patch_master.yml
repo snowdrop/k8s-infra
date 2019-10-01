@@ -1,27 +1,26 @@
 - name: Check if master config is already patched
-  command: cat {{ openshift_env.config_dir }}/master/master-config.yaml
+  command: cat {{ openshift_env.config_dir }}/kube-apiserver/master-config.yaml
   register: master_content
 
 - block:
-
   - name: Generate patch using template
     template:
       src: "mutating_webhook_patch.j2"
       dest: /tmp/mutating_webhook_patch.json
-
   - name: Get patch file
     command: cat /tmp/mutating_webhook_patch.json
     register: patch
-
+  - name: Stop okd service
+    systemd:
+      state: stopped
+      name: okd.service
   - name: Patch master-config file to use Mutating Webhook
     command: "oc ex config patch {{ openshift_env.master_config_file }} --patch '{{ patch.stdout }}'"
     register: r
-
   - name: Copy patch to new master config file
-    copy: content="{{ r.stdout }}" dest={{ openshift_env.config_dir }}/master/master-config.yaml
-
-  - name: Restart master
-    include_role:
-      name: restart_master
-
+    copy: content="{{ r.stdout }}" dest={{ openshift_env.config_dir }}/kube-apiserver/master-config.yaml
+  - name: Restart okd service
+    systemd:
+      state: restarted
+      name: okd.service
   when: master_content.stdout.find('MutatingAdmissionWebhook') == -1

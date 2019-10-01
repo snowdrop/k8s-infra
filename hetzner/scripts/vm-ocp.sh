@@ -24,7 +24,8 @@ ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_hetzner_snowdrop root@$IP_HETZNER '
 
 # Execute playbooks to :
 # - Generate inventory file with IP address
-# - Create oc cluster up and register it as systemctl okd service
+# - Create oc cluster up configuration
+# - Register it as systemctl okd service but don't start it
 cd ../ansible
 ansible-playbook playbook/generate_inventory.yml \
    -e ssh_private_key_path=~/.ssh/id_hetzner_snowdrop \
@@ -32,5 +33,6 @@ ansible-playbook playbook/generate_inventory.yml \
    -e type=hetzner
 ansible-playbook -i inventory/hetzner_host playbook/cluster.yml \
    -e public_ip_address=$IP_HETZNER \
+   -e cluster_write_config=True \
    -e ansible_os_family="RedHat" \
    --tags "up"
