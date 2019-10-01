@@ -15,8 +15,8 @@ get_host_timezone(){
 }
 
 echo -e "Creating user-data file at: \n ${SCRIPT_ABSOLUTE_DIR}"
-YOUR_SSH_KEY=$(cat ~/.ssh/id_rsa.pub)
+SNOWDROP_SSH_KEY=$(cat ~/.ssh/id_hetzner_snowdrop.pub)
 HOST_TIMEZONE=$(get_host_timezone)
-sed "s|SSH_PUBLIC_KEY|${YOUR_SSH_KEY}|g" "${SCRIPT_ABSOLUTE_DIR}"/user-data.tpl > "${SCRIPT_ABSOLUTE_DIR}"/user-data.tmp
+sed "s|SSH_PUBLIC_KEY|${SNOWDROP_SSH_KEY}|g" "${SCRIPT_ABSOLUTE_DIR}"/user-data.tpl > "${SCRIPT_ABSOLUTE_DIR}"/user-data.tmp
 sed "s|TIMEZONE|${HOST_TIMEZONE}|g" "${SCRIPT_ABSOLUTE_DIR}"/user-data.tmp > "${SCRIPT_ABSOLUTE_DIR}"/user-data
 rm "${SCRIPT_ABSOLUTE_DIR}"/user-data.tmp
