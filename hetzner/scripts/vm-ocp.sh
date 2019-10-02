@@ -4,9 +4,13 @@
 # to create a new Hetzner VM using hcloud tool
 #
 
-# ./scripts/vm-ocp.sh VM_NAME
+# ./scripts/vm-ocp.sh VM_NAME VM_TYPE VM_IMAGE
+# e.g
+# ./scripts/vm-ocp.sh halkyon cx41 centos-7
 
 VM_NAME=${1:-halkyon}
+VM_TYPE=${2:-cx31}
+VM_IMAGE=${3:-centos-7}
 
 # Delete cloud server and key
 hcloud server delete $VM_NAME
@@ -17,7 +21,7 @@ hcloud ssh-key create --name snowdrop --public-key-from-file ~/.ssh/id_hetzner_s
 ./scripts/create-user-data.sh
 
 # Create cloud instance - centos7
-hcloud server create --name $VM_NAME --type cx41 --image centos-7 --ssh-key snowdrop --user-data-from-file ./scripts/user-data
+hcloud server create --name $VM_NAME --type $VM_TYPE --image $VM_IMAGE --ssh-key snowdrop --user-data-from-file ./scripts/user-data
 
 # Get IP address and wait till we can SSH
 IP_HETZNER=$(hcloud server describe $VM_NAME  -o json | jq -r .public_net.ipv4.ip)
