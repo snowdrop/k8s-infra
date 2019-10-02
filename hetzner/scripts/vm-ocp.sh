@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
 
-# Script to be executed under Hetzner folder path
-# ./scripts/vm-ocp.sh
+# Script to be executed under Hetzner folder path in order
+# to create a new Hetzner VM using hcloud tool
+#
 
-VM_NAME=halkyon
+# ./scripts/vm-ocp.sh VM_NAME
+
+VM_NAME=${1:-halkyon}
 
 # Delete cloud server and key
 hcloud server delete $VM_NAME
