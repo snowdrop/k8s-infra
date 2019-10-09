@@ -3,28 +3,35 @@
   register: master_content
 
 - block:
-  - name: Generate patch using template
-    template:
-      src: "mutating_webhook_patch.j2"
-      dest: /tmp/mutating_webhook_patch.json
-  - name: Get patch file
-    command: cat /tmp/mutating_webhook_patch.json
-    register: patch
   - name: Stop okd service
     systemd:
       state: stopped
       name: okd.service
+
+  - name: Generate patch using template
+    template:
+      src: "mutating_webhook_patch.j2"
+      dest: /tmp/mutating_webhook_patch.json
+
+  - name: Get patch file
+    command: cat /tmp/mutating_webhook_patch.json
+    register: patch
+
   - name: Patch master-config file to use Mutating Webhook
-    command: "oc ex config patch {{ openshift_env.master_config_file }} --patch '{{ patch.stdout }}'"
+    command: "oc ex config patch {{ openshift_env.config_dir }}/kube-apiserver/master-config.yaml --patch='{{ patch.stdout }}'"
     register: r
+
   - name: Display master-config.yml file before to patch it
     debug:
       msg: "Before to patch: {{ master_content.stdout }}"
+
   - name: Copy patch to new master config file
     copy: content="{{ r.stdout }}" dest={{ openshift_env.config_dir }}/kube-apiserver/master-config.yaml
+
   - name: Display master-config.yml patched
     debug:
       msg: "After we patch it: {{ r.stdout }}"
+
   - name: Restart okd service
     systemd:
       state: restarted
