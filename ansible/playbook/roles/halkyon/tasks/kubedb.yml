@@ -1,6 +1,7 @@
 - name: Patch master to allow webhooks
   include_tasks:
     file: ./patch_master.yml
+  when: patch | bool
 
 - name: Generate Helm values file
   template:
