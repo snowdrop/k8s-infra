@@ -2,7 +2,7 @@
 become_override: False
 silent: False
 kube_config: $HOME/.kube/config
-patch: false
+patch: true
 
 # Helm vars
 helm_namespace: kube-system

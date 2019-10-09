@@ -114,8 +114,8 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
   ``` 
 
   To remove halkyon, pass as parameter `-e ACTION=remove` 
-  You can also patch the `master-config.yaml` file of the kube-api server in order to enable `MutatingAdmissionWebhook` and `ValidatingAdmissionWebhook` using 
-  `-e patch=true`. By default, it is not patched. 
+  You can also disable to patch the `master-config.yaml` file of the kube-api server with `MutatingAdmissionWebhook` and `ValidatingAdmissionWebhook` using 
+  `-e patch=false`. By default, it is patched. 
   
 ### Command Persistence
 
