@@ -10,7 +10,8 @@
 - name: Configure IpTables to accept incoming trafic on port 2376
   shell: |
     iptables -I INPUT -p tcp --dport 2376 -j ACCEPT
-    service iptables save
+    #service iptables restart
+    iptables-save > /etc/sysconfig/iptables
 
 - name: Reload systemctl daemon and restart docker service
   shell: |
