@@ -67,8 +67,8 @@ kubectl -n kubernetes-dashboard describe secret $(kubectl -n kubernetes-dashboar
 
 OR
 
-secretname=$(kubectl get serviceaccount default --namespace=kube-system -o jsonpath='{.secrets[0].name}')
-kubectl get secret "$secretname" --namespace=kube-system -o template --template='{{.data.token}}' | base64 --decode
+secretname=$(kubectl get serviceaccount admin-user --namespace=kubernetes-dashboard -o jsonpath='{.secrets[0].name}')
+kubectl get secret "$secretname" --namespace=kubernetes-dashboard -o template --template='{{.data.token}}' | base64 --decode
 ```  
 - Open your browser at this address `http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/#/login`, copy/paste the token
   and enjoy your K8s experience
