@@ -28,7 +28,6 @@ spec:
       args: ["-c", "$JAVA_HOME/bin/keytool -v -alias dockerregistry -import -file /var/run/secrets/kubernetes.io/serviceaccount/ca.crt -keystore /builder/home/trust.jks -storepass changeit -noprompt"]
     - name: build-and-push
       image: gcr.io/cloud-builders/mvn
-      # /builder/home/.docker/config.json
       command:
         - mvn
         - compile
