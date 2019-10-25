@@ -33,7 +33,14 @@ kBProgress (1): 450/480 kBProgress (1): 454/480 kBProgress (1): 458/480 kBProgre
 oc get imagestreams 
 NAME              DOCKER REPO                                                 TAGS      UPDATED
 spring-boot-jib   docker-registry.default.svc:5000/cmoullia/spring-boot-jib   latest    3 minutes ago
+```
 
+- Create a pod using a deployment yml and check the log's message
+```bash
+kubectl apply -f deployment.yml
+pod_name=$(oc get pods -lapp=java-hello-app -o name)
+oc logs $pod_name
+Hello World Che!
 ```
 
 To clean, delete the resources

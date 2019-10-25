@@ -1,0 +1,27 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: java-hello
+spec:
+  selector:
+    matchLabels:
+      app: java-hello-app
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: java-hello-app
+    spec:
+      containers:
+      - name: spring-boot-app
+        image: docker-registry.default.svc:5000/cmoullia/spring-boot-jib
+        imagePullPolicy: IfNotPresent
+        command:
+          - java
+          - -cp
+          - /app/resources:/app/classes:/app/libs/*
+          - org.eclipse.che.examples.HelloWorld
+        ports:
+        - containerPort: 8080
+          name: server
+          protocol: TCP
