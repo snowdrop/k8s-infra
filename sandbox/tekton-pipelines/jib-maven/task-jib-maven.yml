@@ -36,6 +36,9 @@ spec:
     #   args: ["-c", "$JAVA_HOME/bin/keytool -list -keystore $JAVA_HOME/lib/security/cacerts -storepass changeit"]
     - name: build-and-push
       image: gcr.io/cloud-builders/mvn
+      env:
+      - name: DOCKER_CONFIG
+        value: /builder/home/.docker/config.json
       command:
         - mvn
         - compile
