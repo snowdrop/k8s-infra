@@ -19,9 +19,9 @@ spec:
         type: git
         params:
         - name: revision
-          value: 2.1.3-2
+          value: master
         - name: url
-          value: https://github.com/snowdrop/rest-http-example
+          value: https://github.com/che-samples/console-java-simple
   outputs:
     resources:
     - name: image
@@ -29,4 +29,4 @@ spec:
         type: image
         params:
         - name: url
-          value: 10.101.25.6:5000/demo/spring-boot-jib
+          value: docker-registry.default.svc:5000/demo/spring-boot-jib

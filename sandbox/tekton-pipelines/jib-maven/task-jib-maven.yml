@@ -21,14 +21,23 @@ spec:
         type: image
 
   steps:
+    - name: cacert
+      image: gcr.io/cloud-builders/mvn
+      command: ["/bin/bash"]
+      # args: ["-c", "$JAVA_HOME/bin/keytool -importcert -storepass changeit -alias certificate.cer -file /var/run/secrets/kubernetes.io/serviceaccount/ca.crt -noprompt"]
+      args: ["-c", "$JAVA_HOME/bin/keytool -v -alias dockerregistry -import -file /var/run/secrets/kubernetes.io/serviceaccount/ca.crt -keystore /builder/home/trust.jks -storepass changeit -noprompt"]
     - name: build-and-push
       image: gcr.io/cloud-builders/mvn
+      # /builder/home/.docker/config.json
       command:
         - mvn
         - compile
         - com.google.cloud.tools:jib-maven-plugin:build
         - -Duser.home=/builder/home
+        - -Djavax.net.ssl.trustStore=/builder/home/trust.jks
+        - -Djavax.net.ssl.trustStorePassword=changeit
         - -Dimage=${outputs.resources.image.url}
+        - -Djib.allowInsecureRegistries=true
       workingDir: /workspace/source/${inputs.params.DIRECTORY}
       volumeMounts:
         - name: ${inputs.params.CACHE}
