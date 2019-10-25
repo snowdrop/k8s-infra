@@ -24,17 +24,22 @@ spec:
     - name: cacert
       image: gcr.io/cloud-builders/mvn
       command: ["/bin/bash"]
-      # args: ["-c", "$JAVA_HOME/bin/keytool -importcert -storepass changeit -alias certificate.cer -file /var/run/secrets/kubernetes.io/serviceaccount/ca.crt -noprompt"]
-      args: ["-c", "$JAVA_HOME/bin/keytool -v -alias dockerregistry -import -file /var/run/secrets/kubernetes.io/serviceaccount/ca.crt -keystore /builder/home/trust.jks -storepass changeit -noprompt"]
+      # args: ["-c", "$JAVA_HOME/bin/keytool -alias dockerregistry -import -file /var/run/secrets/kubernetes.io/serviceaccount/ca.crt -keystore /builder/home/trust.jks -storepass changeit -noprompt"]
+      # args: ["-c", "$JAVA_HOME/bin/keytool -import -storepass changeit -keystore $JAVA_HOME/lib/security/cacerts -alias certificate.cer -file /var/run/secrets/kubernetes.io/serviceaccount/ca.crt -noprompt"]
+      args: ["-c", "$JAVA_HOME/bin/keytool -importcert -storepass changeit -file /etc/secrets/registry.crt -noprompt"]
+      volumeMounts:
+      - mountPath: /etc/secrets
+        name: volume-docker-secret
     - name: build-and-push
       image: gcr.io/cloud-builders/mvn
       command:
         - mvn
         - compile
+        # - -X
         - com.google.cloud.tools:jib-maven-plugin:build
         - -Duser.home=/builder/home
-        - -Djavax.net.ssl.trustStore=/builder/home/trust.jks
-        - -Djavax.net.ssl.trustStorePassword=changeit
+        #- -Djavax.net.ssl.trustStore=/builder/home/trust.jks
+        #- -Djavax.net.ssl.trustStorePassword=changeit
         - -Dimage=${outputs.resources.image.url}
         - -Djib.allowInsecureRegistries=true
       workingDir: /workspace/source/${inputs.params.DIRECTORY}
@@ -49,3 +54,7 @@ spec:
   volumes:
     - name: empty-dir-volume
       emptyDir: {}
+    - name: volume-docker-secret
+      secret:
+        defaultMode: 420
+        secretName: docker-registry-cert
