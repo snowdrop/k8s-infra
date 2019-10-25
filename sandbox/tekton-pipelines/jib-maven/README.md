@@ -40,8 +40,10 @@ spring-boot-jib   docker-registry.default.svc:5000/cmoullia/spring-boot-jib   la
 kubectl apply -f deployment.yml
 pod_name=$(oc get pods -lapp=java-hello-app -o name)
 oc logs $pod_name
-Hello World Che!
+...
 ```
+
+TODO: Add step to call the endpoint !!
 
 To clean, delete the resources
 ```bash
