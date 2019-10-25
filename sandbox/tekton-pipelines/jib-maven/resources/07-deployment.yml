@@ -16,11 +16,10 @@ spec:
       - name: spring-boot-app
         image: docker-registry.default.svc:5000/cmoullia/spring-boot-jib
         imagePullPolicy: IfNotPresent
-        command:
-          - java
-          - -cp
-          - /app/resources:/app/classes:/app/libs/*
-          - org.eclipse.che.examples.HelloWorld
+#        command:
+#          - java
+#          - -jar
+#          - /app/*.jar
         ports:
         - containerPort: 8080
           name: server

@@ -1,18 +1,11 @@
 apiVersion: tekton.dev/v1alpha1
 kind: TaskRun
 metadata:
-  name: jib-buildah-push
+  name: jib-push
 spec:
   taskRef:
     name: jib-maven
   inputs:
-    # params:
-    # - name: baseImage
-    #   value: registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift
-    # - name: verifyTLS
-    #   value: "false"
-    # - name: contextFolder
-    #   value: /workspace/
     resources:
     - name: source
       resourceSpec:
@@ -21,7 +14,7 @@ spec:
         - name: revision
           value: master
         - name: url
-          value: https://github.com/che-samples/console-java-simple
+          value: https://github.com/cmoulliard/hello-world-springboot
   outputs:
     resources:
     - name: image
