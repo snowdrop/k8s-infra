@@ -3,7 +3,7 @@
 - Have tekton operator deployed on k8s/openshift
 - Install the following yaml resources to start a JIB build and image push to the docker registry
 ```bash
-kubectl apply -f resources/
+kubectl apply -f resources/  --validate=false
 ```
 - Check the log of the pod to see the build result
 ```bash
@@ -28,22 +28,11 @@ kBProgress (1): 450/480 kBProgress (1): 454/480 kBProgress (1): 458/480 kBProgre
 [INFO] Finished at: 2019-10-25T16:21:49Z
 [INFO] ------------------------------------------------------------------------
 ```
-- Then you should be able to see an imagestream
+- Get the route and call the Service endpoint within your browser
 ```bash
-oc get imagestreams 
-NAME              DOCKER REPO                                                 TAGS      UPDATED
-spring-boot-jib   docker-registry.default.svc:5000/cmoullia/spring-boot-jib   latest    3 minutes ago
+route_url="http://$(kubectl get route/java-hello-app -o jsonpath='{.spec.host}')"
+open $route_url
 ```
-
-- Create a pod using a deployment yml and check the log's message
-```bash
-kubectl apply -f deployment.yml
-pod_name=$(oc get pods -lapp=java-hello-app -o name)
-oc logs $pod_name
-...
-```
-
-TODO: Add step to call the endpoint !!
 
 To clean, delete the resources
 ```bash

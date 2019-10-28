@@ -1,3 +1,37 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+    app: java-hello-app
+  name: java-hello-app
+spec:
+  host: ""
+  port:
+    targetPort: 8080-8080
+  to:
+    kind: Service
+    name: java-hello-app
+    weight: 100
+  wildcardPolicy: None
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: '2019-10-28T15:03:05Z'
+  labels:
+    app: java-hello-app
+  name: java-hello-app
+spec:
+  ports:
+    - name: 8080-8080
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app: java-hello-app
+  sessionAffinity: None
+  type: ClusterIP
+---
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
