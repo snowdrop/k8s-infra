@@ -6,6 +6,11 @@ spec:
   taskRef:
     name: jib-maven
   inputs:
+    params:
+    - name: USERNAME
+      value: USERNAME
+    - name: PASSWORD
+      value: PASSWORD
     resources:
     - name: source
       resourceSpec:

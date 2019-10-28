@@ -11,6 +11,10 @@ spec:
       - name: CACHE
         description: The name of the volume for caching Maven artifacts and base image layers
         default: empty-dir-volume
+      - name: USERNAME
+        description: Username to be used to auth the user with the Registry
+      - name: PASSWORD
+        description: Password to be used to auth the user with the Registry
     resources:
       - name: source
         type: git
@@ -52,7 +56,7 @@ spec:
       image: gcr.io/cloud-builders/mvn
       env:
       - name: DOCKER_CONFIG
-        value: /builder/home/.docker/config.json
+        value: /builder/home/.docker
       command:
         - mvn
         - compile
@@ -61,9 +65,9 @@ spec:
         - -Djavax.net.ssl.trustStore=/etc/secrets/truststore.jks
         - -Djavax.net.ssl.trustStorePassword=changeit
         - -Dimage=${outputs.resources.image.url}
-        #- -Djib.from.image=registry.redhat.io/redhat-openjdk-18/openjdk18-openshift
-        #- -Djib.from.auth.username=USERNAME
-        #- -Djib.from.auth.password=PASSWORD
+        - -Djib.from.image=registry.redhat.io/redhat-openjdk-18/openjdk18-openshift
+        - -Djib.from.auth.username=${inputs.params.USERNAME}
+        - -Djib.from.auth.password=${inputs.params.PASSWORD}
         #- -Djib.appRoot=/app
         #- -Djib.containerizingMode=packaged
         #- -Djib.allowInsecureRegistries=true
