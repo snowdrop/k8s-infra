@@ -48,4 +48,5 @@ TODO: Add step to call the endpoint !!
 To clean, delete the resources
 ```bash
 kubectl delete -f resources/
+kubectl delete imagestreams/spring-boot-jib
 ```
