@@ -61,7 +61,7 @@ spec:
         - -Djavax.net.ssl.trustStore=/etc/secrets/truststore.jks
         - -Djavax.net.ssl.trustStorePassword=changeit
         - -Dimage=${outputs.resources.image.url}
-        - -Djib.from.image=registry.redhat.io/redhat-openjdk-18/openjdk18-openshift
+        #- -Djib.from.image=registry.redhat.io/redhat-openjdk-18/openjdk18-openshift
         #- -Djib.from.auth.username=USERNAME
         #- -Djib.from.auth.password=PASSWORD
         #- -Djib.appRoot=/app
