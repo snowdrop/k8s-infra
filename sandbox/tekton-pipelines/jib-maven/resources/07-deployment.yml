@@ -15,11 +15,7 @@ spec:
       containers:
       - name: spring-boot-app
         image: docker-registry.default.svc:5000/cmoullia/spring-boot-jib
-        imagePullPolicy: IfNotPresent
-#        command:
-#          - java
-#          - -jar
-#          - /app/*.jar
+        imagePullPolicy: Always
         ports:
         - containerPort: 8080
           name: server
