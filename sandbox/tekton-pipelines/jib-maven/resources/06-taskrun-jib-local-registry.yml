@@ -8,9 +8,9 @@ spec:
   inputs:
     params:
     - name: USERNAME
-      value: USERNAME
+      value: TO_BE_CHANGED
     - name: PASSWORD
-      value: PASSWORD
+      value: TO_BE_CHANGED
     resources:
     - name: source
       resourceSpec:
