@@ -21,6 +21,7 @@ networking:
 
 **Remark**: More info about the config is available here : https://github.com/kubernetes-sigs/kind/blob/master/pkg/apis/config/v1alpha3/types.go
 
+**Warning**: If you can access the Virtualbox VM, check if the `vboxnet0` network is still working and if it fails, reset it using the script `/virtualbox/reset-vboxnet0.sh`
 - Create the Kind cluster
 ```bash
 kind delete cluster --name halkyon
