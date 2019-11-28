@@ -59,6 +59,21 @@
   
   **REMARK** : Customization of the installation (inventory file generated) is possible by changing the variables found in `inventory/cloud_host` from the command line using Ansible's `-e` syntax.
   
+- To renew the certificates
+
+  If, when you push a binary file, you get a `Internal error occurred: error dialing backend: x509: certificate has expired or is not yet valid"`, then it is most
+  probably due to certificates expired on the ocp cluster.
+  
+  So, check the status of the certificates using this bash command executed within the vm `for i in /etc/origin/master/*.crt; do echo $i; openssl x509 -in $i -noout -enddate; done`
+  or execute the following ansible playbook which is responsible to produce a HTML report under `$HOME/cert-expiry-report.20191128T173443.html`
+  ```bash
+  ansible-playbook -v -i inventory/hetzner_host openshift-ansible/playbooks/openshift-checks/certificate_expiry/easy-mode.yaml
+  ```
+  To renew the certificates, then execute this command
+  ```bash
+  ansible-playbook -v -i inventory/hetzner_host openshift-ansible/playbooks/redeploy-certificates.yml
+  ```
+  
 - Setup DNS
 
   Execute 
