@@ -13,12 +13,14 @@ The table hereafter summarizes the roles available that you can call using the `
 | [persistence](#command-persistence) | Enable Persistence using `hotPath` as `persistenceVolume` |
 | [docker](#extra-docker-config) | Enable extra docker config to access it using port 2376 |
 | [component_crd_operator](#component-crd-operator)| Install the Component CRD and Operator processing them | 
+| [deploy_snowdrop_site](#command-deploy_snowdrop_site) | Install SnowDrop web site |
 | [install_nexus](#command-install_nexus) | Install Nexus Repository Server |
 | [install_jenkins](#command-install_jenkins) | Install Jenkins and configure it to handle `s2i` builds started within an OpenShift project |
 | [install_jaeger](#command-install_jaeger) | Install Distributed Tracing - Jaeger |
 | [install_istio](#command-install_istio) | Install ServiceMesh - Istio |
 | [service_catalog](#command-service-catalog) | Deploy the [Ansible Service Broker](http://automationbroker.io/) |
 | [install_efk](#command-logging-efk) | Install EFK on the cluster |
+| [tekton_pipelines](#command-tekton-pipelines) | Install Tekton Pipelines |
 | [install_launcher](#command-install_launcher) | Install and enable the Fabric8 [Launcher](http://fabric8-launcher) |
 | [install_oc](#command-install_oc) | Install oc client within the vm
 
@@ -147,7 +149,7 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
   
   To use a different version of the image, then use `-e component_operator_docker_image_version=master`
 
-### Tekton Pipelines
+### Command Tekton Pipelines
 
   ```bash
   ansible-playbook -i inventory/cloud_host playbook/post_installation.yml \
@@ -157,6 +159,14 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
   To uninstall the `tekton pipelines`, execute this command where you pass the parameter `-e remove=true`
   
   You can specify the version to be installed. If not defined, the latest release will be installed using the parameter `-e tekton_release_version=v0.3.1`
+
+### Command deploy_snowdrop_site
+
+  The Snowdrop web site can be installed using the following role and command
+  
+  ```bash
+  ansible-playbook -i inventory/cloud_host playbook/post_installation.yml --tags snowdrop -e github_secret=secret101
+  ```
 
 ### Command install_nexus
 
