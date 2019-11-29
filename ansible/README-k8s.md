@@ -58,6 +58,11 @@ roles
   ```   
   
   To uninstall the dashboard, execute this command where you pass the parameter `-e remove=true` 
+  
+  Next, grab the token of the admin-user secret in order to access the dashboard
+  ```bash
+  kubectl -n kubernetes-dashboard describe secret $(kubectl -n kubernetes-dashboard get secret | grep admin-user | awk '{print $1}')
+  ```
 
 ### Docker Registry
 
