@@ -165,7 +165,9 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
   The Snowdrop web site can be installed using the following role and command
   
   ```bash
-  ansible-playbook -i inventory/cloud_host playbook/post_installation.yml --tags snowdrop -e github_secret=secret101
+  ansible-playbook -i inventory/cloud_host playbook/post_installation.yml \
+    --tags snowdrop \
+    -e github_secret=secret101
   ```
 
 ### Command install_nexus
