@@ -1,9 +1,6 @@
-- name: Remove the Ingress route
+- name: Remove the Dashboard k8s resources created from the templates
   shell: |
     kubectl --kubeconfig=$HOME/.kube/config delete ingress/k8s-dashboard -n {{ k8s_dashboard_namespace }}
-
-- name: Remove the Service Account, ClusterRoleBinding
-  shell: |
     kubectl --kubeconfig=$HOME/.kube/config delete sa/admin-user -n {{ k8s_dashboard_namespace }}
     kubectl --kubeconfig=$HOME/.kube/config delete ClusterRoleBinding/admin-user
 

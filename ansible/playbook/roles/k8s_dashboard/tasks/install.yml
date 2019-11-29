@@ -11,12 +11,9 @@
   with_fileglob:
     - ../templates/*.j2
 
-- name: Create the Service Account & ClusterRoleBinding for the K8s Dashboard admin-user
+- name: Create the Service Account, ClusterRoleBinding for the K8s Dashboard admin-user like also the Ingress route
   shell: |
     kubectl --kubeconfig=$HOME/.kube/config apply -f /tmp/serviceaccount-clusterrolebinding.yml
-
-- name: Install the Ingress route
-  shell: |
     kubectl --kubeconfig=$HOME/.kube/config apply -f /tmp/ingress-dashboard.yml
 
 - name: Get K8s Dashboard token from the admin-user secret
@@ -29,14 +26,11 @@
 - set_fact:
     k8s_token: "{{ get_token_out.stdout }}"
 
-- name: Print kubernetes dashboard URL
+- name: Print kubernetes dashboard URL & Token
   debug:
     msg:
       - "You can also view the kubernetes dashboard at"
       - "http://k8s-console.{{ k8s_dashboard_ingress_host }}/"
-
-- name: Print Dashboard Token
-  debug:
-    msg:
-      - "You can use the following Token to be auth with the web console"
-      - "Token: {{ k8s_token }}"
+      - ""
+      - "Using the Token: "
+      - "{{ k8s_token }}"
