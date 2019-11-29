@@ -1,38 +1,20 @@
-#- name: Copy Dashboard RBAC files
-#  template:
-#    src: "dashboard-rbac.yml.j2"
-#    dest: /tmp/dashboard-rbac.yml
-#
-#- name: Apply Dashboard RBAC files
-#  command: "kubectl apply -f /tmp/dashboard-rbac.yml"
-#
-#- name: Copy Ingress Dashboard file
-#  template:
-#    src: "ingress-dashboard.yml.j2"
-#    dest: /tmp/ingress-dashboard.yml
-#
-#- name: Apply Ingress route
-#  command: "kubectl apply -f /tmp/ingress-dashboard.yml"
-#
-#- name: Install Dashboard
-#  command: "kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/master/aio/deploy/recommended.yaml"
-#
-#- name: Disable dashboard login
-#  shell: |
-#    kubectl -n kube-system patch deploy kubernetes-dashhtailboard --type='json' -p='[{"op": "add", "path": "/spec/template/spec/containers/0/args/-", "value": "--enable-skip-login"}]'
-
-- name: Copy Ingress Dashboard file
-  template:
-    src: "values.j2"
-    dest: /tmp/values.yml
-
 - name: Install Dashboard
   shell: |
-    helm --kubeconfig=$HOME/.kube/config install stable/kubernetes-dashboard --name {{ dashboard_name }} \
-         -f /tmp/values.yml
+    kubectl --kubeconfig=$HOME/.kube/config \
+      apply -f \
+      https://raw.githubusercontent.com/kubernetes/dashboard/{{ k8s_dashboard_version }}/aio/deploy/recommended.yaml
+
+- name: Copy Ingress yml file
+  template:
+    src: "ingress-dashboard.yml.j2"
+    dest: /tmp/ingress-dashboard.yml
+
+- name: Install the Ingress route
+  shell: |
+    kubectl --kubeconfig=$HOME/.kube/config apply -f /tmp/ingress-dashboard.yml
 
 - name: Print kubernetes dashboard URL
   debug:
     msg:
       - "You can also view the kubernetes dashboard at"
-      - "http://k8s-console.{{ ingress_host }}/"
+      - "http://k8s-console.{{ k8s_dashboard_ingress_host }}/"

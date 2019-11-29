@@ -53,13 +53,11 @@ roles
   
 ### Install K8s Dashboard
 
-  **Prerequisite**: Helm must be installed. Run the playbook command where you pass to `playbook/k8s.yml`, the tag `--tags helm`
-
   ```bash
   ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags k8s_dashboard
   ```   
   
-    To uninstall the `helm k8s chart console`, execute this command where you pass the parameter `-e remove=true` 
+  To uninstall the dashboard, execute this command where you pass the parameter `-e remove=true` 
 
 ### Docker Registry
 

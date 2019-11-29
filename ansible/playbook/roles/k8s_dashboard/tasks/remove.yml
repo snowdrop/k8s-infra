@@ -1,3 +1,9 @@
+- name: Remove the Ingress route
+  shell: |
+    kubectl --kubeconfig=$HOME/.kube/config delete ingress/k8s-dashboard -n {{ k8s_dashboard_namespace }}
+
 - name: Remove Dashboard
   shell: |
-    helm --kubeconfig=$HOME/.kube/config  delete {{ dashboard_name }} --purge
+    kubectl --kubeconfig=$HOME/.kube/config \
+      delete -f \
+      https://raw.githubusercontent.com/kubernetes/dashboard/{{ k8s_dashboard_version }}/aio/deploy/recommended.yaml

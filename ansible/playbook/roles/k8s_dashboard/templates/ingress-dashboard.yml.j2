@@ -6,10 +6,10 @@ metadata:
   labels:
     app: kubernetes-dashboard
   name: k8s-dashboard
-  namespace: kube-system
+  namespace: {{ k8s_dashboard_namespace }}
 spec:
   rules:
-  - host: k8s-console.{{ ingress_host }}
+  - host: k8s-console.{{ k8s_dashboard_ingress_host }}
     http:
       paths:
       - backend:
