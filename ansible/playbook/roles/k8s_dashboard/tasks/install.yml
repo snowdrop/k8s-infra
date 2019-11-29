@@ -30,3 +30,9 @@
   shell: |
     helm --kubeconfig=$HOME/.kube/config install stable/kubernetes-dashboard --name {{ dashboard_name }} \
          -f /tmp/values.yml
+
+- name: Print kubernetes dashboard URL
+  debug:
+    msg:
+      - "You can also view the kubernetes dashboard at"
+      - "http://k8s-console.{{ ingress_host }}/"
