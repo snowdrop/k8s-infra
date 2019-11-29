@@ -169,6 +169,9 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
     --tags snowdrop \
     -e github_secret=secret101
   ```
+  
+  To remove the kubernetes resources of the Snowdrop web site, pass then the following variable `-e remove=true`
+
 
 ### Command install_nexus
 

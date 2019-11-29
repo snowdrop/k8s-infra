@@ -1,0 +1,2 @@
+- name: Remove SnowDrop web site k8s resources
+  command: oc {{ openshift_env.oc_admin_kubeconfig_arg }} delete -f https://raw.githubusercontent.com/snowdrop/snowdrop-site-angular/master/openshift/snowdrop-site.yaml
