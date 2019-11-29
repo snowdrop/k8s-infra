@@ -61,7 +61,7 @@ roles
   
   Next, grab the token of the admin-user secret in order to access the dashboard
   ```bash
-  kubectl -n kubernetes-dashboard describe secret $(kubectl -n kubernetes-dashboard get secret | grep admin-user | awk '{print $1}')
+  kubectl -n kubernetes-dashboard get secret/admin-user -o jsonpath='{.data.token}' | base64 -d
   ```
 
 ### Docker Registry
