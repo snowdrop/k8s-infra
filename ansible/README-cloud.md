@@ -71,7 +71,7 @@
   ```
   To renew the certificates, then execute this command
   ```bash
-  ansible-playbook -v -i inventory/hetzner_host openshift-ansible/playbooks/redeploy-certificates.yml
+  ansible-playbook -v -i inventory/cloud_host openshift-ansible/playbooks/redeploy-certificates.yml -e template_service_broker_install=False -e ansible_service_broker_install=False
   ```
   
 - Setup DNS
