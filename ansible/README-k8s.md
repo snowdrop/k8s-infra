@@ -11,7 +11,8 @@ This cluster that the following playbook will setup will be created using `Kubel
 
 ```bash
 cd ansible
-ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags k8s_cluster
+ansible-playbook -i inventory/simple_host playbook/k8s.yml \
+   --tags k8s_cluster
 ```
 
 You can specify the version of kubernetes to be installed using this parameter `-e k8s_version=1.14.1`. If you need to use the sudo root user on the target vm, then pass the parameter `--become`
