@@ -2,6 +2,11 @@
   shell: |
     kubectl --kubeconfig=$HOME/.kube/config delete ingress/k8s-dashboard -n {{ k8s_dashboard_namespace }}
 
+- name: Remove the Service Account, ClusterRoleBinding
+  shell: |
+    kubectl --kubeconfig=$HOME/.kube/config delete sa/admin-user -n {{ k8s_dashboard_namespace }}
+    kubectl --kubeconfig=$HOME/.kube/config delete ClusterRoleBinding/admin-user
+
 - name: Remove Dashboard
   shell: |
     kubectl --kubeconfig=$HOME/.kube/config \

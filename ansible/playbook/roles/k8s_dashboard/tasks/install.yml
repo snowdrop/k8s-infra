@@ -4,10 +4,16 @@
       apply -f \
       https://raw.githubusercontent.com/kubernetes/dashboard/{{ k8s_dashboard_version }}/aio/deploy/recommended.yaml
 
-- name: Copy Ingress yml file
-  template:
-    src: "ingress-dashboard.yml.j2"
-    dest: /tmp/ingress-dashboard.yml
+- name: Copy Template files
+  copy:
+    src: {{ item }}
+    dest: /tmp/{{ item | basename | regex_replace('\.j2','') }}
+  with_fileglob:
+    - ../templates/*.j2
+
+- name: Create the Service Account & ClusterRoleBinding for the K8s Dashboard admin-user
+  shell: |
+    kubectl --kubeconfig=$HOME/.kube/config apply -f /tmp/serviceaccount-clusterrolebinding.yml
 
 - name: Install the Ingress route
   shell: |
