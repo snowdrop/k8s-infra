@@ -34,6 +34,8 @@ ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_hetzner_snowdrop root@$IP_HETZNER '
 # - Generate inventory file with IP address
 # - Install K8s cluster
 # - Create local KUBECONFIG file
+# - Install the Ingress Router
+# - Deploy the Kubernetes Dashboard
 cd $BASH_SCRIPTS_DIR/../../ansible
 ansible-playbook playbook/generate_inventory.yml \
    -e ssh_private_key_path=~/.ssh/id_hetzner_snowdrop \
@@ -51,6 +53,14 @@ ansible-playbook -i inventory/${VM_NAME}_host \
     playbook/k8s.yml \
     --tags k8s_config \
     -e k8s_config_filename=${VM_NAME}_k8s_config.yml
+
+ansible-playbook -i inventory/${VM_NAME}_host \
+    playbook/k8s.yml \
+    --tags ingress
+
+ansible-playbook -i inventory/${VM_NAME}_host \
+    playbook/k8s.yml \
+    --tags k8s_dashboard
 
 echo "#######################################"
 echo "Execute the following command within a terminal to ssh to the vm"
