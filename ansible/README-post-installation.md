@@ -13,7 +13,7 @@ The table hereafter summarizes the roles available that you can call using the `
 | [persistence](#command-persistence) | Enable Persistence using `hotPath` as `persistenceVolume` |
 | [docker](#extra-docker-config) | Enable extra docker config to access it using port 2376 |
 | [component_crd_operator](#component-crd-operator)| Install the Component CRD and Operator processing them | 
-| [deploy_snowdrop_site](#command-deploy_snowdrop_site) | Install SnowDrop web site |
+| [deploy_snowdrop_site](#command-deploy-snowdrop-site) | Install SnowDrop web site |
 | [install_nexus](#command-install_nexus) | Install Nexus Repository Server |
 | [install_jenkins](#command-install_jenkins) | Install Jenkins and configure it to handle `s2i` builds started within an OpenShift project |
 | [install_jaeger](#command-install_jaeger) | Install Distributed Tracing - Jaeger |
@@ -160,7 +160,7 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
   
   You can specify the version to be installed. If not defined, the latest release will be installed using the parameter `-e tekton_release_version=v0.3.1`
 
-### Command deploy_snowdrop_site
+### Command Deploy Snowdrop Site
 
   The Snowdrop web site can be installed using the following role and command
   
