@@ -3,9 +3,15 @@
     that: github_secret != ""
     msg: "The github_secret variable has not been specified. Please specify it in the inventory file or using the '-e' syntax"
 
-- name: Create namespace/project if it doesn't exist
-  command: oc {{ openshift_env.oc_admin_kubeconfig_arg }} new-project {{ snowdrop_namespace }}
+- name: Create project if it doesn't exist
+  command: {{ client_tool }} {{ k8s_config }} new-project {{ snowdrop_namespace }}
   ignore_errors: true
+  when: isOpenshift | bool
+
+- name: Create namespace if it doesn't exist
+  command: {{ client_tool }} {{ k8s_config }} creaate namespace {{ snowdrop_namespace }}
+  ignore_errors: true
+  when: not isOpenshift | bool
 
 - name: Download the site's Openshift resources
   get_url:
@@ -19,4 +25,4 @@
     replace: "{{ github_secret }}"
 
 - name: Deploy openshift resources
-  command: oc {{ openshift_env.oc_admin_kubeconfig_arg }} apply -f /tmp/snowdrop.yaml -n {{ snowdrop_namespace }}
+  command: {{ client_tool }} {{ k8s_config }} apply -f /tmp/snowdrop.yaml -n {{ snowdrop_namespace }}

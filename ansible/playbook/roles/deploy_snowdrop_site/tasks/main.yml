@@ -1,3 +1,14 @@
+- set_fact:
+    k8s_config: "--kubeconfig '/etc/kubernetes/admin.config'"
+  when: not isOpenshift | bool
+
+- set_fact:
+    k8s_config: "{{ openshift_env.oc_admin_kubeconfig_arg }}"
+  when: isOpenshift | bool
+
+- debug:
+    var: k8s_config
+
 - include_tasks: install.yml
   when: not remove | bool
 
