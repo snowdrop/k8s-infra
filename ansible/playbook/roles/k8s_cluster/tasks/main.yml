@@ -71,16 +71,16 @@
     volume_name: "pv{{ item }}"
   with_sequence: start=1 count=5 format=%03d
 
-- name: save_config.yml
-  include_role:
-    name: k8s_config
-
 - name: Create user's k8s config file
-  command: |
+  shell: |
     mkdir -p .kube
     sudo cp /etc/kubernetes/admin.conf .kube/config
     sudo chown centos:centos -R .kube/
     chmod 644 .kube/config
+
+- name: save_config.yml
+  include_role:
+    name: k8s_config
 
 - name: Print kubernetes dashboard URL
   debug:
