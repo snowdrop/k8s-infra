@@ -5,11 +5,11 @@
       https://raw.githubusercontent.com/kubernetes/dashboard/{{ k8s_dashboard_version }}/aio/deploy/recommended.yaml
 
 - name: Copy Template files
-  copy:
-    src: {{ item }}
-    dest: /tmp/{{ item | basename | regex_replace('\.j2','') }}
+  template:
+    src: "{{ item }}"
+    dest: "/tmp/{{ item | basename | regex_replace('.j2','') }}"
   with_fileglob:
-    - ../templates/*.j2
+    - "../templates/*.j2"
 
 - name: Create the Service Account, ClusterRoleBinding for the K8s Dashboard admin-user like also the Ingress route
   shell: |
@@ -18,9 +18,8 @@
 
 - name: Get K8s Dashboard token from the admin-user secret
   shell: |
-    kubectl --kubeconfig=$HOME/.kube/config -n {{ k8s_dashboard_namespace }} \
-      get secret/{{ k8s_secret_name }} \
-      -o jsonpath='{.data.token}' | base64 -d
+    secretname=$(kubectl --kubeconfig=$HOME/.kube/config -n {{ k8s_dashboard_namespace }} get serviceaccount admin-user -o jsonpath='{.secrets[0].name}')
+    kubectl --kubeconfig=$HOME/.kube/config -n {{ k8s_dashboard_namespace }} get secret $secretname -o template -o jsonpath='{.data.token}' | base64 --decode
   register: get_token_out
 
 - set_fact:
