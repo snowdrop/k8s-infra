@@ -3,9 +3,7 @@
 - Create a Centos7 VM where a docker daemon is running
 - Install kind tool
 ```bash
-curl -Lo ./kind https://github.com/kubernetes-sigs/kind/releases/download/v0.5.1/kind-$(uname)-amd64
-chmod +x ./kind
-mv ./kind /usr/loca/bin/kind
+brew install kind
 ```
 
 - Add the IP Address of your VM running docker as it will be used to register the K8s Api server. If you don't specify it, then
@@ -35,9 +33,34 @@ kubectl cluster-info
 The k8s version available can be found here: https://hub.docker.com/r/kindest/node/tags
 ```bash
 examples of images
-  --image kindest/node:v1.13.10@sha256:2f5f882a6d0527a2284d29042f3a6a07402e1699d792d0d5a9b9a48ef155fa2a
-  --image kindest/node:v1.15.3@sha256:27e388752544890482a86b90d8ac50fcfa63a2e8656a96ec5337b902ec8e5157
+  --image kindest/node:v1.16.3@sha256:bced4bc71380b59873ea3917afe9fb35b00e174d22f50c7cab9188eac2b0fb88
+  --image kindest/node:v1.15.6@sha256:1c8ceac6e6b48ea74cecae732e6ef108bc7864d8eca8d211d6efb58d6566c40a
+  --image kindest/node:v1.14.9@sha256:00fb7d424076ed07c157eedaa3dd36bc478384c6d7635c5755746f151359320f
+  --image kindest/node:v1.13.12@sha256:ad1dd06aca2b85601f882ba1df4fdc03d5a57b304652d0e81476580310ba6289
+  --image kindest/node:v1.12.10@sha256:e93e70143f22856bd652f03da880bfc70902b736750f0a68e5e66d70de236e40
+  --image kindest/node:v1.11.10@sha256:44e1023d3a42281c69c255958e09264b5ac787c20a7b95caf2d23f8d8f
 ```
+
+- The following procedure uses the new `Docker Desktop` client which is using `hyperkit` instead of virtualbox
+```bash
+kind delete cluster --name halkyon
+kind create cluster --name halkyon --image kindest/node:v1.14.6@sha256:464a43f5cf6ad442f100b0ca881a3acae37af069d5f96849c1d06ced2870888d
+Creating cluster "halkyon" ...
+ ✓ Ensuring node image (kindest/node:v1.14.6) 🖼
+ ✓ Preparing nodes 📦 
+ ✓ Writing configuration 📜 
+ ✓ Starting control-plane 🕹️ 
+ ✓ Installing CNI 🔌 
+ ✓ Installing StorageClass 💾 
+Set kubectl context to "kind-halkyon"
+You can now use your cluster with:
+
+kubectl cluster-info --context kind-halkyon
+
+Thanks for using kind! 😊
+
+```
+
 - Next, install the console
 ```bash
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-beta4/aio/deploy/recommended.yaml
