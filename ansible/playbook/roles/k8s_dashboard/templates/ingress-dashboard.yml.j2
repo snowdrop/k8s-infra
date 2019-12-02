@@ -8,6 +8,10 @@ metadata:
   name: k8s-dashboard
   namespace: {{ k8s_dashboard_namespace }}
 spec:
+  tls:
+  - hosts:
+    - k8s-console.{{ k8s_dashboard_ingress_host }}
+    secretName: kubernetes-dashboard-certs
   rules:
   - host: k8s-console.{{ k8s_dashboard_ingress_host }}
     http:
