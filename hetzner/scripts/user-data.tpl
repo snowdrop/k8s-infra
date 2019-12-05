@@ -1,7 +1,7 @@
 #cloud-config
 chpasswd:
   list: |
-    root:centos
+    root:USER_PASSWORD_HASHED
   expire: False
 
 disable_root: false
@@ -14,8 +14,7 @@ packages:
 users:
   - name: centos
     gecos: Centos User
-    # Password is - passw0rd
-    passwd: $6$altGzO36s.9bPVLU$F/X/IGg5Sdsmc1RgN78O7gV5kvbKX3OPPVvs/qobJpRM4CMQMxjf0JoiMRS1j4V//fkg1QT/6w5gd4KecVtod.
+    passwd: USER_PASSWORD_HASHED
     lock-passwd: false
     chpasswd: { expire: False }
     sudo: ALL=(ALL) NOPASSWD:ALL

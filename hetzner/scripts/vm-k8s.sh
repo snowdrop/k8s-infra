@@ -4,13 +4,16 @@
 # to create a new Hetzner VM using hcloud tool
 #
 
-# ./scripts/vm-ocp.sh VM_NAME VM_TYPE VM_IMAGE
+# ./scripts/vm-k8s.sh VM_NAME VM_TYPE VM_IMAGE SALT_TEXT USER_PWD
 # e.g
-# ./scripts/vm-ocp.sh halkyon cx41 centos-7
+# ./scripts/vm-k8s.sh halkyon cx41 centos-7 salt_text R%^&gghyi90
 
 VM_NAME=${1:-halkyon}
 VM_TYPE=${2:-cx31}
 VM_IMAGE=${3:-centos-7}
+SALT_TEXT=$4
+USER_PASSWORD=$5
+
 BASH_SCRIPTS_DIR=$(dirname $0)
 
 # Delete cloud server and key
@@ -19,7 +22,7 @@ hcloud ssh-key delete snowdrop
 hcloud ssh-key create --name snowdrop --public-key-from-file ~/.ssh/id_hetzner_snowdrop.pub
 
 # Create the cloud init file using user private key
-$BASH_SCRIPTS_DIR/create-user-data.sh
+$BASH_SCRIPTS_DIR/create-user-data.sh $SALT_TEXT $USER_PASSWORD
 
 # Create cloud instance - centos7
 hcloud server create --name $VM_NAME --type $VM_TYPE --image $VM_IMAGE --ssh-key snowdrop --user-data-from-file $BASH_SCRIPTS_DIR/user-data
