@@ -13,7 +13,8 @@ The table hereafter summarizes the roles available that you can call using the `
 | [persistence](#command-persistence) | Enable Persistence using `hotPath` as `persistenceVolume` |
 | [docker](#extra-docker-config) | Enable extra docker config to access it using port 2376 |
 | [component_crd_operator](#component-crd-operator)| Install the Component CRD and Operator processing them | 
-| [deploy_snowdrop_site](#command-deploy-snowdrop-site) | Install SnowDrop web site |
+| [snowdrop_site](#command-install-snowdrop-site) | Install Snowdrop web site |
+| [halkyon_site](#command-install-halkyon-site) | Install Halkyon Nginx web site |
 | [install_nexus](#command-install_nexus) | Install Nexus Repository Server |
 | [install_jenkins](#command-install_jenkins) | Install Jenkins and configure it to handle `s2i` builds started within an OpenShift project |
 | [install_jaeger](#command-install_jaeger) | Install Distributed Tracing - Jaeger |
@@ -160,18 +161,28 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
   
   You can specify the version to be installed. If not defined, the latest release will be installed using the parameter `-e tekton_release_version=v0.3.1`
 
-### Command Deploy Snowdrop Site
+### Command Install Snowdrop Site
 
   The Snowdrop web site can be installed using the following role and command
   
   ```bash
   ansible-playbook -i inventory/cloud_host playbook/post_installation.yml \
-    --tags snowdrop \
+    --tags snowdrop-site \
     -e github_secret=secret101
   ```
   
   To remove the kubernetes resources of the Snowdrop web site, pass then the following variable `-e remove=true`
 
+### Command Install Halkyon Site
+
+  The Halkyon web site can be installed using the following role and command
+  
+  ```bash
+  ansible-playbook -i inventory/cloud_host playbook/post_installation.yml \
+    --tags halkyon-site
+  ```
+  
+  To remove the kubernetes resources of the Snowdrop web site, pass then the following variable `-e remove=true`
 
 ### Command install_nexus
 

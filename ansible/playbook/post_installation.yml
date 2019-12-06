@@ -23,6 +23,7 @@
     - { role: 'install_launcher',       tags: 'install-launcher'}
     - { role: 'uninstall_launcher',     tags: 'uninstall-launcher'}
     - { role: 'component_crd_operator', tags: 'component_crd_operator'}
-    - { role: 'deploy_snowdrop_site',   tags: 'snowdrop'}
+    - { role: 'snowdrop_site',          tags: 'snowdrop-site'}
+    - { role: 'k8s_halkyon_site',       tags: 'halkyon-site'}
     - { role: 'tekton_pipelines',       tags: 'tekton_pipelines'}
     - { role: 'halkyon',                tags: 'halkyon'}

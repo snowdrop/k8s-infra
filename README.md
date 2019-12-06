@@ -22,15 +22,15 @@ Table of Contents
       * [Ansible playbooks](#ansible-playbooks)
 
 
-# Instructions to install OpenShift and Cloud Native Features
+# Instructions to install a kubernetes/openshift cluster and Cloud Native Features
 
-This project details the prerequisites and steps necessary to convert a machine / environment into a Cloud Development Platform using Linux Container as a foundation and OpenShift as the
+This project details the prerequisites and steps necessary to convert a machine / environment into a Cloud Development Platform using Linux Container as a foundation and Kubernetes/OpenShift as the
 orchestration and management platform of those containers.
 
 The documentation has been designed around the following topics 
 
 - Become a Docker machine
-- Next, to provision OpenShift and
+- Next, to provision Kubernetes/OpenShift and
 - Finally to turn it on into a Cloud Native Developer Box !
 
 ## Become a Docker Machine
