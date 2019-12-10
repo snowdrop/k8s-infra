@@ -4,9 +4,9 @@
 # to create a new Hetzner VM using hcloud tool
 #
 
-# ./scripts/vm-ocp.sh VM_NAME VM_TYPE VM_IMAGE SALT_TEXT USER_PWD
+# ./scripts/vm-ocp.sh VM_NAME VM_TYPE VM_IMAGE SALT_TEXT USER_GENERATED_PWD
 # e.g
-# ./scripts/vm-ocp.sh halkyon cx41 centos-7 salt_text R%^&gghyi90
+# ./scripts/vm-ocp.sh halkyon cx31 centos-7 <SALT_TEXT> <USER_GENERATED_PWD>
 
 VM_NAME=${1:-halkyon}
 VM_TYPE=${2:-cx31}

@@ -6,7 +6,7 @@
 
 # ./scripts/vm-k8s.sh VM_NAME VM_TYPE VM_IMAGE SALT_TEXT USER_PWD
 # e.g
-# ./scripts/vm-k8s.sh halkyon cx41 centos-7 salt_text R%^&gghyi90
+# ./scripts/vm-k8s.sh halkyon cx41 centos-7 <SALT_TEXT> <USER_GENERATED_PWD>
 
 VM_NAME=${1:-halkyon}
 VM_TYPE=${2:-cx31}
