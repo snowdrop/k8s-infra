@@ -1,27 +1,52 @@
-- name: Generate Helm values file
-  template:
-    src: "values.yml.j2"
-    dest: /tmp/values.yml
+- name: Check if kubectl exists
+  stat:
+    path: /usr/local/bin/kubectl
+  register: result
 
-- name: Install KubeDB Helm chart
+- name: Install kubectl
+  get_url:
+    url: https://storage.googleapis.com/kubernetes-release/release/{{ kubeclient_version }}/bin/linux/amd64/kubectl
+    dest: /usr/local/bin/kubectl
+    mode: '755'
+  when: result.stat.exists == false
+
+- name: Create KubeDB namespace
+  command: kubectl --kubeconfig=$HOME/.kube/config create namespace {{ kubedb_namespace }}
+  ignore_errors: true
+
+- name: Fetch KubeDB bash script
+  get_url:
+    url: https://raw.githubusercontent.com/kubedb/cli/{{ kubedb_version }}/hack/deploy/kubedb.sh
+    dest: $HOME/kubedb.sh
+    mode: '0755'
+
+- name: Check if kubedb.sh exists
+  stat:
+    path: $HOME/kubedb.sh
+  register: result
+
+- name: Login to the cluster
+  command: oc login --config=$HOME/.kube/config -u system:admin
+
+# - name: Set the default context
+#   shell: |
+#     kubectl --kubeconfig=$HOME/.kube/config config use-context default/{{ ansible_eth0.ipv4.address | regex_replace("\.", "-") }}:8443/admin
+
+# - name: Use our local copy of kubedb bash script
+#   copy:
+#     src: "{{ role_path }}/files/kubedb.sh"
+#     dest: $HOME/kubedb.sh
+#     mode: '0755'
+
+- name: Install KubeDB
   shell: |
-    /usr/local/bin/helm --kubeconfig=$HOME/.kube/config repo add appscode https://charts.appscode.com/stable/
-    /usr/local/bin/helm --kubeconfig=$HOME/.kube/config repo update
-    /usr/local/bin/helm --kubeconfig=$HOME/.kube/config install appscode/kubedb --name kubedb-operator \
-      -f /tmp/values.yml \
-      --version {{ kubedb_version }} \
-      --namespace {{ kubedb_namespace }}
+    ./kubedb.sh --namespace={{ kubedb_namespace }}
+  when: result.stat.exists == true
 
 - name: Wait till CRDs are installed
   shell: |
     TIMER=0
-    until kubectl --kubeconfig=$HOME/.kube/config get crd elasticsearchversions.catalog.kubedb.com memcachedversions.catalog.kubedb.com mongodbversions.catalog.kubedb.com mysqlversions.catalog.kubedb.com postgresversions.catalog.kubedb.com redisversions.catalog.kubedb.com || [[ ${TIMER} -eq 60 ]]; do
+    until {{ client_tool }} --kubeconfig=$HOME/.kube/config get crd elasticsearchversions.catalog.kubedb.com memcachedversions.catalog.kubedb.com mongodbversions.catalog.kubedb.com mysqlversions.catalog.kubedb.com postgresversions.catalog.kubedb.com redisversions.catalog.kubedb.com || [[ ${TIMER} -eq 60 ]]; do
       sleep 5
       TIMER=$((TIMER + 1))
     done
-
-- name: Install KubeDB catalog
-  shell: |
-    /usr/local/bin/helm --kubeconfig=$HOME/.kube/config install appscode/kubedb-catalog --name kubedb-catalog \
-      --version {{ kubedb_version }} \
-      --namespace {{ kubedb_namespace }}

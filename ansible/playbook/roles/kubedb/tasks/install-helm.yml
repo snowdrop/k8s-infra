@@ -1,0 +1,27 @@
+- name: Generate Helm values file
+  template:
+    src: "values.yml.j2"
+    dest: /tmp/values.yml
+
+- name: Install KubeDB Helm chart
+  shell: |
+    /usr/local/bin/helm --kubeconfig=$HOME/.kube/config repo add appscode https://charts.appscode.com/stable/
+    /usr/local/bin/helm --kubeconfig=$HOME/.kube/config repo update
+    /usr/local/bin/helm --kubeconfig=$HOME/.kube/config install appscode/kubedb --name kubedb-operator \
+      -f /tmp/values.yml \
+      --version {{ kubedb_version }} \
+      --namespace {{ kubedb_namespace }}
+
+- name: Wait till CRDs are installed
+  shell: |
+    TIMER=0
+    until kubectl --kubeconfig=$HOME/.kube/config get crd elasticsearchversions.catalog.kubedb.com memcachedversions.catalog.kubedb.com mongodbversions.catalog.kubedb.com mysqlversions.catalog.kubedb.com postgresversions.catalog.kubedb.com redisversions.catalog.kubedb.com || [[ ${TIMER} -eq 60 ]]; do
+      sleep 5
+      TIMER=$((TIMER + 1))
+    done
+
+- name: Install KubeDB catalog
+  shell: |
+    /usr/local/bin/helm --kubeconfig=$HOME/.kube/config install appscode/kubedb-catalog --name kubedb-catalog \
+      --version {{ kubedb_version }} \
+      --namespace {{ kubedb_namespace }}
