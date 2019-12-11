@@ -4,7 +4,7 @@ https://stackoverflow.com/questions/53212149/x509-certificate-signed-by-unknown-
 https://kubernetes.io/docs/concepts/cluster-administration/certificates/
 see - ansible/playbook/roles/kubedb/files/kubedb.sh#L458-L470
 
-## Kubernetes CSR
+## Procedure using Kubernetes CSR
 
 Both approaches tested on ocp 3.11 using a `CertificateSigningRequest` and cluster up are failing as the certificate controller is 
 not started at boot time and by consequence, even if the CSR is approved, no certificate will be generated.
@@ -55,7 +55,8 @@ kubectl get csr my-svc.my-namespace -o jsonpath='{.status.certificate}' \
 
 See the following bash file `kubernetes/gen-cert-csr.sh` for an example using `openssl` and `kubernetes CSR`
 
-## one ssl
+## Procedure using : onessl tool
+
 ```bash
 curl -fsSL -o onessl https://github.com/kubepack/onessl/releases/download/v0.14.0/onessl-darwin-amd64
 chmod +x onessl
@@ -65,7 +66,7 @@ onessl create ca-cert --cert-dir pki
 onessl create server-cert server --domains=kubedb-operator-kubedb.svc --cert-dir pki
 ```
 
-## oc adm
+## Procedure using : oc adm
 
 - Generate ca certificate chain : `ca.crt` and `ca.key`
 ```bash
