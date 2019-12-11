@@ -1,7 +1,19 @@
-- name: Remove Helm DB catalog & Operator
+- name: Fetch KubeDB bash script
+  get_url:
+    url: https://raw.githubusercontent.com/kubedb/cli/{{ kubedb_version }}/hack/deploy/kubedb.sh
+    dest: $HOME/kubedb.sh
+    mode: '0755'
+
+- name: Check if kubedb.sh exists
+  stat:
+    path: $HOME/kubedb.sh
+  register: result
+
+- name: Uninstall Kube DB and purge the CRDs
   shell: |
-    /usr/local/bin/helm del --kubeconfig=$HOME/.kube/config --purge kubedb-catalog
-    /usr/local/bin/helm del --kubeconfig=$HOME/.kube/config --purge kubedb-operator
+    export KUBECONFIG=$HOME/.kube/config
+    $HOME/kubedb.sh --namespace={{ kubedb_namespace }} --uninstall --purge
+  when: result.stat.exists == true
 
 - name: Delete KubeDB namespace
   shell: |

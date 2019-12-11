@@ -25,28 +25,8 @@
     path: $HOME/kubedb.sh
   register: result
 
-- name: Login to the cluster
-  command: oc login --config=$HOME/.kube/config -u system:admin
-
-# - name: Set the default context
-#   shell: |
-#     kubectl --kubeconfig=$HOME/.kube/config config use-context default/{{ ansible_eth0.ipv4.address | regex_replace("\.", "-") }}:8443/admin
-
-# - name: Use our local copy of kubedb bash script
-#   copy:
-#     src: "{{ role_path }}/files/kubedb.sh"
-#     dest: $HOME/kubedb.sh
-#     mode: '0755'
-
 - name: Install KubeDB
   shell: |
-    ./kubedb.sh --namespace={{ kubedb_namespace }}
+    export KUBECONFIG=$HOME/.kube/config
+    $HOME/kubedb.sh --namespace={{ kubedb_namespace }}
   when: result.stat.exists == true
-
-- name: Wait till CRDs are installed
-  shell: |
-    TIMER=0
-    until {{ client_tool }} --kubeconfig=$HOME/.kube/config get crd elasticsearchversions.catalog.kubedb.com memcachedversions.catalog.kubedb.com mongodbversions.catalog.kubedb.com mysqlversions.catalog.kubedb.com postgresversions.catalog.kubedb.com redisversions.catalog.kubedb.com || [[ ${TIMER} -eq 60 ]]; do
-      sleep 5
-      TIMER=$((TIMER + 1))
-    done

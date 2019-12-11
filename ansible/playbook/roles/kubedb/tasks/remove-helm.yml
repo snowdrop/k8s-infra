@@ -1,0 +1,8 @@
+- name: Remove Helm DB catalog & Operator
+  shell: |
+    /usr/local/bin/helm del --kubeconfig=$HOME/.kube/config --purge kubedb-catalog
+    /usr/local/bin/helm del --kubeconfig=$HOME/.kube/config --purge kubedb-operator
+
+- name: Delete KubeDB namespace
+  shell: |
+    {{ client_tool }} --kubeconfig=$HOME/.kube/config delete ns {{ kubedb_namespace }}
