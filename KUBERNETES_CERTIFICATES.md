@@ -1,8 +1,21 @@
 # How to generate new CA Cert 
 
-https://stackoverflow.com/questions/53212149/x509-certificate-signed-by-unknown-authority-kubeadm
-https://kubernetes.io/docs/concepts/cluster-administration/certificates/
-see - ansible/playbook/roles/kubedb/files/kubedb.sh#L458-L470
+Table of Contents
+=================
+
+* [How to generate new CA Cert](#how-to-generate-new-ca-cert)
+   * [Procedure using Kubernetes CSR](#procedure-using-kubernetes-csr)
+      * [cfssl](#cfssl)
+      * [openssl](#openssl)
+   * [Procedure using : onessl tool](#procedure-using--onessl-tool)
+   * [Procedure using : oc adm](#procedure-using--oc-adm)
+   * [Procedure to renew kubelet certificate](#procedure-to-renew-kubelet-certificate)
+      * [All in one](#all-in-one)
+
+Useful links:
+
+- https://stackoverflow.com/questions/53212149/x509-certificate-signed-by-unknown-authority-kubeadm
+- https://kubernetes.io/docs/concepts/cluster-administration/certificates/
 
 ## Procedure using Kubernetes CSR
 
@@ -56,6 +69,8 @@ kubectl get csr my-svc.my-namespace -o jsonpath='{.status.certificate}' \
 See the following bash file `kubernetes/gen-cert-csr.sh` for an example using `openssl` and `kubernetes CSR`
 
 ## Procedure using : onessl tool
+
+See `ansible/playbook/roles/kubedb/files/kubedb.sh#L458-L470`
 
 ```bash
 curl -fsSL -o onessl https://github.com/kubepack/onessl/releases/download/v0.14.0/onessl-darwin-amd64

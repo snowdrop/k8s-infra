@@ -22,16 +22,16 @@ crds=(
 )
 apiServices=(v1alpha1.validators v1alpha1.mutators)
 
-# As we got the error "error: current-context is not set"
-# then we will disable this part of the script even if the playbook install it
-# echo "checking kubeconfig context"
-# kubectl config current-context || {
-#   echo "Set a context (kubectl use-context <context>) out of the following:"
-#   echo
-#   kubectl config get-contexts
-#   exit 1
-# }
-# echo ""
+#As we got the error "error: current-context is not set"
+#then we will disable this part of the script even if the playbook install it
+echo "checking kubeconfig context"
+kubectl config current-context || {
+  echo "Set a context (kubectl use-context <context>) out of the following:"
+  echo
+  kubectl config get-contexts
+  exit 1
+}
+echo ""
 
 # http://redsymbol.net/articles/bash-exit-traps/
 function cleanup() {
