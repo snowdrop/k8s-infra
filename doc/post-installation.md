@@ -6,24 +6,33 @@ The table hereafter summarizes the roles available that you can call using the `
 
 | Role Name | Cluster | Description  |
 | --------- | ------- | ------------ | 
+| [Command : identity_provider](#command--identity_provider) | okd | Set the Master-configuration of OpenShift to use `htpasswd` as its identity provider |
 | [add_extra_users](#command-add_extra_users) | okd | Create list of users/passwords and their corresponding project |
 | [delete_extra_users](#command-delete_extra_users) | | okd | Delete extra users created using `add_extra_users` |
 | [enable_cluster_role](#command-enable_cluster_role) | okd | Grant a cluster role to an OpenShift user |
-| [identity_provider](#command-identity_provider) | okd | Set the Master-configuration of OpenShift to use `htpasswd` as its identity provider |
 | [persistence](#command-persistence) | okd | Enable Persistence using `hotPath` as `persistenceVolume` |
 | [docker](#extra-docker-config) | okd |  Enable extra docker config to access it using port 2376 |
-| [component_crd_operator](#component-crd-operator)| okd | Install the Component CRD and Operator processing them | 
 | [snowdrop_site](#command-install-snowdrop-site) | k8s,okd | Install Snowdrop web site |
 | [halkyon_site](#command-install-halkyon-site) | k8s,okd | Install Halkyon Nginx web site |
 | [install_nexus](#command-install_nexus) | okd | Install Nexus Repository Server |
 | [install_jenkins](#command-install_jenkins) | okd | Install Jenkins and configure it to handle `s2i` builds started within an OpenShift project |
 | [install_jaeger](#command-install_jaeger) | okd | Install Distributed Tracing - Jaeger |
 | [install_istio](#command-install_istio) | okd | Install ServiceMesh - Istio |
-| [service_catalog](#command-service-catalog) | okd | Deploy the [Ansible Service Broker](http://automationbroker.io/) |
-| [install_efk](#command-logging-efk) | okd | Install EFK on the cluster |
-| [tekton_pipelines](#command-tekton-pipelines) | k8s,okd |  Install Tekton Pipelines |
 | [install_launcher](#command-install_launcher) | okd | Install and enable the Fabric8 [Launcher](http://fabric8-launcher) |
 | [install_oc](#command-install_oc) | okd | Install oc client within the vm
+| [service_catalog](#command-service-catalog) | okd | Deploy the [Ansible Service Broker](http://automationbroker.io/) |
+| [install_efk](#command-logging-efk) | okd | Install EFK on the cluster |
+| [KubeDB](#command-kubedb)| k8s | KubeDB |
+| [tekton_pipelines](#command-tekton-pipelines) | k8s,okd |  Install Tekton Pipelines |
+| [component_crd_operator](#component-crd-operator)| okd | Install the Component CRD and Operator processing them | 
+| [Halkyon](#command-halkyon)| k8s,okd | Halkyon |
+| [](#command-) | k8s | Create K8s Config file |
+| [](#command-) | k8s | Ingress Router |
+| [](#command-) | k8s | K8s Dashboard |
+| [](#command-) | k8s | Deploy Helm Tool |
+| [](#command-) | k8s | Docker Registry |
+| [](#command-) | k8s | New OCP4 console |
+| [](#command-) | k8s | K8s Service Broker |
 
 ## Prerequisite
 
@@ -33,12 +42,12 @@ The table hereafter summarizes the roles available that you can call using the `
 
 ## General command
 
-The post_installation playbook, that yu can execute as presented hereafter performs various tasks.
+The post_installation playbook, that you can execute as presented hereafter performs various tasks.
 When you will run it, make sure that the `openshift_admin_pwd` is specified when invoking the command as it contains the 'openshift' admin user
 to be used to executed `oc` commands on the cluster.
 
 ```bash
-ansible-playbook -i inventory/simple_host playbook/post_installation.yml -e openshift_admin_pwd=admin
+ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e openshift_admin_pwd=admin
 ```
 
 To install one of the roles, you will specify it using the `--tags` parameter as showed hereafter.
@@ -55,13 +64,14 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
 
 ## Role's command
 
-### Command identity_provider
+### Command : identity_provider
 
   ```bash
   ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e openshift_admin_pwd=admin --tags "identity_provider"
   ```
   
-### Command add_extra_users
+
+### Command : add_extra_users
 
   **WARNING**: Role `identity_provider` must be executed before !
   
@@ -78,7 +88,8 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
   By default these users will have admin roles (although not cluster-admin) and will each have a project that corresponds to the user name.
   These defaults can be changed using the `make_users_admin` and `create_user_project` flags. See [here](playbook/roles/add_extra_users/defaults/main.yml)
   
-### Command delete_extra_users
+
+### Command : delete_extra_users
 
   **WARNING**: Role `identity_provider` must be executed before !
 
@@ -91,7 +102,7 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
   This step will delete 5 users whose user names are like  `user1` while also deleting the projects like `user1` that were associated to those users
     
 
-### Command enable_cluster_role
+### Command : enable_cluster_role
 
   ```bash
   ansible-playbook -i inventory/cloud_host playbook/post_installation.yml \
@@ -108,19 +119,8 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
 | user | The user to which to grant the cluster role | admin  
 | openshift_admin_pwd | The password of the admin user |   
   
-### Command halkyon
 
-  ```bash
-  ansible-playbook -i inventory/hetzner_host playbook/post_installation.yml \
-    --tags halkyon \
-    -e ACTION=create
-  ``` 
-
-  To remove halkyon, pass as parameter `-e ACTION=remove` 
-  You can also disable to patch the `master-config.yaml` file of the kube-api server with `MutatingAdmissionWebhook` and `ValidatingAdmissionWebhook` using 
-  `-e patch=false`. By default, it is patched. 
-  
-### Command Persistence
+### Command : Persistence
 
   ```bash
   ansible-playbook -i inventory/cloud_host playbook/post_installation.yml \
@@ -131,37 +131,15 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
   The number of PVs to be created can be controlled by the `number_of_volumes` variable. See [here](playbook/roles/persistence/defaults/main.yml).
   By default, 10 volumes of 5Gb each will be created.
 
-### Extra docker config
+### Command : Extra docker config
 
   ```bash
   ansible-playbook -i inventory/cloud_host playbook/post_installation.yml --tags docker
   ```
   
   Configure docker daemon to accept traffic on port 2376. Client can then access it using `export DOCKER_HOST=tcp://IP_ADDRESS:2376`   
-  
-### Component crd operator  
 
-  ```bash
-  ansible-playbook -i inventory/cloud_host playbook/post_installation.yml \
-    --tags component_crd_operator
-  ```
-  
-  To remove the Component CRD and its operator, pass then the following variable `-e remove=true`
-  
-  To use a different version of the image, then use `-e component_operator_docker_image_version=master`
-
-### Command Tekton Pipelines
-
-  ```bash
-  ansible-playbook -i inventory/cloud_host playbook/post_installation.yml \
-    --tags tekton_pipelines
-  ```
-  
-  To uninstall the `tekton pipelines`, execute this command where you pass the parameter `-e remove=true`
-  
-  You can specify the version to be installed. If not defined, the latest release will be installed using the parameter `-e tekton_release_version=v0.3.1`
-
-### Command Install Snowdrop Site
+### Command : Install Snowdrop Site
 
   The Snowdrop web site can be installed using the following role and command
   
@@ -173,7 +151,7 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
   
   To remove the kubernetes resources of the Snowdrop web site, pass then the following variable `-e remove=true`
 
-### Command Install Halkyon Site
+### Command : Install Halkyon Site
 
   The Halkyon web site can be installed using the following role and command
   
@@ -184,7 +162,7 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
   
   To remove the kubernetes resources of the Snowdrop web site, pass then the following variable `-e remove=true`
 
-### Command install_nexus
+### Command : install_nexus
 
   The nexus server will be installed under the project `infra` and will contain the Red Hat proxy servers
   
@@ -200,7 +178,7 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
 | --------- | ------------ | ------------ |
 | persistence | Whether or not the Nexus instance uses persistent storage | true
 
-### Command install_jenkins
+### Command : install_jenkins
 
   The Jenkins server will be installed under the project `infra` 
   
@@ -211,7 +189,7 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
   
   **WARNING**: In case you would be interested to re-install jenkins, then the namespace `infra` must be deleted and recreated manually !
 
-### Command install_jaeger
+### Command : install_jaeger
 
   ```bash
   ansible-playbook -i inventory/cloud_host playbook/post_installation.yml \
@@ -220,7 +198,7 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
   ```
   **WARNING**: the `infra_project` parameter is mandatory
 
-### Command install_istio
+### Command : install_istio
 
   ```bash
   ansible-playbook -i inventory/cloud_host playbook/post_installation.yml \
@@ -235,7 +213,7 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
 | --------- | ------------ | ------------ |
 | istio_authentication | Whether or not the Istio installation will have auth enabled | false
 
-### Command install_launcher
+### Command : install_launcher
 
   ```bash
   ansible-playbook -i inventory/cloud_host playbook/post_installation.yml \
@@ -265,28 +243,28 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
 | launcher_openshift_api_url | The URL of the Openshift API | https://openshift.default.svc.cluster.local |  
 | launcher_keycloak_template_name | The project where the launcher will be installed | devex |  
 
-### Command install_oc
+### Command : install_oc
 
   ```bash
   ansible-playbook -i inventory/cloud_host playbook/post_installation.yml \
      --tags install_oc
   ```
 
-### Command Service catalog
+### Command : Service catalog
 
   To install the service catalog, execute this command
   ```bash
   ansible-playbook -i inventory/cloud_host openshift-ansible/playbooks/openshift-service-catalog/config.yml -e ansible_service_broker_install=true
   ```
 
-### Command Logging EFK
+### Command : Logging EFK
 
   To install the infrastructure collecting the pod's logs using ElasticSearch Fluendtd & Kibana dashboard, execute this command
   ```bash
   ansible-playbook -i inventory/cloud_host openshift-ansible/playbooks/openshift-logging/config.yml -e openshift_logging_install_logging=true
   ```
 
-### KubeDB Operator
+### Command : KubeDB Operator
 
   **Prerequisite**: Helm must be installed. Run the playbook command where you pass to `playbook/post_installation.yml`, the tag `--tags helm`
 
@@ -302,18 +280,43 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
   You can, during the installation of the kubedb operator, install and enable their mutating and validating webhooks using this parameter `-e kubedb_enablewebhook=true`. By default, webhooks are not enabled.
   The namespace where kudedb should be installed can be specified using `-e kubedb_namespace=my-kudeb`. By default, it is `kubedb`
   
-### K8s Service Catalog and OABroker
+
+### Command : Component Operator
 
   ```bash
-  ansible-playbook -i inventory/simple_host playbook/post_installation.yml --tags k8s_service_broker
-  ```    
+  ansible-playbook -i inventory/simple_host playbook/post_installation.yml --tags component_crd_operator -e isOpenshift=false
+  ```  
   
-  To uninstall the `Service Catalog and OABroker`, execute this command where you pass the parameter `remove=true`
-  ```bash
-  ansible-playbook -i inventory/simple_host playbook/post_installation.yml --tags k8s_service_broker -e remove=true
-  ```
+  To remove the Component CRD and its operator, pass then the following variable `-e remove=true`
+  
+  To use a different version of the image, then use `-e component_operator_docker_image_version=master`
+  
+### Command : halkyon
 
-### Tekton Pipelines
+  ```bash
+  ansible-playbook -i inventory/hetzner_host playbook/post_installation.yml \
+    --tags halkyon \
+    -e ACTION=create
+  ``` 
+
+  To remove halkyon, pass as parameter `-e ACTION=remove` 
+  You can also disable to patch the `master-config.yaml` file of the kube-api server with `MutatingAdmissionWebhook` and `ValidatingAdmissionWebhook` using 
+  `-e patch=false`. By default, it is patched. 
+  
+  
+  
+### Command : Component crd operator  
+
+  ```bash
+  ansible-playbook -i inventory/cloud_host playbook/post_installation.yml \
+    --tags component_crd_operator
+  ```
+  
+  To remove the Component CRD and its operator, pass then the following variable `-e remove=true`
+  
+  To use a different version of the image, then use `-e component_operator_docker_image_version=master`
+
+### Command : Tekton Pipelines
 
   ```bash
   ansible-playbook -i inventory/simple_host playbook/post_installation.yml --tags tekton_pipelines -e isOpenshift=false
@@ -334,13 +337,95 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
   ansible-playbook -i inventory/simple_host playbook/post_installation.yml --tags tekton_pipelines -e isOpenshift=true -e client_tool=oc
   ```
   
-### Component Operator
+
+### Command : Tekton Pipelines
 
   ```bash
-  ansible-playbook -i inventory/simple_host playbook/post_installation.yml --tags component_crd_operator -e isOpenshift=false
+  ansible-playbook -i inventory/cloud_host playbook/post_installation.yml \
+    --tags tekton_pipelines
+  ```
+  
+  To uninstall the `tekton pipelines`, execute this command where you pass the parameter `-e remove=true`
+  
+  You can specify the version to be installed. If not defined, the latest release will be installed using the parameter `-e tekton_release_version=v0.3.1`  
+
+### Command : Create K8s Config Yml
+
+  ```bash
+  ansible-playbook -i inventory/simple_host playbook/post_installation.yml --tags k8s_config
+  ```
+  
+  This role will generate the file `remote-k8s-config.yml` within the inventory folder and will contain 
+  the `Kind: Config` yaml resource which specify the definition of the `clusters`, `contexts`, `tokens` and `certificates`.
+  
+  You can then use it if you export the `KUBECONFIG` env var
+  
+  `e.g. export KUBECONFIG=inventory/remote-k8s-config.yml`
+  
+  If you need to use the sudo root user on the target vm, then pass the parameter `--become`
+  
+  To export the configuration using a different file name within the inventory folder, pass the parameter `-e k8s_config_filename`
+  ```bash
+  ansible-playbook -i inventory/simple_host playbook/post_installation.yml --tags k8s_config -e k8s_config_filename=node_k8s_config.yml
+  ```  
+
+### Command : Ingress Router
+  
+  By default, a kubernetes cluster don't install a proxy able communicate with the [services deployed](https://kubernetes.io/docs/concepts/services-networking/ingress/) on the cluster. To have 
+  access to such information, then it is needed to install an [Ingress controller](https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/).
+  
+  ```bash
+  ansible-playbook -i inventory/simple_host playbook/post_installation.yml --tags ingress
+  ```  
+
+### Command : Install K8s Dashboard
+
+By default, the kubernetes cluster don't install [Web UI - Dashboard](https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/) to manage, access the Kubernetes resources.
+
+  ```bash
+  ansible-playbook -i inventory/simple_host playbook/post_installation.yml --tags k8s_dashboard
+  ```   
+  
+  To uninstall the dashboard, execute this command where you pass the parameter `-e remove=true` 
+  
+  Next, grab the token of the admin-user secret in order to access the dashboard
+  ```bash
+  kubectl -n kubernetes-dashboard get secret/admin-user -o jsonpath='{.data.token}' | base64 -d
+  ```
+
+### Command : Install Helm (optional)
+
+  ```bash
+  ansible-playbook -i inventory/simple_host playbook/post_installation.yml --tags helm
+  ``` 
+
+### Command : Docker Registry (optional)
+
+  ```bash
+  ansible-playbook -i inventory/simple_host playbook/post_installation.yml --tags docker_registry
   ```  
   
-  To remove the Component CRD and its operator, pass then the following variable `-e remove=true`
   
-  To use a different version of the image, then use `-e component_operator_docker_image_version=master`
+### Command : New ocp4 console  (optional)
 
+  To install the new ocp4 console on the port `0.0.0.0:9000`, then execute the following command
+  
+  ```bash
+  ansible-playbook -i inventory/simple_host playbook/post_installation.yml --tags ocp4_console
+  ```    
+  
+  You can next access it at the address `http://ocp4-console.external_ip_address.nip.io`.
+  The External IP address exposing the console can be changed using the following parameter `-e external_ip_address=192.168.99.50`
+  
+  To uninstall the `ocp4 console`, execute this command where you pass the parameter `-e remove=true`
+  
+### Command : K8s Service Catalog and OABroker
+
+  ```bash
+  ansible-playbook -i inventory/simple_host playbook/post_installation.yml --tags k8s_service_broker
+  ```    
+  
+  To uninstall the `Service Catalog and OABroker`, execute this command where you pass the parameter `remove=true`
+  ```bash
+  ansible-playbook -i inventory/simple_host playbook/post_installation.yml --tags k8s_service_broker -e remove=true
+  ```  
