@@ -285,3 +285,64 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
   ```bash
   ansible-playbook -i inventory/cloud_host openshift-ansible/playbooks/openshift-logging/config.yml -e openshift_logging_install_logging=true
   ```
+
+## TODO
+
+### KubeDB Operator
+
+  **Prerequisite**: Helm must be installed. Run the playbook command where you pass to `playbook/k8s.yml`, the tag `--tags helm`
+
+  ```bash
+  ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags kubedb
+  ```    
+  
+  To uninstall the `KubeDB operator and catalog of the availbale databases`, execute this command where you pass the parameter `remove=true`
+  ```bash
+  ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags kubedb -e remove=true
+  ```  
+  
+  You can, during the installation of the kubedb operator, install and enable their mutating and validating webhooks using this parameter `-e kubedb_enablewebhook=true`. By default, webhooks are not enabled.
+  The namespace where kudedb should be installed can be specified using `-e kubedb_namespace=my-kudeb`. By default, it is `kubedb`
+  
+### K8s Service Catalog and OABroker
+
+  ```bash
+  ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags k8s_service_broker
+  ```    
+  
+  To uninstall the `Service Catalog and OABroker`, execute this command where you pass the parameter `remove=true`
+  ```bash
+  ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags k8s_service_broker -e remove=true
+  ```
+
+### Tekton Pipelines
+
+  ```bash
+  ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags tekton_pipelines -e isOpenshift=false
+  ```
+  
+  To uninstall the `tekton pipelines`, execute this command where you pass the parameter `remove=true`
+  ```bash
+  ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags tekton_pipelines -e remove=true  -e isOpenshift=false
+  ```
+  
+  You can specify the version to be installed. If not defined, the latest release will be installed
+  ```bash
+  ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags tekton_pipelines -e tekton_release_version=v0.3.1 -e isOpenshift=false
+  ```
+  
+  To install it using the oc client installed within the VM, then execute this command
+  ```bash
+  ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags tekton_pipelines -e isOpenshift=true -e client_tool=oc
+  ```
+  
+### Component Operator
+
+  ```bash
+  ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags component_crd_operator -e isOpenshift=false
+  ```  
+  
+  To remove the Component CRD and its operator, pass then the following variable `-e remove=true`
+  
+  To use a different version of the image, then use `-e component_operator_docker_image_version=master`
+

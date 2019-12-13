@@ -278,7 +278,8 @@ As the vm is now running and the docker daemon is up, you can install `OpenShift
 ## Kubernetes Installation
 
 If you have a Virtual Machine which has been created as described for the option: `2`, `3` or `4` of the previous section,
-you can then use the following [instructions](doc/k8s.md) to install a Kubernetes cluster using `kubelet/kubeadmin` tools.
+you can then use the following [instructions](doc/k8s.md) to install a Kubernetes cluster with the help of ansible 
+and the role we created which uses the `kubelet/kubeadmin` tools.
 
 ## Turn on your OpenShift machine into a Cloud Native Dev environment 
 
