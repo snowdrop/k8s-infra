@@ -15,7 +15,7 @@ Table of Contents
 
 ## Prerequisite
 
-- Linux VM (CentOS7, ...) running, that you can ssh on port 22 and where your public key has been imported
+- Linux VM (CentOS 7, ...) running, that you can ssh on port 22 and where your public key has been imported
 - Ansible [>=2.7](http://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
 
 ## Instructions
@@ -28,7 +28,9 @@ ansible-playbook -i inventory/simple_host playbook/k8s.yml \
    --tags k8s_cluster
 ```
 
-You can specify the version of kubernetes to be installed using this parameter `-e k8s_version=1.14.1`. If you need to use the sudo root user on the target vm, then pass the parameter `--become`
+You can specify the version of kubernetes to be installed using this parameter `-e k8s_version=1.14.1`.
+
+If you need to use the sudo root user on the target vm, then pass the parameter `--become`
 
 ## Post installations steps
 
@@ -58,12 +60,6 @@ roles
   ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags ingress
   ```  
 
-### Install Helm (optional)
-
-  ```bash
-  ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags helm
-  ``` 
-  
 ### Install K8s Dashboard
 
   ```bash
@@ -76,6 +72,12 @@ roles
   ```bash
   kubectl -n kubernetes-dashboard get secret/admin-user -o jsonpath='{.data.token}' | base64 -d
   ```
+
+### Install Helm (optional)
+
+  ```bash
+  ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags helm
+  ``` 
 
 ### Docker Registry (optional)
 
