@@ -10,7 +10,7 @@ Table of Contents
           * [Create VM on VirtualBox](#create-vm-on-virtualbox)
        * [Option 3 : Public Cloud Provider - Hetzner](#option-3--public-cloud-provider---hetzner)
        * [Option 4 : Private Cloud Provider - Openstack](#option-4--private-cloud-provider---openstack)
-       * [OpenShift Deployment](#openshift-deployment)
+       * [OpenShift Deployment (option 2,3 and 4)](#openshift-deployment-option-23-and-4)
     * [Kubernetes Installation](#kubernetes-installation)
     * [Turn on your OpenShift machine into a Cloud Native Dev environment](#turn-on-your-openshift-machine-into-a-cloud-native-dev-environment)
        * [Bash script (minishift only)](#bash-script-minishift-only)
@@ -268,7 +268,7 @@ Warning: Permanently added '192.168.99.50' (ECDSA) to the list of known hosts.
 - See [OpenStack](openstack/README.md) page explaining how to create an OpenStack cloud vm.
 - Move to `OpenShift deployment` [section](#openshift-deployment) hereafter to see how to provision the local VM.
 
-### OpenShift Deployment
+### OpenShift Deployment (option 2,3 and 4)
 
 As the vm is now running and the docker daemon is up, you can install `OpenShift` using either one of the following approaches :
 
