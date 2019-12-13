@@ -1,7 +1,7 @@
 Table of Contents
 =================
 
- * [Instructions to install a kubernetes/openshift cluster](#instructions-to-install-a-kubernetesopenshift-cluster)
+ * [Instructions to install a k8s cluster](#instructions-to-install-a-k8s-cluster)
     * [Become a Docker Machine](#become-a-docker-machine)
     * [Provision OpenShift](#provision-openshift)
        * [Option 1 : Local - Minishift](#option-1--local---minishift)
@@ -13,8 +13,6 @@ Table of Contents
        * [OpenShift Deployment (option 2, 3 and 4)](#openshift-deployment-option-2-3-and-4)
     * [Kubernetes Installation](#kubernetes-installation)
     * [Turn on your OpenShift machine into a Cloud Native Dev environment](#turn-on-your-openshift-machine-into-a-cloud-native-dev-environment)
-       * [Bash script (minishift only)](#bash-script-minishift-only)
-       * [Ansible playbooks](#ansible-playbooks)
 
 # Instructions to install a k8s cluster
 
