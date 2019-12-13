@@ -16,15 +16,16 @@ Table of Contents
        * [Bash script (minishift only)](#bash-script-minishift-only)
        * [Ansible playbooks](#ansible-playbooks)
 
-# Instructions to install a kubernetes/openshift cluster
+# Instructions to install a k8s cluster
 
-This project details the prerequisites and steps necessary to convert a machine / environment into a Cloud Development Platform using Linux Container as a foundation and Kubernetes/OpenShift as the
-orchestration and management platform of those containers.
+This project details the `prerequisites` and `steps` necessary to convert a machine / environment into a Cloud Development Platform 
+where we can deploy a Kubernetes (aka k8s) cluster.
 
-The documentation has been designed around the following topics 
+The documentation has been designed around the following topics :
 
 - Become a Docker machine
 - Next, to provision Kubernetes/OpenShift
+- Post installation
 
 ## Become a Docker Machine
 
@@ -236,7 +237,7 @@ changed: [localhost]
 
 TASK [generate_inventory : Show inventory file location] ****************************************************************************************************************************************************************
 ok: [localhost] => {
-    "msg": "Inventory file created at : /Users/dabou/Code/snowdrop/openshift-infra/ansible/inventory/simple_host"
+    "msg": "Inventory file created at : /Users/dabou/Code/snowdrop/k8s-infra/ansible/inventory/simple_host"
 }
 
 PLAY RECAP **************************************************************************************************************************************************************************************************************
