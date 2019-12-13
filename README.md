@@ -1,20 +1,23 @@
 Table of Contents
 =================
 
-  * [Instructions to install a k8s cluster](#instructions-to-install-a-k8s-cluster)
-     * [Become a Docker Machine](#become-a-docker-machine)
-     * [Provision the Cluster](#provision-the-cluster)
-        * [Option 1 : Local](#option-1--local)
-           * [Minikube](#minikube)
-           * [MiniShift](#minishift)
-        * [Option 2 : Local - Customized VM](#option-2--local---customized-vm)
-           * [Create vdi file from Cloud ISO](#create-vdi-file-from-cloud-iso)
-           * [Create VM on VirtualBox](#create-vm-on-virtualbox)
-        * [Option 3 : Public Cloud Provider - Hetzner](#option-3--public-cloud-provider---hetzner)
-        * [Option 4 : Private Cloud Provider - Openstack](#option-4--private-cloud-provider---openstack)
-        * [OpenShift Deployment (option 2, 3 and 4)](#openshift-deployment-option-2-3-and-4)
-     * [Kubernetes Installation](#kubernetes-installation)
-     * [Turn on your OpenShift machine into a Cloud Native Dev environment](#turn-on-your-openshift-machine-into-a-cloud-native-dev-environment)
+   * [Table of Contents](#table-of-contents)
+   * [Instructions to install a k8s cluster](#instructions-to-install-a-k8s-cluster)
+      * [Become a Docker Machine](#become-a-docker-machine)
+      * [Provision the Cluster](#provision-the-cluster)
+         * [Option 1 : Local](#option-1--local)
+            * [Minikube](#minikube)
+            * [MiniShift](#minishift)
+         * [Option 2 : Local - Customized VM](#option-2--local---customized-vm)
+            * [Create vdi file from Cloud ISO](#create-vdi-file-from-cloud-iso)
+            * [Create VM on VirtualBox](#create-vm-on-virtualbox)
+         * [Option 3 : Using a cloud provider](#option-3--using-a-cloud-provider)
+            * [Public : Hetzner](#public--hetzner)
+            * [VPN : OpenStack](#vpn--openstack)
+         * [Cluster Deployment (option 2, 3)](#cluster-deployment-option-2-3)
+            * [OpenShift](#openshift)
+            * [Kubernetes](#kubernetes)
+      * [Turn on your OpenShift machine into a Cloud Native Dev environment](#turn-on-your-openshift-machine-into-a-cloud-native-dev-environment)
 
 # Instructions to install a k8s cluster
 
@@ -45,8 +48,8 @@ summarizes and presents the possibilities offered:
 
 **NOTE**: 
 - Aside from `option 1` where the `Minishift` tool manages the whole process to create the vm and next install the docker server, the other `options` only require a Linux VM and Docker server.
-- For `option 3 and 4`, the Linux VM must be accessible using `ssh`
-- The `option 2, 3 & 4` can also performed using `fedora`, `rhel` or `ubuntu` operating system but they haven't been tested and will not be presented here.
+- For `option 3`, the Linux VM must be accessible using `ssh`
+- The `option 2, 3` can also performed using `fedora`, `rhel` or `ubuntu` operating system but they haven't been tested and will not be presented here.
 
 ### Option 1 : Local
 
@@ -267,30 +270,32 @@ Warning: Permanently added '192.168.99.50' (ECDSA) to the list of known hosts.
 
 - Move to `OpenShift deployment` [section](#openshift-deployment) to see how to provision the local VM.
 
-### Option 3 : Public Cloud Provider - Hetzner
+### Option 3 : Using a cloud provider
+
+#### Public : Hetzner
 
 - See [hetzner](hetzner/README.md) page explaining how to create a cloud vm.
 - Move to `OpenShift deployment` [section](#openshift-deployment) to see how to provision the local VM.
 
-### Option 4 : Private Cloud Provider - Openstack
+#### VPN : OpenStack
 
 - See [OpenStack](openstack/README.md) page explaining how to create an OpenStack cloud vm.
 - Move to `OpenShift deployment` [section](#openshift-deployment) hereafter to see how to provision the local VM.
 
-### OpenShift Deployment (option 2, 3 and 4)
+### Cluster Deployment (option 2, 3)
 
-As the vm is now running and the docker daemon is up, you can install `OpenShift` using either one of the following approaches :
+As the vm is now running and the docker daemon is up, you can install your `k8s` distribution using either one of the following approaches :
+
+#### OpenShift
 
 - Simple using the `oc` binary tool and the command [oc cluster up](https://github.com/openshift/origin/blob/master/docs/cluster_up_down.md) within the vm
 - More elaborated using `Ansible` tool and one of the following playbook/role:
   - `oc cluster up` [role](doc/oc.md)
   - `openshift-ansible` all-in-one playbook as described [here](doc/cloud.md)
+  
+#### Kubernetes
 
-## Kubernetes Installation
-
-If you have a Virtual Machine which has been created as described for the option: `2`, `3` or `4` of the previous section,
-you can then use the following [instructions](doc/k8s.md) to install a Kubernetes cluster with the help of ansible 
-and the role we created which uses the `kubelet/kubeadmin` tools.
+You can then use the following instructions to install a Kubernetes cluster with the help of Ansible : [role](doc/k8s.md)
 
 ## Turn on your OpenShift machine into a Cloud Native Dev environment 
 
