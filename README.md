@@ -13,9 +13,9 @@ Table of Contents
          * [Option 3 : Using a cloud provider](#option-3--using-a-cloud-provider)
             * [Public : Hetzner](#public--hetzner)
             * [VPN : OpenStack](#vpn--openstack)
-         * [Cluster Deployment (option 2, 3)](#cluster-deployment-option-2-3)
-            * [OpenShift](#openshift)
-            * [Kubernetes](#kubernetes)
+      * [Cluster Deployment (option 2, 3)](#cluster-deployment-option-2-3)
+         * [OpenShift](#openshift)
+         * [Kubernetes](#kubernetes)
       * [Turn on your OpenShift machine into a Cloud Native Dev environment](#turn-on-your-openshift-machine-into-a-cloud-native-dev-environment)
 
 # Instructions to install a k8s cluster
@@ -281,18 +281,18 @@ Warning: Permanently added '192.168.99.50' (ECDSA) to the list of known hosts.
 - See [OpenStack](openstack/README.md) page explaining how to create an OpenStack cloud vm.
 - Move to `OpenShift deployment` [section](#openshift-deployment) hereafter to see how to provision the local VM.
 
-### Cluster Deployment (option 2, 3)
+## Cluster Deployment (option 2, 3)
 
 As the vm is now running and the docker daemon is up, you can install your `k8s` distribution using either one of the following approaches :
 
-#### OpenShift
+### OpenShift
 
 - Simple using the `oc` binary tool and the command [oc cluster up](https://github.com/openshift/origin/blob/master/docs/cluster_up_down.md) within the vm
 - More elaborated using `Ansible` tool and one of the following playbook/role:
   - `oc cluster up` [role](doc/oc.md)
   - `openshift-ansible` all-in-one playbook as described [here](doc/cloud.md)
   
-#### Kubernetes
+### Kubernetes
 
 You can then use the following instructions to install a Kubernetes cluster with the help of Ansible : [role](doc/k8s.md)
 
