@@ -1,3 +1,12 @@
+Table of Contents
+=================
+
+ * [Mac OSX](#mac-osx)
+    * [Docker Desktop](#docker-desktop)
+    * [Docker machine](#docker-machine)
+    * [Vagrant](#vagrant)
+ * [Linux](#linux)
+
 ### Mac OSX
 
 As the MacOS operating system doesn't natively support `Linux container`, it is then required to run a `Linux` vm using either `Virtualbox`, `Xhyve` or `Hyperkit` as 
