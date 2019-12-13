@@ -1,7 +1,6 @@
 Table of Contents
 =================
 
-   * [Table of Contents](#table-of-contents)
    * [Instructions to install a k8s cluster](#instructions-to-install-a-k8s-cluster)
       * [Become a Docker Machine](#become-a-docker-machine)
       * [Provision the Cluster](#provision-the-cluster)
