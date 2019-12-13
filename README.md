@@ -273,11 +273,11 @@ Warning: Permanently added '192.168.99.50' (ECDSA) to the list of known hosts.
 As the vm is now running and the docker daemon is up, you can install `OpenShift` using either one of the following approaches :
 
 - Simple using the `oc` binary tool and the command [oc cluster up](https://github.com/openshift/origin/blob/master/docs/cluster_up_down.md) within the vm
-- More elaborated using `Ansible` tool with our `cluster` [role](ansible/README-oc.md) or with the `openshift-ansible` all-in-one playbook as described [here](ansible/README-cloud.md)
+- More elaborated using `Ansible` tool with our `cluster` [role](doc/oc.md) or with the `openshift-ansible` all-in-one playbook as described [here](doc/cloud.md)
 
 ## Kubernetes Installation
 
-If you have a Virtual Machine which has been created as described for the option 2) and 4) of the `Provision OpenShift section`, you can then use the following [instructions](ansible/README-k8s.md) to install
+If you have a Virtual Machine which has been created as described for the option 2) and 4) of the `Provision OpenShift section`, you can then use the following [instructions](doc/k8s.md) to install
 a Kubernetes cluster using the `kubeadmin` tool.
 
 ## Turn on your OpenShift machine into a Cloud Native Dev environment 
