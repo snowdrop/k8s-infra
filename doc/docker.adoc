@@ -1,0 +1,45 @@
+
+=== Become a Docker Machine 11
+
+==== Mac OSX
+
+As the MacOS operating system doesn’t natively support `+Linux container+`, it is then required to run a `+Linux+` vm using either `+Virtualbox+`, `+Xhyve+` or `+Hyperkit+` as hypervisor.
+
+Various tools, approaches exist to turn your mac into a `+Containerized+` platform and are presented hereafter.
+
+===== Docker Desktop
+
+The new `+Docker Machine+` tool is available now as a `+Client desktop+` which can be installed as described here: https://docs.docker.com/docker-for-mac/install/ This new client replaces `+docker-machine or docker tools+` and uses natively `+Hyperkit+` which is lightweight macOS virtualization solution built on top of `+Hypervisor.framework+` in macOS. Docker Desktop does not use https://docs.docker.com/docker-for-mac/docker-toolbox/[docker-machine] to provision its VM. The Docker Engine API is exposed on a socket available to the Mac host at /var/run/docker.sock
+
+===== Docker machine
+
+Deprecated !
+
+Docker machine is a client Tool communicating with the `+Virtualbox+` hypervisor and able to manage Linux VMs. Using docker-machine commands, you can start, inspect, stop, and restart a managed host, upgrade the Docker client and daemon, and configure a Docker client to talk to your host.
+
+* Why or when to use it ?
+** For linux container development and testing
+** To bootstrap `+OpenShift+` using the `+oc cluster up+` command. This approach is not recommended and the link:[Minishift tool] should then be used for that purpose.
+* Prerequisites
+** https://www.virtualbox.org/wiki/Downloads[Virtualbox]
+* Follow installation instructions for Docker machine at https://docs.docker.com/machine/install-machine/ or execute the following commands within a terminal.
++
+*WARNING*: Change the version of the `+docker-machine+` according to the latest version published https://github.com/docker/machine/releases/[here]
++
+[source,bash]
+----
+base=https://github.com/docker/machine/releases/download/v0.14.0 &&
+curl -L $base/docker-machine-$(uname -s)-$(uname -m) >/usr/local/bin/docker-machine &&
+chmod +x /usr/local/bin/docker-machine
+----
+* Alternatively, if you prefer to install `+Docker+` using the docker package that you can download from https://download.docker.com/mac/stable/Docker.dmg[here], then the following tools including docker machine will be also installed :
+** Docker client
+** Docker compose
+** Docker machine
+** Docker credential osxkeychain
+* To verify, validate if docker machine works with Virtualbox, then execute this command to create a vm named `+default+` using a lightweight linux distribution - https://github.com/boot2docker/boot2docker[boot2docker]
++
+[source,bash]
+----
+docker-machine create --driver virtualbox default
+----

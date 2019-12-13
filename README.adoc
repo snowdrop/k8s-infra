@@ -32,6 +32,8 @@ The documentation has been designed around the following topics
 
 === Become a Docker Machine
 
+include::doc/docker.adoc
+
 ==== Mac OSX
 
 As the MacOS operating system doesn’t natively support `+Linux container+`, it is then required to run a `+Linux+` vm using either `+Virtualbox+`, `+Xhyve+` or `+Hyperkit+` as hypervisor.
