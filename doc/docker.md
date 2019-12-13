@@ -7,20 +7,20 @@ Table of Contents
     * [Vagrant](#vagrant)
  * [Linux](#linux)
 
-### Mac OSX
+## Mac OSX
 
 As the MacOS operating system doesn't natively support `Linux container`, it is then required to run a `Linux` vm using either `Virtualbox`, `Xhyve` or `Hyperkit` as 
 hypervisor.
 
 Various tools, approaches exist to turn your mac into a `Containerized` platform and are presented hereafter.
 
-#### Docker Desktop
+### Docker Desktop
 
 The new `Docker Machine` tool is available now as a `Client desktop` which can be installed as described here: https://docs.docker.com/docker-for-mac/install/
 This new client replaces `docker-machine or docker tools` and uses natively `Hyperkit` which is lightweight macOS virtualization solution built on top of `Hypervisor.framework` in macOS.
 Docker Desktop does not use [docker-machine](https://docs.docker.com/docker-for-mac/docker-toolbox/) to provision its VM. The Docker Engine API is exposed on a socket available to the Mac host at /var/run/docker.sock
 
-#### Docker machine
+### Docker machine
 
 Deprecated !
 
@@ -58,7 +58,7 @@ Using docker-machine commands, you can start, inspect, stop, and restart a manag
   docker-machine create --driver virtualbox default
   ```
 
-#### Vagrant
+### Vagrant
 
 Vagrant is a Ruby tool for building and managing Linux virtual machine environments. It offers more flexibility than `docker machine` as you can select the Linux OS that you would like to run locally, 
 can work with different hypervisors and can better automate the process to bootstrap a Linux vm, configure it and execute post installations tasks. 
@@ -146,7 +146,7 @@ can work with different hypervisors and can better automate the process to boots
   vagrant ssh
   ```  
   
-### Linux
+## Linux
 
 When using a Linux operating system, it is not by necessary to use a hypervisor and `docker` can be installed directly using 
 the corresponding package.
