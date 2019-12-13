@@ -1,4 +1,17 @@
-# Instructions to install a Kubernetes Cluster using Ansible playbooks 
+# Instructions to install Kubernetes
+
+Table of Contents
+=================
+
+  * [Prerequisite](#prerequisite)
+  * [Instructions](#instructions)
+  * [Post installations steps](#post-installations-steps)
+     * [Create K8s Config Yml](#create-k8s-config-yml)
+     * [Install Ingress Router](#install-ingress-router)
+     * [Install Helm](#install-helm)
+     * [Install K8s Dashboard](#install-k8s-dashboard)
+     * [Docker Registry](#docker-registry)
+     * [New ocp4 console](#new-ocp4-console)
 
 ## Prerequisite
 
@@ -45,7 +58,7 @@ roles
   ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags ingress
   ```  
 
-### Install Helm
+### Install Helm (optional)
 
   ```bash
   ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags helm
@@ -64,13 +77,13 @@ roles
   kubectl -n kubernetes-dashboard get secret/admin-user -o jsonpath='{.data.token}' | base64 -d
   ```
 
-### Docker Registry
+### Docker Registry (optional)
 
   ```bash
   ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags docker_registry
   ```  
   
-### New ocp4 console
+### New ocp4 console  (optional)
 
   To install the new ocp4 console on the port `0.0.0.0:9000`, then execute the following command
   
