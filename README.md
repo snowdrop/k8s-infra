@@ -1,18 +1,20 @@
 Table of Contents
 =================
 
- * [Instructions to install a k8s cluster](#instructions-to-install-a-k8s-cluster)
-    * [Become a Docker Machine](#become-a-docker-machine)
-    * [Provision OpenShift](#provision-openshift)
-       * [Option 1 : Local - Minishift](#option-1--local---minishift)
-       * [Option 2 : Local - Customized Linux VM](#option-2--local---customized-linux-vm)
-          * [Create vdi file from Cloud ISO](#create-vdi-file-from-cloud-iso)
-          * [Create VM on VirtualBox](#create-vm-on-virtualbox)
-       * [Option 3 : Public Cloud Provider - Hetzner](#option-3--public-cloud-provider---hetzner)
-       * [Option 4 : Private Cloud Provider - Openstack](#option-4--private-cloud-provider---openstack)
-       * [OpenShift Deployment (option 2, 3 and 4)](#openshift-deployment-option-2-3-and-4)
-    * [Kubernetes Installation](#kubernetes-installation)
-    * [Turn on your OpenShift machine into a Cloud Native Dev environment](#turn-on-your-openshift-machine-into-a-cloud-native-dev-environment)
+  * [Instructions to install a k8s cluster](#instructions-to-install-a-k8s-cluster)
+     * [Become a Docker Machine](#become-a-docker-machine)
+     * [Provision the Cluster](#provision-the-cluster)
+        * [Option 1 : Local](#option-1--local)
+           * [Minikube](#minikube)
+           * [MiniShift](#minishift)
+        * [Option 2 : Local - Customized VM](#option-2--local---customized-vm)
+           * [Create vdi file from Cloud ISO](#create-vdi-file-from-cloud-iso)
+           * [Create VM on VirtualBox](#create-vm-on-virtualbox)
+        * [Option 3 : Public Cloud Provider - Hetzner](#option-3--public-cloud-provider---hetzner)
+        * [Option 4 : Private Cloud Provider - Openstack](#option-4--private-cloud-provider---openstack)
+        * [OpenShift Deployment (option 2, 3 and 4)](#openshift-deployment-option-2-3-and-4)
+     * [Kubernetes Installation](#kubernetes-installation)
+     * [Turn on your OpenShift machine into a Cloud Native Dev environment](#turn-on-your-openshift-machine-into-a-cloud-native-dev-environment)
 
 # Instructions to install a k8s cluster
 
