@@ -17,6 +17,7 @@ Table of Contents
 
 - Linux VM (CentOS 7, ...) running, that you can ssh on port 22 and where your public key has been imported
 - Ansible [>=2.7](http://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
+- Ansible inventory - see [doc](inventory.md) ! 
 
 ## Instructions
 
