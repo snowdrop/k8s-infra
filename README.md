@@ -294,7 +294,7 @@ As the vm is now running and the docker daemon is up, you can install your `k8s`
   
 ### Kubernetes
 
-You can then use the following instructions to install a Kubernetes cluster with the help of Ansible : [role](doc/k8s.md)
+You can then use the following instructions to install a Kubernetes cluster with the help of Ansible and the [roles we created](doc/k8s.md)
 
 ## Turn on your OpenShift machine into a Cloud Native Dev environment 
 
