@@ -3,7 +3,8 @@
 ## Prerequisite
 
   - Linux VM (CentOS7, ...) running, that you can ssh on port 22 and where your public key has been imported
-  - Ansible [=2.7](http://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html) (Note that Ansible 2.8 will **not** work properly on the `openshift-ansible` playbooks)  
+  - Ansible [=2.7](http://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html) (Note that Ansible 2.8 will **not** work properly on the `openshift-ansible` playbooks) 
+  - Ansible inventory - see [doc](inventory.md) ! 
 
 ## Instructions
 

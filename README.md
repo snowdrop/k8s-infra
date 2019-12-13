@@ -296,14 +296,14 @@ As the vm is now running and the docker daemon is up, you can install your `k8s`
 
 You can then use the following instructions to install a Kubernetes cluster with the help of Ansible and the [roles we created](doc/k8s.md)
 
-## Turn on your OpenShift machine into a Cloud Native Dev environment 
+## Turn on your machine into a Cloud Native Dev environment 
 
 Independent of the approach you choose before, you'll be now able to configure your cluster
 using one of the following features and with the help of the [Ansible roles](ansible/playbook/roles) we have created: 
 
 - Create list of users/passwords and their corresponding project
 - Grant Cluster admin role to an OpenShift user 
-- Set the Master-configuration of Openshift to use `htpasswd` as its identity provider
+- Set the Master-configuration of OpenShift to use `htpasswd` as its identity provider
 - Enable Persistence using `hotPath` as `persistenceVolume`
 - Install Nexus Repository Server
 - Install Jenkins and configure it to handle `s2i` builds started within an OpenShift project

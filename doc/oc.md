@@ -4,7 +4,8 @@
 
   - Linux VM (CentOS7, ...) running, that you can ssh on port 22 and where your public key has been imported
   - Ansible [>=2.7](http://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
-
+  - Ansible inventory - see [doc](inventory.md) ! 
+  
 ## Instructions
 
 - To create an all in one cluster using the oc cluster role, then it is required to first generate an inventory file.
