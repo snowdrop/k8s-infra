@@ -6,33 +6,33 @@ The table hereafter summarizes the roles available that you can call using the `
 
 | Role Name | Cluster | Description  |
 | --------- | ------- | ------------ | 
-| [Command : identity_provider](#command--identity_provider) | okd | Set the Master-configuration of OpenShift to use `htpasswd` as its identity provider |
-| [add_extra_users](#command-add_extra_users) | okd | Create list of users/passwords and their corresponding project |
-| [delete_extra_users](#command-delete_extra_users) | | okd | Delete extra users created using `add_extra_users` |
-| [enable_cluster_role](#command-enable_cluster_role) | okd | Grant a cluster role to an OpenShift user |
-| [persistence](#command-persistence) | okd | Enable Persistence using `hotPath` as `persistenceVolume` |
-| [docker](#extra-docker-config) | okd |  Enable extra docker config to access it using port 2376 |
-| [snowdrop_site](#command-install-snowdrop-site) | k8s,okd | Install Snowdrop web site |
-| [halkyon_site](#command-install-halkyon-site) | k8s,okd | Install Halkyon Nginx web site |
-| [install_nexus](#command-install_nexus) | okd | Install Nexus Repository Server |
-| [install_jenkins](#command-install_jenkins) | okd | Install Jenkins and configure it to handle `s2i` builds started within an OpenShift project |
-| [install_jaeger](#command-install_jaeger) | okd | Install Distributed Tracing - Jaeger |
-| [install_istio](#command-install_istio) | okd | Install ServiceMesh - Istio |
-| [install_launcher](#command-install_launcher) | okd | Install and enable the Fabric8 [Launcher](http://fabric8-launcher) |
-| [install_oc](#command-install_oc) | okd | Install oc client within the vm
-| [service_catalog](#command-service-catalog) | okd | Deploy the [Ansible Service Broker](http://automationbroker.io/) |
-| [install_efk](#command-logging-efk) | okd | Install EFK on the cluster |
-| [KubeDB](#command-kubedb)| k8s | KubeDB |
-| [tekton_pipelines](#command-tekton-pipelines) | k8s,okd |  Install Tekton Pipelines |
-| [component_crd_operator](#component-crd-operator)| okd | Install the Component CRD and Operator processing them | 
-| [Halkyon](#command-halkyon)| k8s,okd | Halkyon |
-| [](#command-) | k8s | Create K8s Config file |
-| [](#command-) | k8s | Ingress Router |
-| [](#command-) | k8s | K8s Dashboard |
-| [](#command-) | k8s | Deploy Helm Tool |
-| [](#command-) | k8s | Docker Registry |
-| [](#command-) | k8s | New OCP4 console |
-| [](#command-) | k8s | K8s Service Broker |
+| [identity_provider](#command--identity_provider) | okd | Set the Master-configuration of OpenShift to use `htpasswd` as its identity provider |
+| [add_extra_users](#command--add_extra_users) | okd | Create list of users/passwords and their corresponding project |
+| [delete_extra_users](#command--delete_extra_users) | okd | Delete extra users created using `add_extra_users` |
+| [enable_cluster_role](#command--enable_cluster_role) | okd | Grant a cluster role to an OpenShift user |
+| [Persistence](#command--persistence) | okd | Enable Persistence using `hotPath` as `persistenceVolume` |
+| [Extra docker config](#command--extra-docker-config) | okd |  Enable extra docker config to access it using port 2376 |
+| [Install Snowdrop Site](#command--install-snowdrop-site) | k8s,okd | Install Snowdrop web site |
+| [Install Halkyon Site](#command--install-halkyon-site) | k8s,okd | Install Halkyon Nginx web site |
+| [Install_nexus](#command--install_nexus) | okd | Install Nexus Repository Server |
+| [Install_jenkins](#command--install_jenkins) | okd | Install Jenkins and configure it to handle `s2i` builds started within an OpenShift project |
+| [Install_jaeger](#command--install_jaeger) | okd | Install Distributed Tracing - Jaeger |
+| [Install_istio](#command--install_istio) | okd | Install ServiceMesh - Istio |
+| [Install_launcher](#command--install_launcher) | okd | Install and enable the Fabric8 [Launcher](http://fabric8-launcher) |
+| [Install_oc](#command--install_oc) | okd | Install oc client within the vm
+| [service_catalog](#command--service-catalog) | okd | Deploy the [Ansible Service Broker](http://automationbroker.io/) |
+| [Logging_efk](#command--logging-efk) | okd | Install EFK on the cluster |
+| [KubeDB](#command--kubedb-operator)| k8s | KubeDB |
+| [Tekton_pipelines](#command--tekton-pipelines) | k8s,okd |  Install Tekton Pipelines |
+| [Component_crd_operator](#component--crd-operator)| okd | Install the Component CRD and Operator processing them | 
+| [Halkyon](#command--halkyon)| k8s,okd | Halkyon |
+| [Create K8s Config file](#command--create-k8s-config-yml) | k8s | Create K8s Config file |
+| [Ingress router](#command--ingress-router) | k8s | Ingress Router |
+| [K8s dashboard](#command--install-k8s-dashboard) | k8s | K8s Dashboard |
+| [Helm](#command--install-helm-optional) | k8s | Deploy Helm Tool |
+| [Docker Registry](#command--docker-registry-optional) | k8s | Docker Registry |
+| [okd4 console](#command--new-ocp4-console-optional) | k8s | New OCP4 console |
+| [K8s Service Broker](#command--k8s-service-catalog-and-oabroker) | k8s | K8s Service Broker |
 
 ## Prerequisite
 
