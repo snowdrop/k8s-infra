@@ -25,7 +25,7 @@ This cluster that the following playbook will setup will be created using `Kubel
 
 ```bash
 cd ansible
-ansible-playbook -i inventory/simple_host playbook/k8s.yml \
+ansible-playbook -i inventory/simple_host playbook/post_installation.yml \
    --tags k8s_cluster
 ```
 
@@ -41,7 +41,7 @@ roles :
 ### Create K8s Config Yml
 
   ```bash
-  ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags k8s_config
+  ansible-playbook -i inventory/simple_host playbook/post_installation.yml --tags k8s_config
   ```
   
   This role will generate the file `remote-k8s-config.yml` within the inventory folder and will contain 
@@ -55,7 +55,7 @@ roles :
   
   To export the configuration using a different file name within the inventory folder, pass the parameter `-e k8s_config_filename`
   ```bash
-  ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags k8s_config -e k8s_config_filename=node_k8s_config.yml
+  ansible-playbook -i inventory/simple_host playbook/post_installation.yml --tags k8s_config -e k8s_config_filename=node_k8s_config.yml
   ```  
 
 ### Install Ingress Router
@@ -64,7 +64,7 @@ roles :
   access to such information, then it is needed to install an [Ingress controller](https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/).
   
   ```bash
-  ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags ingress
+  ansible-playbook -i inventory/simple_host playbook/post_installation.yml --tags ingress
   ```  
 
 ### Install K8s Dashboard
@@ -72,7 +72,7 @@ roles :
 By default, the kubernetes cluster don't install [Web UI - Dashboard](https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/) to manage, access the Kubernetes resources.
 
   ```bash
-  ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags k8s_dashboard
+  ansible-playbook -i inventory/simple_host playbook/post_installation.yml --tags k8s_dashboard
   ```   
   
   To uninstall the dashboard, execute this command where you pass the parameter `-e remove=true` 
@@ -85,13 +85,13 @@ By default, the kubernetes cluster don't install [Web UI - Dashboard](https://ku
 ### Install Helm (optional)
 
   ```bash
-  ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags helm
+  ansible-playbook -i inventory/simple_host playbook/post_installation.yml --tags helm
   ``` 
 
 ### Docker Registry (optional)
 
   ```bash
-  ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags docker_registry
+  ansible-playbook -i inventory/simple_host playbook/post_installation.yml --tags docker_registry
   ```  
   
 ### New ocp4 console  (optional)
@@ -99,7 +99,7 @@ By default, the kubernetes cluster don't install [Web UI - Dashboard](https://ku
   To install the new ocp4 console on the port `0.0.0.0:9000`, then execute the following command
   
   ```bash
-  ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags ocp4_console
+  ansible-playbook -i inventory/simple_host playbook/post_installation.yml --tags ocp4_console
   ```    
   
   You can next access it at the address `http://ocp4-console.external_ip_address.nip.io`.

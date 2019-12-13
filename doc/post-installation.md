@@ -4,26 +4,26 @@
 
 The table hereafter summarizes the roles available that you can call using the `post_installation` playbook.
 
-| Role Name | Description  |
-| --------- | ------------ | 
-| [add_extra_users](#command-add_extra_users) | Create list of users/passwords and their corresponding project |
-| [delete_extra_users](#command-delete_extra_users) | Delete extra users created using `add_extra_users` |
-| [enable_cluster_role](#command-enable_cluster_role) | Grant a cluster role to an OpenShift user |
-| [identity_provider](#command-identity_provider) | Set the Master-configuration of OpenShift to use `htpasswd` as its identity provider |
-| [persistence](#command-persistence) | Enable Persistence using `hotPath` as `persistenceVolume` |
-| [docker](#extra-docker-config) | Enable extra docker config to access it using port 2376 |
-| [component_crd_operator](#component-crd-operator)| Install the Component CRD and Operator processing them | 
-| [snowdrop_site](#command-install-snowdrop-site) | Install Snowdrop web site |
-| [halkyon_site](#command-install-halkyon-site) | Install Halkyon Nginx web site |
-| [install_nexus](#command-install_nexus) | Install Nexus Repository Server |
-| [install_jenkins](#command-install_jenkins) | Install Jenkins and configure it to handle `s2i` builds started within an OpenShift project |
-| [install_jaeger](#command-install_jaeger) | Install Distributed Tracing - Jaeger |
-| [install_istio](#command-install_istio) | Install ServiceMesh - Istio |
-| [service_catalog](#command-service-catalog) | Deploy the [Ansible Service Broker](http://automationbroker.io/) |
-| [install_efk](#command-logging-efk) | Install EFK on the cluster |
-| [tekton_pipelines](#command-tekton-pipelines) | Install Tekton Pipelines |
-| [install_launcher](#command-install_launcher) | Install and enable the Fabric8 [Launcher](http://fabric8-launcher) |
-| [install_oc](#command-install_oc) | Install oc client within the vm
+| Role Name | Cluster | Description  |
+| --------- | ------- | ------------ | 
+| [add_extra_users](#command-add_extra_users) | okd | Create list of users/passwords and their corresponding project |
+| [delete_extra_users](#command-delete_extra_users) | | okd | Delete extra users created using `add_extra_users` |
+| [enable_cluster_role](#command-enable_cluster_role) | okd | Grant a cluster role to an OpenShift user |
+| [identity_provider](#command-identity_provider) | okd | Set the Master-configuration of OpenShift to use `htpasswd` as its identity provider |
+| [persistence](#command-persistence) | okd | Enable Persistence using `hotPath` as `persistenceVolume` |
+| [docker](#extra-docker-config) | okd |  Enable extra docker config to access it using port 2376 |
+| [component_crd_operator](#component-crd-operator)| okd | Install the Component CRD and Operator processing them | 
+| [snowdrop_site](#command-install-snowdrop-site) | k8s,okd | Install Snowdrop web site |
+| [halkyon_site](#command-install-halkyon-site) | k8s,okd | Install Halkyon Nginx web site |
+| [install_nexus](#command-install_nexus) | okd | Install Nexus Repository Server |
+| [install_jenkins](#command-install_jenkins) | okd | Install Jenkins and configure it to handle `s2i` builds started within an OpenShift project |
+| [install_jaeger](#command-install_jaeger) | okd | Install Distributed Tracing - Jaeger |
+| [install_istio](#command-install_istio) | okd | Install ServiceMesh - Istio |
+| [service_catalog](#command-service-catalog) | okd | Deploy the [Ansible Service Broker](http://automationbroker.io/) |
+| [install_efk](#command-logging-efk) | okd | Install EFK on the cluster |
+| [tekton_pipelines](#command-tekton-pipelines) | k8s,okd |  Install Tekton Pipelines |
+| [install_launcher](#command-install_launcher) | okd | Install and enable the Fabric8 [Launcher](http://fabric8-launcher) |
+| [install_oc](#command-install_oc) | okd | Install oc client within the vm
 
 ## Prerequisite
 
@@ -286,19 +286,17 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
   ansible-playbook -i inventory/cloud_host openshift-ansible/playbooks/openshift-logging/config.yml -e openshift_logging_install_logging=true
   ```
 
-## TODO
-
 ### KubeDB Operator
 
-  **Prerequisite**: Helm must be installed. Run the playbook command where you pass to `playbook/k8s.yml`, the tag `--tags helm`
+  **Prerequisite**: Helm must be installed. Run the playbook command where you pass to `playbook/post_installation.yml`, the tag `--tags helm`
 
   ```bash
-  ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags kubedb
+  ansible-playbook -i inventory/simple_host playbook/post_installation.yml --tags kubedb
   ```    
   
   To uninstall the `KubeDB operator and catalog of the availbale databases`, execute this command where you pass the parameter `remove=true`
   ```bash
-  ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags kubedb -e remove=true
+  ansible-playbook -i inventory/simple_host playbook/post_installation.yml --tags kubedb -e remove=true
   ```  
   
   You can, during the installation of the kubedb operator, install and enable their mutating and validating webhooks using this parameter `-e kubedb_enablewebhook=true`. By default, webhooks are not enabled.
@@ -307,39 +305,39 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
 ### K8s Service Catalog and OABroker
 
   ```bash
-  ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags k8s_service_broker
+  ansible-playbook -i inventory/simple_host playbook/post_installation.yml --tags k8s_service_broker
   ```    
   
   To uninstall the `Service Catalog and OABroker`, execute this command where you pass the parameter `remove=true`
   ```bash
-  ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags k8s_service_broker -e remove=true
+  ansible-playbook -i inventory/simple_host playbook/post_installation.yml --tags k8s_service_broker -e remove=true
   ```
 
 ### Tekton Pipelines
 
   ```bash
-  ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags tekton_pipelines -e isOpenshift=false
+  ansible-playbook -i inventory/simple_host playbook/post_installation.yml --tags tekton_pipelines -e isOpenshift=false
   ```
   
   To uninstall the `tekton pipelines`, execute this command where you pass the parameter `remove=true`
   ```bash
-  ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags tekton_pipelines -e remove=true  -e isOpenshift=false
+  ansible-playbook -i inventory/simple_host playbook/post_installation.yml --tags tekton_pipelines -e remove=true  -e isOpenshift=false
   ```
   
   You can specify the version to be installed. If not defined, the latest release will be installed
   ```bash
-  ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags tekton_pipelines -e tekton_release_version=v0.3.1 -e isOpenshift=false
+  ansible-playbook -i inventory/simple_host playbook/post_installation.yml --tags tekton_pipelines -e tekton_release_version=v0.3.1 -e isOpenshift=false
   ```
   
   To install it using the oc client installed within the VM, then execute this command
   ```bash
-  ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags tekton_pipelines -e isOpenshift=true -e client_tool=oc
+  ansible-playbook -i inventory/simple_host playbook/post_installation.yml --tags tekton_pipelines -e isOpenshift=true -e client_tool=oc
   ```
   
 ### Component Operator
 
   ```bash
-  ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags component_crd_operator -e isOpenshift=false
+  ansible-playbook -i inventory/simple_host playbook/post_installation.yml --tags component_crd_operator -e isOpenshift=false
   ```  
   
   To remove the Component CRD and its operator, pass then the following variable `-e remove=true`
