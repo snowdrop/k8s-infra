@@ -1,4 +1,4 @@
-# Instructions to install OpenShift using a cluster ansible role
+# Instructions to install OpenShift using the Cluster Ansible role
 
 ## Prerequisite
 
