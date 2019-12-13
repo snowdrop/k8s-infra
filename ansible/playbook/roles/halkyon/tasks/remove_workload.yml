@@ -26,7 +26,7 @@
 
 - name: Uninstall Tekton Pipelines on Openshift
   shell: |
-    oc --kubeconfig={{ kube_config }} delete -f https://storage.googleapis.com/tekton-releases/{{ prefix }}/release.yaml
+    oc --kubeconfig={{ kube_config }} delete -f https://storage.googleapis.com/tekton-releases/pipeline/{{ prefix }}/release.yaml
   ignore_errors: true
 
 - name: Delete Helm tiller

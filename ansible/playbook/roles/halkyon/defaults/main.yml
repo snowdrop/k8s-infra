@@ -9,7 +9,7 @@ helm_namespace: kube-system
 
 # Tekton vars
 # tekton_release_version: latest
-tekton_release_version: v0.5.2
+tekton_release_version: v0.9.1
 
 # KubeDB
 kubedb_version: 0.12.0
