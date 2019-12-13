@@ -28,14 +28,14 @@ ansible-playbook -i inventory/simple_host playbook/k8s.yml \
    --tags k8s_cluster
 ```
 
-You can specify the version of kubernetes to be installed using this parameter `-e k8s_version=1.14.1`.
+You can specify the version of `kubernetes` to be installed using this parameter `-e k8s_version=1.14.1`.
 
-If you need to use the sudo root user on the target vm, then pass the parameter `--become`
+If you need to use the sudo root user on the target vm, then pass the parameter `--become`.
 
 ## Post installations steps
 
 If you want to configure your cluster with additional features, then you can install them using the following
-roles
+roles :
 
 ### Create K8s Config Yml
 
@@ -43,9 +43,12 @@ roles
   ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags k8s_config
   ```
   
-  This role will generate the file `remote-k8s-config.yml` within the inventory folder. You can then use it if you export the `KUBECONFIG` env var
+  This role will generate the file `remote-k8s-config.yml` within the inventory folder and will contain 
+  the `Kind: Config` yaml resource which specify the definition of the `clusters`, `contexts`, `tokens` and `certificates`.
   
-  e.g. export KUBECONFIG=inventory/remote-k8s-config.yml
+  You can then use it if you export the `KUBECONFIG` env var
+  
+  `e.g. export KUBECONFIG=inventory/remote-k8s-config.yml`
   
   If you need to use the sudo root user on the target vm, then pass the parameter `--become`
   
@@ -55,12 +58,17 @@ roles
   ```  
 
 ### Install Ingress Router
-
+  
+  By default, a kubernetes cluster don't install a proxy able communicate with the [services deployed](https://kubernetes.io/docs/concepts/services-networking/ingress/) on the cluster. To have 
+  access to such information, then it is needed to install an [Ingress controller](https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/).
+  
   ```bash
   ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags ingress
   ```  
 
 ### Install K8s Dashboard
+
+By default, the kubernetes cluster don't install [Web UI - Dashboard](https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/) to manage, access the Kubernetes resources.
 
   ```bash
   ansible-playbook -i inventory/simple_host playbook/k8s.yml --tags k8s_dashboard
