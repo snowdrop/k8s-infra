@@ -1,24 +1,22 @@
 Table of Contents
 =================
 
-   * [Table of Contents](#table-of-contents)
-   * [Instructions to install OpenShift and Cloud Native Features](#instructions-to-install-openshift-and-cloud-native-features)
-      * [Become a Docker Machine](#become-a-docker-machine)
-      * [Provision OpenShift](#provision-openshift)
-         * [Option 1 : Local - Minishift](#option-1--local---minishift)
-         * [Option 2 : Local - Customized Linux VM](#option-2--local---customized-linux-vm)
-            * [Create vdi file from Cloud ISO file](#create-vdi-file-from-cloud-iso-file)
-            * [Create CentOS vm on VirtualBox](#create-vm-on-virtualbox)
-         * [Option 3 : Public Cloud Provider - Hetzner](#option-3--public-cloud-provider---hetzner)
-         * [Option 4 : Private Cloud Provider - Openstack](#option-4--private-cloud-provider---openstack)
-         * [OpenShift Deployment](#openshift-deployment)
-   * [Instructions to create a Kubernetes cluster](#kubernetes-installation)
-   * [Turn on your OpenShift machine into a Cloud Native Dev environment](#turn-on-your-openshift-machine-into-a-cloud-native-dev-environment)
-      * [Bash script (minishift only)](#bash-script-minishift-only)
-      * [Ansible playbooks](#ansible-playbooks)
+ * [Instructions to install a kubernetes/openshift cluster](#instructions-to-install-a-kubernetesopenshift-cluster)
+    * [Become a Docker Machine](#become-a-docker-machine)
+    * [Provision OpenShift](#provision-openshift)
+       * [Option 1 : Local - Minishift](#option-1--local---minishift)
+       * [Option 2 : Local - Customized Linux VM](#option-2--local---customized-linux-vm)
+          * [Create vdi file from Cloud ISO](#create-vdi-file-from-cloud-iso)
+          * [Create VM on VirtualBox](#create-vm-on-virtualbox)
+       * [Option 3 : Public Cloud Provider - Hetzner](#option-3--public-cloud-provider---hetzner)
+       * [Option 4 : Private Cloud Provider - Openstack](#option-4--private-cloud-provider---openstack)
+       * [OpenShift Deployment](#openshift-deployment)
+    * [Kubernetes Installation](#kubernetes-installation)
+    * [Turn on your OpenShift machine into a Cloud Native Dev environment](#turn-on-your-openshift-machine-into-a-cloud-native-dev-environment)
+       * [Bash script (minishift only)](#bash-script-minishift-only)
+       * [Ansible playbooks](#ansible-playbooks)
 
-
-# Instructions to install a kubernetes/openshift cluster and Cloud Native Features
+# Instructions to install a kubernetes/openshift cluster
 
 This project details the prerequisites and steps necessary to convert a machine / environment into a Cloud Development Platform using Linux Container as a foundation and Kubernetes/OpenShift as the
 orchestration and management platform of those containers.
@@ -26,8 +24,7 @@ orchestration and management platform of those containers.
 The documentation has been designed around the following topics 
 
 - Become a Docker machine
-- Next, to provision Kubernetes/OpenShift and
-- Finally to turn it on into a Cloud Native Developer Box !
+- Next, to provision Kubernetes/OpenShift
 
 ## Become a Docker Machine
 
@@ -278,12 +275,12 @@ As the vm is now running and the docker daemon is up, you can install `OpenShift
 - Simple using the `oc` binary tool and the command [oc cluster up](https://github.com/openshift/origin/blob/master/docs/cluster_up_down.md) within the vm
 - More elaborated using `Ansible` tool with our `cluster` [role](ansible/README-oc.md) or with the `openshift-ansible` all-in-one playbook as described [here](ansible/README-cloud.md)
 
-# Kubernetes Installation
+## Kubernetes Installation
 
 If you have a Virtual Machine which has been created as described for the option 2) and 4) of the `Provision OpenShift section`, you can then use the following [instructions](ansible/README-k8s.md) to install
 a Kubernetes cluster using the `kubeadmin` tool.
 
-# Turn on your OpenShift machine into a Cloud Native Dev environment 
+## Turn on your OpenShift machine into a Cloud Native Dev environment 
 
 Independent of the approach you choose before, you'll be able to install or configure OpenShift
 to play with the Hands On Lab, run local demos, or simply test one of the following features:
@@ -299,7 +296,7 @@ to play with the Hands On Lab, run local demos, or simply test one of the follow
 - Deploy the [Ansible Service Broker](http://automationbroker.io/)
 - Install and enable the Fabric8 [Launcher](http://fabric8-launcher)
 
-## Bash script (minishift only)
+### Bash script (minishift only)
 
 **NOTE**: Due to some limitations we are currently facing with `minishift|cdk`, where
 we can't use Ansible Playbooks to provision our different features once OpenShift is installed, we will instead use 
@@ -316,7 +313,7 @@ cd minishift
 E.g ./deploy_launcher_minishift.sh -p devex -g myGithubUser:myGithubToken
 ```
 
-## Ansible playbooks
+### Ansible playbooks
 
 See [Ansible post installation](ansible/README-post-installation.md) file to provision OpenShift with one of the Cloud Development features.
  
