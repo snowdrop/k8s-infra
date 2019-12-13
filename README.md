@@ -29,14 +29,14 @@ The documentation has been designed around the following topics :
 
 [docker section](doc/docker.md)
 
-## Provision OpenShift
+## Provision the Cluster
 
-As different tools / bootstrapping methods are available and serve different purposes to install `OpenShift`, the following table 
-summarize and present the possibilities offered:
+As different tools / bootstrapping methods are available and serve different purposes to install a cluster, the following table 
+summarizes and presents the possibilities offered:
 
 | Option  | Cloud Provider             | Purpose                                              | Tool        | ISO                     |  Hypervisor       |
 | ------: | ---------------------------| ---------------------------------------------------- | ----------- | ------------------------| :---------------: |
-| 1       | Local Machine              | Local dvlpt                                          | Minishift   | CentOS or boot2docker   | Xhyve, Virtualbox |
+| 1       | Local Machine              | Local dvlpt                                          | Minishift/Minikube   | CentOS or boot2docker   | Xhyve, Virtualbox |
 | 2       | Local Machine              | Local dvlpt, test new oc release, validate playbooks | Ansible     | CentOS                  | Virtualbox        |
 | 3       | Remote Public  - Hetzner   | Demo, Hands On Lab machine                           | Ansible     | CentOS, Fedora, RHEL    | -                 |
 | 4       | Remote Private - OpenStack | Testing, Productization                              | Ansible     | CentOS, Fedora, RHEL    | -                 |
@@ -46,7 +46,15 @@ summarize and present the possibilities offered:
 - For `option 3 and 4`, the Linux VM must be accessible using `ssh`
 - The `option 2, 3 & 4` can also performed using `fedora`, `rhel` or `ubuntu` operating system but they haven't been tested and will not be presented here.
 
-### Option 1 : Local - Minishift
+### Option 1 : Local
+
+For local development on your machine, you can install a `K8s` cluster using `minikube` or `minishift` depending which flavor you prefer to use as distribution
+
+#### Minikube
+
+See the [official documentation](https://kubernetes.io/docs/tasks/tools/install-minikube/) to install `minikube` on Macos, Linux or Windows
+
+#### MiniShift
 
 `Minishift` is a tool that helps you to run `OpenShift` locally by launching a single-node `OpenShift` cluster inside a virtual machine.
 
@@ -90,16 +98,16 @@ summarize and present the possibilities offered:
      
      **NOTE** : Once the virtual machine has been created, it can be stopped/started using the commands `minishift stop|start --profile demo`.
 
-### Option 2 : Local - Customized Linux VM
+### Option 2 : Local - Customized VM
 
-While we can use Vagrant in combination with Virtualbox to install easily one of the vagrant boxes available such as `CentOS`, `Fedora`, `Ubuntu`, the iso image used (and its packaging)
-doesn't necessarily fit the requirements that you need.
+When it is needed to customize the `Linux VM` locally, you cannot rely on the VM installed with mini(kube/shift) or docker destop tools as they dont offer the possibility 
+to install additional packages, to custmize easily the firewall, host adapters, ...
 
-This is specifically true when you are interested in validating a new version of `OpenShift` using `ansible-playbooks` as the deployment tool.
+This is also specifically true when you will install the cluster using `ansible-playbook` as the deployment tool.
 The `Ansible playooks` requires some `prerequisites` in addition to having a
 primary ethernet adapter, the one to be used by the OpenShift Master API (which is the Kubernetes controller, ....).
 
-For such an environment, it makes sense to customize a Linux ISO image and to perform post-installation tasks to make it ready for your needs
+For such an environment, it makes sense to customize a Linux ISO image and to perform post-installation tasks to make it ready for your needs.
 
 The following section explains how you can create a customized Generic Cloud image, repackaged as a `vdi` file for Virtualbox.
 
