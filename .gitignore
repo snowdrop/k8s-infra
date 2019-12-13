@@ -5,7 +5,9 @@
 **/.vagrant/
 **/user-data
 **/*.retry
-/ansible/inventory/*
+ansible/inventory/*
+ansible/playbook/roles/test
+**/test.sh
 
 # Testing purposes
 sandbox/cluster_up/test.sh
