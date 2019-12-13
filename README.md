@@ -282,8 +282,9 @@ a Kubernetes cluster using the `kubeadmin` tool.
 
 ## Turn on your OpenShift machine into a Cloud Native Dev environment 
 
-Independent of the approach you choose before, you'll be able to install or configure OpenShift
-to play with the Hands On Lab, run local demos, or simply test one of the following features:
+Independent of the approach you choose before, you'll be now able to install or configure your cluster
+to play with the Hands On Lab, run local demos, or simply test using one of the following features
+with the help of the playbooks we have created: 
 
 - Create list of users/passwords and their corresponding project
 - Grant Cluster admin role to an OpenShift user 
@@ -295,25 +296,7 @@ to play with the Hands On Lab, run local demos, or simply test one of the follow
 - Install ServiceMesh - Istio
 - Deploy the [Ansible Service Broker](http://automationbroker.io/)
 - Install and enable the Fabric8 [Launcher](http://fabric8-launcher)
+...
 
-### Bash script (minishift only)
-
-**NOTE**: Due to some limitations we are currently facing with `minishift|cdk`, where
-we can't use Ansible Playbooks to provision our different features once OpenShift is installed, we will instead use 
-bash script, manual `oc` commands or `Minishift` addons to install some of the features.  
-
-We will then use the following bash script - `deploy_launcher_minishift.sh` instead to install the `Fabric8 launcher` and play with missions / boosters.
-Using this script, you will have to specify your OpenShift account user/password and also your github user and API access token ([get an access token here](https://github.com/settings/tokens)).
-This will enable you to use the `git flow` when running missions / boosters, rather than downloading boosters as zip files and deploying them manually.
-
-```bash
-cd minishift 
-./deploy_launcher_minishift.sh -p projectName -i username:password -g myGithubUser:myGithubToken 
-
-E.g ./deploy_launcher_minishift.sh -p devex -g myGithubUser:myGithubToken
-```
-
-### Ansible playbooks
-
-See [Ansible post installation](ansible/README-post-installation.md) file to provision OpenShift with one of the Cloud Development features.
+See [Ansible post installation](doc/post-installation.md)
  
