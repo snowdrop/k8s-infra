@@ -1,9 +1,9 @@
 - name: Uninstall Tekton Pipelines on Openshift
   shell: |
     {{ client_tool }} {{ openshift_env.oc_admin_kubeconfig_arg }} delete -f https://storage.googleapis.com/tekton-releases/pipeline/{{ prefix }}/release.yaml
-  when: isOpenshift
+  when: isOpenshift | bool
 
 - name: Uninstall Tekton Pipelines on K8s
   shell: |
     {{ client_tool }} delete -f https://storage.googleapis.com/tekton-releases/pipeline/{{ prefix }}/release.yaml
-  when: not isOpenshift
+  when: not isOpenshift | bool
