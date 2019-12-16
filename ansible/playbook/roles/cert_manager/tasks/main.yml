@@ -1,0 +1,15 @@
+- name: Set client tool to oc when the cluster is Openshift
+  set_fact:
+    client_tool: oc
+  when: isOpenshift | bool
+
+- name: Set client tool to kubectl when the cluster is Kubernetes
+  set_fact:
+    client_tool: kubectl
+  when: not isOpenshift | bool
+
+- include_tasks: install.yml
+  when: not remove | bool
+
+- include_tasks: remove.yml
+  when: remove | bool

@@ -1,0 +1,9 @@
+- name: Install Cert Manager on OpenShift
+  shell: |
+    {{ client_tool }} {{ openshift_env.oc_admin_kubeconfig_arg }} apply -f https://github.com/jetstack/cert-manager/releases/download/{{ cert_manager.version }}/cert-manager.yaml --validate=false
+  when: isOpenshift | bool
+
+- name: Install Cert Manager on K8s
+  shell: |
+    {{ client_tool }} --kubeconfig=$HOME/.kube/config apply -f https://github.com/jetstack/cert-manager/releases/download/{{ cert_manager.version }}/cert-manager.yaml --validate=false
+  when: not isOpenshift | bool

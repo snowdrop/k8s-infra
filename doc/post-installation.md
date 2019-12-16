@@ -33,6 +33,7 @@ The table hereafter summarizes the roles available that you can call using the `
 | [Docker Registry](#command--docker-registry-optional) | k8s | Docker Registry |
 | [okd4 console](#command--new-ocp4-console-optional) | k8s | New OCP4 console |
 | [K8s Service Broker](#command--k8s-service-catalog-and-oabroker) | k8s | K8s Service Broker |
+| [Certificate Manager](#command--certificate-manager) | k8s | Certificate Manager |
 
 ## Prerequisite
 
@@ -428,4 +429,16 @@ By default, the kubernetes cluster don't install [Web UI - Dashboard](https://ku
   To uninstall the `Service Catalog and OABroker`, execute this command where you pass the parameter `remove=true`
   ```bash
   ansible-playbook -i inventory/simple_host playbook/post_installation.yml --tags k8s_service_broker -e remove=true
+  ```  
+
+
+### Command : Certificate Manager
+
+  ```bash
+  ansible-playbook -i inventory/simple_host playbook/post_installation.yml --tags cert_manager -e isOpenshift=false
+  ```    
+  
+  To uninstall the `Certificate Manager`, execute this command where you pass the parameter `remove=true`
+  ```bash
+  ansible-playbook -i inventory/simple_host playbook/post_installation.yml --tags cert_manager -e remove=true -e isOpenshift=false
   ```  
