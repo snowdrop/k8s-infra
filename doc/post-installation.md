@@ -12,7 +12,7 @@ The table hereafter summarizes the roles available that you can call using the `
 | [enable_cluster_role](#command--enable_cluster_role) | okd | Grant a cluster role to an OpenShift user |
 | [Persistence](#command--persistence) | okd | Enable Persistence using `hotPath` as `persistenceVolume` |
 | [Extra docker config](#command--extra-docker-config) | okd |  Enable extra docker config to access it using port 2376 |
-| [Install Snowdrop Site](#command--install-snowdrop-site) | k8s,okd | Install Snowdrop web site |
+| [Install Snowdrop Site](#command--install-snowdrop-site) | okd | Install Snowdrop web site on Openshift |
 | [Install Halkyon Site](#command--install-halkyon-site) | k8s,okd | Install Halkyon Nginx web site |
 | [Install_nexus](#command--install_nexus) | okd | Install Nexus Repository Server |
 | [Install_jenkins](#command--install_jenkins) | okd | Install Jenkins and configure it to handle `s2i` builds started within an OpenShift project |
@@ -34,6 +34,7 @@ The table hereafter summarizes the roles available that you can call using the `
 | [okd4 console](#command--new-ocp4-console-optional) | k8s | New OCP4 console |
 | [K8s Service Broker](#command--k8s-service-catalog-and-oabroker) | k8s | K8s Service Broker |
 | [Certificate Manager](#command--certificate-manager) | k8s | Certificate Manager |
+| [Install Snowdrop Site K8s](#command--install-snowdrop-site-k8s) | k8s | Install Snowdrop web site on Kubernetes |
 
 ## Prerequisite
 
@@ -442,3 +443,14 @@ By default, the kubernetes cluster don't install [Web UI - Dashboard](https://ku
   ```bash
   ansible-playbook -i inventory/simple_host playbook/post_installation.yml --tags cert_manager -e remove=true -e isOpenshift=false
   ```  
+
+### Command : Install Snowdrop Site K8s
+
+  The Snowdrop web site can be installed using the following role and command on Kubernetes
+  
+  ```bash
+  ansible-playbook -i inventory/cloud_host playbook/post_installation.yml \
+    --tags k8s_snowdrop_site
+  ```
+  
+  To remove the kubernetes resources of the Snowdrop web site, pass then the following variable `-e remove=true`

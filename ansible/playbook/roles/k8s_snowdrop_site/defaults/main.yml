@@ -1,0 +1,4 @@
+remove: false
+isOpenshift: false
+
+snowdrop_namespace: "snowdrop-site"

@@ -44,4 +44,5 @@
     - { role: 'component_crd_operator', tags: 'component_crd_operator'}
     - { role: 'ocp4_console',           tags: 'ocp4_console'}
     - { role: 'cert_manager',           tags: 'cert_manager'}
+    - { role: 'k8s_snowdrop_site',      tags: 'k8s_snowdrop_site'}
     - { role: 'test',                   tags: 'test'}
