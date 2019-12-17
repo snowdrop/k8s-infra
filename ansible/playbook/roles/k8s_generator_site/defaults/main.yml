@@ -1,0 +1,7 @@
+remove: false
+isOpenshift: false
+
+generator:
+  version: "v0.3.10"
+  namespace: "generator-site"
+  configmap_name: spring-boot-generator

@@ -45,4 +45,5 @@
     - { role: 'ocp4_console',           tags: 'ocp4_console'}
     - { role: 'cert_manager',           tags: 'cert_manager'}
     - { role: 'k8s_snowdrop_site',      tags: 'k8s_snowdrop_site'}
+    - { role: 'k8s_generator_site',     tags: 'k8s_generator_site'}
     - { role: 'test',                   tags: 'test'}

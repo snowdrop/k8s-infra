@@ -457,3 +457,14 @@ By default, the kubernetes cluster don't install [Web UI - Dashboard](https://ku
   ```
   
   To remove the kubernetes resources of the Snowdrop web site, pass then the following variable `-e remove=true`
+
+### Command : Install Code Generator on K8s
+
+  The Code Generator application can be installed using the following role and command on Kubernetes
+  
+  ```bash
+  ansible-playbook -i inventory/cloud_host playbook/post_installation.yml \
+    --tags k8s_generator_site
+  ```
+  The version of the application can be changed using the parameter: `-e generator.version=v0.3.10`
+  To remove the kubernetes resources of the Generator application, pass then the following variable `-e remove=true`

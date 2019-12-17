@@ -1,0 +1,14 @@
+- name: Create namespace if it doesn't exist
+  command: "{{ client_tool }} {{ k8s_config }} create namespace {{ generator.namespace }}"
+  ignore_errors: true
+
+- name: Fetch Generator yml file using URL and version defined
+  get_url:
+    url: "https://raw.githubusercontent.com/snowdrop/generator/{{ generator.version}}/conf/generator.yaml"
+    dest: /tmp/generator.yaml
+
+- name: Create the Generator configmap using the downloaded file
+  command: "{{ client_tool }} {{ k8s_config }} create configmap {{ generator.configmap_name }} --from-file /tmp/generator.yaml -n {{ generator.namespace }}"
+
+- name: Deploy the Code Generator application
+  command: "{{ client_tool }} {{ k8s_config }} apply -f https://raw.githubusercontent.com/snowdrop/generator/master/config/k8s/generator-application.yml -n {{ generator.namespace }}"
