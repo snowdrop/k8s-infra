@@ -6,7 +6,7 @@
 - debug:
     var: k8s_config
 
-- include_tasks: install.yml
+- include_tasks: install1.yml
   when: not remove | bool
 
 - include_tasks: remove.yml
