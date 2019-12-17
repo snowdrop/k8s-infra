@@ -2,7 +2,7 @@
   command: "{{ client_tool }} {{ k8s_config }} delete configmap {{ generator.configmap_name }} -n {{ generator.namespace }}"
 
 - name: Remove the Code Generator application
-  command: "{{ client_tool }} {{ k8s_config }} delete -f https://raw.githubusercontent.com/snowdrop/generator/master/config/k8s/generator-application.yml -n {{ generator.namespace }}"
+  command: "{{ client_tool }} {{ k8s_config }} delete -f https://raw.githubusercontent.com/snowdrop/generator/v{{ generator.version }}/config/k8s/generator-application.yml -n {{ generator.namespace }}"
 
 - name: Delete the namespace
   command: "{{ client_tool }} {{ k8s_config }} delete ns {{ generator.namespace }}"

@@ -466,5 +466,5 @@ By default, the kubernetes cluster don't install [Web UI - Dashboard](https://ku
   ansible-playbook -i inventory/cloud_host playbook/post_installation.yml \
     --tags k8s_generator_site
   ```
-  The version of the application can be changed using the parameter: `-e generator.version=v0.3.10`
+  The version of the application can be changed using the parameter: `-e generator.version=0.3.10`
   To remove the kubernetes resources of the Generator application, pass then the following variable `-e remove=true`
