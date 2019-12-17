@@ -1,13 +1,14 @@
-- name: Uninstall Tekton Pipelines on Openshift
+- name: Uninstall Cert Manager on Openshift
   shell: |
     {{ client_tool }} {{ openshift_env.oc_admin_kubeconfig_arg }} delete -f https://github.com/jetstack/cert-manager/releases/download/{{ cert_manager.version }}/cert-manager.yaml
   when: isOpenshift | bool
+
+- name: Uninstall Godaddy webhook on K8s
+  shell: |
+    {{ client_tool }} {{ k8s_config }} delete -f https://raw.githubusercontent.com/snowdrop/godaddy-webhook/master/deploy/webhook-all.yml
+  when: not isOpenshift | bool
 
 - name: Uninstall Cert Manager on K8s
   shell: |
     {{ client_tool }} {{ k8s_config }} delete -f https://github.com/jetstack/cert-manager/releases/download/{{ cert_manager.version }}/cert-manager.yaml
   when: not isOpenshift | bool
-
-- name: Uninstall Cert Manager on K8s
-  shell: |
-    {{ client_tool }} {{ k8s_config }} delete -f https://raw.githubusercontent.com/snowdrop/godaddy-webhook/master/deploy/webhook-all.yml
