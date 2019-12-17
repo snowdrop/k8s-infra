@@ -1,8 +1,8 @@
 - name: Create namespace if it doesn't exist
-  command: {{ client_tool }} {{ k8s_config }} create namespace {{ halkyon_namespace }}
+  command: "{{ client_tool }} {{ k8s_config }} create namespace {{ halkyon_namespace }}"
   ignore_errors: true
 
-- name: Install the resources on the cluster
+- name: Install the resources of Halkyon web site
   shell: |
-     {{ client_tool }} {{ k8s_config }} apply -f https://raw.githubusercontent.com/halkyonio/halkyonio-site/master/resources/common.yml -n {{ halkyon_namespace }}
-     {{ client_tool }} {{ k8s_config }} apply -f https://raw.githubusercontent.com/halkyonio/halkyonio-site/master/resources/ingress.yml -n {{ halkyon_namespace }}
+     {{ client_tool }} {{ k8s_config }} apply -f https://raw.githubusercontent.com/halkyonio/halkyonio-site/{{ halkyon_version }}/config/common.yml -n {{ halkyon_namespace }}
+     {{ client_tool }} {{ k8s_config }} apply -f https://raw.githubusercontent.com/halkyonio/halkyonio-site/{{ halkyon_version }}/config/ingress.yml -n {{ halkyon_namespace }}
