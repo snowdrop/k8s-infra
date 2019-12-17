@@ -1,0 +1,17 @@
+{% set dnsNameList = (item.names.split(",")) %}
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: {{ item.name }}
+  namespace: {{ item.namespace }}
+spec:
+  renewBefore: 2159h
+  keySize: 2048
+  keyAlgorithm: rsa
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt-{{ letsencrypt_env}}
+  secretName: {{ item.secretname }}
+  dnsNames:
+  {% for i in dnsNameList %}- {{ i }}
+  {% endfor %}

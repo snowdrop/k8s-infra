@@ -2,20 +2,16 @@
 apiVersion: cert-manager.io/v1alpha2
 kind: Issuer
 metadata:
-  name: letsencrypt-{{ item.name }}-{{ letsencrypt_env }}
+  name: letsencrypt-{{ letsencrypt_env }}-{{ item.name }}
   namespace: {{ item.namespace }}
 spec:
   acme:
     server: {{ letsencrypt_url }}
     email: {{ letsencrypt_email }}
     privateKeySecretRef:
-      name: letsencrypt-{{ letsencrypt_env }}
+      name: letsencrypt-{{ letsencrypt_env }}-{{ item.name }}
     solvers:
-      - selector:
-          dnsNames:
-          {% for i in dnsNameList %}- {{ i }}
-          {% endfor %}
-        dns01:
+      - dns01:
           webhook:
             config:
               apiKeySecretRef:
@@ -25,3 +21,8 @@ spec:
               ttl: 600
             groupName: acme.mycompany.com
             solverName: godaddy
+        selector:
+          dnsNames:
+          {% for i in dnsNameList %}- {{ i }}
+          {% endfor %}
+

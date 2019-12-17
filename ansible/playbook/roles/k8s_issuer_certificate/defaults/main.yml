@@ -4,26 +4,3 @@ isOpenshift: false
 letsencrypt_env: staging
 letsencrypt_url: https://acme-{{ letsencrypt_env }}-v02.api.letsencrypt.org/directory
 letsencrypt_email:
-
-modules:
-   - {name: module1, version: version1, info: extra1}
-   - {name: module2, version: version2, info: extra2}
-   - {name: module3, version: version3, info: extra3}
-
-domains:
-  - key:
-    name:                snowdrop.me
-    site_name:           snowdrop-site
-    secret_ingress_name: www-snowdrop-me-tls
-  - key:
-    domain_name:         snowdrop.dev
-    site_name:           snowdrop-site
-    secret_ingress_name: www-snowdrop-dev-tls
-  - key:
-    domain_name:         generator.snowdrop.me
-    site_name:           snowdrop-site
-    secret_ingress_name: generator-snowdrop-me-tls
-  - key:
-    domain_name:         halkyon.io
-    site_name:           halkyon-site
-    secret_ingress_name: www-halkyon-io-tls

@@ -485,7 +485,7 @@ By default, the kubernetes cluster don't install [Web UI - Dashboard](https://ku
   ```bash
   ansible-playbook -i inventory/cloud_host playbook/post_installation.yml \
     --tags k8s_issuer_certificate \
-    -e godady_token=<GODADDY_API>:<GODADDY_SECRET>
+    -e godaddy_token=<GODADDY_API>:<GODADDY_SECRET>
   ```
 
   To remove the kubernetes resources, pass then the following variable `-e remove=true`

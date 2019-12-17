@@ -1,8 +1,0 @@
-- name: Generate issuer yml files
-  template:
-    src: letsencrypt_issuer.yml.j2
-    dest: "{{ item.name }}.yml"
-  delegate_to: localhost
-  with_items:
-    - { name: snowdrop-me, namespace: snowdrop-site, names: "snowdrop1.me,snowdrop2.dev"}
-    - { name: snowdrop-dev, namespace: snowdrop-site, names: "snowdrop1.me,snowdrop2.dev"}

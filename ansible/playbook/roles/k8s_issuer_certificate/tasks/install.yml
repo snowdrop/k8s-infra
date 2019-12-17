@@ -1,23 +1,32 @@
-
-- name: Copy Template files
+- name: Generate the secret yml files. One per namespace
   template:
-    src: "{{ item }}"
-    dest: "/tmp/{{ item | basename | regex_replace('.j2','') }}"
-  with_fileglob:
-    - "../templates/*.j2"
+    src: godaddy_token_secret.yml.j2
+    dest: "/tmp/{{ item.namespace }}-{{ item.name }}.yml"
+  with_items:
+    - { name: godaddy-api-key,  namespace: snowdrop-site }
+    - { name: godaddy-api-key,  namespace: generator-site }
+    - { name: godaddy-api-key,  namespace: halkyon-site }
 
-- name: Display File generated
-  command: cat /tmp/letsencrypt_issuer.yml
-  register: issuer
+- name: Generate the certificate yml files. One per namespace
+  template:
+    src: certificate.yml.j2
+    dest: "/tmp/{{ item.namespace }}-{{ item.name }}.yml"
+  with_items:
+    - { name: snowdrop-dev,          namespace: snowdrop-site,  names: snowdrop.dev,          secretname: www-snowdrop-dev-tls}
+    - { name: snowdrop-me,           namespace: snowdrop-site,  names: snowdrop.me,           secretname: www-snowdrop-me-tls}
+    - { name: generator-snowdrop-me, namespace: generator-site, names: generator.snowdrop.me, secretname: generator-snowdrop-me-tls}
+    - { name: halkyon-io,            namespace: halkyon-site,   names: halkyon.io,            secretname: www-halkyon-io-tls}
 
-- debug:
-    var: issuer.stdout_lines
+- name: Generate issuer yml files for the different domains
+  template:
+    src: letsencrypt_issuer.yml.j2
+    dest: "/tmp/{{ item.namespace }}-{{ item.name }}.yml"
+  with_items:
+    - { name: snowdrop-dev,          namespace: snowdrop-site,  names: snowdrop.dev}
+    - { name: snowdrop-me,           namespace: snowdrop-site,  names: snowdrop.me}
+    - { name: generator-snowdrop-me, namespace: generator-site, names: generator.snowdrop.me}
+    - { name: halkyon-io,            namespace: halkyon-site,   names: halkyon.io}
 
-# - name: Deploy the Godaddy secrets, Issuers resources containing the API Token
-#   shell: |
-#     {{ client_tool }} {{ k8s_config }} -n {{ item }} apply -f /tmp/godaddy_token_secret.yml
-#     {{ client_tool }} {{ k8s_config }} -n {{ item }} apply -f /tmp/letsencrypt_issuer.yml
-#   with_items:
-#     - halkyon-site
-#     - snowdrop-site
-#     - generator-site
+- name: Deploy the Godaddy secrets, Issuers resources containing the API Token
+  shell: |
+    {{ client_tool }} {{ k8s_config }} apply -f /tmp/
