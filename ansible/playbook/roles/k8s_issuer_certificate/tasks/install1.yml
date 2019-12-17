@@ -1,0 +1,6 @@
+- name: Printing Stuffs...
+  shell: |
+    echo This is "{{ item.name }}"
+    echo  for the : "{{ item.version }}"
+    echo and : "{{ item.info }}"
+  with_items: "{{ modules }}"

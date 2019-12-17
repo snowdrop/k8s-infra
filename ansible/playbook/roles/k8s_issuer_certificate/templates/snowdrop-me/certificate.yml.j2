@@ -1,0 +1,14 @@
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: www-snowdrop-me
+spec:
+  renewBefore: 2159h
+  keySize: 2048
+  keyAlgorithm: rsa
+  dnsNames:
+  - snowdrop.me
+  issuerRef:
+    kind: Issuer
+    name: letsencrypt-{{ letsencrypt_env }}
+  secretName: {{  }}

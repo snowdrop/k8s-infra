@@ -468,3 +468,24 @@ By default, the kubernetes cluster don't install [Web UI - Dashboard](https://ku
   ```
   The version of the application can be changed using the parameter: `-e generator_version=0.3.10`
   To remove the kubernetes resources of the Generator application, pass then the following variable `-e remove=true`
+
+### Command : Issuer and certificate for the Cert Manager
+
+  The role `k8s_issuer_certificate` allows to install the `Issuer` and `Certificate` CRD resources which are used by the certificate manager operator
+  in order to request to sign a certificate for a domain with the godaddy DNS provider
+  
+  The resources created corresponds to the domains that w currently owns:
+  - `snowdrop.me`
+  - `snowdrop.dev`
+  - `halkyion.io`
+  
+  **NOTE**: The names of the secrets defined within the certificates MUST match the names of secrets too as defined within the Ingress resources ! The secret will be used
+  to keep the `TLS.crt` and `TLS.key` of the domain signed by the CA Authority and owned by he Godaddy provider.
+  
+  ```bash
+  ansible-playbook -i inventory/cloud_host playbook/post_installation.yml \
+    --tags k8s_issuer_certificate \
+    -e godady_token=<GODADDY_API>:<GODADDY_SECRET>
+  ```
+
+  To remove the kubernetes resources, pass then the following variable `-e remove=true`

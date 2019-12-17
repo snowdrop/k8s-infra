@@ -1,0 +1,23 @@
+
+- name: Copy Template files
+  template:
+    src: "{{ item }}"
+    dest: "/tmp/{{ item | basename | regex_replace('.j2','') }}"
+  with_fileglob:
+    - "../templates/*.j2"
+
+- name: Display File generated
+  command: cat /tmp/letsencrypt_issuer.yml
+  register: issuer
+
+- debug:
+    var: issuer.stdout_lines
+
+# - name: Deploy the Godaddy secrets, Issuers resources containing the API Token
+#   shell: |
+#     {{ client_tool }} {{ k8s_config }} -n {{ item }} apply -f /tmp/godaddy_token_secret.yml
+#     {{ client_tool }} {{ k8s_config }} -n {{ item }} apply -f /tmp/letsencrypt_issuer.yml
+#   with_items:
+#     - halkyon-site
+#     - snowdrop-site
+#     - generator-site

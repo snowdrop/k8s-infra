@@ -1,0 +1,8 @@
+- name: Remove Godaddy Secrets, issuers and certificates resources
+  shell: |
+    {{ client_tool }} {{ k8s_config }} -n {{ item }} delete -f /tmp/godaddy_token_secret.yml
+    {{ client_tool }} {{ k8s_config }} -n {{ item }} delete -f /tmp/letsencrypt_issuer.yml
+  with_items:
+    - halkyon-site
+    - snowdrop-site
+    - generator-site
