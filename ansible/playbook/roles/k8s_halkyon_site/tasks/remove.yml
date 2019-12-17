@@ -1,4 +1,4 @@
 - name: Remove SnowDrop web site k8s resources
   shell: |
-    {{ client_tool }} {{ k8s_config }} delete -f https://raw.githubusercontent.com/halkyonio/halkyonio-site/master/resources/common.yml -n {{ halkyon_namespace }}
-    {{ client_tool }} {{ k8s_config }} delete -f https://raw.githubusercontent.com/halkyonio/halkyonio-site/master/resources/ingress.yml -n {{ halkyon_namespace }}
+    {{ client_tool }} {{ k8s_config }} delete -f https://raw.githubusercontent.com/halkyonio/halkyonio-site/master/resources/common.yml -n {{ halkyon.namespace }}
+    {{ client_tool }} {{ k8s_config }} delete -f https://raw.githubusercontent.com/halkyonio/halkyonio-site/master/resources/ingress.yml -n {{ halkyon.namespace }}

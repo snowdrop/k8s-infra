@@ -1,3 +1,4 @@
 remove: false
 
-halkyon_namespace: "halkyon-site"
+halkyon:
+  namespace: "halkyon-site"
