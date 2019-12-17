@@ -26,7 +26,6 @@ spec:
           env:
             - name: "NODE_ENV"
               value: "production"
-          resources: {}
           terminationMessagePath: /dev/termination-log
           readinessProbe:
             httpGet:

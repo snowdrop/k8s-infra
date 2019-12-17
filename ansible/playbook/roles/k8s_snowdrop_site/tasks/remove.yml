@@ -2,4 +2,4 @@
 #   command: {{ client_tool }} {{ k8s_config }} delete -f https://raw.githubusercontent.com/snowdrop/snowdrop-site-angular/master/openshift/snowdrop-site.yaml -n {{ snowdrop_namespace }}
 
 - name: Remove SnowDrop web site k8s resources
-  command: {{ client_tool }} {{ k8s_config }} delete -f /tmp/snowdrop.yml -n {{ snowdrop_namespace }}
+  command: "{{ client_tool }} {{ k8s_config }} delete -f /tmp/snowdrop.yml -n {{ snowdrop_namespace }}"
