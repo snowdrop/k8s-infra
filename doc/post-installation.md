@@ -435,6 +435,9 @@ By default, the kubernetes cluster don't install [Web UI - Dashboard](https://ku
 
 ### Command : Certificate Manager
 
+  This role will install the JetStack Certificate Manager able to handle the management of the certificates with Lets Encrypt CA Authority but
+  also the `GoDaddy` DNS Providers
+
   ```bash
   ansible-playbook -i inventory/simple_host playbook/post_installation.yml --tags cert_manager -e isOpenshift=false
   ```    

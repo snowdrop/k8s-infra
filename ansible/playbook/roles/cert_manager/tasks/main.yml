@@ -6,6 +6,7 @@
 - name: Set client tool to kubectl when the cluster is Kubernetes
   set_fact:
     client_tool: kubectl
+    k8s_config: "--kubeconfig '/etc/kubernetes/admin.conf'"
   when: not isOpenshift | bool
 
 - include_tasks: install.yml

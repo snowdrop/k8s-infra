@@ -5,5 +5,19 @@
 
 - name: Install Cert Manager on K8s
   shell: |
-    {{ client_tool }} --kubeconfig=$HOME/.kube/config apply -f https://github.com/jetstack/cert-manager/releases/download/{{ cert_manager.version }}/cert-manager.yaml --validate=false
+    {{ client_tool }} {{ k8s_config }} apply -f https://github.com/jetstack/cert-manager/releases/download/{{ cert_manager.version }}/cert-manager.yaml --validate=false
+  when: not isOpenshift | bool
+
+- name: Waill till the cert manager pods are running
+  shell: |
+    while [[ $({{ client_tool }} {{ k8s_config }} get pod -l app=cert-manager -n {{ cert_manager.namespace }} -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]];
+    do echo "Waiting for cert manager pod" && sleep 1; done
+    while [[ $({{ client_tool }} {{ k8s_config }} get pod -l app=cainjector -n {{ cert_manager.namespace }} -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]];
+    do echo "Waiting for cert manager cainjector pod" && sleep 1; done
+    while [[ $({{ client_tool }} {{ k8s_config }} get pod -l app=webhook -n {{ cert_manager.namespace }} -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]];
+    do echo "Waiting for cert manager webhook pod" && sleep 1; done
+  when: not isOpenshift | bool
+
+- name: Install GoDaddy Webhook
+  command: "{{ client_tool }} {{ k8s_config }} apply -f https://raw.githubusercontent.com/snowdrop/godaddy-webhook/master/deploy/webhook-all.yml --validate=false"
   when: not isOpenshift | bool
