@@ -33,8 +33,8 @@
 - name: Show Application modified file
   debug: msg="New Application file {{ application_modified.stdout }}"
 
-# - name: Create the Generator configmap using the downloaded file
-#   command: "{{ client_tool }} {{ k8s_config }} create configmap {{ generator_configmap_name }} --from-file /tmp/generator.yaml -n {{ generator_namespace }}"
-#
-# - name: Deploy the Code Generator application
-#   command: "{{ client_tool }} {{ k8s_config }} apply -f /tmp/application.yaml -n {{ generator_namespace }}"
+- name: Create the Generator configmap using the downloaded file
+  command: "{{ client_tool }} {{ k8s_config }} create configmap {{ generator_configmap_name }} --from-file /tmp/generator.yaml -n {{ generator_namespace }}"
+
+- name: Deploy the Code Generator application
+  command: "{{ client_tool }} {{ k8s_config }} apply -f /tmp/application.yaml -n {{ generator_namespace }}"
