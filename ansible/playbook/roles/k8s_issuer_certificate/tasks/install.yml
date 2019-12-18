@@ -1,9 +1,5 @@
 - set_fact:
     tempPath: /tmp/generated
-    #tempPath: /Users/dabou/Code/snowdrop/k8s-infra/ansible/generated
-
-- debug:
-    var: letsencrypt_env
 
 - set_fact:
     renewBefore: 8759h # 1 year - 1h
@@ -15,7 +11,7 @@
     letsencrypt_url: https://acme-v02.api.letsencrypt.org/directory
   when: letsencrypt_env == "prod"
 
-- name: Create generated directory
+- name: Create /tmp/generated directory
   file:
     path: "{{ tempPath }}"
     state: directory
@@ -27,7 +23,6 @@
   template:
     src: godaddy_token_secret.yml.j2
     dest: "{{ tempPath }}/{{ item.namespace }}-{{ item.name }}-secret.yml"
-  #delegate_to: localhost
   with_items:
     - { name: godaddy-api-key,  namespace: snowdrop-site }
     - { name: godaddy-api-key,  namespace: generator-site }
@@ -37,7 +32,6 @@
   template:
     src: certificate.yml.j2
     dest: "{{ tempPath }}/{{ item.namespace }}-{{ item.name }}-certificate.yml"
-  #delegate_to: localhost
   with_items:
     - { name: snowdrop-dev,          namespace: snowdrop-site,  names: snowdrop.dev,          secretname: www-snowdrop-dev-tls}
     - { name: generator-snowdrop-me, namespace: generator-site, names: generator.snowdrop.me, secretname: generator-snowdrop-me-tls}
@@ -47,7 +41,6 @@
   template:
     src: letsencrypt_issuer.yml.j2
     dest: "{{ tempPath }}/{{ item.namespace }}-{{ item.name }}-issuer.yml"
-  #delegate_to: localhost
   with_items:
     - { name: snowdrop-dev,          namespace: snowdrop-site,  names: snowdrop.dev}
     - { name: generator-snowdrop-me, namespace: generator-site, names: generator.snowdrop.me}
