@@ -3,14 +3,16 @@ apiVersion: cert-manager.io/v1alpha2
 kind: Certificate
 metadata:
   name: {{ item.name }}
+  labels:
+    app: ca-cert
   namespace: {{ item.namespace }}
 spec:
   renewBefore: 2159h
   keySize: 2048
   keyAlgorithm: rsa
   issuerRef:
-    kind: ClusterIssuer
-    name: letsencrypt-{{ letsencrypt_env}}
+    kind: Issuer
+    name: letsencrypt-{{ letsencrypt_env }}-{{ item.name }}
   secretName: {{ item.secretname }}
   dnsNames:
   {% for i in dnsNameList %}- {{ i }}

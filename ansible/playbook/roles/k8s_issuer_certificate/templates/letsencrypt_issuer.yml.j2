@@ -3,6 +3,8 @@ apiVersion: cert-manager.io/v1alpha2
 kind: Issuer
 metadata:
   name: letsencrypt-{{ letsencrypt_env }}-{{ item.name }}
+  labels:
+    app: ca-cert
   namespace: {{ item.namespace }}
 spec:
   acme:

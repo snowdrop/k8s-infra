@@ -1,32 +1,47 @@
+- set_fact:
+    tempPath: /tmp/generated
+    #tempPath: /Users/dabou/Code/snowdrop/k8s-infra/ansible/generated
+
+- name: Create generated directory
+  file:
+    path: "{{ tempPath }}"
+    state: directory
+
+- name: Remove generated files
+  shell: rm -rf {{ tempPath }}/*.yml
+
 - name: Generate the secret yml files. One per namespace
   template:
     src: godaddy_token_secret.yml.j2
-    dest: "/tmp/{{ item.namespace }}-{{ item.name }}.yml"
+    dest: "{{ tempPath }}/{{ item.namespace }}-{{ item.name }}-secret.yml"
+  #delegate_to: localhost
   with_items:
-    - { name: godaddy-api-key,  namespace: snowdrop-site }
-    - { name: godaddy-api-key,  namespace: generator-site }
+    #- { name: godaddy-api-key,  namespace: snowdrop-site }
+    #- { name: godaddy-api-key,  namespace: generator-site }
     - { name: godaddy-api-key,  namespace: halkyon-site }
 
 - name: Generate the certificate yml files. One per namespace
   template:
     src: certificate.yml.j2
-    dest: "/tmp/{{ item.namespace }}-{{ item.name }}.yml"
+    dest: "{{ tempPath }}/{{ item.namespace }}-{{ item.name }}-certificate.yml"
+  #delegate_to: localhost
   with_items:
-    - { name: snowdrop-dev,          namespace: snowdrop-site,  names: snowdrop.dev,          secretname: www-snowdrop-dev-tls}
-    - { name: snowdrop-me,           namespace: snowdrop-site,  names: snowdrop.me,           secretname: www-snowdrop-me-tls}
-    - { name: generator-snowdrop-me, namespace: generator-site, names: generator.snowdrop.me, secretname: generator-snowdrop-me-tls}
-    - { name: halkyon-io,            namespace: halkyon-site,   names: halkyon.io,            secretname: www-halkyon-io-tls}
+    #- { name: snowdrop-dev,          namespace: snowdrop-site,  names: snowdrop.dev,          secretname: www-snowdrop-dev-tls}
+    #- { name: snowdrop-me,           namespace: snowdrop-site,  names: snowdrop.me,           secretname: www-snowdrop-me-tls}
+    #- { name: generator-snowdrop-me, namespace: generator-site, names: generator.snowdrop.me, secretname: generator-snowdrop-me-tls}
+    - { name: halkyon-io,            namespace: halkyon-site,   names: gog.halkyon.io,            secretname: www-halkyon-io-tls}
 
 - name: Generate issuer yml files for the different domains
   template:
     src: letsencrypt_issuer.yml.j2
-    dest: "/tmp/{{ item.namespace }}-{{ item.name }}.yml"
+    dest: "{{ tempPath }}/{{ item.namespace }}-{{ item.name }}-issuer.yml"
+  #delegate_to: localhost
   with_items:
-    - { name: snowdrop-dev,          namespace: snowdrop-site,  names: snowdrop.dev}
-    - { name: snowdrop-me,           namespace: snowdrop-site,  names: snowdrop.me}
-    - { name: generator-snowdrop-me, namespace: generator-site, names: generator.snowdrop.me}
-    - { name: halkyon-io,            namespace: halkyon-site,   names: halkyon.io}
+    #- { name: snowdrop-dev,          namespace: snowdrop-site,  names: snowdrop.dev}
+    #- { name: snowdrop-me,           namespace: snowdrop-site,  names: snowdrop.me}
+    #- { name: generator-snowdrop-me, namespace: generator-site, names: generator.snowdrop.me}
+    - { name: halkyon-io,            namespace: halkyon-site,   names: gog.halkyon.io}
 
 - name: Deploy the Godaddy secrets, Issuers resources containing the API Token
   shell: |
-    {{ client_tool }} {{ k8s_config }} apply -f /tmp/
+    {{ client_tool }} {{ k8s_config }} apply -f {{ tempPath }}
