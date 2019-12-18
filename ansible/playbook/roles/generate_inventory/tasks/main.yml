@@ -1,16 +1,23 @@
 - set_fact:
-    file_name: "{{ type | default('simple') }}"
+    model: "{{ type | default('simple') }}"
+    file_name: "{{ model }}_host"
+  when: filename == ""
+
+- set_fact:
+    model: "{{ type | default('simple') }}"
+    file_name: "{{ filename }}"
+  when: filename != ""
 
 - name: Create Ansible Host file
   template:
-    src: "{{ role_path }}/templates/{{ file_name }}.inventory.j2"
-    dest: ../inventory/{{ file_name }}_host
+    src: "{{ role_path }}/templates/{{ model }}.inventory.j2"
+    dest: ../inventory/{{ file_name }}
 
 - name:
-  shell: 'echo "$( cd "$( dirname {{ playbook_dir }}/../inventory/{{ file_name }}_host )" && pwd )"'
+  shell: 'echo "$( cd "$( dirname {{ playbook_dir }}/../inventory/{{ file_name }} )" && pwd )"'
   register: inventory_dir_out
 
 - name: Show inventory file location
   debug:
-    msg: "Inventory file created at : {{ inventory_dir_out.stdout }}/{{ file_name }}_host"
+    msg: "Inventory file created at : {{ inventory_dir_out.stdout }}/{{ file_name }}"
 

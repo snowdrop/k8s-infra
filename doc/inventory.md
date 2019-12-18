@@ -9,10 +9,16 @@ it using the following role where you can specify :
   - [hetzner](../ansible/playbook/roles/generate_inventory/templates/hetzner.inventory.j2),
   - [okd-cloud](../ansible/playbook/roles/generate_inventory/templates/cloud.inventory.j2),
 - The `IP` address of the VM to ssh
+- The name of the file `filename`
+
+**NOTE**: the host file is created under the folder `./inventory`
 
 The command to be executed is :
   
   ```bash
   cd ansible/
   ansible-playbook playbook/generate_inventory.yml -e ip_address=192.168.99.50 -e type=simple
+  ansible-playbook playbook/generate_inventory.yml -e ip_address=192.168.99.50 -e type=simple -e filename=192.168.99.50_host
   ```
+
+   
