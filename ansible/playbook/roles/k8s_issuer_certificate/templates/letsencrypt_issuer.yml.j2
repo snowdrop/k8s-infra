@@ -11,7 +11,7 @@ spec:
     server: {{ letsencrypt_url }}
     email: {{ letsencrypt_email }}
     privateKeySecretRef:
-      name: letsencrypt-{{ letsencrypt_env }}-{{ item.name }}
+      name:  letsencrypt-{{ letsencrypt_env }}-{{ item.name }}
     solvers:
       - dns01:
           webhook:
@@ -25,6 +25,6 @@ spec:
             solverName: godaddy
         selector:
           dnsNames:
-          {% for i in dnsNameList %}- {{ i }}
-          {% endfor %}
+          {% for i in dnsNameList %}- '{{ i }}'
+{% endfor %}
 
