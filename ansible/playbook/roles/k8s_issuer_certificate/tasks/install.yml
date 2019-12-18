@@ -2,6 +2,19 @@
     tempPath: /tmp/generated
     #tempPath: /Users/dabou/Code/snowdrop/k8s-infra/ansible/generated
 
+- debug:
+    var: letsencrypt_env
+
+- set_fact:
+    renewBefore: 8759h # 1 year - 1h
+    letsencrypt_url: https://acme-{{ letsencrypt_env }}-v02.api.letsencrypt.org/directory
+  when: letsencrypt_env == "staging"
+
+- set_fact:
+    renewBefore: 2159h # 3 months - 1h
+    letsencrypt_url: https://acme-v02.api.letsencrypt.org/directory
+  when: letsencrypt_env == "prod"
+
 - name: Create generated directory
   file:
     path: "{{ tempPath }}"
@@ -16,8 +29,8 @@
     dest: "{{ tempPath }}/{{ item.namespace }}-{{ item.name }}-secret.yml"
   #delegate_to: localhost
   with_items:
-    #- { name: godaddy-api-key,  namespace: snowdrop-site }
-    #- { name: godaddy-api-key,  namespace: generator-site }
+    - { name: godaddy-api-key,  namespace: snowdrop-site }
+    - { name: godaddy-api-key,  namespace: generator-site }
     - { name: godaddy-api-key,  namespace: halkyon-site }
 
 - name: Generate the certificate yml files. One per namespace
@@ -26,9 +39,8 @@
     dest: "{{ tempPath }}/{{ item.namespace }}-{{ item.name }}-certificate.yml"
   #delegate_to: localhost
   with_items:
-    #- { name: snowdrop-dev,          namespace: snowdrop-site,  names: snowdrop.dev,          secretname: www-snowdrop-dev-tls}
-    #- { name: snowdrop-me,           namespace: snowdrop-site,  names: snowdrop.me,           secretname: www-snowdrop-me-tls}
-    #- { name: generator-snowdrop-me, namespace: generator-site, names: generator.snowdrop.me, secretname: generator-snowdrop-me-tls}
+    - { name: snowdrop-dev,          namespace: snowdrop-site,  names: snowdrop.dev,          secretname: www-snowdrop-dev-tls}
+    - { name: generator-snowdrop-me, namespace: generator-site, names: generator.snowdrop.me, secretname: generator-snowdrop-me-tls}
     - { name: halkyon-io,            namespace: halkyon-site,   names: gog.halkyon.io,            secretname: www-halkyon-io-tls}
 
 - name: Generate issuer yml files for the different domains
@@ -37,9 +49,8 @@
     dest: "{{ tempPath }}/{{ item.namespace }}-{{ item.name }}-issuer.yml"
   #delegate_to: localhost
   with_items:
-    #- { name: snowdrop-dev,          namespace: snowdrop-site,  names: snowdrop.dev}
-    #- { name: snowdrop-me,           namespace: snowdrop-site,  names: snowdrop.me}
-    #- { name: generator-snowdrop-me, namespace: generator-site, names: generator.snowdrop.me}
+    - { name: snowdrop-dev,          namespace: snowdrop-site,  names: snowdrop.dev}
+    - { name: generator-snowdrop-me, namespace: generator-site, names: generator.snowdrop.me}
     - { name: halkyon-io,            namespace: halkyon-site,   names: gog.halkyon.io}
 
 - name: Deploy the Godaddy secrets, Issuers resources containing the API Token

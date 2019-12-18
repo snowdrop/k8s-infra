@@ -2,5 +2,4 @@ remove: false
 isOpenshift: false
 
 letsencrypt_env: staging
-letsencrypt_url: https://acme-{{ letsencrypt_env }}-v02.api.letsencrypt.org/directory
 letsencrypt_email:
