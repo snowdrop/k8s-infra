@@ -1,4 +1,4 @@
-- name: Install Dashboard
+- name: Install Dashboard Version - {{ k8s_dashboard_version }}
   shell: |
     kubectl --kubeconfig=$HOME/.kube/config \
       apply -f \
