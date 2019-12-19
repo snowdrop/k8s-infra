@@ -1,8 +1,8 @@
 - name: Remove the Dashboard k8s resources created from the templates
   shell: |
     kubectl --kubeconfig=$HOME/.kube/config delete ingress/k8s-dashboard -n {{ k8s_dashboard_namespace }}
-    kubectl --kubeconfig=$HOME/.kube/config delete sa/admin-user -n {{ k8s_dashboard_namespace }}
-    kubectl --kubeconfig=$HOME/.kube/config delete ClusterRoleBinding/admin-user
+    kubectl --kubeconfig=$HOME/.kube/config delete ClusterRoleBinding/cluster-admin-for-bootstrappers
+  ignore_errors: true
 
 - name: Remove Dashboard
   shell: |
