@@ -1,9 +1,9 @@
 k8s_dashboard_namespace: kubernetes-dashboard
-k8s_dashboard_version: v2.0.0-beta6
+k8s_dashboard_version: v2.0.0-beta8
 k8s_dashboard_ingress_host: "{{ public_ip_address }}.nip.io"
 
-k8s_dashboard_token_public: ub9mlk
-k8s_dashboard_token_secret: ok0vnd1boic1h6yd
+k8s_dashboard_token_public: changeme
+k8s_dashboard_token_secret: changeme
 k8s_dashboard_token_ttl: 0
 k8s_dashboard_token_description: snowdrop-admin-user
 k8s_dashboard_token_auth_extra_group: system:bootstrappers
