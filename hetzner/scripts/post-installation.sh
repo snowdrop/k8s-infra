@@ -1,34 +1,22 @@
 #!/bin/bash
 
 # Command
-# ./scripts/post-installation.sh true
-# where boolean is used to specify if we run Ansible locally or remotely
+# ./scripts/post-installation.sh IP_ADDRESS
 
-IS_ANSIBLE_LOCAL=${1:-true}
+ip_address=$1
+temp_dir=/tmp/infra
 
-echo "Install needed yum packages: docker git wget ..."
-if [ "$IS_ANSIBLE_LOCAL" = true ]; then
-  yum install -y -q docker git wget
-else
-  yum install -y -q docker git wget ansible
-fi
+echo "Cloning Snowdrop Infra Playbook"
+git clone https://github.com/snowdrop/k8s-infra.git ${temp_dir} 2>&1
 
-# echo "Enable Network manager"
-# yum install -y -q NetworkManager
-# systemctl enable NetworkManager
-# systemctl start NetworkManager
+echo "Generating the Ansible inventory file for - local machine"
+echo -e "[masters]\nlocalhost ansible_connection=local ansible_user=root public_ip_address=${ip_address}" > /tmp/infra/ansible/inventory/localhost_vm
 
-systemctl enable docker
-systemctl start docker
+echo "Cat Inventory file"
+cat /tmp/infra/ansible/inventory/localhost_vm
 
-until [ "$(systemctl is-active docker)" = "active" ]; do echo "Wait till docker daemon is running"; sleep 10; done;
-
-if [ "$IS_ANSIBLE_LOCAL" = false ] ; then
-  echo "Cloning Snowdrop Infra Playbook"
-  git clone https://github.com/snowdrop/openshift-infra.git /tmp/infra 2>&1
-
-  echo "Creating Ansible inventory file"
-  echo -e "[masters]\nlocalhost ansible_connection=local ansible_user=root" > /tmp/infra/ansible/inventory/hetzner_vm
-fi
+cd ${temp_dir}/ansible
+echo "Play the k8s_cluster role"
+ansible-playbook -i inventory/localhost_vm playbook/post_installation.yml --tags k8s_cluster -e install_docker=false
 
 exit 0
