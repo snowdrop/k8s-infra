@@ -389,11 +389,6 @@ By default, the kubernetes cluster don't install [Web UI - Dashboard](https://ku
   ```   
   
   To uninstall the dashboard, execute this command where you pass the parameter `-e remove=true` 
-  
-  Next, grab the token of the admin-user secret in order to access the dashboard
-  ```bash
-  kubectl -n kubernetes-dashboard get secret/admin-user -o jsonpath='{.data.token}' | base64 -d
-  ```
 
 ### Command : Install Helm (optional)
 

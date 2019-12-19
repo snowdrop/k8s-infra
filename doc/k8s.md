@@ -31,6 +31,8 @@ ansible-playbook -i inventory/simple_host playbook/post_installation.yml \
 
 You can specify the version of `kubernetes` to be installed using this parameter `-e k8s_version=1.14.1`.
 
+To delete the cluster and remove the `kubeadm`, `kubelet`, `kubectl` packages within the VM, pass the parameter `-e remove=true`
+
 If you need to use the sudo root user on the target vm, then pass the parameter `--become`.
 
 ## Post installations steps
