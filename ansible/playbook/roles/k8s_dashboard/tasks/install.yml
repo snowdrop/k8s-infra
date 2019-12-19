@@ -16,15 +16,6 @@
     kubectl --kubeconfig=$HOME/.kube/config apply -f /tmp/rbac.yml
     kubectl --kubeconfig=$HOME/.kube/config apply -f /tmp/ingress-dashboard.yml
 
-# - name: Get K8s Dashboard token from the admin-user secret
-#   shell: |
-#     secretname=$(kubectl --kubeconfig=$HOME/.kube/config -n {{ k8s_dashboard_namespace }} get serviceaccount admin-user -o jsonpath='{.secrets[0].name}')
-#     kubectl --kubeconfig=$HOME/.kube/config -n {{ k8s_dashboard_namespace }} get secret $secretname -o template -o jsonpath='{.data.token}' | base64 --decode
-#   register: get_token_out
-#
-# - set_fact:
-#     k8s_token: "{{ get_token_out.stdout }}"
-
 - name: Print kubernetes dashboard URL & Token
   debug:
     msg:
