@@ -13,4 +13,3 @@ hcloud server create --name $VM_NAME --type $VM_TYPE --image $VM_IMAGE --ssh-key
 IP_HETZNER=$(hcloud server describe $VM_NAME  -o json | jq -r .public_net.ipv4.ip)
 ssh-keygen -R $IP_HETZNER
 while ! nc -z $IP_HETZNER 22; do echo "Wait till we can ssh to the $VM_NAME vm ..."; sleep 10; done
-ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_hetzner_snowdrop root@$IP_HETZNER 'bash -s' < $BASH_SCRIPTS_DIR/post-installation.sh
