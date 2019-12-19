@@ -11,16 +11,16 @@
     gpgkey: https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
     exclude: kube*
 
-- name: Install Kubernetes packages
+- name: Install Kubernetes packages - {{ k8s_version }}
   yum:
     name: "{{ packages }}"
     state: present
     disable_excludes: kubernetes
   vars:
     packages:
-      - kubeadm-{{k8s_version}}
-      - kubectl-{{k8s_version}}
-      - kubelet-{{k8s_version}}
+      - kubeadm-{{ k8s_version }}
+      - kubectl-{{ k8s_version }}
+      - kubelet-{{ k8s_version }}
 
 - name: Disable selinux
   shell: |
@@ -45,7 +45,7 @@
 - name: Pull k8s linux images for version {{ k8s_version }}
   command: kubeadm config images pull --kubernetes-version {{ k8s_version }}
 
-- name: Initialize cluster
+- name: Initialize cluster for k8s - {{ k8s_version }}
   command: "kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address={{ public_ip_address }} --kubernetes-version {{ k8s_version }}"
 
 - name: Install Flannel Virtual Network for pod communication
