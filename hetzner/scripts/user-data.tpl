@@ -8,8 +8,16 @@ disable_root: false
 
 package_upgrade: false
 
+yum_repos:
+  - epel:
+      baseurl: http://download.fedoraproject.org/pub/epel/7/$basearch
+      enabled: true
+      gpgcheck: false
+      name: Extra Packages for Centos 7 - $basearch
+
 packages:
   - ansible
+  - git
 
 users:
   - name: centos
