@@ -1,1 +1,2 @@
+ingress_version: 0.23.0
 ingress_namespace: kube-system
