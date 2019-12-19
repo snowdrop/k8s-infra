@@ -4,7 +4,7 @@
 
 - name: Fetch Generator yml file using URL and version defined
   get_url:
-    url: "https://raw.githubusercontent.com/snowdrop/generator/v{{ generator_version}}/conf/generator_yaml"
+    url: "https://raw.githubusercontent.com/snowdrop/generator/v{{ generator_version}}/conf/generator.yaml"
     dest: /tmp/generator.yaml
 
 - name: Fetch the Deployment yml file using the URL and version defined
