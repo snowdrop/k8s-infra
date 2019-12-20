@@ -1,0 +1,15 @@
+apiVersion: cert-manager.io/v1alpha2
+kind: Issuer
+metadata:
+  name: letsencrypt-{{ letsencrypt_env }}-{{ letsencrypt_name }}
+  namespace: {{ k8s_dashboard_namespace }}
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: cmoulliard@redhat.com
+    privateKeySecretRef:
+      name: letsencrypt-http01
+    solvers:
+      - http01:
+          ingress:
+            class: nginx
