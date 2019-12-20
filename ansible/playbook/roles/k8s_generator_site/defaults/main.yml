@@ -3,4 +3,5 @@ isOpenshift: false
 
 generator_version: 0.3.11
 generator_namespace: generator-site
+generator_name: spring-boot-generator
 generator_configmap_name: spring-boot-generator
