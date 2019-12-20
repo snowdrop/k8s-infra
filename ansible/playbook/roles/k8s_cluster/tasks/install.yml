@@ -73,10 +73,10 @@
 
 - name: Create user's k8s config file
   shell: |
-    mkdir -p .kube
-    sudo cp /etc/kubernetes/admin.conf .kube/config
-    sudo chown centos:centos -R .kube/
-    chmod 644 .kube/config
+    mkdir -p $HOME/.kube
+    sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config
+    sudo chown centos:centos -R $HOME/.kube/
+    chmod 644 $HOME/.kube/config
 
 - name: save_config.yml
   include_role:
