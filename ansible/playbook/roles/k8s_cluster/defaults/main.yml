@@ -1,5 +1,6 @@
 k8s_version: 1.14.9
 remove: false
+remote: true
 
 ingress_host: "{{ public_ip_address }}.nip.io"
 install_docker: true

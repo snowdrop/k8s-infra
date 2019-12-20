@@ -22,6 +22,6 @@ cat /tmp/infra/ansible/inventory/localhost_vm
 
 cd ${temp_dir}/ansible
 echo "Play the k8s_cluster role"
-ansible-playbook -i inventory/localhost_vm playbook/post_installation.yml --tags k8s_cluster -e remove=false -e install_docker=true -vvv
+ansible-playbook -i inventory/localhost_vm playbook/post_installation.yml --tags k8s_cluster -e remove=false -e install_docker=true -e remote=false
 
 exit 0

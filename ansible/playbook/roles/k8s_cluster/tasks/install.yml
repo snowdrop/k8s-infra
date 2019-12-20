@@ -81,4 +81,5 @@
 - name: save_config.yml
   include_role:
     name: k8s_config
+  when: remote | bool
 
