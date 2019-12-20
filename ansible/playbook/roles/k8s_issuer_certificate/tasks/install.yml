@@ -7,7 +7,7 @@
   when: letsencrypt_env == "staging"
 
 - set_fact:
-    renewBefore: 2159h # 3 months - 1h
+    renewBefore: 2136h # 3 months - 24h
     letsencrypt_url: https://acme-v02.api.letsencrypt.org/directory
   when: letsencrypt_env == "prod"
 
@@ -25,27 +25,29 @@
     dest: "{{ tempPath }}/{{ item.namespace }}-{{ item.name }}-secret.yml"
   with_items:
     - { name: godaddy-api-key,  namespace: snowdrop-site }
-    - { name: godaddy-api-key,  namespace: generator-site }
     - { name: godaddy-api-key,  namespace: halkyon-site }
+    #- { name: godaddy-api-key,  namespace: generator-site }
 
 - name: Generate the certificate yml files. One per namespace
   template:
     src: certificate.yml.j2
     dest: "{{ tempPath }}/{{ item.namespace }}-{{ item.name }}-certificate.yml"
   with_items:
-    - { name: snowdrop-dev,          namespace: snowdrop-site,  names: snowdrop.dev,          secretname: www-snowdrop-dev-tls}
-    - { name: generator-snowdrop-me, namespace: generator-site, names: generator.snowdrop.me, secretname: generator-snowdrop-me-tls}
-    - { name: halkyon-io,            namespace: halkyon-site,   names: gog.halkyon.io,            secretname: www-halkyon-io-tls}
+    - { name: snowdrop-dev,          namespace: snowdrop-site,  names: "snowdrop.dev,www.snowdrop.dev,start.snowdrop.dev,generator.snowdrop.dev" ,          secretname: www-snowdrop-dev-tls}
+    - { name: snowdrop-me,           namespace: snowdrop-site,  names: "snowdrop.me,www.snowdrop.me,start.snowdrop.me,generator.snowdrop.me",           secretname: www-snowdrop-me-tls}
+    - { name: halkyon-io,            namespace: halkyon-site,   names: "halkyon.io,www.halkyon.io",            secretname: www-halkyon-io-tls}
+    #- { name: generator-snowdrop-me, namespace: generator-site, names: generator.snowdrop.me, secretname: generator-snowdrop-me-tls}
 
 - name: Generate issuer yml files for the different domains
   template:
     src: letsencrypt_issuer.yml.j2
     dest: "{{ tempPath }}/{{ item.namespace }}-{{ item.name }}-issuer.yml"
   with_items:
-    - { name: snowdrop-dev,          namespace: snowdrop-site,  names: snowdrop.dev}
-    - { name: generator-snowdrop-me, namespace: generator-site, names: generator.snowdrop.me}
-    - { name: halkyon-io,            namespace: halkyon-site,   names: gog.halkyon.io}
+    - { name: snowdrop-dev,          namespace: snowdrop-site,  names: "snowdrop.dev,www.snowdrop.dev,start.snowdrop.dev,generator.snowdrop.dev"}
+    - { name: snowdrop-me,           namespace: snowdrop-site,  names: "snowdrop.me,www.snowdrop.me,start.snowdrop.me,generator.snowdrop.me"}
+    - { name: halkyon-io,            namespace: halkyon-site,   names: "halkyon.io,www.halkyon.io"}
+    #- { name: generator-snowdrop-me, namespace: generator-site, names: generator.snowdrop.me}
 
-- name: Deploy the Godaddy secrets, Issuers resources containing the API Token
-  shell: |
-    {{ client_tool }} {{ k8s_config }} apply -f {{ tempPath }}
+#- name: Deploy the Godaddy secrets, Issuers resources containing the API Token
+#  shell: |
+#    {{ client_tool }} {{ k8s_config }} apply -f {{ tempPath }}
