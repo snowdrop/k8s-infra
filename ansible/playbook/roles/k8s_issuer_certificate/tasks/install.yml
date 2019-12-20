@@ -26,7 +26,6 @@
   with_items:
     - { name: godaddy-api-key,  namespace: snowdrop-site }
     - { name: godaddy-api-key,  namespace: halkyon-site }
-    #- { name: godaddy-api-key,  namespace: generator-site }
 
 - name: Generate the certificate yml files. One per namespace
   template:
@@ -36,7 +35,6 @@
     - { name: snowdrop-dev,          namespace: snowdrop-site,  names: "snowdrop.dev,www.snowdrop.dev,start.snowdrop.dev,generator.snowdrop.dev" ,          secretname: www-snowdrop-dev-tls}
     - { name: snowdrop-me,           namespace: snowdrop-site,  names: "snowdrop.me,www.snowdrop.me,start.snowdrop.me,generator.snowdrop.me",           secretname: www-snowdrop-me-tls}
     - { name: halkyon-io,            namespace: halkyon-site,   names: "halkyon.io,www.halkyon.io",            secretname: www-halkyon-io-tls}
-    #- { name: generator-snowdrop-me, namespace: generator-site, names: generator.snowdrop.me, secretname: generator-snowdrop-me-tls}
 
 - name: Generate issuer yml files for the different domains
   template:
@@ -46,8 +44,7 @@
     - { name: snowdrop-dev,          namespace: snowdrop-site,  names: "snowdrop.dev,www.snowdrop.dev,start.snowdrop.dev,generator.snowdrop.dev"}
     - { name: snowdrop-me,           namespace: snowdrop-site,  names: "snowdrop.me,www.snowdrop.me,start.snowdrop.me,generator.snowdrop.me"}
     - { name: halkyon-io,            namespace: halkyon-site,   names: "halkyon.io,www.halkyon.io"}
-    #- { name: generator-snowdrop-me, namespace: generator-site, names: generator.snowdrop.me}
 
-#- name: Deploy the Godaddy secrets, Issuers resources containing the API Token
-#  shell: |
-#    {{ client_tool }} {{ k8s_config }} apply -f {{ tempPath }}
+- name: Deploy the Godaddy secrets, Issuers resources containing the API Token
+  shell: |
+    {{ client_tool }} {{ k8s_config }} apply -f {{ tempPath }}
