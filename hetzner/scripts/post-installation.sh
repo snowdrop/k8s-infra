@@ -1,7 +1,12 @@
 #!/bin/bash
 
-# Command
+#
+# The following bash script allows to run the playbooks of the project k8s-infra within a Hetzner cloud vm created
+# where ansible, git have already been installed
+# To use it, pass the IP address of the VM as parameter
+#
 # ./scripts/post-installation.sh IP_ADDRESS
+#
 
 ip_address=$1
 temp_dir=/tmp/infra
@@ -17,6 +22,6 @@ cat /tmp/infra/ansible/inventory/localhost_vm
 
 cd ${temp_dir}/ansible
 echo "Play the k8s_cluster role"
-ansible-playbook -i inventory/localhost_vm playbook/post_installation.yml --tags k8s_cluster -e install_docker=true
+ansible-playbook -i inventory/localhost_vm playbook/post_installation.yml --tags k8s_cluster -e remove=false -e install_docker=true -vvv
 
 exit 0
