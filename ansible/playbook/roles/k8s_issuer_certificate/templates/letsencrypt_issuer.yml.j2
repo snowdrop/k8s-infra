@@ -25,6 +25,7 @@ spec:
             solverName: godaddy
         selector:
           dnsNames:
-          {% for i in dnsNameList %}- '{{ i }}'
-{% endfor %}
+      {% for i in dnsNameList %}
+      - '{{ i }}'
+      {% endfor %}
 

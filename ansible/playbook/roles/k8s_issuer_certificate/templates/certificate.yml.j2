@@ -15,5 +15,6 @@ spec:
     name: letsencrypt-{{ letsencrypt_env }}-{{ item.name }}
   secretName: {{ item.secretname }}
   dnsNames:
-  {% for i in dnsNameList %}- '{{ i }}'
-{% endfor %}
+  {% for i in dnsNameList %}
+  - '{{ i }}'
+  {% endfor %}
