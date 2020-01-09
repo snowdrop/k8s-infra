@@ -6,7 +6,7 @@
 
 # ./scripts/vm.sh VM_NAME VM_TYPE VM_IMAGE SALT_TEXT USER_PWD
 # e.g
-# ./scripts/vm.sh cloud1 on cx31 centos-7 <SALT_TEXT> <USER_GENERATED_PWD>
+# ./scripts/vm.sh cloud1 cx31 centos-7 <SALT_TEXT> <USER_GENERATED_PWD>
 
 VM_NAME=${1:-cloud1}
 VM_TYPE=${2:-cx31}
@@ -16,8 +16,8 @@ USER_PASSWORD=$5
 
 BASH_SCRIPTS_DIR=$(dirname $0)
 
-# Delete and create the Hetzner Cloud server
-. create-hcloud-server.sh
+# Delete and create the Hetzner Cloud vm
+. $BASH_SCRIPTS_DIR/create-hcloud-server.sh
 
 echo "#######################################"
 echo "Execute the following command within a terminal to ssh to the vm"
