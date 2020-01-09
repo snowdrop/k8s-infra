@@ -48,10 +48,3 @@
 - name: Deploy the Godaddy secrets, Issuers resources containing the API Token
   shell: |
     {{ client_tool }} {{ k8s_config }} apply -f {{ tempPath }}
-
-- name: Copy the snowdrop.me or .dev secrets to the generator-site namespace
-  shell: |
-    {{ client_tool }} get secret {{ item }} -n snowdrop-site -o json | jq 'del(.items[].metadata.namespace)' | {{ client_tool }} apply --force -n generator-site -f -
-  with_items:
-    - www-snowdrop-dev-tls
-    - www-snowdrop-me-tls

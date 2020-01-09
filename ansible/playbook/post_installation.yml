@@ -36,7 +36,6 @@
     - { role: 'k8s_service_broker',     tags: 'k8s_service_broker'}
     - { role: 'k8s_halkyon_site',       tags: 'k8s_halkyon_site'}
     - { role: 'k8s_snowdrop_site',      tags: 'k8s_snowdrop_site'}
-    - { role: 'k8s_generator_site',     tags: 'k8s_generator_site'}
     - { role: 'k8s_issuer_certificate', tags: 'k8s_issuer_certificate'}
     - { role: 'kind',                   tags: 'kind'}
     - { role: 'ingress',                tags: 'ingress'}

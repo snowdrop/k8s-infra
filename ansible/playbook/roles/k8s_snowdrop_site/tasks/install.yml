@@ -2,6 +2,32 @@
   command: "{{ client_tool }} {{ k8s_config }} create namespace {{ snowdrop_namespace }}"
   ignore_errors: true
 
+- name: Fetch Generator yml file using URL and version defined
+  get_url:
+    url: "https://raw.githubusercontent.com/snowdrop/generator/v{{ generator_version}}/conf/generator.yaml"
+    dest: /tmp/generator.yaml
+
+- name: Fetch the Deployment yml file using the URL and version defined
+  get_url:
+    url: "https://raw.githubusercontent.com/snowdrop/generator/v{{ generator_version}}/config/k8s/01_deployment.yml"
+    force: yes
+    dest: /tmp/deployment.yml
+
+- name: Change the image version to use the one specified
+  replace:
+    path: "/tmp/deployment.yml"
+    regexp: "latest"
+    replace: "{{ generator_version }}"
+
+- name: Create the Generator configmap using the downloaded file
+  command: "{{ client_tool }} {{ k8s_config }} create configmap {{ generator_configmap_name }} --from-file /tmp/generator.yaml -n {{ generator_namespace }}"
+
+- name: Deploy the Code Generator application
+  shell: |
+    {{ client_tool }} {{ k8s_config }} -n {{ snowdrop_namespace }} apply -f /tmp/deployment.yml
+    {{ client_tool }} {{ k8s_config }} -n {{ snowdrop_namespace }} apply -f https://raw.githubusercontent.com/snowdrop/generator/v{{ generator_version}}/config/k8s/02_service.yml
+    {{ client_tool }} {{ k8s_config }} -n {{ snowdrop_namespace }} apply -f https://raw.githubusercontent.com/snowdrop/generator/v{{ generator_version}}/config/k8s/03_ingress.yml
+
 - name: Deploy Snowdrop site application
   shell: |
     {{ client_tool }} {{ k8s_config }} -n {{ snowdrop_namespace }} apply -f https://raw.githubusercontent.com/snowdrop/snowdrop-site-angular/master/deploy/k8s/02_deployment.yml

@@ -1,3 +1,12 @@
+- name: Remove the configmap Generator
+  command: "{{ client_tool }} {{ k8s_config }} delete configmap {{ generator_configmap_name }} -n {{ snowdrop_namespace }}"
+
+- name: Remove the Code Generator application
+  shell: |
+    {{ client_tool }} {{ k8s_config }} -n {{ snowdrop_namespace }} delete deployment/{{ generator_name }}
+    {{ client_tool }} {{ k8s_config }} -n {{ snowdrop_namespace }} delete service/{{ generator_name }}
+    {{ client_tool }} {{ k8s_config }} -n {{ snowdrop_namespace }} delete ingress/{{ generator_name }}
+
 - name: Remove SnowDrop web site k8s resources
   shell: |
     {{ client_tool }} {{ k8s_config }} -n {{ snowdrop_namespace }} delete -f https://raw.githubusercontent.com/snowdrop/snowdrop-site-angular/master/deploy/k8s/02_deployment.yml

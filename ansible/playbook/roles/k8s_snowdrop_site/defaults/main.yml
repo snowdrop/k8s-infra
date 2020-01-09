@@ -1,4 +1,8 @@
 remove: false
 isOpenshift: false
 
-snowdrop_namespace: "snowdrop-site"
+snowdrop_namespace: snowdrop-site
+
+generator_version: 0.3.14
+generator_name: spring-boot-generator
+generator_configmap_name: spring-boot-generator
