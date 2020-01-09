@@ -8,6 +8,7 @@
 ansible/inventory/*
 ansible/playbook/roles/test
 **/test.sh
+_tmp
 
 # Testing purposes
 sandbox/cluster_up/test.sh
