@@ -71,11 +71,15 @@ roles :
 
 ### Install K8s Dashboard
 
+**Prerequisite**: The `k8s_issuer_certificate` role must be installed previously as we will generate TLS Certificates needed to access the console and to be authenticated 
+
 By default, the kubernetes cluster don't install [Web UI - Dashboard](https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/) to manage, access the Kubernetes resources.
 
   ```bash
   ansible-playbook -i inventory/simple_host playbook/post_installation.yml --tags k8s_dashboard
   ```   
+
+  To specify a different version, use this parameter `-e k8s_dashboard_version=v2.0.0-rc5`
   
   To uninstall the dashboard, execute this command where you pass the parameter `-e remove=true` 
   
