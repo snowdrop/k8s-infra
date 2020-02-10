@@ -26,10 +26,11 @@ BASH_SCRIPTS_DIR=$(dirname $0)
 cd $BASH_SCRIPTS_DIR/../../ansible
 ansible-playbook playbook/generate_inventory.yml \
    -e ssh_private_key_path=~/.ssh/id_hetzner_snowdrop \
-   -e ip_address=$IP_HETZNER \
+   -e ip_address=${IP_HETZNER} \
+   -e filename=${IP_HETZNER}_host \
    -e type=hetzner
 ansible-playbook -i inventory/hetzner_host playbook/cluster.yml \
-   -e public_ip_address=$IP_HETZNER \
+   -e public_ip_address=${IP_HETZNER} \
    -e cluster_write_config=true \
    -e ansible_os_family="RedHat" \
    --tags "up"

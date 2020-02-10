@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 # Script to be executed under Hetzner folder path in order
 # to create a new Hetzner VM using hcloud tool
 #
@@ -23,26 +25,26 @@ BASH_SCRIPTS_DIR=$(dirname $0)
 # - Generate inventory file with IP address
 # - Install K8s cluster
 # - Create local KUBECONFIG file
-# - Install the Ingress Router
-# - Deploy the Kubernetes Dashboard
 cd $BASH_SCRIPTS_DIR/../../ansible
 ansible-playbook playbook/generate_inventory.yml \
    -e ssh_private_key_path=~/.ssh/id_hetzner_snowdrop \
-   -e ip_address=$IP_HETZNER \
+   -e ip_address=${IP_HETZNER} \
+   -e filename=${IP_HETZNER}_host \
    -e type=hetzner
 
-cp inventory/hetzner_host inventory/${VM_NAME}_host
-
-ansible-playbook -i inventory/${VM_NAME}_host \
+ansible-playbook -i inventory/${IP_HETZNER}_host \
     playbook/k8s.yml \
     --tags k8s_cluster \
-    -e ip_address=$IP_HETZNER
+    -e k8s_version=1.15.9 \
+    -e ip_address=${IP_HETZNER}
 
-ansible-playbook -i inventory/${VM_NAME}_host \
+ansible-playbook -i inventory/${IP_HETZNER}_host \
     playbook/k8s.yml \
     --tags k8s_config \
-    -e k8s_config_filename=${VM_NAME}_k8s_config.yml
+    -e k8s_config_filename=${IP_HETZNER}-k8s-config.yml
 
+echo "#######################################"
+echo export KUBECONFIG="$BASH_SCRIPTS_DIR/../../ansible/inventory/${IP_HETZNER}-k8s-config.yml"
 echo "#######################################"
 echo "Execute the following command within a terminal to ssh to the vm"
 echo "alias ssh-${VM_NAME}=\"ssh -i ~/.ssh/id_hetzner_snowdrop root@${IP_HETZNER}\""
