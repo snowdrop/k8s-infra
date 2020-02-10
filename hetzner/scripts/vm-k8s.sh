@@ -43,14 +43,6 @@ ansible-playbook -i inventory/${VM_NAME}_host \
     --tags k8s_config \
     -e k8s_config_filename=${VM_NAME}_k8s_config.yml
 
-ansible-playbook -i inventory/${VM_NAME}_host \
-    playbook/k8s.yml \
-    --tags ingress
-
-ansible-playbook -i inventory/${VM_NAME}_host \
-    playbook/k8s.yml \
-    --tags k8s_dashboard
-
 echo "#######################################"
 echo "Execute the following command within a terminal to ssh to the vm"
 echo "alias ssh-${VM_NAME}=\"ssh -i ~/.ssh/id_hetzner_snowdrop root@${IP_HETZNER}\""
