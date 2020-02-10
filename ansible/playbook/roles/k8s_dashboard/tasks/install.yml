@@ -16,7 +16,7 @@
     kubectl --kubeconfig=$HOME/.kube/config apply -f /tmp/rbac.yml
     kubectl --kubeconfig=$HOME/.kube/config apply -f /tmp/ingress-dashboard.yml
     kubectl --kubeconfig=$HOME/.kube/config apply -f /tmp/letsencrypt-http01-issuer.yml
-    kubectl --kubeconfig=$HOME/.kube/config apply -f /tmp/certificate.yml
+    kubectl --kubeconfig=$HOME/.kube/config --validate=false apply -f /tmp/certificate.yml
 
 - name: Print kubernetes dashboard URL & Token
   debug:
