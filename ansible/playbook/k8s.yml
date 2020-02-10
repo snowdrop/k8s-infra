@@ -22,4 +22,3 @@
     - { role: 'tekton_pipelines',   tags: 'tekton_pipelines'}
     - { role: 'component_crd_operator',  tags: 'component_crd_operator'}
     - { role: 'ocp4_console',   tags: 'ocp4_console'}
-    - { role: 'test', tags: 'test'}
