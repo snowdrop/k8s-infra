@@ -9,112 +9,23 @@ In order to create a vm and next access it, you must first import your ssh publi
 hcloud ssh-key create --name USER_KEY_NAME --public-key-from-file ~/.ssh/id_rsa.pub
 ```
 
-## Using oc cluster up
+## Using Ansible playbook
 
-In order to configure and install different software and to deploy openshift using `oc cluster up`,
-you must execute locally the bash script `./scripts/create-user-data.sh` responsible to populate the `user-data` file
-that cloud-init will use on the remote vm during the creation of the vm.
+### Steps to create a k8s cluster
 
 ```bash
-./scripts/create-user-data.sh
-```
+cd /Users/dabou/Code/snowdrop/k8s-infra/hetzner/ansible
+../hetzner/scripts/vm-k8s.sh k8s-115 cx31 centos-7 snowdrop YaV2PyLqJzssh
 
-Next create a Hetzner cloud vm using as parameters the `user-data` file created previously and your public key imported
+IP=$(hcloud server describe k8s-115 -o json | jq -r .public_net.ipv4.ip)
+alias ssh-k8s-115="ssh -i ~/.ssh/id_hetzner_snowdrop root@${IP}"
+export KUBECONFIG=/Users/dabou/Code/snowdrop/k8s-infra/ansible/inventory/${IP}-k8s-config.yml
 
-```bash
-hcloud server delete VM_NAME
-hcloud server create --name VM_NAME --type cx41 --image centos-7 --ssh-key USER_KEY_NAME  --user-data-from-file ./scripts/user-data
-```
-
-You can ssh to the newly created vm using the following command
-```bash
-IP_HETZNER=$(hcloud server describe VM_NAME -o json | jq -r .public_net.ipv4.ip)
-ssh-keygen -R $IP_HETZNER
-sleep 20s
-ssh root@$IP_HETZNER
-```
-
-## Using OpenShift Ansible playbook
-
-### Remote
-
-We can provision the VM using Ansible playbook by importing this project within the VM and next by executing this playbook as defined
-within the bash script
-
-```bash
-ansible-playbook -i ./inventory/hetzner_vm playbook/cluster.yml \
-    -e openshift_release_tag_name=v3.11.0 \
-    -e public_ip_address="${hostIP}" \
-    --tags "up" \
-    2>&1
-```
-
-The scenario to create a VM and next to ssh the bash ansible script is the following: 
-
-```bash
-./scripts/create-user-data.sh
-hcloud server create --name VM_NAME --type cx41 --image centos-7 --ssh-key USER_KEY_NAME --user-data-from-file ./scripts/user-data
-IP_HETZNER=$(hcloud server describe VM_NAME -o json | jq -r .public_net.ipv4.ip)
-sleep 90s
-ssh-keygen -R $IP_HETZNER
-while ! nc -z $IP_HETZNER 22; do echo "Wait till we can ssh..."; sleep 10; done
-ssh -o StrictHostKeyChecking=no root@$IP_HETZNER 'while kill -0 $(cat /run/yum.pid) 2> /dev/null; do echo "Wait till yum process is released"; sleep 10; done;'
-ssh -o StrictHostKeyChecking=no root@$IP_HETZNER 'bash -s' < ./scripts/post-installation.sh
-ssh -o StrictHostKeyChecking=no root@$IP_HETZNER << EOF
-hostIP=$(hostname -I | awk '{print $1}')
-cd /tmp/infra/ansible
-ansible-playbook -i ./inventory/hetzner_vm playbook/cluster.yml \
-    -e openshift_release_tag_name="v${version}.0" \
-    -e public_ip_address="${hostIP}" \
-    --tags "up" \
-    2>&1
-
-echo "Enable cluster-admin role for admin user"
-ansible-playbook -i ./inventory/hetzner_vm playbook/post_installation.yml \
-     -e openshift_admin_pwd=admin \
-     --tags "enable_cluster_role"
-
-exit 0
-EOF
-```
-
-### Locally
-
-You can also if you prefer execute from this project the Ansible playbook. The commands to be executed are described here after
-
-- Create a Hetzner cloud vm and wait till we can ssh
-```bash
-cd hetzner
-./scripts/create-user-data.sh
-hcloud server create \
-  --name VM_NAME \
-  --type cx41 \
-  --image centos-7 \
-  --ssh-key USER_KEY_NAME \
-  --user-data-from-file ./scripts/user-data
-IP_HETZNER=$(hcloud server describe VM_NAME -o json | jq -r .public_net.ipv4.ip)
-ssh-keygen -R $IP_HETZNER
-while ! nc -z $IP_HETZNER 22; do echo "Wait till we can ssh..."; sleep 10; done
-```
-- Execute the post installation script to install docker loike git, wget
-```bash
-ssh -o StrictHostKeyChecking=no root@$IP_HETZNER 'bash -s' < ./scripts/post-installation.sh
-```
-
-- Move to the ansible directory, generate the inventory file and run the playbook able to perform a `oc cluster up`
-```bash
-cd ../ansible
-ansible-playbook playbook/generate_inventory.yml \
-  -e ip_address=$IP_HETZNER \
-  -e type=hetzner
-ansible-playbook -i inventory/hetzner_host playbook/cluster.yml \
-   -e public_ip_address=$(hcloud server describe VM_NAME -o json | jq -r .public_net.ipv4.ip) \
-   -e ansible_os_family="RedHat" \
-   --tags "up"
-```
-
-The following bash_script is playing the different commands all in one to delete/create a new VM and next start `oc cluster up`
-```bash
-
-./scripts/vm-ocp.sh 
+ansible-playbook -i inventory/${IP}_host playbook/post_installation.yml --tags ingress
+ansible-playbook -i inventory/${IP}_host playbook/post_installation.yml --tags cert_manager \
+    -e isOpenshift=false
+ansible-playbook -i inventory/${IP}_host playbook/post_installation.yml --tags k8s_dashboard \
+    -e k8s_dashboard_version=v2.0.0-rc5 \
+    -e k8s_dashboard_token_public="siqyah" \
+    -e k8s_dashboard_token_secret="tv231i6itqiems9y"
 ```
