@@ -15,19 +15,17 @@ hcloud ssh-key create --name USER_KEY_NAME --public-key-from-file ~/.ssh/id_rsa.
 
 ```bash
 cd ansible
-../hetzner/scripts/vm-k8s.sh k8s-115 cx31 centos-7 snowdrop YaV2PyLqJzssh
+../hetzner/scripts/vm-k8s.sh k8s-115 cx31 centos-7 <SALT_TEXT> <PASSWORD>
 
-IP=$(hcloud server describe k8s-115 -o json | jq -r .public_net.ipv4.ip)
-alias ssh-k8s-115="ssh -i ~/.ssh/id_hetzner_snowdrop root@${IP}"
-export KUBECONFIG=/Users/dabou/Code/snowdrop/k8s-infra/ansible/inventory/${IP}-k8s-config.yml
+ping 
 
 ansible-playbook -i inventory/${IP}_host playbook/post_installation.yml --tags ingress
 ansible-playbook -i inventory/${IP}_host playbook/post_installation.yml --tags cert_manager \
     -e isOpenshift=false
 ansible-playbook -i inventory/${IP}_host playbook/post_installation.yml --tags k8s_dashboard \
     -e k8s_dashboard_version=v2.0.0-rc5 \
-    -e k8s_dashboard_token_public="siqyah" \
-    -e k8s_dashboard_token_secret="tv231i6itqiems9y"
+    -e k8s_dashboard_token_public="<token_public>" \
+    -e k8s_dashboard_token_secret="<token_secret>"
 ```
 
 ### Steps to create an okd cluster
@@ -40,7 +38,7 @@ The following all-in one bash script will create a:
 ```bash
 cd ansible
 VM=okd3-halkyon
-../hetzner/scripts/vm-ocp.sh ${VM} cx31 centos-7 snowdrop YaV2PyLqJzssh
+../hetzner/scripts/vm-ocp.sh ${VM} cx31 centos-7  <SALT_TEXT> <PASSWORD>
 
 IP=$(hcloud server describe ${VM} -o json | jq -r .public_net.ipv4.ip)
 alias ${VM}="ssh -i ~/.ssh/id_hetzner_snowdrop root@${IP}"
