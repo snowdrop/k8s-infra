@@ -15,9 +15,11 @@ hcloud ssh-key create --name USER_KEY_NAME --public-key-from-file ~/.ssh/id_rsa.
 
 ```bash
 cd ansible
-../hetzner/scripts/vm-k8s.sh k8s-115 cx31 centos-7 <SALT_TEXT> <PASSWORD>
+../hetzner/scripts/vm-k8s.sh <vm_name> <vm_flavor> <vm_os_type> <SALT_TEXT> <PASSWORD>
 
-ping 
+IP=$(hcloud server describe k8s-115 -o json | jq -r .public_net.ipv4.ip)
+alias ssh-k8s-115="ssh -i ~/.ssh/id_hetzner_snowdrop root@${IP}"
+export KUBECONFIG=~/k8s-infra/ansible/inventory/${IP}-k8s-config.yml
 
 ansible-playbook -i inventory/${IP}_host playbook/post_installation.yml --tags ingress
 ansible-playbook -i inventory/${IP}_host playbook/post_installation.yml --tags cert_manager \
