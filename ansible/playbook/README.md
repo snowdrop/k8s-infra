@@ -14,7 +14,7 @@ Parameters:
 | Variable | Default | Meaning |
 | --- | --- | --- |
 | hetzner_context_name |  | context name |
-| vm_delete |  | Deletes the VM prior to creating it |
+| hetzner_token |  | The token to register with Hetzner. |
 
 ```bash
 $ ansible-playbook playbook/hetzner-create-hcloud-server.yml
