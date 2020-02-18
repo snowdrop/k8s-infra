@@ -27,7 +27,6 @@
     - name: hetzner_context_name
       prompt: Hetzner context name
       private: no
-      default: snowdrop
       when: " hetzner_context_name is not defined "
 
   tasks:
@@ -147,17 +146,16 @@
       register: hetzner_server_poweron_res
       when: "hetzner_describe.status == 'off'"
 
-    - name: Template inventory file
-      template:
-        src: templates/new-inventory.j2
-        dest: ../inventory/heztner
+- name:  Update local inventory
+  hosts: localhost
+  gather_facts: False
 
-    - name: Refresh the inventory with the new added host
-      meta: refresh_inventory
-
-#    - name: Get IP address and wait till we can SSH
-#      shell: "IP_HETZNER=$(hcloud server describe {{ vm_name }}  -o json | jq -r .public_net.ipv4.ip)"
-#      register: hcloud_server_describe_res
+  roles:
+    - role: generate_inventory
+      filename: "{{ ip_address }}_host"
+      ssh_private_key_path: ~/.ssh/id_hetzner_snowdrop
+      type: "hetzner"
+      username: centos
 
 - name:  Wait for the VM to boot and we can ssh
   hosts: masters

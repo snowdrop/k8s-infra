@@ -7,7 +7,6 @@
     - name: hetzner_context_name
       prompt: Hetzner context name
       private: no
-      default: snowdrop
       when: " hetzner_context_name is not defined "
     - name: hcloud_context_create
       prompt: Create hetzner context name

@@ -299,7 +299,7 @@ You can then use the following instructions to install a Kubernetes cluster with
 ## Turn on your machine into a Cloud Native Dev environment 
 
 Independent of the approach you choose before, you'll be now able to configure your cluster
-using one of the following features and with the help of the [Ansible roles](ansible/playbook/roles) we have created: 
+using one of the following features and with the help of the [Ansible roles](ansible/roles) we have created: 
 
 - Create list of users/passwords and their corresponding project
 - Grant Cluster admin role to an OpenShift user 
