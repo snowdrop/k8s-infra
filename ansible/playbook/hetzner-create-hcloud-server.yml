@@ -51,20 +51,21 @@
     - name: Delete cloud server
       shell: "hcloud server delete {{ vm_name }}"
       register: hcloud_delete_res
-      changed_when: "hcloud_delete_res.rc == 0 or ('server not found' in hcloud_delete_res.stderr)"
+      changed_when: "hcloud_delete_res.rc == 0"
       failed_when: "hcloud_delete_res.rc != 0 and ('server not found' not in hcloud_delete_res.stderr)"
-      when: "vm_delete is defined and vm_delete"
+      when: "vm_delete is defined and vm_delete | bool"
 
     - name: Delete cloud server key
       shell: "hcloud ssh-key delete snowdrop"
       register: hcloud_delete_key_res
       changed_when: "hcloud_delete_key_res.rc == 0"
-      when: "vm_delete is defined and vm_delete"
+      failed_when: "hcloud_delete_key_res.rc != 0 and ('SSH key not found' not in hcloud_delete_key_res.stderr)"
+      when: "vm_delete is defined and vm_delete | bool"
 
     - name: Create cloud server key
       shell: "hcloud ssh-key create --name snowdrop --public-key-from-file ~/.ssh/id_hetzner_snowdrop.pub"
       changed_when: True
-      when: "vm_delete is defined and vm_delete"
+      when: "vm_delete is defined and vm_delete | bool"
 
     - name: Hash user password
       set_fact:
