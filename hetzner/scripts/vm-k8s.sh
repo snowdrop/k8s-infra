@@ -18,8 +18,9 @@ USER_PASSWORD=$5
 
 BASH_SCRIPTS_DIR=$(dirname $0)
 
-# Delete and create the Hetzner Cloud server
-. $BASH_SCRIPTS_DIR/create-hcloud-server.sh
+# Delete and create the Hetzner Cloud vm
+# TODO : Add playbook command
+# . $BASH_SCRIPTS_DIR/create-hcloud-server.sh
 
 # Execute playbooks to :
 # - Generate inventory file with IP address

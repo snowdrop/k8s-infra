@@ -17,7 +17,8 @@ USER_PASSWORD=$5
 BASH_SCRIPTS_DIR=$(dirname $0)
 
 # Delete and create the Hetzner Cloud vm
-. $BASH_SCRIPTS_DIR/create-hcloud-server.sh
+# TODO : Add playbook command
+# . $BASH_SCRIPTS_DIR/create-hcloud-server.sh
 
 echo "#######################################"
 echo "Execute the following command within a terminal to ssh to the vm"
