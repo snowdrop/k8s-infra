@@ -1,0 +1,159 @@
+---
+# file: hetzner-create-hcloud-server.yml
+# Optional variables:
+#  . vm_delete: Deletes the virtual machine prior to creating it.
+#  . pass_store_dir: Directory containing the password store.
+#  . server_type:
+#  . vm_image:
+- name:  Create hetzner server
+  hosts: localhost
+  gather_facts: yes
+  vars_prompt:
+    - name: vm_name
+      prompt: vm name
+      private: no
+      when: " vm_name is not defined "
+    - name: salt_text
+      prompt: Salt
+      private: yes
+      when: " salt_text is not defined "
+    - name: password_text
+      prompt: Password
+      private: yes
+      when: " password_text is not defined "
+    - name: hetzner_context_name
+      prompt: Hetzner context name
+      private: no
+      when: " hetzner_context_name is not defined "
+
+  tasks:
+    - name: Get variables
+      include_vars: "{{lookup('first_found', params)}}"
+      vars:
+        params:
+          files:
+            - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
+            - "{{ ansible_distribution }}.yml"
+            - "{{ ansible_os_family }}.yml"
+          paths:
+            - vars
+            - playbook/vars
+
+#    - name: Basic lookup. Fails if example/test doesn't exist
+#      debug:
+#        msg: "{{ lookup( 'passwordstore', 'hetzner/id_rsa ' + ('directory='+pass_store_dir if pass_store_dir is defined else '') )}}"
+
+    - name: "Set {{ hetzner_context_name }} context as active"
+      command: "hcloud context use  {{ hetzner_context_name }}"
+      register: hcloud_context_use_res
+      changed_when: "hcloud_context_use_res.rc == 0 "
+
+    - name: Delete cloud server
+      shell: "hcloud server delete {{ vm_name }}"
+      register: hcloud_delete_res
+      changed_when: "hcloud_delete_res.rc == 0"
+      failed_when: "hcloud_delete_res.rc != 0 and ('server not found' not in hcloud_delete_res.stderr)"
+      when: "vm_delete is defined and vm_delete | bool"
+
+    - name: Delete cloud server key
+      shell: "hcloud ssh-key delete snowdrop"
+      register: hcloud_delete_key_res
+      changed_when: "hcloud_delete_key_res.rc == 0"
+      failed_when: "hcloud_delete_key_res.rc != 0 and ('SSH key not found' not in hcloud_delete_key_res.stderr)"
+      when: "vm_delete is defined and vm_delete | bool"
+
+    - name: Create cloud server key
+      shell: "hcloud ssh-key create --name snowdrop --public-key-from-file ~/.ssh/id_hetzner_snowdrop.pub"
+      changed_when: True
+      when: "vm_delete is defined and vm_delete | bool"
+
+    - name: Hash user password
+      set_fact:
+        hashed_user_pw: "{{ password_text | password_hash('sha512', salt_text) }}"
+
+    - name: "TODO: Add the password to the pass store"
+      debug:
+        msg: "TODO"
+
+    - name: Get user home
+      shell: "echo ${HOME}"
+      register: user_home_res
+      changed_when: False
+
+    - name: Set user home
+      set_fact:
+        user_home: "{{ user_home_res.stdout }}"
+
+    - name: Get server public key
+      set_fact:
+        ssh_public_key: "{{ lookup('file', user_home + '/.ssh/id_hetzner_snowdrop.pub' ) }}"
+
+    - name: Get timezone
+      shell: "{{ get_time_zone_script }}"
+      register: timezone_res
+
+    - name: Set timezone variable
+      set_fact:
+        timezone: "{{ timezone_res.stdout }}"
+
+    - name: Template cloudinit file
+      template:
+        src: templates/user-data.j2
+        dest: /tmp/user-data
+
+    - name: Create cloud instance
+      shell: "hcloud server create --name {{ vm_name }} --type {{ server_type | default ('cx31') }} --image {{ vm_image | default ('centos-7') }} --ssh-key snowdrop --user-data-from-file /tmp/user-data"
+      register: hcloud_server_create_res
+      changed_when: "hcloud_server_create_res.rc == 0 or 'uniqueness_error' in hcloud_server_create_res.stderr"
+      failed_when: "hcloud_server_create_res.rc == 1 and 'uniqueness_error' not in hcloud_server_create_res.stderr"
+
+    - name: Collect server information
+      command: "hcloud server describe {{ vm_name }} -o json"
+      register: hetzner_describe_res
+
+    - name: Parse server information from hetzner
+      set_fact:
+        hetzner_describe: "{{ hetzner_describe_res.stdout | from_json }}"
+
+    - name: Set ip address
+      set_fact:
+        ip_address: "{{ hetzner_describe.public_net.ipv4.ip }}"
+
+    - name: "Clear known hosts for this server if it is newlly created"
+      known_hosts:
+        path: "{{ user_home + '/.ssh/known_hosts' }}"
+        name: "{{ ip_address }}"
+        state: absent
+      when: "hcloud_server_create_res.rc == 0"
+
+    - name: "Add server key to local authorized keys"
+      authorized_key:
+        user: "{{ ansible_user }}"
+        key: "{{ ssh_public_key }}"
+      when: "hcloud_server_create_res.rc == 0 or 'uniqueness_error' in hcloud_server_create_res.stderr"
+
+    - name: Start server if stopped
+      command: "hcloud server poweron {{ vm_name }}"
+      register: hetzner_server_poweron_res
+      when: "hetzner_describe.status == 'off'"
+
+- name:  Update local inventory
+  hosts: localhost
+  gather_facts: False
+
+  roles:
+    - role: generate_inventory
+      filename: "{{ ip_address }}_host"
+      ssh_private_key_path: ~/.ssh/id_hetzner_snowdrop
+      type: "hetzner"
+      username: centos
+
+- name:  Wait for the VM to boot and we can ssh
+  hosts: masters
+  gather_facts: no
+
+  tasks:
+    - name: ping hosts
+      wait_for_connection:
+        timeout: 60
+...

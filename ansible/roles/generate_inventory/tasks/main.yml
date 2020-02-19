@@ -13,6 +13,9 @@
     src: "{{ role_path }}/templates/{{ model }}.inventory.j2"
     dest: ../inventory/{{ file_name }}
 
+- name: Refresh the inventory so the newly added host is available
+  meta: refresh_inventory
+
 - name:
   shell: 'echo "$( cd "$( dirname {{ playbook_dir }}/../inventory/{{ file_name }} )" && pwd )"'
   register: inventory_dir_out
@@ -20,4 +23,3 @@
 - name: Show inventory file location
   debug:
     msg: "Inventory file created at : {{ inventory_dir_out.stdout }}/{{ file_name }}"
-

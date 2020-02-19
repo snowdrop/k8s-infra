@@ -1,0 +1,4 @@
+get_time_zone_script: "timedatectl | gawk -F': ' ' $1 ~ /Time zone/ {print $2}'"
+
+required_packages:
+  - python3-pexpect

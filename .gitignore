@@ -4,11 +4,19 @@
 **/openshift-ansible/
 **/.vagrant/
 **/user-data
+
+###########
+# Ansible #
+###########
 **/*.retry
 ansible/inventory/*
+#!ansible/inventory/controller
+!ansible/inventory/.gitkeep
 ansible/playbook/roles/test
+
 **/test.sh
 _tmp
 
 # Testing purposes
 sandbox/cluster_up/test.sh
+

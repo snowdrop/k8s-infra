@@ -1,0 +1,37 @@
+#cloud-config
+chpasswd:
+  list: |
+    root: {{ hashed_user_pw }}
+  expire: False
+
+disable_root: false
+
+package_upgrade: false
+
+yum_repos:
+  - epel:
+      baseurl: http://download.fedoraproject.org/pub/epel/7/$basearch
+      enabled: true
+      gpgcheck: false
+      name: Extra Packages for Centos 7 - $basearch
+
+packages:
+  - git
+
+users:
+  - name: centos
+    gecos: Centos User
+    passwd: {{ hashed_user_pw }}
+    lock-passwd: false
+    chpasswd: { expire: False }
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    ssh_pwauth: True
+    ssh_authorized_keys:
+      - {{ ssh_public_key }}
+
+  - name: root
+    ssh_authorized_keys:
+      - {{ ssh_public_key }}
+
+runcmd:
+  - timedatectl set-timezone {{ timezone }}
