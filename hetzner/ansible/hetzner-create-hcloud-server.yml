@@ -62,7 +62,7 @@
       failed_when: "hcloud_delete_key_res.rc != 0 and ('SSH key not found' not in hcloud_delete_key_res.stderr)"
       when: "vm_delete is defined and vm_delete | bool"
 
-    - name: Create cloud server key
+    - name: "Create cloud server key - TODO: Use passwordstore"
       shell: "hcloud ssh-key create --name snowdrop --public-key-from-file ~/.ssh/id_hetzner_snowdrop.pub"
       changed_when: True
       when: "vm_delete is defined and vm_delete | bool"
@@ -147,6 +147,7 @@
       ssh_private_key_path: ~/.ssh/id_hetzner_snowdrop
       type: "hetzner"
       username: centos
+      inventory_relative_path: "../../ansible/inventory/"
 
 - name:  Wait for the VM to boot and we can ssh
   hosts: masters

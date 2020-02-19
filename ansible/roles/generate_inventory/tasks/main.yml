@@ -11,7 +11,7 @@
 - name: Create Ansible Host file
   template:
     src: "{{ role_path }}/templates/{{ model }}.inventory.j2"
-    dest: ../inventory/{{ file_name }}
+    dest: "{{ inventory_relative_path }}{{ file_name }}"
 
 - name: Refresh the inventory so the newly added host is available
   meta: refresh_inventory
