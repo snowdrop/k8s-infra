@@ -40,7 +40,7 @@
           (?i)Token: "{{ hetzner_token }}"
       register: hcloud_context_create_res
       no_log: true
-      changed_when: "(hcloud_context_create_res.rc == 0) or ('name already used' in hcloud_context_create_res.stdout)"
+      changed_when: "(hcloud_context_create_res.rc == 0)"
       failed_when: "(hcloud_context_create_res.rc != 0) and ('name already used' not in hcloud_context_create_res.stdout)"
 
 ...

@@ -20,7 +20,7 @@ hcloud ssh-key create --name USER_KEY_NAME --public-key-from-file ~/.ssh/id_rsa.
 Then init the hetzner context using the available `hetzner-init-context` ansible playbook.
 
 ```bash
-$ ansible-playbook hetzner/ansible/hetzner-create-hcloud-server.yml
+$ ansible-playbook hetzner/ansible/hetzner-init-context.yml
 ```
 
 This playbook has the following variables.
@@ -33,7 +33,19 @@ This playbook has the following variables.
 Each of the Ansible prompts can be replaced by defining it's value as an extra variable of the playbook.
 
 ```bash
-$ ansible-playbook hetzner/playbook/hetzner-create-hcloud-server.yml -e hetzner_context_name=mycontext -e hetzner_token=mytoken 
+$ ansible-playbook hetzner/ansible/hetzner-init-context.yml -e hetzner_context_name=mycontext -e hetzner_token=mytoken 
+```
+
+The context can be verified reviewing the configuration file.
+
+```bash
+$ cat  ~/.config/hcloud/cli.toml
+
+active_context = "oneofmycontexts"
+
+[[contexts]]
+  name = "oneofmycontexts"
+  token = "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
 ```
 
 ## Create the hetzner vm
@@ -41,7 +53,7 @@ $ ansible-playbook hetzner/playbook/hetzner-create-hcloud-server.yml -e hetzner_
 The task of creating the hetzner context is also available through an Ansible playbook.
 
 ```bash
-$ ansible-playbook hetzner/playbook/hetzner-create-hcloud-server.yml
+$ ansible-playbook hetzner/ansible/hetzner-create-hcloud-server.yml
 ```
 
 This will present some prompts which can be replaced by environment variables. 
@@ -59,7 +71,7 @@ This will present some prompts which can be replaced by environment variables.
 Each of the Ansible prompts can be replaced by defining it's value as an extra variable of the playbook.
 
 ```bash
-$ ansible-playbook hetzner/playbook/hetzner-create-hcloud-server.yml -e '{ "vm_name": "my-name" }' -e '{ "salt_text": "<my salt>" }' -e '{ "password_text": "<my password>" }' -e '{ "hetzner_context_name": "<context name>" }' -e '{ "vm_delete": True }' -e '{ "pass_store_dir": "/home/<my home>/.my-password-store" }'
+$ ansible-playbook hetzner/ansible/hetzner-create-hcloud-server.yml -e '{ "vm_name": "my-name" }' -e '{ "salt_text": "<my salt>" }' -e '{ "password_text": "<my password>" }' -e '{ "hetzner_context_name": "<context name>" }' -e '{ "vm_delete": True }' -e '{ "pass_store_dir": "/home/<my home>/.my-password-store" }'
 ```
 
 ## Steps to create a k8s cluster
