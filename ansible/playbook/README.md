@@ -17,7 +17,7 @@ Parameters:
 | hetzner_token | x | x | The token to register with Hetzner. |
 
 ```bash
-$ ansible-playbook playbook/hetzner-create-hcloud-server.yml
+$ ansible-playbook playbook/hetzner-init-context.yml
 ```
 
 ## create hcloud server
