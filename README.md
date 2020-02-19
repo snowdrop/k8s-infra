@@ -12,6 +12,7 @@ Table of Contents
             * [Create VM on VirtualBox](#create-vm-on-virtualbox)
          * [Option 3 : Using a cloud provider](#option-3--using-a-cloud-provider)
             * [Public : Hetzner](#public--hetzner)
+            * [Public : Hetzner Cloud](#public--hetzner-cloud)
             * [VPN : OpenStack](#vpn--openstack)
       * [Cluster Deployment (option 2, 3)](#cluster-deployment-option-2-3)
          * [OpenShift](#openshift)
@@ -273,8 +274,12 @@ Warning: Permanently added '192.168.99.50' (ECDSA) to the list of known hosts.
 
 #### Public : Hetzner
 
-- See [hetzner](hetzner/README.md) page explaining how to create a cloud vm.
+- See [hetzner](hetzner/README.md) page explaining how to create a vm.
 - Move to `OpenShift deployment` [section](#openshift-deployment) to see how to provision the local VM.
+
+#### Public : Hetzner Cloud
+
+- See [hetzner-cloud](hetzner/README-cloud.md) page explaining how to create a cloud vm.
 
 #### VPN : OpenStack
 
