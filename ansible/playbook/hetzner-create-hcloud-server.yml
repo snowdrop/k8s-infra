@@ -1,5 +1,10 @@
 ---
 # file: hetzner-create-hcloud-server.yml
+# Optional variables:
+#  . vm_delete: Deletes the virtual machine prior to creating it.
+#  . pass_store_dir: Directory containing the password store.
+#  . server_type:
+#  . vm_image:
 - name:  Create hetzner server
   hosts: localhost
   gather_facts: yes
@@ -8,14 +13,6 @@
       prompt: vm name
       private: no
       when: " vm_name is not defined "
-    - name: server_type
-      prompt: Hetzner server type [cx31,...], check list with `hcloud server-type list`
-      private: no
-      when: " server_type is not defined "
-    - name: vm_image
-      prompt: Hetzner image name [centos-7,...]
-      private: no
-      when: " vm_image is not defined "
     - name: salt_text
       prompt: Salt
       private: yes
@@ -42,6 +39,10 @@
             - vars
             - playbook/vars
 
+#    - name: Basic lookup. Fails if example/test doesn't exist
+#      debug:
+#        msg: "{{ lookup( 'passwordstore', 'hetzner/id_rsa ' + ('directory='+pass_store_dir if pass_store_dir is defined else '') )}}"
+
     - name: "Set {{ hetzner_context_name }} context as active"
       command: "hcloud context use  {{ hetzner_context_name }}"
       register: hcloud_context_use_res
@@ -65,13 +66,6 @@
       changed_when: True
       when: "vm_delete is defined and vm_delete"
 
-#    - name: Create the cloud init file using user private key
-#      shell: "$BASH_SCRIPTS_DIR/create-user-data.sh $SALT_TEXT $USER_PASS"
-#      changed_when: True
-
-#    - name: Create the cloud init file using user private key
-#      shell: "$BASH_SCRIPTS_DIR/create-user-data.sh $SALT_TEXT $USER_PASSWORD"
-#
     - name: Hash user password
       set_fact:
         hashed_user_pw: "{{ password_text | password_hash('sha512', salt_text) }}"
@@ -101,17 +95,13 @@
       set_fact:
         timezone: "{{ timezone_res.stdout }}"
 
-#    - name: Debug timezone_res
-#      debug:
-#        msg: "timezone_res: {{ timezone_res }}"
-
     - name: Template cloudinit file
       template:
         src: templates/user-data.j2
         dest: /tmp/user-data
 
     - name: Create cloud instance
-      shell: "hcloud server create --name {{ vm_name }} --type {{ server_type }} --image {{ vm_image }} --ssh-key snowdrop --user-data-from-file /tmp/user-data"
+      shell: "hcloud server create --name {{ vm_name }} --type {{ server_type | default ('cx31') }} --image {{ vm_image | default ('centos-7') }} --ssh-key snowdrop --user-data-from-file /tmp/user-data"
       register: hcloud_server_create_res
       changed_when: "hcloud_server_create_res.rc == 0 or 'uniqueness_error' in hcloud_server_create_res.stderr"
       failed_when: "hcloud_server_create_res.rc == 1 and 'uniqueness_error' not in hcloud_server_create_res.stderr"
