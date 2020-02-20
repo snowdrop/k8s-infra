@@ -1,3 +1,12 @@
+# Table of Contents
+
+   * [Hetzner Cloud](#hetzner-cloud)
+      * [Init the hetzner context](#init-the-hetzner-context)
+      * [Create the hetzner vm](#create-the-hetzner-vm)
+      * [Steps to create a k8s cluster](#steps-to-create-a-k8s-cluster)
+      * [Steps to create an okd cluster](#steps-to-create-an-okd-cluster)
+
+
 # Hetzner Cloud
 
 The following guide details how to provision a Hetzner VM using the [Hetzner Cloud APi](https://docs.hetzner.cloud/#overview) or the  [Hetzner Cloud client](https://github.com/hetznercloud/cli) that you can install using the 
@@ -11,11 +20,6 @@ All Ansible playbooks must be launched from the root of the project, at `k8s-inf
 ## Init the hetzner context
 
 To getting started, you must get a Token for your API as described [here](https://docs.hetzner.cloud/#overview-getting-started).
-
-In order to create a vm and next access it, you must first import your ssh public key using this command
-```bash
-hcloud ssh-key create --name USER_KEY_NAME --public-key-from-file ~/.ssh/id_rsa.pub
-```
 
 Then init the hetzner context using the available `hetzner-init-context` ansible playbook.
 
@@ -71,7 +75,9 @@ This will present some prompts which can be replaced by environment variables.
 Each of the Ansible prompts can be replaced by defining it's value as an extra variable of the playbook.
 
 ```bash
-$ ansible-playbook hetzner/ansible/hetzner-create-hcloud-server.yml -e '{ "vm_name": "my-name" }' -e '{ "salt_text": "<my salt>" }' -e '{ "password_text": "<my password>" }' -e '{ "hetzner_context_name": "<context name>" }' -e '{ "vm_delete": True }' -e '{ "pass_store_dir": "/home/<my home>/.my-password-store" }'
+$ ansible-playbook hetzner/ansible/hetzner-create-hcloud-server.yml -e vm_name=my-name \
+-e salt_text=$(head -c 500 /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 20 | head -n 1) \
+-e password_text=my-password -e hetzner_context_name=context-name -e vm_delete=True
 ```
 
 ## Steps to create a k8s cluster

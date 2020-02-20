@@ -39,9 +39,9 @@
             - vars
             - playbook/vars
 
-#    - name: Basic lookup. Fails if example/test doesn't exist
-#      debug:
-#        msg: "{{ lookup( 'passwordstore', 'hetzner/id_rsa ' + ('directory='+pass_store_dir if pass_store_dir is defined else '') )}}"
+    - name: Get server public key from pass
+      set_fact:
+        hetzner_public_key: "{{ lookup('passwordstore', 'snowdrop/hetzner/id_rsa.pub' ) }}"
 
     - name: "Set {{ hetzner_context_name }} context as active"
       command: "hcloud context use  {{ hetzner_context_name }}"
@@ -62,18 +62,18 @@
       failed_when: "hcloud_delete_key_res.rc != 0 and ('SSH key not found' not in hcloud_delete_key_res.stderr)"
       when: "vm_delete is defined and vm_delete | bool"
 
-    - name: "Create cloud server key - TODO: Use passwordstore"
-      shell: "hcloud ssh-key create --name snowdrop --public-key-from-file ~/.ssh/id_hetzner_snowdrop.pub"
+    - name: "Create cloud server key"
+      shell: "hcloud ssh-key create --name snowdrop --public-key \"{{ hetzner_public_key }}\""
       changed_when: True
       when: "vm_delete is defined and vm_delete | bool"
+
+#    - name: "Hash user password and store it in pass"
+#      set_fact:
+#        user_pw: "{{ lookup('passwordstore', 'snowdrop/hetzner/'+vm_name+'/centos/password create=yes overwrite=yes userpass=' + password_text) }}"
 
     - name: Hash user password
       set_fact:
         hashed_user_pw: "{{ password_text | password_hash('sha512', salt_text) }}"
-
-    - name: "TODO: Add the password to the pass store"
-      debug:
-        msg: "TODO"
 
     - name: Get user home
       shell: "echo ${HOME}"
@@ -83,10 +83,6 @@
     - name: Set user home
       set_fact:
         user_home: "{{ user_home_res.stdout }}"
-
-    - name: Get server public key
-      set_fact:
-        ssh_public_key: "{{ lookup('file', user_home + '/.ssh/id_hetzner_snowdrop.pub' ) }}"
 
     - name: Get timezone
       shell: "{{ get_time_zone_script }}"
@@ -100,6 +96,8 @@
       template:
         src: templates/user-data.j2
         dest: /tmp/user-data
+      vars:
+        ssh_public_key: "{{ hetzner_public_key }}"
 
     - name: Create cloud instance
       shell: "hcloud server create --name {{ vm_name }} --type {{ server_type | default ('cx31') }} --image {{ vm_image | default ('centos-7') }} --ssh-key snowdrop --user-data-from-file /tmp/user-data"
@@ -129,7 +127,7 @@
     - name: "Add server key to local authorized keys"
       authorized_key:
         user: "{{ ansible_user }}"
-        key: "{{ ssh_public_key }}"
+        key: "{{ hetzner_public_key }}"
       when: "hcloud_server_create_res.rc == 0 or 'uniqueness_error' in hcloud_server_create_res.stderr"
 
     - name: Start server if stopped
