@@ -115,7 +115,7 @@ This will present some prompts which can be replaced by environment variables.
 | salt_text | x | | x | Salt and pepper. |
 | password_text | x | | x | Password of the created user. |
 | hetzner_context_name | x | | x | Context name for hcloud. |
-| override_public_key |  | |  | Use a local custom key instead the default one. |
+| override_public_key |  | |  | Use a *local custom key* instead the default one. |
 
 Tags:
 
