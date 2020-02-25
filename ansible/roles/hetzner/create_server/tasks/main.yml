@@ -44,7 +44,8 @@
 
 - name: Hash user password
   set_fact:
-    hashed_user_pw: "{{ password_text | password_hash('sha512', salt_text) }}"
+#    hashed_user_pw: "{{ password_text | password_hash('sha512', salt_text) }}"
+    hashed_user_pw: '{{ password_text | password_hash("sha512", salt_text[:16] | default(None) | regex_replace("[^\.\/a-zA-Z0-9]", "x"), rounds=10000 ) }}'
 
 - name: Get user home
   shell: "echo ${HOME}"
