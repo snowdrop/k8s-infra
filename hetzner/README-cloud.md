@@ -87,10 +87,13 @@ ansible_ssh_private_key_file: ~/.ssh/id_rsa_<ansible-hostname>
 new_ssh_port_number: <my-custom-ssh-port>
 ```
 
-The ansaible_user is obtaining from the `passstore` using `pass get snowdrop/hetzner/username`.
+The `ansible_user` is obtained from the `passstore` using `pass get snowdrop/hetzner/username`.
 
 > NOTE: Upon installation, Ansible will use the default SSH port to apply security scripts. One of this scripts is changing the ssh port to a non default one. 
 > See the corresponding [README](../ansible/playbook/README.md).
+
+The `ansible_ssh_private_key_file` is obtained from the `passstore` using `pass get snowdrop/hetzner/<ansible_hostname>/id_rsa | tee ~/.ssh/id_rsa_snowdrop_hetzner_<ansible_hostname>`. 
+It's used so Ansible can connect to the server without requiring password.  
 
 # The VM
 
