@@ -78,7 +78,7 @@ The host variable file should start with the following entries:
 #####################
 #ansible_ssh_port: <my-custom-ssh-port>
 ansible_user: <user used by ansible to connect to the server>
-ansible_ssh_host: <host name / ip address to the host>
+#ansible_ssh_host: <host name / ip address to the host>
 ansible_ssh_private_key_file: ~/.ssh/id_rsa_<ansible-hostname>
 
 ############
