@@ -10,8 +10,8 @@
 ###########
 **/*.retry
 ansible/inventory/*
-#!ansible/inventory/controller
 !ansible/inventory/.gitkeep
+!ansible/inventory/**/.gitkeep
 ansible/playbook/roles/test
 
 **/test.sh

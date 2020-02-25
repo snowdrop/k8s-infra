@@ -1,0 +1,8 @@
+---
+# tasks for update
+- name: Create journal folder to presist across reboots
+  file:
+    dest: "/var/log/journal"
+    state: directory
+  become: yes
+...

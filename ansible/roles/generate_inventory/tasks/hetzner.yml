@@ -1,0 +1,45 @@
+---
+- name: Create Hetzner Ansible Host file, group
+  lineinfile:
+    path: "{{ inventory_relative_path }}/{{ file_name }}"
+    regexp: "^[masters]"
+    line: "[masters]"
+    create: yes
+
+- name: Create Hetzner Ansible Host file, host
+  lineinfile:
+    path: "{{ inventory_relative_path }}/{{ file_name }}"
+    insertafter: "[masters]"
+    regexp: "^{{ vm_name | default(ip_address) }}"
+    line: "{{ vm_name | default(ip_address) }}"
+
+- name: Create Ansible Host var file
+  lineinfile:
+    path: "{{ inventory_relative_path }}/host_vars/{{ vm_name | default(ip_address) }}"
+    regexp: "^ansible_user"
+    line: "ansible_user: {{ os_user }}"
+  when: "os_user is defined"
+
+- name: Create Ansible Host var file
+  lineinfile:
+    path: "{{ inventory_relative_path }}/host_vars/{{ vm_name | default(ip_address) }}"
+    regexp: "^ansible_ssh_host"
+    line: "ansible_ssh_host: {{ ip_address }}"
+  when: "ip_address is defined"
+
+- name: Create Ansible Host var file
+  lineinfile:
+    path: "{{ inventory_relative_path }}/host_vars/{{ vm_name | default(ip_address) }}"
+    regexp: "^new_ssh_port_number"
+    line: "new_ssh_port_number: {{ new_ssh_port_number }}"
+  when: "new_ssh_port_number is defined"
+
+- name: Show inventory file location
+  debug:
+    msg: "Inventory file created at : {{ inventory_relative_path }}/{{ file_name }}"
+
+- name: Show host file location
+  debug:
+    msg: "Hosts file created at : {{ inventory_relative_path }}/host_vars/{{ vm_name | default(ip_address) }}"
+
+...

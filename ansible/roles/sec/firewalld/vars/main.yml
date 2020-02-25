@@ -1,0 +1,4 @@
+---
+# vars file for firewalld
+ipv4_blacklist:
+  - 194.32.146.59

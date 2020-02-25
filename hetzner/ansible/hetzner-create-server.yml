@@ -1,0 +1,75 @@
+---
+# file: hetzner-create-hcloud-server.yml
+# Optional variables:
+#  . vm_delete: Deletes the virtual machine prior to creating it.
+#  . pass_store_dir: Directory containing the password store.
+#  . server_type:
+#  . vm_image:
+- name:  Create hetzner server
+  hosts: localhost
+  gather_facts: yes
+  vars_prompt:
+    - name: vm_name
+      prompt: vm name
+      private: no
+      when: " vm_name is not defined "
+    - name: salt_text
+      prompt: Salt
+      private: yes
+      when: " salt_text is not defined "
+    - name: password_text
+      prompt: Password
+      private: yes
+      when: " password_text is not defined "
+    - name: hetzner_context_name
+      prompt: Hetzner context name
+      private: no
+      when: " hetzner_context_name is not defined "
+
+  pre_tasks:
+
+    - name: Get vm host vars
+      set_fact:
+        my_hostvars: "{{ hostvars[vm_name] }}"
+      tags: [always]
+
+  roles:
+    - role: hetzner/activate_context
+      context_name: "{{ hetzner_context_name }}"
+
+    - role: hetzner/delete_server
+      vm_name: "{{ vm_name }}"
+      tags: [never,vm_delete]
+
+    - role: hetzner/create_server
+      vm_name: "{{ vm_name }}"
+      os_user: "{{ my_hostvars.ansible_user }}"
+      context_name: "{{ hetzner_context_name }}"
+      tags: [always]
+
+    - role: hetzner/start_server
+      vm_name: "{{ vm_name }}"
+      tags: [always]
+
+    - role: generate_inventory
+      filename: "hetzner_host"
+      ssh_private_key_path: ~/.ssh/id_hetzner_snowdrop
+      type: "hetzner"
+      username: "{{ my_hostvars.ansible_user }}"
+      inventory_relative_path: "../../ansible/inventory/"
+      tags: [always]
+
+- name:  Wait for the VM to boot and we can ssh
+  hosts: masters
+  gather_facts: no
+
+  tasks:
+    - name: ping hosts
+      wait_for_connection:
+        timeout: 60
+      tags: [always]
+    - name: "TODO: SECURE SERVER"
+      debug:
+        msg: "The server is created. DON'T FORGET TO SECURE YOUR SERVER"
+      tags: [always]
+...

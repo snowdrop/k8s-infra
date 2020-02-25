@@ -1,0 +1,7 @@
+---
+# tasks for hetzner/activate_context
+- name: "Set {{ context_name }} context as active"
+  command: "hcloud context use  {{ context_name }}"
+  register: hcloud_context_use_res
+  changed_when: "hcloud_context_use_res.rc == 0 "
+...

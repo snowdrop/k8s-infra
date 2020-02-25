@@ -1,0 +1,6 @@
+---
+required_packages:
+  - firewalld
+firewall_services:
+  - ssh
+...

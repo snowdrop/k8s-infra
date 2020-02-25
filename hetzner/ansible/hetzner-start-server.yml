@@ -1,0 +1,17 @@
+---
+# file: hetzner-start-server.yml
+# Optional variables:
+#  . vm_image:
+- name:  Start hetzner server
+  hosts: localhost
+  gather_facts: no
+  vars_prompt:
+    - name: vm_name
+      prompt: vm name
+      private: no
+      when: " vm_name is not defined "
+
+  roles:
+    - role: hetzner/start_server
+      vm_name: "{{ vm_name }}"
+...

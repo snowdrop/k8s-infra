@@ -30,3 +30,5 @@ When using `"state": "present"`, the playbook will also generate an Openshift 3.
 as well as the private key of the new VM as `inventory/id_openstack.rsa` 
 
 **IMPORTANT** : The Ansible commands should be executed within the ansible folder !
+
+ansible-playbook playbook/openstack.yml -e '{"state": "present", "hostname": "n311-prod", "openstack": {"os_username": "psi-spring-boot-jenkins", "os_password": "Eing6zeimoPh1wae", "os_domain":  "redhat.com", "os_auth_url": "https://rhos-d.infra.prod.upshift.rdu2.redhat.com:13000/v3/", "vm": {"network": "provider_net_shared", "security_group": "spring-boot",  "flavor": "ci.m5.large", "volumes" : ["ceph-volume"]}}}'

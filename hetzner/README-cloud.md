@@ -17,6 +17,10 @@ file into the `~/bin` directory.
 
 All Ansible playbooks must be launched from the root of the project, at `k8s-infra`.
 
+## Requirements
+
+This project uses [pass](https://www.passwordstore.org/) to store passwords and certificates related to the project itself. To use the `passstore` project must be cloned.
+
 ## Init the hetzner context
 
 To getting started, you must get a Token for your API as described [here](https://docs.hetzner.cloud/#overview-getting-started).
@@ -52,6 +56,44 @@ active_context = "oneofmycontexts"
   token = "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
 ```
 
+# The inventory
+
+Prior to launching the creation of the VMS the Ansible inventory must be in place. The inventory consists of 2 files:
+
+* The inventory file itself: `ansible/inventory/hetzner`
+* The host variables `ansible/inventory/host_vars/<ansible-hostname>`
+
+The inventory file should be somethine like:
+
+```
+[masters]
+<ansible-hostname>
+```
+
+The host variable file should start with the following entries:
+
+```
+#####################
+# Ansible inventory #
+#####################
+#ansible_ssh_port: <my-custom-ssh-port>
+ansible_user: <user used by ansible to connect to the server>
+ansible_ssh_host: <host name / ip address to the host>
+ansible_ssh_private_key_file: ~/.ssh/id_rsa_<ansible-hostname>
+
+############
+# Security #
+############
+new_ssh_port_number: <my-custom-ssh-port>
+```
+
+The ansaible_user is obtaining from the `passstore` using `pass get snowdrop/hetzner/username`.
+
+> NOTE: Upon installation, Ansible will use the default SSH port to apply security scripts. One of this scripts is changing the ssh port to a non default one. 
+> See the corresponding [README](../ansible/playbook/README.md).
+
+# The VM
+
 ## Create the hetzner vm
 
 The task of creating the hetzner context is also available through an Ansible playbook.
@@ -70,49 +112,26 @@ This will present some prompts which can be replaced by environment variables.
 | salt_text | x | | x | Salt and pepper. |
 | password_text | x | | x | Password of the created user. |
 | hetzner_context_name | x | | x | Context name for hcloud. |
-| vm_delete |  | False |  | Deletes the VM prior to creating it. |
+
+Tags:
+
+| Tag | Meaning |
+| --- | --- |
+| vm_delete | Deletes the VM prior to creating it. |
 
 Each of the Ansible prompts can be replaced by defining it's value as an extra variable of the playbook.
 
 ```bash
 $ ansible-playbook hetzner/ansible/hetzner-create-hcloud-server.yml -e vm_name=my-name \
 -e salt_text=$(head -c 500 /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 20 | head -n 1) \
--e password_text=my-password -e hetzner_context_name=context-name -e vm_delete=True
+-e password_text=my-password -e hetzner_context_name=context-name --tag "vm_delete"
 ```
 
-## Steps to create a k8s cluster
+# Next steps
 
-The VM is created using an 
+Once the server is created it must be secured before installing other software. For that check [this README file](../ansible/playbook/README.md).
 
-```bash
-cd ansible
-../hetzner/scripts/vm-k8s.sh k8s-115 cx31 centos-7 snowdrop YaV2PyLqJzssh
+## Steps to create a k8s / okd cluster
 
-IP=$(hcloud server describe k8s-115 -o json | jq -r .public_net.ipv4.ip)
-alias ssh-k8s-115="ssh -i ~/.ssh/id_hetzner_snowdrop root@${IP}"
-export KUBECONFIG=/Users/dabou/Code/snowdrop/k8s-infra/ansible/inventory/${IP}-k8s-config.yml
+Check [the corresponding README file](../kubernetes/README.md). 
 
-ansible-playbook -i inventory/${IP}_host playbook/post_installation.yml --tags ingress
-ansible-playbook -i inventory/${IP}_host playbook/post_installation.yml --tags cert_manager \
-    -e isOpenshift=false
-ansible-playbook -i inventory/${IP}_host playbook/post_installation.yml --tags k8s_dashboard \
-    -e k8s_dashboard_version=v2.0.0-rc5 \
-    -e k8s_dashboard_token_public="pubtkn" \
-    -e k8s_dashboard_token_secret="verysecrettoken1"
-```
-
-## Steps to create an okd cluster
-
-The following all-in one bash script will create a:
-- Hetzner cloud vm
-- Generate an inventory file 
-- Deploy the okd cluster using the playbook cluster
- 
-```bash
-cd ansible
-VM=okd3-halkyon
-../hetzner/scripts/vm-ocp.sh ${VM} cx31 centos-7 snowdrop complexpasswd
-
-IP=$(hcloud server describe ${VM} -o json | jq -r .public_net.ipv4.ip)
-alias ${VM}="ssh -i ~/.ssh/id_hetzner_snowdrop root@${IP}"
-```
