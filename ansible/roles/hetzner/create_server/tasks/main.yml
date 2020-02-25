@@ -1,16 +1,5 @@
 ---
 # tasks for hetzner/create_server
-- name: Get variables
-  include_vars: "{{lookup('first_found', params)}}"
-  vars:
-    params:
-      files:
-        - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
-        - "{{ ansible_distribution }}.yml"
-        - "{{ ansible_os_family }}.yml"
-      paths:
-        - vars
-
 - name: Get server public key from pass
   set_fact:
     hetzner_public_key: "{{ lookup('passwordstore', 'snowdrop/hetzner/id_rsa.pub' ) }}"
@@ -20,7 +9,6 @@
   set_fact:
     hetzner_public_key: "{{ lookup('file', override_public_key ) }}"
   when: "override_public_key is defined"
-
 
 #- name: "Set {{ hetzner_context_name }} context as active"
 #  command: "hcloud context use  {{ hetzner_context_name }}"
@@ -66,15 +54,6 @@
 - name: Set user home
   set_fact:
     user_home: "{{ user_home_res.stdout }}"
-
-- name: Get timezone
-  shell: "{{ get_time_zone_script }}"
-  changed_when: False
-  register: timezone_res
-
-- name: Set timezone variable
-  set_fact:
-    timezone: "{{ timezone_res.stdout }}"
 
 - name: Template cloudinit file
   template:

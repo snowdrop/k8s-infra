@@ -8,15 +8,14 @@
 ###########
 # Ansible #
 ###########
-**/*.retry
+#**/*.retry
 ansible/inventory/*
-!ansible/inventory/.gitkeep
-!ansible/inventory/**/.gitkeep
-ansible/playbook/roles/test
+#ansible/roles/test
+!ansible/inventory/group_vars
+ansible/inventory/host_vars
 
 **/test.sh
 _tmp
 
 # Testing purposes
 sandbox/cluster_up/test.sh
-
