@@ -25,17 +25,14 @@
     path: "{{ inventory_relative_path }}/host_vars/{{ host_name }}"
     regexp: "^ansible_user"
     line: "ansible_user: {{ os_user }}"
+  when: "os_user is defined"
 #  when: "(vm_vars is defined and vm_vars.ansible_user is defined and os_user is defined) or vm_vars is not defined or vm_vars.ansible_user is not defined or os_user is defined"
-
-- name: Set default ansible_ssh_private_key_file
-  set_fact:
-    default_ansible_ssh_private_key_file: "~/.ssh/id_rsa_{{ vm_name }}"
 
 - name: Set ansible_ssh_private_key_file
   lineinfile:
     path: "{{ inventory_relative_path }}/host_vars/{{ host_name }}"
     regexp: "^ansible_ssh_private_key_file"
-    line: "ansible_ssh_private_key_file: {{ override_ssh_private_key_file | default('~/.ssh/id_rsa_'+ vm_name) }}"
+    line: "ansible_ssh_private_key_file: {{ override_ssh_private_key_file | default('~/.ssh/id_rsa_snowdrop_hetzner_'+ vm_name) }}"
 #  when: "vm_vars is not defined or vm_vars.ansible_ssh_private_key_file is not defined or override_ssh_private_key_file is defined"
 
 - name: Create Ansible Host var file

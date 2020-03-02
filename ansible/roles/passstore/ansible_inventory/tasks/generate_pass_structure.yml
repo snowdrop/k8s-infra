@@ -1,63 +1,63 @@
 ---
-#- name: "Set pass creation facts"
-#  set_fact:
-#    username: "{{ vm_user | default('snowdrop') }}"
-#    custom_ssh_port_number: "{{ vm_custom_ssh_port | default('47286') }}"
-
 - set_fact:
     pass_os_password_tmp: "{{  (' userpaserpass=' + os_password) if os_password is defined else (' length=16') }}"
-
 
 - name: "Set pass facts (user, ssh_port)"
   set_fact:
     pass_os_user: "{{ query('passwordstore', pass_l3_route + '/os_user create=True userpass=' + username)[0] }}"
     pass_os_password: "{{ query('passwordstore', pass_l3_route + '/os_password create=True ' + pass_os_password_tmp )[0] }}"
     pass_ssh_port: "{{ query('passwordstore', pass_l3_route + '/ssh_port create=True userpass=' + custom_ssh_port_number)[0] }}"
-    pass_rsa_private_key: "{{ query('passwordstore', pass_l3_route + '/id_rsa', errors='ignore') }}"
+    pass_rsa_private_key: "{{ query('passwordstore', pass_l3_route + '/id_rsa returnall=true', errors='ignore')[0] | default('') }}"
+    pass_rsa_public_key: "{{ query('passwordstore', pass_l3_route + '/id_rsa.pub returnall=true', errors='ignore')[0] | default('') }}"
+  failed_when: false
   register: res_set_fact
 
-#- name: "TODO: REMOVE: debug res_set_fact"
-#  debug:
-#    msg: "res_set_fact: {{ pass_rsa_private_key }}, {{ pass_rsa_private_key | length }}, {{ pass_username }}, {{ res_set_fact }}"
-
-- name: "Check if the RSA private key file exists in the filesystem"
-  stat:
-    path: "{{ '~/.ssh/id_rsa_'+ pass_l3_name }}"
-  register: stat_rsa_private_reg
-
-- name: "Create RSA private key from pass - Private key missing in controoller but found in pass, "
+- name: "Create RSA private key from pass - Private key found in pass"
   copy:
     dest: "{{ '~/.ssh/id_rsa_'+ pass_l3_name }}"
     content: "{{ pass_rsa_private_key }}"
-  when: "pass_rsa_private_key is defined and pass_rsa_private_key | length > 0 and not stat_rsa_private_reg.stat.exists"
+  when: "pass_rsa_private_key is defined and pass_rsa_private_key | length > 0"
 
 - name: "Generate new RSA private key"
   openssl_privatekey:
     path: "{{ '~/.ssh/id_rsa_'+ pass_l3_name }}"
-  when: "(pass_rsa_private_key is not defined or pass_rsa_private_key | length == 0) and not stat_rsa_private_reg.stat.exists"
+  when: "(pass_rsa_private_key is not defined or pass_rsa_private_key | length == 0)"
+  register: rsa_pk_gen_res
 
 - name: "Gather RSA PK contents"
   set_fact:
     pass_rsa_private_key: "{{ query('file', '~/.ssh/id_rsa_'+ pass_l3_name) }}"
-  when: "(pass_rsa_private_key is not defined or pass_rsa_private_key | length == 0) and not stat_rsa_private_reg.stat.exists"
+  when: "(pass_rsa_private_key is not defined or pass_rsa_private_key | length == 0)"
 
-#- name: "TODO: REMOVE: debug pass_rsa_private_key"
-#  debug:
-#    msg: "pass_rsa_private_key: {{ pass_rsa_private_key[0] }}"
+- name: "Change RSA private key permission"
+  file:
+    path: "~/.ssh/id_rsa_{{ pass_l3_name }}"
+    mode: "0600"
 
 - name: "Add the contents of the private key to pass"
   shell: "cat ~/.ssh/id_rsa_{{ pass_l3_name }} | pass insert -m {{ pass_l3_route}}/id_rsa "
-#  set_fact:
-#    pass_rsa_private_key: "{{ query('passwordstore', pass_l3_route + '/id_rsa create=True userpass=' + pass_rsa_private_key[0]) }}"
   when: "(res_set_fact.ansible_facts.pass_rsa_private_key is not defined or res_set_fact.ansible_facts.pass_rsa_private_key | length == 0)"
 
-- name: "Generate an OpenSSL public key from the private key"
+- name: "Create RSA public key from pass - Public key found in pass"
+  copy:
+    dest: "{{ '~/.ssh/id_rsa_'+ pass_l3_name + '.pub'}}"
+    content: "{{ pass_rsa_public_key }}"
+  when: "pass_rsa_public_key is defined and pass_rsa_public_key | length > 0"
+
+- name: "Generate an OpenSSL public key from the private key, if the RSA key was generated."
   openssl_publickey:
     path: "~/.ssh/id_rsa_{{ pass_l3_name }}.pub"
     privatekey_path: "~/.ssh/id_rsa_{{ pass_l3_name }}"
-  when: "(res_set_fact.ansible_facts.pass_rsa_private_key is not defined or res_set_fact.ansible_facts.pass_rsa_private_key | length == 0)"
+    format: "OpenSSH"
+  when: "rsa_pk_gen_res is defined and rsa_pk_gen_res.changed"
 
 - name: "Add the contents of the public key to pass"
   shell: "cat ~/.ssh/id_rsa_{{ pass_l3_name }}.pub | pass insert -m {{ pass_l3_route }}/id_rsa.pub "
-  when: "(res_set_fact.ansible_facts.pass_rsa_private_key is not defined or res_set_fact.ansible_facts.pass_rsa_private_key | length == 0)"
+  when: "(res_set_fact.ansible_facts.pass_rsa_public_key is not defined or res_set_fact.ansible_facts.pass_rsa_public_key | length == 0)"
+
+- name: "Change RSA public key permission"
+  file:
+    path: "~/.ssh/id_rsa_{{ pass_l3_name }}.pub"
+    mode: "0600"
+
 ...

@@ -20,20 +20,23 @@ This playbook executes several tasks regarding the security of hosts.
 1. Installs lsof
 
 
-# Generate inventory
+# Ansible Inventory
+
+Ansible inventory manages access to hosts using Ansible.
 
 Clean existing inventory.
 
 ```bash
-$ pass rm snowdrop/hetzner/h01-k8s-116 -rf 
-$ rm -f ~/.ssh/id_rsa_snowdrop_hetzner_h01-k8s-116* 
-$ rm ansible/inventory/host_vars/h01-k8s-116 
+$ VM_NAME=h01-k8s-116
+$ pass rm snowdrop/hetzner/${VM_NAME} -rf 
+$ rm -f ~/.ssh/id_rsa_snowdrop_hetzner_${VM_NAME}* 
+$ rm ansible/inventory/host_vars/${VM_NAME}
 ```
 
-Generate a new inventory record for a machine.
+Generate a new inventory record for a machine. This playbook will either build the inventory from pass or create a new one from scratch if it doesn't exist in pass.
 
 ```bash
-$ ansible-playbook ansible/playbook/passstore_controller_inventory.yml -e vm_name=h01-k8s-116  
+$ ansible-playbook ansible/playbook/passstore_controller_inventory.yml -e vm_name=${VM_NAME}
 ```
 
 Extra variables that can be passed to the playbook:
@@ -43,3 +46,11 @@ Extra variables that can be passed to the playbook:
 | pass_db_name | | snowdrop | The 1st level on the pass folder |
 | host_provider | | hetzner | The 2nd level on the pass folder which identifies the host provider for information purposes. |
 | vm_name | x | | Name of the host in the inventory with no spaces. Could be something like `h01-k8s-116`  |
+| vm_user |  | snowdrop | OS user |
+| vm_custom_ssh_port | | 47286 | Custom SSH port to be used for connections. |
+
+Extra tags:
+
+| Tag | Meaning |
+| --- | --- |
+| vm_delete | Deletes the VM prior to creating it. |

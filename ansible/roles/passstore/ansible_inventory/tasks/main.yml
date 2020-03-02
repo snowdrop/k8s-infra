@@ -4,9 +4,9 @@
   set_fact:
     my_passwordstore_folder: "{{ lookup('env', 'PASSWORD_STORE_DIR') | default('~/.password-store') }}"
 
-- name: "TODO REMOVE: Debug my_passwordstore"
-  debug:
-    msg: "my_passwordstore_folder: {{ my_passwordstore_folder }}"
+#- name: "TODO REMOVE: Debug my_passwordstore"
+#  debug:
+#    msg: "my_passwordstore_folder: {{ my_passwordstore_folder }}"
 
 - name: "Set the pass URL"
   set_fact:
@@ -18,9 +18,9 @@
     path: "{{ my_passwordstore_folder + '/' + pass_l3_route }}"
   register: stat_result
 
-- name: "TODO REMOVE: Debug pass_db_name"
-  debug:
-    msg: "stat_result: {{ stat_result }}"
+#- name: "TODO REMOVE: Debug pass_db_name"
+#  debug:
+#    msg: "stat_result: {{ stat_result }}"
 
 - name: "Create vm folder if it doesn't exist"
   file:

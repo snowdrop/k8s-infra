@@ -17,10 +17,6 @@
       prompt: Salt
       private: yes
       when: " salt_text is not defined "
-    - name: password_text
-      prompt: Password
-      private: yes
-      when: " password_text is not defined "
     - name: hetzner_context_name
       prompt: Hetzner context name
       private: no
@@ -52,8 +48,8 @@
       tags: [always]
 
     - role: generate_inventory
-      filename: "hetzner_host"
-      ssh_private_key_path: "~/.ssh/id_rsa_hetzner_{{ vm_name }}"
+      filename: "hetzner_hosts"
+#      ssh_private_key_path: "~/.ssh/id_rsa_hetzner_{{ vm_name }}"
       type: "hetzner"
       username: "{{ my_hostvars.ansible_user }}"
       inventory_relative_path: "../../ansible/inventory/"

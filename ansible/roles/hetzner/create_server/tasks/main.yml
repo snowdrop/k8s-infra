@@ -10,42 +10,18 @@
     hetzner_public_key: "{{ lookup('file', override_public_key ) }}"
   when: "override_public_key is defined"
 
-#- name: "Set {{ hetzner_context_name }} context as active"
-#  command: "hcloud context use  {{ hetzner_context_name }}"
-#  register: hcloud_context_use_res
-#  changed_when: "hcloud_context_use_res.rc == 0 "
-#
-#- name: Call delete server role
-#  import_role:
-#    name: "hetzner/delete_server"
-
-#- name: Delete cloud server
-#  shell: "hcloud server delete {{ vm_name }}"
-#  register: hcloud_delete_res
-#  changed_when: "hcloud_delete_res.rc == 0"
-#  failed_when: "hcloud_delete_res.rc != 0 and ('server not found' not in hcloud_delete_res.stderr)"
-#  when: "vm_delete is defined and vm_delete | bool"
-
-#- name: Delete cloud server key
-#  shell: "hcloud ssh-key delete snowdrop"
-#  register: hcloud_delete_key_res
-#  changed_when: "hcloud_delete_key_res.rc == 0"
-#  failed_when: "hcloud_delete_key_res.rc != 0 and ('SSH key not found' not in hcloud_delete_key_res.stderr)"
-#  when: "vm_delete is defined and vm_delete | bool"
-
 - name: "Create cloud server key"
   shell: "hcloud ssh-key create --name {{ context_name }} --public-key \"{{ hetzner_public_key }}\""
   changed_when: True
   tags: vm_delete
 
-    - name: "Get user password from pass"
-      set_fact:
-        user_pw: "{{ query('passwordstore', 'snowdrop/hetzner/'+vm_name+'/centos/password create=yes overwrite=yes userpass=' + password_text)[0] }}"
+- name: "Get user password from pass"
+  set_fact:
+    user_pw: "{{ query('passwordstore', 'snowdrop/hetzner/'+vm_name+'/os_password')[0] }}"
 
 - name: Hash user password
   set_fact:
-#    hashed_user_pw: "{{ password_text | password_hash('sha512', salt_text) }}"
-    hashed_user_pw: '{{ password_text | password_hash("sha512", salt_text[:16] | default(None) | regex_replace("[^\.\/a-zA-Z0-9]", "x"), rounds=10000 ) }}'
+    hashed_user_pw: '{{ user_pw | password_hash("sha512", salt_text[:16] | default(None) | regex_replace("[^\.\/a-zA-Z0-9]", "x"), rounds=10000 ) }}'
 
 - name: Get user home
   shell: "echo ${HOME}"
@@ -55,13 +31,12 @@
 - name: Set user home
   set_fact:
     user_home: "{{ user_home_res.stdout }}"
+    ssh_public_key: "{{ query('passwordstore', 'snowdrop/hetzner/' + vm_name + '/id_rsa.pub returnall=true')[0] }}"
 
 - name: Template cloudinit file
   template:
     src: templates/user-data.j2
     dest: /tmp/user-data
-  vars:
-    ssh_public_key: "{{ query('passstore', 'snowdrop/hetzner/' + vm_name + '/id_rsa.pub }}"
 
 - name: Create cloud instance
   shell: "hcloud server create --name {{ vm_name }} --type {{ server_type | default ('cx31') }} --image {{ vm_image | default ('centos-7') }} --ssh-key {{ context_name }} --user-data-from-file /tmp/user-data"
@@ -87,6 +62,14 @@
     name: "{{ ip_address }}"
     state: absent
   when: "hcloud_server_create_res.rc == 0"
+
+#- name: "Add the server to the known_hosts file"
+#  known_hosts:
+#    path: "{{ user_home + '/.ssh/known_hosts' }}"
+#    name: "{{ ip_address }}"
+#    key: "{{ ip_address }} {{ ssh_public_key }}"
+#    state: present
+#  when: "hcloud_server_create_res.rc == 0"
 
 - name: "Add server key to local authorized keys"
   authorized_key:
