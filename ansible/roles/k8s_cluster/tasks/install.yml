@@ -10,6 +10,7 @@
     repo_gpgcheck: true
     gpgkey: https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
     exclude: kube*
+  become: yes
 
 - name: Install Kubernetes packages - {{ k8s_version }}
   yum:
@@ -21,32 +22,39 @@
       - kubeadm-{{ k8s_version }}
       - kubectl-{{ k8s_version }}
       - kubelet-{{ k8s_version }}
+  become: yes
 
 - name: Disable selinux
   shell: |
     setenforce 0
     sed -i 's/^SELINUX=.*/SELINUX=disabled/g' /etc/selinux/config
     getenforce
+  become: yes
 
 - name: Start kubelet
   systemd:
     state: started
     name: kubelet
     enabled: yes
+  become: yes
 
 - name: Create k8s conf file
   template:
     src: "k8s.conf.j2"
     dest: /etc/sysctl.d/k8s.conf
+  become: yes
 
 - name: Make k8s conf file take effect
   command: "sysctl --system"
+  become: yes
 
 - name: Pull k8s linux images for version {{ k8s_version }}
   command: kubeadm config images pull --kubernetes-version {{ k8s_version }}
+  become: yes
 
 - name: Initialize cluster for k8s - {{ k8s_version }}
   command: "kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address={{ public_ip_address }} --kubernetes-version {{ k8s_version }}"
+  become: yes
 
 - name: Install Flannel Virtual Network for pod communication
   shell: |
@@ -55,15 +63,18 @@
 
 - name: Taint the node
   command: "kubectl taint nodes --all node-role.kubernetes.io/master-"
+  become: yes
 
 - name: Generate ClusterRole file for the sa default and namespace kube-system
   template:
     src: "clusterrole-admin.j2"
     dest: /tmp/clusterrole-admin.yml
+  become: yes
 
 - name: Grant Cluster Admin role to the serviceaccount default of kube-system
   shell: |
     kubectl apply -f /tmp/clusterrole-admin.yml
+  become: yes
 
 - name: Create persistence volume
   include_tasks: create_single_pv.yml
@@ -77,9 +88,9 @@
     sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config
     sudo chown centos:centos -R $HOME/.kube/
     chmod 644 $HOME/.kube/config
+  become: yes
 
 - name: save_config.yml
   include_role:
     name: k8s_config
   when: remote | bool
-

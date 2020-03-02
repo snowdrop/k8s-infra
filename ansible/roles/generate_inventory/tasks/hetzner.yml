@@ -10,29 +10,40 @@
   lineinfile:
     path: "{{ inventory_relative_path }}/{{ file_name }}"
     insertafter: "[masters]"
-    regexp: "^{{ vm_name | default(ip_address) }}"
-    line: "{{ vm_name | default(ip_address) }}"
+    regexp: "^{{ host_name }}"
+    line: "{{ host_name }}"
 
-- name: Create Ansible Host var file
+- name: Set Custom ssh port in host var file
   lineinfile:
-    path: "{{ inventory_relative_path }}/host_vars/{{ vm_name | default(ip_address) }}"
+    path: "{{ inventory_relative_path }}/host_vars/{{ host_name }}"
+    regexp: "^new_ssh_port_number"
+    line: "new_ssh_port_number: {{ new_ssh_port_number | default('47286') }}"
+    create: yes
+
+- name: Set Ansible user in host vars file
+  lineinfile:
+    path: "{{ inventory_relative_path }}/host_vars/{{ host_name }}"
     regexp: "^ansible_user"
     line: "ansible_user: {{ os_user }}"
-  when: "os_user is defined"
+#  when: "(vm_vars is defined and vm_vars.ansible_user is defined and os_user is defined) or vm_vars is not defined or vm_vars.ansible_user is not defined or os_user is defined"
+
+- name: Set default ansible_ssh_private_key_file
+  set_fact:
+    default_ansible_ssh_private_key_file: "~/.ssh/id_rsa_{{ vm_name }}"
+
+- name: Set ansible_ssh_private_key_file
+  lineinfile:
+    path: "{{ inventory_relative_path }}/host_vars/{{ host_name }}"
+    regexp: "^ansible_ssh_private_key_file"
+    line: "ansible_ssh_private_key_file: {{ override_ssh_private_key_file | default('~/.ssh/id_rsa_'+ vm_name) }}"
+#  when: "vm_vars is not defined or vm_vars.ansible_ssh_private_key_file is not defined or override_ssh_private_key_file is defined"
 
 - name: Create Ansible Host var file
   lineinfile:
-    path: "{{ inventory_relative_path }}/host_vars/{{ vm_name | default(ip_address) }}"
+    path: "{{ inventory_relative_path }}/host_vars/{{ host_name }}"
     regexp: "^ansible_ssh_host"
     line: "ansible_ssh_host: {{ ip_address }}"
   when: "ip_address is defined"
-
-- name: Create Ansible Host var file
-  lineinfile:
-    path: "{{ inventory_relative_path }}/host_vars/{{ vm_name | default(ip_address) }}"
-    regexp: "^new_ssh_port_number"
-    line: "new_ssh_port_number: {{ new_ssh_port_number }}"
-  when: "new_ssh_port_number is defined"
 
 - name: Show inventory file location
   debug:
@@ -40,6 +51,6 @@
 
 - name: Show host file location
   debug:
-    msg: "Hosts file created at : {{ inventory_relative_path }}/host_vars/{{ vm_name | default(ip_address) }}"
+    msg: "Hosts file created at : {{ inventory_relative_path }}/host_vars/{{ host_name }}"
 
 ...

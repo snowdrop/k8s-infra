@@ -1,20 +1,13 @@
 ---
-- name: Define host type
+- name: "Define host variables 1/2"
   set_fact:
     model: "{{ type | default('simple') }}"
-    file_name: "{{ model }}_host"
-  when: filename == ""
+    host_name: "{{ vm_name | default(ip_address) }}"
 
-- name: "Define host type [cloud, hetzner, simple, ["
+- name: "Define host variables 2/2"
   set_fact:
-    model: "{{ type | default('simple') }}"
-    file_name: "{{ filename }}"
-  when: filename != ""
-
-#- name: Create Ansible Host var file
-#  template:
-#    src: "{{ role_path }}/templates/{{ model }}.inventory.j2"
-#    dest: "{{ inventory_relative_path }}/{{ file_name }}"
+    file_name: "{{ filename | default(model + '_hosts') }}"
+    vm_vars: "{{ hostvars[host_name] }}"
 
 - include_tasks: osev3.yml
   when: " type == 'cloud' "

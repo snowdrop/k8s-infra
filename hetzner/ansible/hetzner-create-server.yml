@@ -53,7 +53,7 @@
 
     - role: generate_inventory
       filename: "hetzner_host"
-      ssh_private_key_path: ~/.ssh/id_hetzner_snowdrop
+      ssh_private_key_path: "~/.ssh/id_rsa_hetzner_{{ vm_name }}"
       type: "hetzner"
       username: "{{ my_hostvars.ansible_user }}"
       inventory_relative_path: "../../ansible/inventory/"

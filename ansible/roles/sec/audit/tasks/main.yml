@@ -13,18 +13,17 @@
   register: auditd_install_res
   become: yes
 
-- name: Enable auditd
-  service:
-    name: auditd
-    state: started
-    enabled: yes
-  when: "auditd_install_res.changed"
-  become: yes
-
 - name: Apply auditd configuration
   template:
     src: "../templates/auditd.conf.j2"
     dest: "/etc/audit/auditd.conf"
   become: yes
   notify: Restart auditd
+
+- name: "Enable and restart auditd"
+  service:
+    name: auditd
+    state: restarted
+    enabled: yes
+  become: yes
 ...

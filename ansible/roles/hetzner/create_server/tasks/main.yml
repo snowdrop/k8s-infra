@@ -38,9 +38,9 @@
   changed_when: True
   tags: vm_delete
 
-#    - name: "Hash user password and store it in pass"
-#      set_fact:
-#        user_pw: "{{ lookup('passwordstore', 'snowdrop/hetzner/'+vm_name+'/centos/password create=yes overwrite=yes userpass=' + password_text) }}"
+    - name: "Get user password from pass"
+      set_fact:
+        user_pw: "{{ query('passwordstore', 'snowdrop/hetzner/'+vm_name+'/centos/password create=yes overwrite=yes userpass=' + password_text)[0] }}"
 
 - name: Hash user password
   set_fact:
@@ -61,7 +61,7 @@
     src: templates/user-data.j2
     dest: /tmp/user-data
   vars:
-    ssh_public_key: "{{ hetzner_public_key }}"
+    ssh_public_key: "{{ query('passstore', 'snowdrop/hetzner/' + vm_name + '/id_rsa.pub }}"
 
 - name: Create cloud instance
   shell: "hcloud server create --name {{ vm_name }} --type {{ server_type | default ('cx31') }} --image {{ vm_image | default ('centos-7') }} --ssh-key {{ context_name }} --user-data-from-file /tmp/user-data"

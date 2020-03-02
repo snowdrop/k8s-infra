@@ -1,4 +1,4 @@
 # Release version of Openshift origin to be installed. IT will be used to configure the inventory file from the j2 template
 openshift_origin_version: "3.11.0"
 ssh_private_key_path: ~/.ssh/id_rsa
-inventory_relative_path: ../inventory/
+inventory_relative_path: ../inventory

@@ -1,0 +1,14 @@
+- name: "Generate inventory files on the controller"
+  hosts: localhost
+  gather_facts: no
+  vars_prompt:
+    - name: vm_name
+      prompt: vm name
+      private: no
+      when: " vm_name is not defined "
+  roles:
+    - role: "passstore/ansible_inventory"
+      pass_l1: "{{ pass_db_name | default('snowdrop') }}"
+      pass_l2: "{{ host_provider | default('hetzner') }}"
+      pass_l3: "{{ vm_name }}"
+...
