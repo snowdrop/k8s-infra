@@ -10,6 +10,7 @@
 ###########
 #**/*.retry
 ansible/inventory/*
+!ansible/inventory/template
 #ansible/roles/test
 !ansible/inventory/group_vars
 ansible/inventory/host_vars
