@@ -2,7 +2,7 @@
 # tasks for hetzner/create_server
 - name: Get server public key from pass
   set_fact:
-    hetzner_public_key: "{{ lookup('passwordstore', 'snowdrop/hetzner/id_rsa.pub' ) }}"
+    hetzner_public_key: "{{ lookup('passwordstore', 'hetzner/id_rsa.pub' ) }}"
   when: "override_public_key is not defined"
 
 - name: Get server public key from file
@@ -17,7 +17,7 @@
 
 - name: "Get user password from pass"
   set_fact:
-    user_pw: "{{ query('passwordstore', 'snowdrop/hetzner/'+vm_name+'/os_password')[0] }}"
+    user_pw: "{{ query('passwordstore', 'hetzner/'+vm_name+'/os_password')[0] }}"
 
 - name: Hash user password
   set_fact:
@@ -31,7 +31,7 @@
 - name: Set user home
   set_fact:
     user_home: "{{ user_home_res.stdout }}"
-    ssh_public_key: "{{ query('passwordstore', 'snowdrop/hetzner/' + vm_name + '/id_rsa.pub returnall=true')[0] }}"
+    ssh_public_key: "{{ query('passwordstore', 'hetzner/' + vm_name + '/id_rsa.pub returnall=true')[0] }}"
 
 - name: Template cloudinit file
   template:

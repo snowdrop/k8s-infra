@@ -28,7 +28,7 @@ Clean existing inventory.
 
 ```bash
 $ VM_NAME=h01-k8s-116
-$ pass rm snowdrop/hetzner/${VM_NAME} -rf 
+$ pass rm hetzner/${VM_NAME} -rf 
 $ rm -f ~/.ssh/id_rsa_snowdrop_hetzner_${VM_NAME}* 
 $ rm ansible/inventory/host_vars/${VM_NAME}
 ```

@@ -4,18 +4,19 @@ Role Name
 Obtains the keys for a server in a pass database.
 
 The structure of the database used is the following:
-```
-\ l1: name
-  |
-  \ l2: provider
-    |
-    \ l3: host
-      |
-      \ entry 1
-      |
-      \ entry 2
-```
 
+```
+\ l2: provider
+  |
+  \ l3: host
+    |
+    \ os_user: user to be created at OS level
+    \ os_password: password of the os_user
+    \ os_password: password of the os_user
+    \ ssh_port: custom ssh port to be used in ssh connections
+    \ id_rsa: RSA pivate key in PEM format
+    \ id_rsa.pub: RSA public key in OpenSSH format
+```
 
 Requirements
 ------------
