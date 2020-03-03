@@ -1,4 +1,4 @@
-x---
+---
 - hosts: "{{ openshift_node | default('masters') }}"
   gather_facts: "{{ gathering_host_info | default('true') | bool == true }}"
 
