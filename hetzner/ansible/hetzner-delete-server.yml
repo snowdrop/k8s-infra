@@ -39,10 +39,14 @@
 
     - name: Remove local ssh keys
       shell: "rm -f ~/.ssh/id_rsa_snowdrop_hetzner_{{ vm_name }}*"
+      changed_when: "pass_rm_res.rc == 0"
+      failed_when: "false"
       tags: [always]
 
     - name: Remove host from Ansible Inventory
       shell: "rm ../../ansible/inventory/host_vars/{{ vm_name }}"
+      changed_when: "pass_rm_res.rc == 0"
+      failed_when: "false"
       tags: [always]
 
 #    - name: "Don't forget to remove the passstore entrues for this server"
