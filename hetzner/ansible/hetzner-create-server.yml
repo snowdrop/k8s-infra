@@ -64,8 +64,10 @@
       wait_for_connection:
         timeout: 60
       tags: [always]
-    - name: "TODO: SECURE SERVER"
+
+  post_tasks:
+    - name: "DON'T FORGET TO SECURE YOUR SERVER"
       debug:
-        msg: "The server is created. DON'T FORGET TO SECURE YOUR SERVER"
+        msg: "Start server securization executing step 1: $ ansible-playbook ansible/playbook/sec_host_1.yml --limit=<name of the ansible host>"
       tags: [always]
 ...

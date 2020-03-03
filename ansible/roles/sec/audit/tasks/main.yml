@@ -20,10 +20,10 @@
   become: yes
   notify: Restart auditd
 
-- name: "Enable and restart auditd"
+- name: "Enable and start auditd"
   service:
     name: auditd
-    state: restarted
+    state: started
     enabled: yes
   become: yes
 ...

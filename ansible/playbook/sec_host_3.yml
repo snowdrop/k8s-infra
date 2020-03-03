@@ -1,0 +1,9 @@
+---
+- name:  Apply host security roles 2
+  hosts: masters
+  gather_facts: yes
+  roles:
+    - role: 'sec/update'
+      tags: [always]
+# disable root user
+...

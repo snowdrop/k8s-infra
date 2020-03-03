@@ -19,5 +19,5 @@
   post_tasks:
     - name: Add the ansible_ssh_port variable to the host_var files
       debug:
-        msg: To continue to step 2, add the ansible_ssh_port variable to the host_vars file
+        msg: "To continue to step 2, add the ansible_ssh_port variable to the host_vars file by executing ansible-playbook ansible/playbook/sec_host_2.yml -e vm_name=<name of the ansible host>"
 ...

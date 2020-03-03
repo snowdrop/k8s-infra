@@ -1,9 +1,21 @@
 ---
-- name:  Apply host security roles 2
-  hosts: masters
-  gather_facts: yes
-  roles:
-    - role: 'sec/update'
+- name:  Update the ssh port
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Get vm host vars
+      set_fact:
+        my_hostvars: "{{ hostvars[vm_name] }}"
       tags: [always]
-# disable root user
+    - include_role:
+        name: "generate_inventory"
+        tasks_from: "update-custom-ssh-port"
+      vars:
+        new_ssh_port_number: "{{ my_hostvars.new_ssh_port_number }}"
+        host_name: "{{ vm_name }}"
+      tags: [always]
+  post_tasks:
+    - name: Finish server securitation
+      debug:
+        msg: "Finish server securization executing step 3, $ ansible-playbook ansible/playbook/sec_host_3.yml --limit=<name of the ansible host>"
 ...
