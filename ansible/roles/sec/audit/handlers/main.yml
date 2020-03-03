@@ -1,9 +1,3 @@
 ---
-# handlers for sshd_port
-- name: Restart auditd
-  service:
-    name: auditd
-    state: restarted
-    enabled: yes
-  become: yes
+# handlers for audit
 ...

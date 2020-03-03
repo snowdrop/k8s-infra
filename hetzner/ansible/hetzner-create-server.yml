@@ -56,7 +56,7 @@
       tags: [always]
 
 - name:  Wait for the VM to boot and we can ssh
-  hosts: masters
+  hosts: "{{ vm_name }}"
   gather_facts: no
 
   tasks:
@@ -68,6 +68,6 @@
   post_tasks:
     - name: "DON'T FORGET TO SECURE YOUR SERVER"
       debug:
-        msg: "Start server securization executing step 1: $ ansible-playbook ansible/playbook/sec_host_1.yml --limit=<name of the ansible host>"
+        msg: "Start server securization executing step 1: $ ansible-playbook ansible/playbook/sec_host.yml -e vm_name={{ vm_name }} -e provider=hetzner"
       tags: [always]
 ...

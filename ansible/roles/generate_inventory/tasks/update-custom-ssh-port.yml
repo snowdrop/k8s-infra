@@ -1,5 +1,5 @@
 ---
-- name: Add default ssh port in host var file
+- name: Add ansible_ssh_port entry with custom port
   lineinfile:
     path: "{{ inventory_relative_path }}/host_vars/{{ host_name }}"
     regexp: "^ansible_ssh_port"

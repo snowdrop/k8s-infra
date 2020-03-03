@@ -131,6 +131,20 @@ $ ansible-playbook hetzner/ansible/hetzner-create-server.yml -e vm_name=my-name 
 -e password_text=my-password -e hetzner_context_name=context-name --tag "vm_delete"
 ```
 
+Once this task is finished it's mandatory to launch server securization, see the [Next steps](#next-steps) section.
+
+## Delete a hetzner server
+
+```bash
+$ ansible-playbook hetzner/ansible/hetzner-delete-server.yml -e vm_name=my-name -e hetzner_context_name=snowdrop --tag "vm_delete"
+```
+
+After that, remove the pass entries for the server.
+
+```bash
+$ pass rm hetzner/my-name -rf
+```
+
 # Next steps
 
 Once the server is created it must be secured before installing other software. For that check [this README file](../ansible/playbook/README.md).

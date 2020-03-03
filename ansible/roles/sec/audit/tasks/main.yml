@@ -18,7 +18,6 @@
     src: "../templates/auditd.conf.j2"
     dest: "/etc/audit/auditd.conf"
   become: yes
-  notify: Restart auditd
 
 - name: "Enable and start auditd"
   service:
