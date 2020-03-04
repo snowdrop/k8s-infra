@@ -54,3 +54,29 @@ Extra tags:
 | Tag | Meaning |
 | --- | --- |
 | vm_delete | Deletes the VM prior to creating it. |
+
+
+# k8s
+
+The kubernetes install process required that hosts are added to the corresponding group.
+
+Existing groups:
+
+| Group name | Meaning |
+| --- | --- |
+| k8s_115 | Variables for kubernetes 1.15 |
+| k8s_116 | Variables for kubernetes 1.16 |
+| masters | Variables for kubernetes masters, such as firewall ports to be open |
+| hetzner | Identification of the pass provider name (1st level folder in the pass data structure |
+
+Example for installing a k8s server from scratch using a hetzner host.
+ 
+```bash
+$ VM_NAME=h01-k8s-115 \
+  ; ansible-playbook hetzner/ansible/hetzner-delete-server.yml -e vm_name=${VM_NAME} -e hetzner_context_name=snowdrop --tag "vm_delete" \
+  ; ansible-playbook ansible/playbook/clear_local_inventory_configuration.yml -e vm_name=${VM_NAME} \
+  && ansible-playbook ansible/playbook/passstore_controller_inventory.yml -e vm_name=${VM_NAME} \
+  && ansible-playbook hetzner/ansible/hetzner-create-server.yml -e vm_name=${VM_NAME} -e salt_text=$( gpg --gen-random --armor 1 20) -e hetzner_context_name=snowdrop \
+  ; ansible-playbook ansible/playbook/sec_host.yml -e vm_name=${VM_NAME} -e provider=hetzner \
+  && ansible-playbook ansible/playbook/k8s_installation.yml --limit ${VM_NAME}
+```

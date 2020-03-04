@@ -1,14 +1,45 @@
-- name: "Generate inventory files on the controller"
+---
+# file: clear_local_inventory_configuration.yml
+# Required variables:
+#  . vm_name: Name of the vm
+#  . pass_provider: provider in the passstore project [hetzner]
+- name: Delete local inventory configuration
   hosts: localhost
-  gather_facts: no
+  gather_facts: yes
   vars_prompt:
     - name: vm_name
       prompt: vm name
       private: no
       when: " vm_name is not defined "
-  roles:
-    - role: "passstore/ansible_inventory"
-      pass_l1: "{{ pass_db_name | default('snowdrop') }}"
-      pass_l2: "{{ host_provider | default('hetzner') }}"
-      pass_l3: "{{ vm_name }}"
+    - name: pass_provider
+      prompt: Provider [hetzner,...]
+      private: no
+      when: "pass_provider is not defined "
+
+  tasks:
+    - name: Remove passstore entries
+      shell: "pass rm {{ pass_provider }}/{{ vm_name }} -rf"
+      register: pass_rm_res
+      changed_when: "pass_rm_res.rc == 0"
+      failed_when: "pass_rm_res.rc != 0 and 'is not in the password store' not in pass_rm_res.stderr"
+      tags: [always]
+
+    - name: Remove local ssh keys
+      shell: "rm -f ~/.ssh/id_rsa_snowdrop_{{ pass_provider }}_{{ vm_name }}*"
+      changed_when: "pass_rm_res.rc == 0"
+      failed_when: "false"
+      tags: [always]
+
+    - name: Remove host from Ansible Inventory
+      shell: "rm ../inventory/host_vars/{{ vm_name }}"
+      changed_when: "pass_rm_res.rc == 0"
+      failed_when: "false"
+      tags: [always]
+
+    - name: Remove host from the main inventory
+      lineinfile:
+        path: "../inventory/{{ pass_provider }}_hosts"
+        regexp: "^{{ vm_name }}"
+        state: absent
+      tags: [always]
 ...

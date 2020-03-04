@@ -14,13 +14,15 @@
 
   roles:
     - role: 'k8s_cluster'
-      tags: [k8s_cluster]
+      tags: [always,k8s_cluster]
+    - role: 'k8s_config'
+      tags: [always,k8s_config]
     - role: 'ingress'
-      tags: [ingress]
+      tags: [always,ingress]
     - role: 'cert_manager'
-      tags: [cert_manager]
+      tags: [always,cert_manager]
     - role: 'k8s_dashboard'
-      tags: [k8s_dashboard]
+      tags: [always,k8s_dashboard]
 
 - name: "Install misc kubernetes modules"
   hosts: "k8s-misc"
