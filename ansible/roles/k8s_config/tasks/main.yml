@@ -1,5 +1,22 @@
+---
+- name: Create k8s config folder for os user
+  file:
+    path: ".kube"
+    state: directory
+    mode: '0755'
+
+- name: Copy k8s config file
+  copy:
+    src: "/etc/kubernetes/admin.conf"
+    dest: ".kube/config"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0644'
+    remote_src: yes
+  become: yes
+
 - set_fact:
-    k8s_server: https://{{ public_ip_address }}:6443
+    k8s_server: "https://{{ ansible_ssh_host }}:6443"
     inventory_location: "{{ lookup('env', 'PWD') }}/inventory"
 
 - name: Get secret name
@@ -37,7 +54,8 @@
 - name: Save config
   template:
     src: "k8s-config.yml.j2"
-    dest: "{{ inventory_location }}/{{ k8s_config_filename }}"
+    dest: "/tmp/{{ k8s_config_filename }}"
+#    dest: "{{ inventory_location }}/{{ k8s_config_filename }}"
   delegate_to: localhost
   become: no
 
@@ -46,3 +64,4 @@
     msg:
       - "You can use the following Kubernetes config file to interact with remote cluster via kubectl"
       - "{{ inventory_location }}/{{ k8s_config_filename }}"
+...

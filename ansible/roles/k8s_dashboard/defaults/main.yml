@@ -1,6 +1,6 @@
 k8s_dashboard_namespace: kubernetes-dashboard
 k8s_dashboard_version: v2.0.0-rc1
-k8s_dashboard_ingress_host: "{{ public_ip_address }}.nip.io"
+k8s_dashboard_ingress_host: "{{ ansible_ssh_host }}.nip.io"
 
 k8s_dashboard_token_public: changeme
 k8s_dashboard_token_secret: changeme

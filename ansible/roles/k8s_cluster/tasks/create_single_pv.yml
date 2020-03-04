@@ -18,3 +18,4 @@
 
 - name: Create pv {{ pv_name }}
   command: "kubectl apply -f {{ pv_definition_file }}"
+  become: yes

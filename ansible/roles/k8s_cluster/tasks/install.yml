@@ -1,3 +1,53 @@
+---
+
+- name: Include firewalld handlers
+  include_role:
+    name: "sec/firewalld"
+
+- name: Add masquerade to trusted zone
+  firewalld:
+    masquerade: True | bool
+    zone: "trusted"
+    permanent: yes
+    state: enabled
+  notify: Restart firewalld
+  become: yes
+
+- name: Add source network to trusted sources
+  firewalld:
+    source: "{{ item }}"
+    zone: "trusted"
+    permanent: yes
+    state: enabled
+  loop:
+    - "{{ pod_subnet }}"
+    - "{{ service_subnet }}"
+  notify: Restart firewalld
+  become: yes
+
+- name: Open k8s known ports
+  firewalld:
+    port: "{{ item }}"
+    zone: "public"
+    permanent: yes
+    state: enabled
+  loop: "{{ firewalld_public_ports }}"
+  notify: Restart firewalld
+  become: yes
+
+- name: Open k8s known services
+  firewalld:
+    service: "{{ item }}"
+    zone: "public"
+    permanent: yes
+    state: enabled
+  loop: "{{ firewalld_public_services }}"
+  notify: Restart firewalld
+  become: yes
+
+- name: Flush handlers
+  meta: flush_handlers
+
 - include_tasks: docker.yml
   when: install_docker | bool
 
@@ -49,17 +99,26 @@
   become: yes
 
 - name: Pull k8s linux images for version {{ k8s_version }}
-  command: kubeadm config images pull --kubernetes-version {{ k8s_version }}
+  command: "kubeadm config images pull --kubernetes-version {{ k8s_version }}"
   become: yes
 
 - name: Initialize cluster for k8s - {{ k8s_version }}
-  command: "kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address={{ public_ip_address }} --kubernetes-version {{ k8s_version }}"
+  command: "kubeadm init --pod-network-cidr={{ pod_subnet }} --apiserver-advertise-address={{ ansible_ssh_host }} --kubernetes-version {{ k8s_version }}"
+  register: kubeadm_init_res
+  changed_when: "kubeadm_init_res.rc == 0"
+  failed_when: "kubeadm_init_res.rc != 0  and 'already exists' not in kubeadm_init_res.stderr"
   become: yes
 
-- name: Install Flannel Virtual Network for pod communication
+- name: "Install Flannel Virtual Network for pod communication"
   shell: |
     kubectl -n kube-system get deployment coredns -o yaml | sed 's/allowPrivilegeEscalation: false/allowPrivilegeEscalation: true/g' | kubectl apply -f -
     kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/a70459be0084506e4ec919aa1c114638878db11b/Documentation/kube-flannel.yml
+  become: yes
+  register: flannel_install_res
+
+- name: Debug flannel installation
+  debug:
+    msg: "{{ flannel_install_res }}"
 
 - name: Taint the node
   command: "kubectl taint nodes --all node-role.kubernetes.io/master-"
@@ -82,15 +141,25 @@
     volume_name: "pv{{ item }}"
   with_sequence: start=1 count=5 format=%03d
 
-- name: Create user's k8s config file
-  shell: |
-    mkdir -p $HOME/.kube
-    sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config
-    sudo chown centos:centos -R $HOME/.kube/
-    chmod 644 $HOME/.kube/config
+- name: Create k8s config folder for os user
+  file:
+    path: ".kube"
+    state: directory
+    mode: '0755'
+
+- name: Copy k8s config file
+  copy:
+    src: "/etc/kubernetes/admin.conf"
+    dest: ".kube/config"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0644'
+    remote_src: yes
   become: yes
 
-- name: save_config.yml
+- name: Execute k8s_config role
   include_role:
     name: k8s_config
   when: remote | bool
+
+...
