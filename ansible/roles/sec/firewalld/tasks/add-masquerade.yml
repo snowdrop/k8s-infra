@@ -1,8 +1,8 @@
 ---
 # tasks file for common
-- name: firewalld - Manage firewall sources
+- name: firewalld - Manage masquerade
   firewalld:
-    source: "{{ firewalld_source }}"
+    masquerade: "{{ firewalld_masquerade }}"
     zone: "{{ firewalld_zone }}"
     permanent: yes
     state: enabled

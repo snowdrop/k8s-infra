@@ -18,18 +18,7 @@
 - name: Open new ssh port
   include_role:
     name: "sec/firewalld"
-    tasks_from: "open-ports"
+    tasks_from: "add-port"
   vars:
-    firewall_ports:
-      - "{{ item }}/tcp"
-  loop:
-    - "{{ new_ssh_port_number }}"
-
-#- name: Open the custom ssh port on the firewall
-#  firewalld:
-#    port: "{{ new_ssh_port_number }}/tcp"
-#    permanent: yes
-#    state: enabled
-#  become: yes
-#  notify: Restart firewalld
+    firewall_port: "{{ new_ssh_port_number }}/tcp"
 ...

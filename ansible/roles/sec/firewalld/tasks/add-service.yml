@@ -1,8 +1,9 @@
 ---
 # tasks file for common
-- name: firewalld - Manage firewall ports
+- name: firewalld - Manage firewall services
   firewalld:
-    port: "{{ firewall_port }}"
+    service: "{{ firewalld_service }}"
+    zone: "{{ firewalld_zone | default('public') }}"
     permanent: yes
     state: enabled
   become: yes

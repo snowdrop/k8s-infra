@@ -1,11 +1,11 @@
 ---
 # tasks file for common
-- name: firewalld - Manage firewall ports
+- name: firewalld - Manage firewall sources
   firewalld:
-    port: "{{item}}"
+    source: "{{ firewalld_source }}"
+    zone: "{{ firewalld_zone }}"
     permanent: yes
     state: enabled
-  loop: "{{ firewall_ports }}"
   become: yes
   notify: Restart firewalld
 ...
