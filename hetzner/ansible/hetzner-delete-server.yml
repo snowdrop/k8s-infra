@@ -1,16 +1,11 @@
 ---
-# file: hetzner-create-hcloud-server.yml
-# Optional variables:
-#  . vm_delete: Deletes the virtual machine prior to creating it.
-#  . pass_store_dir: Directory containing the password store.
-#  . server_type:
-#  . vm_image:
+# file: hetzner-delete-server.yml
 - name: Delete hetzner server
   hosts: localhost
   gather_facts: yes
   vars_prompt:
     - name: vm_name
-      prompt: vm name
+      prompt: Name of the VM being removed [vm_name]
       private: no
       when: " vm_name is not defined "
 
@@ -28,30 +23,4 @@
     - role: hetzner/delete_server
       vm_name: "{{ vm_name }}"
       tags: [never,vm_delete]
-
-  post_tasks:
-    - name: Remove passstore entries
-      shell: "pass rm hetzner/{{ vm_name }} -rf"
-      register: pass_rm_res
-      changed_when: "pass_rm_res.rc == 0"
-      failed_when: "pass_rm_res.rc != 0 and 'is not in the password store' not in pass_rm_res.stderr"
-      tags: [always]
-
-    - name: Remove local ssh keys
-      shell: "rm -f ~/.ssh/id_rsa_snowdrop_hetzner_{{ vm_name }}*"
-      changed_when: "pass_rm_res.rc == 0"
-      failed_when: "false"
-      tags: [always]
-
-    - name: Remove host from Ansible Inventory
-      shell: "rm ../../ansible/inventory/host_vars/{{ vm_name }}"
-      changed_when: "pass_rm_res.rc == 0"
-      failed_when: "false"
-      tags: [always]
-
-#    - name: "Don't forget to remove the passstore entrues for this server"
-#      debug:
-#        msg: "$ pass rm hetzner/{{ vm_name }} -rf"
-#      tags: [always]
-
 ...
