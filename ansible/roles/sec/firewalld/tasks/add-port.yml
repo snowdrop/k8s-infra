@@ -1,0 +1,10 @@
+---
+# tasks file for common
+- name: firewalld - Manage firewall ports
+  firewalld:
+    port: "{{ firewall_port }}"
+    permanent: yes
+    state: enabled
+  become: yes
+  notify: Restart firewalld
+...
