@@ -74,7 +74,7 @@ Example for installing a k8s server from scratch using a hetzner host.
 ```bash
 $ VM_NAME=h01-k8s-115 \
   ; ansible-playbook hetzner/ansible/hetzner-delete-server.yml -e vm_name=${VM_NAME} -e hetzner_context_name=snowdrop --tag "vm_delete" \
-  ; ansible-playbook ansible/playbook/clear_local_inventory_configuration.yml -e vm_name=${VM_NAME} \
+  ; ansible-playbook ansible/playbook/clear_local_inventory_configuration.yml -e vm_name=${VM_NAME} -e pass_provider=hetzner \
   && ansible-playbook ansible/playbook/passstore_controller_inventory.yml -e vm_name=${VM_NAME} \
   && ansible-playbook hetzner/ansible/hetzner-create-server.yml -e vm_name=${VM_NAME} -e salt_text=$( gpg --gen-random --armor 1 20) -e hetzner_context_name=snowdrop \
   ; ansible-playbook ansible/playbook/sec_host.yml -e vm_name=${VM_NAME} -e provider=hetzner \
