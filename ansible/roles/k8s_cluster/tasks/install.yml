@@ -112,13 +112,7 @@
 - name: "Install Flannel Virtual Network for pod communication"
   shell: |
     kubectl -n kube-system get deployment coredns -o yaml | sed 's/allowPrivilegeEscalation: false/allowPrivilegeEscalation: true/g' | kubectl apply -f -
-    kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/a70459be0084506e4ec919aa1c114638878db11b/Documentation/kube-flannel.yml
-  become: yes
-  register: flannel_install_res
-
-- name: Debug flannel installation
-  debug:
-    msg: "{{ flannel_install_res }}"
+    kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/{{ coreos_flannel_sha_commit }}/Documentation/kube-flannel.yml
 
 - name: Taint the node
   command: "kubectl taint nodes --all node-role.kubernetes.io/master-"
