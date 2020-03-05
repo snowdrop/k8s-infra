@@ -1,6 +1,17 @@
+---
+- name: Generate k8s dasbboard tokens
+  set_fact:
+    k8s_dashboard_token_public: "{{ query('passwordstore', pass_provider + '/' + ansible_hostname + '/k8s_dashboard_token_public create=yes length=6 nosymbols=true')[0] | lower }}"
+    k8s_dashboard_token_secret: "{{ query('passwordstore', pass_provider + '/' + ansible_hostname + '/k8s_dashboard_token_secret create=yes length=16 nosymbols=true' )[0] | lower }}"
+
+- name: Update k8s dasbboard tokens
+  set_fact:
+    k8s_dashboard_token_public: "{{ query('passwordstore', pass_provider + '/' + ansible_hostname + '/k8s_dashboard_token_public overwrite=yes length=6 nosymbols=true userpass=' + k8s_dashboard_token_public )[0] | lower }}"
+    k8s_dashboard_token_secret: "{{ query('passwordstore', pass_provider + '/' + ansible_hostname + '/k8s_dashboard_token_secret overwrite=yes length=16 nosymbols=true userpass=' + k8s_dashboard_token_secret )[0] | lower }}"
+
 - name: Install Dashboard Version - {{ k8s_dashboard_version }}
   shell: |
-    kubectl --kubeconfig=$HOME/.kube/config \
+    kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config \
       apply -f \
       https://raw.githubusercontent.com/kubernetes/dashboard/{{ k8s_dashboard_version }}/aio/deploy/recommended.yaml
 
@@ -11,12 +22,12 @@
   with_fileglob:
     - "../templates/*.j2"
 
-- name: Create the Service Account, ClusterRoleBinding for the K8s Dashboard admin-user like also the Ingress route
+- name: "Create the Service Account, ClusterRoleBinding for the K8s Dashboard admin-user like also the Ingress route"
   shell: |
-    kubectl --kubeconfig=$HOME/.kube/config apply -f /tmp/rbac.yml
-    kubectl --kubeconfig=$HOME/.kube/config apply -f /tmp/ingress-dashboard.yml
-    kubectl --kubeconfig=$HOME/.kube/config apply -f /tmp/letsencrypt-http01-issuer.yml
-    kubectl --kubeconfig=$HOME/.kube/config --validate=false apply -f /tmp/certificate.yml
+    kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config apply -f /tmp/rbac.yml
+    kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config apply -f /tmp/ingress-dashboard.yml
+    kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config apply -f /tmp/letsencrypt-http01-issuer.yml
+    kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config --validate=false apply -f /tmp/certificate.yml
 
 - name: Print kubernetes dashboard URL & Token
   debug:
@@ -26,3 +37,4 @@
       - ""
       - "Using the Boot Token: "
       - "{{ k8s_dashboard_token_public }}.{{ k8s_dashboard_token_secret }}"
+...

@@ -17,9 +17,10 @@ yum_repos:
 
 packages:
   - git
+  - lsof
 
 users:
-  - name: centos
+  - name: {{ os_user }}
     gecos: Centos User
     passwd: {{ hashed_user_pw }}
     lock-passwd: false

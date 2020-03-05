@@ -1,0 +1,11 @@
+---
+# tasks file for common
+- name: firewalld - Manage firewall services
+  firewalld:
+    service: "{{ firewalld_service }}"
+    zone: "{{ firewalld_zone | default('public') }}"
+    permanent: yes
+    state: enabled
+  become: yes
+  notify: Restart firewalld
+...

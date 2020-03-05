@@ -1,0 +1,7 @@
+---
+# tasks for hetzner/stop_server
+- name: Stop server
+  command: "hcloud server shutdown {{ vm_name }}"
+  register: hetzner_server_shutdown_res
+  changed_when: "hetzner_server_shutdown_res.rc == 0"
+...

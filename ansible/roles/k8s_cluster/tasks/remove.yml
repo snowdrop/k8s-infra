@@ -1,5 +1,6 @@
 - name: Reset kubeadm
   command: kubeadm reset -f
+  become: yes
 
 - name: Remove Kubernetes packages - kubeadm, kubelet, kubectl
   yum:
@@ -11,3 +12,4 @@
       - kubeadm-{{k8s_version}}
       - kubectl-{{k8s_version}}
       - kubelet-{{k8s_version}}
+  become: yes

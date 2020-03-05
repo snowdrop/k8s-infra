@@ -1,0 +1,33 @@
+---
+# Tasks for get_provider_host_keys
+- name: "Get passwordstore work folder"
+  set_fact:
+    my_passwordstore_folder: "{{ password_store_dir }}"
+  when: "password_store_dir is defined and password_store_dir | length > 0"
+
+- name: "Get passwordstore work folder"
+  set_fact:
+    my_passwordstore_folder: "{{ lookup('env', 'PASSWORD_STORE_DIR') | default('~/.password-store') }}"
+  when: "password_store_dir is not defined or password_store_dir | length <= 0"
+
+- name: "Set the pass URL"
+  set_fact:
+    pass_l3_route: "{{  pass_l2 + '/' + pass_l3  }}"
+    pass_l3_name: "{{ pass_l1 + '_' + pass_l2 + '_' + pass_l3  }}"
+
+- name: "Generate pass structure if it doesn't exist"
+  include_tasks: "generate_pass_structure.yml"
+  vars:
+    username: "{{ vm_user | default('snowdrop') }}"
+    custom_ssh_port_number: "{{ vm_custom_ssh_port | default('47286') }}"
+
+- name: Call generate_inventory role
+  include_role:
+    name: generate_inventory
+  vars:
+    type: "{{ pass_l2 }}"
+    vm_name: "{{ pass_l3 }}"
+    os_user: "{{ pass_os_user }}"
+    new_ssh_port_number: "{{ pass_ssh_port }}"
+#    override_ssh_private_key_file: "~/.ssh/id_rsa_{{ pass_l3_name }}"
+...

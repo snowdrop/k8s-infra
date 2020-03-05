@@ -1,25 +1,24 @@
-- set_fact:
+---
+- name: "Define host variables 1/2"
+  set_fact:
     model: "{{ type | default('simple') }}"
-    file_name: "{{ model }}_host"
-  when: filename == ""
+    host_name: "{{ vm_name | default(ip_address) }}"
 
-- set_fact:
-    model: "{{ type | default('simple') }}"
-    file_name: "{{ filename }}"
-  when: filename != ""
+- name: "Define host variables 2/2"
+  set_fact:
+    file_name: "{{ filename | default(model + '_hosts') }}"
+    vm_vars: "{{ hostvars[host_name] }}"
 
-- name: Create Ansible Host file
-  template:
-    src: "{{ role_path }}/templates/{{ model }}.inventory.j2"
-    dest: ../inventory/{{ file_name }}
+- include_tasks: osev3.yml
+  when: " type == 'cloud' "
+
+- include_tasks: simple.yml
+  when: " type == 'simple' "
+
+- include_tasks: hetzner.yml
+  when: " type == 'hetzner' "
 
 - name: Refresh the inventory so the newly added host is available
   meta: refresh_inventory
 
-- name:
-  shell: 'echo "$( cd "$( dirname {{ playbook_dir }}/../inventory/{{ file_name }} )" && pwd )"'
-  register: inventory_dir_out
-
-- name: Show inventory file location
-  debug:
-    msg: "Inventory file created at : {{ inventory_dir_out.stdout }}/{{ file_name }}"
+...

@@ -1,0 +1,58 @@
+---
+- name: Create Hetzner Ansible Host file, group
+  lineinfile:
+    path: "{{ inventory_relative_path }}/{{ file_name }}"
+    regexp: "^[[]hetzner]"
+    line: "[hetzner]"
+    create: yes
+
+- name: Create Hetzner Ansible Host file, host
+  lineinfile:
+    path: "{{ inventory_relative_path }}/{{ file_name }}"
+    insertafter: "[hetzner]"
+    regexp: "^{{ host_name }}"
+    line: "{{ host_name }}"
+
+- name: Set Custom ssh port in host var file
+  lineinfile:
+    path: "{{ inventory_relative_path }}/host_vars/{{ host_name }}"
+    regexp: "^new_ssh_port_number"
+    line: "new_ssh_port_number: {{ new_ssh_port_number | default('47286') }}"
+    create: yes
+
+- name: Set Ansible user in host vars file
+  lineinfile:
+    path: "{{ inventory_relative_path }}/host_vars/{{ host_name }}"
+    regexp: "^ansible_user"
+    line: "ansible_user: {{ os_user }}"
+  when: "os_user is defined"
+#  when: "(vm_vars is defined and vm_vars.ansible_user is defined and os_user is defined) or vm_vars is not defined or vm_vars.ansible_user is not defined or os_user is defined"
+
+- name: Set ansible_ssh_private_key_file
+  lineinfile:
+    path: "{{ inventory_relative_path }}/host_vars/{{ host_name }}"
+    regexp: "^ansible_ssh_private_key_file"
+    line: "ansible_ssh_private_key_file: {{ override_ssh_private_key_file | default('~/.ssh/id_rsa_snowdrop_hetzner_'+ vm_name) }}"
+#  when: "vm_vars is not defined or vm_vars.ansible_ssh_private_key_file is not defined or override_ssh_private_key_file is defined"
+
+- name: Create Ansible Host var file
+  lineinfile:
+    path: "{{ inventory_relative_path }}/host_vars/{{ host_name }}"
+    regexp: "^ansible_ssh_host"
+    line: "ansible_ssh_host: {{ ip_address }}"
+  when: "ip_address is defined"
+
+- name: "Set pass ip_address"
+  set_fact:
+    pass_ip_address: "{{ query('passwordstore', pass_provider + '/' + host_name + '/ip_address create=True userpass=' + ip_address)[0] }}"
+  when: "ip_address is defined"
+
+- name: Show inventory file location
+  debug:
+    msg: "Inventory file created at : {{ inventory_relative_path }}/{{ file_name }}"
+
+- name: Show host file location
+  debug:
+    msg: "Hosts file created at : {{ inventory_relative_path }}/host_vars/{{ host_name }}"
+
+...

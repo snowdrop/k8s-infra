@@ -1,0 +1,14 @@
+---
+- name: Create Ansible Host var file for cloud
+  template:
+    src: "{{ role_path }}/templates/{{ model }}.inventory.j2"
+    dest: "{{ inventory_relative_path }}/{{ file_name }}"
+
+- name:
+  shell: 'echo "$( cd "$( dirname {{ playbook_dir }}/../inventory/{{ file_name }} )" && pwd )"'
+  register: inventory_dir_out
+
+- name: Show inventory file location
+  debug:
+    msg: "Inventory file created at : {{ inventory_dir_out.stdout }}/{{ file_name }}"
+...

@@ -4,11 +4,13 @@
     state: absent
     # THIS OPTION OLY WORKS WITH ANSIBLE 2.8
     # lock_timeout: 1000
+  become: yes
 
 - name: Install dependencies needed by docker
   yum:
     name: yum-utils,device-mapper-persistent-data,lvm2
     state: present
+  become: yes
 
 - name: Add docker repository
   yum_repository:
@@ -18,22 +20,27 @@
     enabled: 1
     gpgcheck: 1
     gpgkey: https://download.docker.com/linux/centos/gpg
+  become: yes
 
 - name: Install docker
   yum:
     name: docker-ce-18.06.2.ce
     state: present
+  become: yes
 
 - name: Ensures /etc/docker dir exists
   file: path=/etc/docker state=directory
+  become: yes
 
 - name: Copy docker daemon.json file
   template:
     src: "daemon.json.j2"
     dest: /etc/docker/daemon.json
+  become: yes
 
 - name: Start docker
   systemd:
     state: restarted
     name: docker
     enabled: yes
+  become: yes

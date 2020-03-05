@@ -1,0 +1,24 @@
+---
+# Change the ssh port
+- name: Ignore ICMP packets (ping requests)
+  sysctl:
+    name: net.ipv4.icmp_echo_ignore_all
+    value: '1'
+    state: present
+  become: yes
+
+- name: This "sanity checking" helps against spoofing attack.
+  sysctl:
+    name: net.ipv4.conf.all.rp_filter
+    value: '1'
+    state: present
+  become: yes
+
+- name: Syn Flood protection
+  sysctl:
+    name: net.ipv4.tcp_syncookies
+    value: '1'
+    state: present
+  become: yes
+
+...

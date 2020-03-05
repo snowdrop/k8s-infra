@@ -1,0 +1,8 @@
+---
+# handlers for sshd_port
+- name: Restart sshd
+  service:
+    name: sshd
+    state: restarted
+  become: yes
+...

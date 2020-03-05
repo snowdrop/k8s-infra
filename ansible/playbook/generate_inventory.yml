@@ -1,5 +1,14 @@
-- hosts: localhost
+- name: "Generate inventory files on the controller"
+  hosts: localhost
   gather_facts: False
-
+  vars_prompt:
+    - name: vm_name
+      prompt: vm name
+      private: no
+      when: " vm_name is not defined "
+    - name: type
+      prompt: Host type [cloud,hetzner,simple]
+      private: no
+      when: " type is not defined "
   roles:
     - { role: generate_inventory }

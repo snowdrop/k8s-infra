@@ -1,0 +1,17 @@
+---
+# file: hetzner-stop-server.yml
+# Optional variables:
+#  . vm_image:
+- name:  Stop hetzner server
+  hosts: localhost
+  gather_facts: no
+  vars_prompt:
+    - name: vm_name
+      prompt: vm name
+      private: no
+      when: " vm_name is not defined "
+
+  roles:
+    - role: hetzner/stop_server
+      vm_name: "{{ vm_name }}"
+...

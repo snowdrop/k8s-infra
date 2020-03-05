@@ -1,0 +1,28 @@
+---
+- name: Include var
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ansible_distribution}}-{{ansible_distribution_major_version}}.yml"
+    - "{{ ansible_distribution }}.yml"
+    - "{{ ansible_os_family }}.yml"
+
+- name: Install audit required packages
+  package:
+    name: "{{ required_packages }}"
+    state: present
+  register: auditd_install_res
+  become: yes
+
+- name: Apply auditd configuration
+  template:
+    src: "../templates/auditd.conf.j2"
+    dest: "/etc/audit/auditd.conf"
+  become: yes
+
+- name: "Enable and start auditd"
+  service:
+    name: auditd
+    state: started
+    enabled: yes
+  become: yes
+...

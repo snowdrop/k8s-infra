@@ -6,7 +6,7 @@ parameters:
 - displayName: Master Public URL
   description: The public URL for master
   name: OPENSHIFT_ISTIO_MASTER_PUBLIC_URL
-  value: https://{{ public_ip_address }}:8443
+  value: https://{{ ansible_ssh_host }}:8443
 - displayName: OpenShift Release
   description: The version of the OpenShift release.
   name: OPENSHIFT_RELEASE
