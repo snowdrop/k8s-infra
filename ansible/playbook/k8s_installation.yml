@@ -8,9 +8,7 @@
 
   # Define default values for variables that are common between roles
   vars:
-    openshift_admin_user: admin
-    openshift_admin_pwd: ''
-    client_tool: oc
+    client_tool: kubectl
 
   roles:
     - role: 'k8s_cluster'
