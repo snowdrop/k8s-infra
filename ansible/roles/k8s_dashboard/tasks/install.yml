@@ -11,7 +11,7 @@
 
 - name: Install Dashboard Version - {{ k8s_dashboard_version }}
   shell: |
-    kubectl --kubeconfig=$HOME/.kube/config \
+    kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config \
       apply -f \
       https://raw.githubusercontent.com/kubernetes/dashboard/{{ k8s_dashboard_version }}/aio/deploy/recommended.yaml
 
@@ -24,10 +24,10 @@
 
 - name: "Create the Service Account, ClusterRoleBinding for the K8s Dashboard admin-user like also the Ingress route"
   shell: |
-    kubectl --kubeconfig=$HOME/.kube/config apply -f /tmp/rbac.yml
-    kubectl --kubeconfig=$HOME/.kube/config apply -f /tmp/ingress-dashboard.yml
-    kubectl --kubeconfig=$HOME/.kube/config apply -f /tmp/letsencrypt-http01-issuer.yml
-    kubectl --kubeconfig=$HOME/.kube/config --validate=false apply -f /tmp/certificate.yml
+    kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config apply -f /tmp/rbac.yml
+    kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config apply -f /tmp/ingress-dashboard.yml
+    kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config apply -f /tmp/letsencrypt-http01-issuer.yml
+    kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config --validate=false apply -f /tmp/certificate.yml
 
 - name: Print kubernetes dashboard URL & Token
   debug:

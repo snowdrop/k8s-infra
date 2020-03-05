@@ -20,7 +20,7 @@
 
 - name: Install Ingress
   shell: |
-    kubectl --kubeconfig=$HOME/.kube/config apply -f /tmp/ingress-configmap.yml
-    kubectl --kubeconfig=$HOME/.kube/config apply -f /tmp/ingress-rbac.yml
-    kubectl --kubeconfig=$HOME/.kube/config apply -f /tmp/ingress-svc.yml
-    kubectl --kubeconfig=$HOME/.kube/config apply -f /tmp/ingress-dp.yml
+    kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config apply -f /tmp/ingress-configmap.yml
+    kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config apply -f /tmp/ingress-rbac.yml
+    kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config apply -f /tmp/ingress-svc.yml
+    kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config apply -f /tmp/ingress-dp.yml
