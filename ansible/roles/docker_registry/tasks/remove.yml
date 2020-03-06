@@ -1,6 +1,6 @@
 - name: Uninstall Docker Registry
   shell: |
-    {{ client_tool }} delete ReplicationController/{{ registry.service_name}} -n {{ registry.namespace }}
-    {{ client_tool }} delete pvc/{{ registry.service_name}}-pvc               -n {{ registry.namespace }}
-    {{ client_tool }} delete svc/{{ registry.service_name}}                   -n {{ registry.namespace }}
+    {{ client_tool }} --kubeconfig={{ ansible_user_dir }}/.kube/config delete ReplicationController/{{ registry.service_name}} -n {{ registry.namespace }}
+    {{ client_tool }} --kubeconfig={{ ansible_user_dir }}/.kube/config delete pvc/{{ registry.service_name}}-pvc               -n {{ registry.namespace }}
+    {{ client_tool }} --kubeconfig={{ ansible_user_dir }}/.kube/config delete svc/{{ registry.service_name}}                   -n {{ registry.namespace }}
   ignore_errors: true

@@ -3,7 +3,7 @@
     name: cfssl_tool
 
 - name: Get Kube Registry Service ClusterIP
-  command: kubectl get service/kube-registry -n kube-system -o jsonpath='{.spec.clusterIP}'
+  command: {{ client_tool }} --kubeconfig={{ ansible_user_dir }}/.kube/config get service/kube-registry -n kube-system -o jsonpath='{.spec.clusterIP}'
   register: registry_ip_address
 
 - name: Set fact
@@ -11,7 +11,7 @@
     registry_ip: registry_ip_address.stdout
 
 - name: Delete any previous CSR send to k8s
-  command: kubectl delete csr {{ registry.service_name}}.{{ registry.namespace }}
+  command: {{ client_tool }} --kubeconfig={{ ansible_user_dir }}/.kube/config delete csr {{ registry.service_name}}.{{ registry.namespace }}
   ignore_errors: true
 
 - name: Copy cfssljson file with the Hosts names and IP addresses to be certified
@@ -51,14 +51,14 @@
 
 - name: Create a CertificateSigningRequest on the k8s cluster
   shell: |
-    kubectl apply -f /tmp/csr.yml
+    {{ client_tool }} --kubeconfig={{ ansible_user_dir }}/.kube/config apply -f /tmp/csr.yml
 
 - name: Approve the CSR request
-  command:  kubectl certificate approve {{ registry.service_name}}.{{ registry.namespace }}
+  command: {{ client_tool }} --kubeconfig={{ ansible_user_dir }}/.kube/config certificate approve {{ registry.service_name}}.{{ registry.namespace }}
 
 - name: Get the server certificate
   shell: |
-    kubectl get csr {{ registry.service_name}}.{{ registry.namespace }} -o jsonpath='{.status.certificate}' | base64 --decode > server.crt
+    {{ client_tool }} --kubeconfig={{ ansible_user_dir }}/.kube/config get csr {{ registry.service_name}}.{{ registry.namespace }} -o jsonpath='{.status.certificate}' | base64 --decode > server.crt
 
 - name: Append the CA Certificate to the Server crt"
   shell: |

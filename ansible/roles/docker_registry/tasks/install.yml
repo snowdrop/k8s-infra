@@ -10,11 +10,11 @@
 
 - name: Install PVC
   shell: |
-    kubectl apply -f /tmp/pvc.yml -n {{ registry.namespace }}
+    {{ client_tool }} apply -f /tmp/pvc.yml -n {{ registry.namespace }}
 
 - name: Install Service
   shell: |
-    kubectl apply -f /tmp/service.yml -n {{ registry.namespace }}
+    {{ client_tool }} --kubeconfig={{ ansible_user_dir }}/.kube/config apply -f /tmp/service.yml -n {{ registry.namespace }}
 
 - name: Generate Server crt
   import_tasks: generate_server_crt.yml
@@ -26,5 +26,5 @@
 
 - name: Install Replication Controller
   shell: |
-    kubectl apply -f /tmp/replication-controller.yml -n {{ registry.namespace }}
+    {{ client_tool }} --kubeconfig={{ ansible_user_dir }}/.kube/config apply -f /tmp/replication-controller.yml -n {{ registry.namespace }}
 
