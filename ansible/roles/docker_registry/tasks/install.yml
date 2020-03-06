@@ -10,7 +10,7 @@
 
 - name: Install PVC
   shell: |
-    {{ client_tool }} apply -f /tmp/pvc.yml -n {{ registry.namespace }}
+    {{ client_tool }} --kubeconfig={{ ansible_user_dir }}/.kube/config apply -f /tmp/pvc.yml -n {{ registry.namespace }}
 
 - name: Install Service
   shell: |
