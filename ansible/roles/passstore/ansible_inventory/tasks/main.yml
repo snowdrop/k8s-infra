@@ -20,6 +20,14 @@
   vars:
     username: "{{ vm_user | default('snowdrop') }}"
     custom_ssh_port_number: "{{ vm_custom_ssh_port | default('47286') }}"
+  when: "operation is defined and operation == 'create'"
+
+- name: "Adds to the controller the required information"
+  include_tasks: "init_controller.yml"
+  vars:
+    username: "{{ vm_user | default('snowdrop') }}"
+    custom_ssh_port_number: "{{ vm_custom_ssh_port | default('47286') }}"
+  when: "operation is defined and operation == 'init'"
 
 - name: Call generate_inventory role
   include_role:
@@ -30,4 +38,5 @@
     os_user: "{{ pass_os_user }}"
     new_ssh_port_number: "{{ pass_ssh_port }}"
 #    override_ssh_private_key_file: "~/.ssh/id_rsa_{{ pass_l3_name }}"
+  when: "operation is defined and operation == 'create'"
 ...

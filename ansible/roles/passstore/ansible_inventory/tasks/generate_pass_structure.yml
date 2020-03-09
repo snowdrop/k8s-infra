@@ -4,8 +4,10 @@
 
 - name: "Set pass facts (user, ssh_port)"
   set_fact:
+    # ansible_user
     pass_os_user: "{{ query('passwordstore', pass_l3_route + '/os_user create=True userpass=' + username)[0] }}"
     pass_os_password: "{{ query('passwordstore', pass_l3_route + '/os_password create=True ' + pass_os_password_tmp )[0] }}"
+    # new_ssh_port_number, ansible_ssh_port
     pass_ssh_port: "{{ query('passwordstore', pass_l3_route + '/ssh_port create=True userpass=' + custom_ssh_port_number)[0] }}"
     pass_rsa_private_key: "{{ query('passwordstore', pass_l3_route + '/id_rsa returnall=true', errors='ignore')[0] | default('') }}"
     pass_rsa_public_key: "{{ query('passwordstore', pass_l3_route + '/id_rsa.pub returnall=true', errors='ignore')[0] | default('') }}"
