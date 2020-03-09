@@ -1,5 +1,29 @@
 #! /usr/bin/python
 
+# -*- coding:utf-8 -*-
+# This module reads information from a passwordstore database and turns it into an ansible dynamic inventory.
+
+"""
+This module reads information from a passwordstore database and turns it into an ansible dynamic inventory.
+
+It gathers information on the passwordstore directory, from the `PASSWORD_STORE_DIR` environment variable.
+
+It assumes that the passwordstore database us organized into the following layers
+
++ --- providers_1 (hetzner)
+|      + --- host_1
+|      |     + variable_1
+|      |     + variable_2
+|      |     + variable_3
+|      |
+|      + --- host_1
+|            |
+|            + variable_1
+|            + variable_2
+|            + variable_3
++ --- providers_2 (openstak)
+
+"""
 from os import walk, listdir, environ
 from subprocess import Popen, PIPE
 import sys
@@ -14,48 +38,33 @@ result['_meta']['hostvars'] = {}
 # ansible_connection = 'passwordstore'
 password_store_dir = environ.get('PASSWORD_STORE_DIR')
 
-# print("password_store_dir: " + password_store_dir)
-
 f = []
 
-# def a(dirpath, arrdirnames, filenames): walk('/home/ajc102/dev/client/redhat-snowdrop/passstore/snowdrop')
-
-# print (a)
-
+# Navigate through the passwordstore folder
 for (dirpath, dirnames, filenames) in walk(password_store_dir):
-#  for dirnames in listdir(password_store_dir):
-# for dirnames in next(walk(password_store_dir))[1]:
-    # print("dirpath: "+dirpath)
-    # print(dirnames)
     for (dirname) in dirnames:
-        # print("dirname: "+dirname)
+        # Filter the folders that might contain hosts.
         if (dirname in ['hetzner','openstack']):
-            # print(dirname + " it's an inventory folder!!! Lets dig in " + password_store_dir + '/' + dirname)
             result[dirname] = {}
             result[dirname]['hosts'] = []
+            # list all folders inside a provider
             for (provDirPath, provDirNames, provFileNames) in walk(password_store_dir + '/' + dirname):
-                # print("provDirPath: "+provDirPath)
-                # print(provDirNames)
                 for (provDirName) in provDirNames:
-                    # print("provDirName: "+provDirName)
+                    # Filter out subfolders that don't contain hosts
                     if (provDirName not in ['openshift-accounts', 'console']):
                         result[dirname]['hosts'].append(provDirName)
-                        # print("its a host!!!")
+                        # Get all hosts for that provider.
                         for (hostDirPath, hostDirNames, hostFileNames) in walk(password_store_dir + '/' + dirname + '/' + provDirName):
-                            # result[dirname]['hosts'][provDirName] = {}
-                            # result[dirname]['hosts'][provDirName]['hosts'] = []
+                            # Init host_vars variable with the location of the SSH RSA Private Key
                             host_vars = {'ansible_ssh_private_key_file':'~/.ssh/id_rsa_snowdrop_' + dirname + '_' + provDirName}
-                            # print(hostFileNames)
                             for (hostFileName) in hostFileNames:
                                 passEntryName = hostFileName.split('.')[0]
+                                # Esclude some entries that won't be included in the inventory
                                 if ('id_rsa' not in passEntryName and 'os_password' not in passEntryName):
                                     passEntry = dirname +'/' + provDirName + '/' + passEntryName
-                                    # print(hostFileName)
-                                    # print('passEntry: ' + passEntry)
                                     pipe = Popen(['pass', 'show', passEntry], stdout=PIPE, universal_newlines=True)
                                     passLines = pipe.stdout.readlines()
                                     passEntry = passLines[0].replace('\n', '')
-                                    # print(passLines[0])
                                     if ('os_user' == passEntryName):
                                         host_vars.update({'ansible_user':passEntry})
                                     elif ('ip_address' == passEntryName):
@@ -64,21 +73,9 @@ for (dirpath, dirnames, filenames) in walk(password_store_dir):
                                         host_vars.update({'ansible_ssh_port':passEntry})
                                     else:
                                         host_vars.update({passEntryName:passEntry})
-
                         result['_meta']['hostvars'].update({provDirName:host_vars})
                 break
-
-    # f.extend(filenames)
-    # print('dirpath' + dirpath)
-    # print(dirnames)
-    # print(filenames)
     break
-
-# pipe = Popen(['zoneadm', 'list', '-ip'], stdout=PIPE, universal_newlines=True)
-
-# result['all']['vars']['ansible_connection'] = ansible_connection
-
-# print(result)
 
 if len(sys.argv) == 2 and sys.argv[1] == '--list':
     print(json.dumps(result))
