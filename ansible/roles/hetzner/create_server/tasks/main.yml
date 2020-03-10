@@ -12,8 +12,9 @@
 
 - name: "Create cloud server key"
   shell: "hcloud ssh-key create --name {{ context_name }} --public-key \"{{ hetzner_public_key }}\""
-  changed_when: True
-  tags: vm_delete
+  register: hcloud_ssh_key_res
+  changed_when: "hcloud_ssh_key_res.rc == 0"
+  failed_when: "hcloud_ssh_key_res.rc != 0"
 
 - name: "Get user password from pass"
   set_fact:

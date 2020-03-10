@@ -126,9 +126,9 @@ Tags:
 Each of the Ansible prompts can be replaced by defining it's value as an extra variable of the playbook.
 
 ```bash
-$ ansible-playbook hetzner/ansible/hetzner-create-server.yml -e vm_name=my-name \
+$ ansible-playbook hetzner/ansible/hetzner-create-server.yml -e vm_name=${VM_NAME} \
 -e salt_text=$(head -c 500 /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 20 | head -n 1) \
--e password_text=my-password -e hetzner_context_name=context-name
+-e hetzner_context_name=snowdrop
 ```
 
 Once this task is finished it's mandatory to launch server securization, see the [Next steps](#next-steps) section.

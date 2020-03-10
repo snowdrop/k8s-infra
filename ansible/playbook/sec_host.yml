@@ -2,20 +2,48 @@
 - name:  Apply host security roles
   hosts: "{{ vm_name }}"
   gather_facts: yes
-  roles:
-    - role: 'sec/firewalld'
-      tags: [always]
-    - role: 'sec/sysctl'
-      tags: [always]
-    - role: 'sec/motd'
-      tags: [always]
-    - role: 'sec/journalctl'
-      tags: [always]
-    - role: 'sec/audit'
-      tags: [always]
-    - role: 'sec/sshd_port'
-      tags: [always]
-      when: "new_ssh_port_number is defined and (new_ssh_port_number != ansible_ssh_host)"
+#  roles:
+#    - role: 'sec/firewalld'
+#      tags: [always]
+#    - role: 'sec/sysctl'
+#      tags: [always]
+#    - role: 'sec/motd'
+#      tags: [always]
+#    - role: 'sec/journalctl'
+#      tags: [always]
+#    - role: 'sec/audit'
+#      tags: [always]
+#    - role: 'sec/sshd_port'
+#      new_ssh_port_number:
+#      tags: [always]
+#      when: "new_ssh_port_number is defined and (new_ssh_port_number != ansible_ssh_host)"
+
+  tasks:
+    - name: "Install firewalld"
+      include_role:
+        name: "sec/firewalld"
+
+    - name: "Apply sysctl"
+      include_role:
+        name: "sec/sysctl"
+
+    - name: "Install motd"
+      include_role:
+        name: "sec/motd"
+
+    - name: "Configure journalctl"
+      include_role:
+        name: "sec/journalctl"
+
+    - name: "Install audit"
+      include_role:
+        name: "sec/audit"
+
+    - name: "Change sshd port"
+      include_role:
+        name: "sec/sshd_port"
+      vars:
+        new_ssh_port_number: "{{ query('passwordstore', provider + '/' + vm_name + '/ssh_port' )[0] }}"
 
 #  post_tasks:
 #    - name: Add the ansible_ssh_port variable to the host_var files
@@ -31,14 +59,37 @@
         my_hostvars: "{{ hostvars[vm_name] }}"
       tags: [always]
 
-    - include_role:
-        name: "generate_inventory"
-        tasks_from: "update-custom-ssh-port"
+    - name: Update inventory
+      include_role:
+        name: "passstore/ansible_inventory"
+        tasks_from: "add_variable"
       vars:
-        new_ssh_port_number: "{{ query('passwordstore', provider + '/' + vm_name + '/ssh_port' )[0] }}"
-        host_name: "{{ vm_name }}"
-        inventory_relative_path: "../../ansible/inventory/"
+        pass_l1: "snowdrop"
+        pass_l2: "hetzner"
+        pass_l3: "{{ vm_name }}"
+        var_name: "ansible_ssh_port"
+        var_value: "{{ query('passwordstore', provider + '/' + vm_name + '/ssh_port' )[0] }}"
       tags: [always]
+
+    - name: Update inventory
+      include_role:
+        name: "passstore/ansible_inventory"
+        tasks_from: "remove_variable"
+      vars:
+        pass_l1: "snowdrop"
+        pass_l2: "hetzner"
+        pass_l3: "{{ vm_name }}"
+        var_name: "ssh_port"
+      tags: [always]
+
+#    - include_role:
+#        name: "generate_inventory"
+#        tasks_from: "update-custom-ssh-port"
+#      vars:
+#        new_ssh_port_number: "{{ query('passwordstore', provider + '/' + vm_name + '/ssh_port' )[0] }}"
+#        host_name: "{{ vm_name }}"
+#        inventory_relative_path: "../../ansible/inventory/"
+#      tags: [always]
 
 #  post_tasks:
 #    - name: Finish server securitation

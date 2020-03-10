@@ -1,0 +1,8 @@
+---
+- name: "Set the pass URL"
+  include_tasks: "set_pass_facts.yml"
+
+- name: "Set pass fact {{var_value}}"
+  set_fact:
+    applied_var_data: "{{ query('passwordstore', pass_l3_route + '/' + var_name + ' create=True overwrite=true userpass=' + var_value)[0] }}"
+...

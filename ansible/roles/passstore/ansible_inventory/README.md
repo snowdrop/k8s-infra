@@ -21,7 +21,13 @@ The structure of the database used is the following:
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+This playbook requires the following variables to be informed:
+
+| Variable | Default | Description |
+| --- | --- | --- |
+| pass_l1 | snowdrop | pass_db_name |
+| pass_l2 | hetzner | Host provider [hetzner, ...] |
+| pass_l3 |  | Virtual Machine name |  
 
 Role Variables
 --------------

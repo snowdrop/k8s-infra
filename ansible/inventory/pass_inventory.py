@@ -80,8 +80,8 @@ for (dirpath, dirnames, filenames) in walk(password_store_dir):
                                         host_vars.update({'ansible_user':passEntry})
                                     elif ('ip_address' == passEntryName):
                                         host_vars.update({'ansible_ssh_host':passEntry})
-                                    elif ('ssh_port' == passEntryName):
-                                        host_vars.update({'ansible_ssh_port':passEntry})
+                                    # elif ('ssh_port' == passEntryName):
+                                    #     host_vars.update({'ansible_ssh_port':passEntry})
                                     else:
                                         host_vars.update({passEntryName:passEntry})
                         result['_meta']['hostvars'].update({provDirName:host_vars})

@@ -1,5 +1,5 @@
 ---
-- name: "Set pass facts (user, ssh_port)"
+- name: "Set pass facts for RSA keys"
   set_fact:
     # ansible_user
     pass_rsa_private_key: "{{ query('passwordstore', pass_l3_route + '/id_rsa returnall=true')[0] }}"

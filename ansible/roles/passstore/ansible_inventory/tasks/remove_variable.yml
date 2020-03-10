@@ -1,0 +1,7 @@
+---
+- name: "Set the pass URL"
+  include_tasks: "set_pass_facts.yml"
+
+- name: "Remove variable {{ var_name }}"
+  shell: "pass rm {{ pass_l3_route }}/{{ var_name }}"
+...
