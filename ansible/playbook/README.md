@@ -37,7 +37,6 @@ firewalld_public_ports:
   - 30000-32767/tcp
 ```
 
-
 The assignment of hosts to groups is done in the passwordstore by adding an entry with the name of the host to a folder with the name of the group:
 
 ```bash
