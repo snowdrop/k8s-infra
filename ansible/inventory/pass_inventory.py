@@ -93,7 +93,12 @@ for (dirpath, dirnames, filenames) in walk(password_store_dir):
                 for (ansibleInventoryGroupName) in ansibleInventoryGroupNames:
                     result[ansibleInventoryGroupName] = []
                     # Each file inside a group is a host belonging to that group.
-                    for (hostDirPath, hostDirNames, hostFileNames) in walk(password_store_dir + '/ansible/inventory/' + ansibleInventoryGroupName):
+                    for (hostDirPath, subgroupDirNames, hostFileNames) in walk(password_store_dir + '/ansible/inventory/' + ansibleInventoryGroupName):
+                        # for (subgroupDirName) in subgroupDirNames:
+                        #     if (subgroupDirName == 'vars' ):
+                        #         TODO: Process group variables in here
+                        #     else
+                        #         TODO: Process as subgroup folder
                         for (hostFileName) in hostFileNames:
                             result[ansibleInventoryGroupName].append(hostFileName.split('.')[0])
                     break
