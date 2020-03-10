@@ -16,15 +16,26 @@ It assumes that the passwordstore database us organized into the following layer
 |      |     + variable_2
 |      |     + variable_3
 |      |
-|      + --- host_1
+|      + --- host_2
 |            |
 |            + variable_1
 |            + variable_2
 |            + variable_3
 + --- providers_2 (openstak)
++ --- ansible/inventory
+       + --- group_1
+       |     + host_1
+       |     + host_2
+       |     + host_3
+       |
+       + --- group_2
+             |
+             + host_1
+             + host_3
+             + host_4
 
 """
-from os import walk, listdir, environ
+from os import walk, listdir, environ, path
 from subprocess import Popen, PIPE
 import sys
 import json
@@ -75,6 +86,18 @@ for (dirpath, dirnames, filenames) in walk(password_store_dir):
                                         host_vars.update({passEntryName:passEntry})
                         result['_meta']['hostvars'].update({provDirName:host_vars})
                 break
+        # ansible folder
+        elif (dirname == 'ansible'):
+            for (ansibleInventoryDirPath, ansibleInventoryGroupNames, ansibleInventoryFileNames) in walk(password_store_dir + '/ansible/inventory'):
+                # Each folder is an ansible group
+                for (ansibleInventoryGroupName) in ansibleInventoryGroupNames:
+                    result[ansibleInventoryGroupName] = []
+                    # Each file inside a group is a host belonging to that group.
+                    for (hostDirPath, hostDirNames, hostFileNames) in walk(password_store_dir + '/ansible/inventory/' + ansibleInventoryGroupName):
+                        for (hostFileName) in hostFileNames:
+                            result[ansibleInventoryGroupName].append(hostFileName.split('.')[0])
+                    break
+            break
     break
 
 if len(sys.argv) == 2 and sys.argv[1] == '--list':
