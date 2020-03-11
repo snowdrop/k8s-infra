@@ -30,7 +30,8 @@ Once the inventory is defined, you use patterns to select the hosts or groups yo
 
 The inventory is comprised of several files and scripts based at the `k8s-infra/ansible/inventory` folder.
 
-The inventory is built from the `passwordstore` project using the `pass_inventory.py` python script. This task is done automatically when Ansible is executed.
+The inventory is built from the `passwordstore` project using the `pass_inventory.py` python script. This task is done automatically when Ansible is executed. 
+For more information on the `passwordstore` project check gitlab.
 
 More information on the Ansible Inventory and how to build it in the [Ansible User Guide](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html).
 
