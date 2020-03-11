@@ -1,7 +1,6 @@
 ---
 - name: "Set pass facts for RSA keys"
   set_fact:
-    # ansible_user
     pass_rsa_private_key: "{{ query('passwordstore', pass_l3_route + '/id_rsa returnall=true')[0] }}"
     pass_rsa_public_key: "{{ query('passwordstore', pass_l3_route + '/id_rsa.pub returnall=true')[0] }}"
   register: res_set_fact
@@ -27,5 +26,4 @@
   file:
     path: "~/.ssh/id_rsa_{{ pass_l3_name }}.pub"
     mode: "0600"
-
 ...
