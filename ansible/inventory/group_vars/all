@@ -1,4 +1,0 @@
-timezone: Europe/Madrid
-
-# Default pass_provider to group pass records. This shouldn't be used.
-pass_provider: tbd

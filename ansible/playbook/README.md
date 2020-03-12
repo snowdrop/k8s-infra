@@ -45,10 +45,23 @@ For information regarding retrieving the existing inventory to the local control
 
 ## Groups
 
-Ansible hosts can be grouped into...well groups. This allows the excecution of playbooks and the definition of variables in a common matter for different hosts. 
+Ansible hosts can be grouped into...well groups. This allows the execution of playbooks and the definition of variables in a common matter for different hosts. 
 
-To assign variables to a group of hosts a file must be created in the  `k8s-infra/ansible/inventory/group_vars` folder. The name of the file must be the same
-as the name of the Ansible group.
+Host group assignment is made by adding folders and records to the passstore project, inside the  `/ansible/inventory`. Folders inside the inventory are considered 
+ groups and records inside these folders are considered hosts in a structure like:
+ 
+```text
++ --- ansible/inventory
+       + --- group_1
+       |     + host_1
+       |     + host_2
+       |     + host_3
+       |
+       + --- group_2
+             + host_1
+             + host_3
+             + host_4
+```
 
 So if we want to define the ports that a k8s master should have open we can create a file named `masters` for instance in the `group_vars` folder and add there
 every definition required such as:

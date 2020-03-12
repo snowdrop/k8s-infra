@@ -16,10 +16,16 @@
       prompt: Salt
       private: yes
       when: " salt_text is not defined "
-    - name: hetzner_context_name
-      prompt: Hetzner context name
-      private: no
-      when: " hetzner_context_name is not defined "
+    - name: provider
+      prompt: Provider [hetzner]
+      private: false
+      when: " provider is not defined "
+    - name: k8s_version
+      prompt: Kubernetes version (if
+#    - name: hetzner_context_name
+#      prompt: Hetzner context name
+#      private: no
+#      when: " hetzner_context_name is not defined "
 
   pre_tasks:
 
@@ -52,34 +58,6 @@
         pass_l3: "{{ vm_name }}"
         var_name: "ansible_ssh_host"
         var_value: "{{ ip_address }}"
-
-#  roles:
-#    - role: hetzner/activate_context
-#      context_name: "{{ hetzner_context_name }}"
-#
-#    - role: hetzner/create_server
-#      vm_name: "{{ vm_name }}"
-#      os_user: "{{ my_hostvars.ansible_user }}"
-#      context_name: "{{ hetzner_context_name }}"
-#      tags: [always]
-#
-#    - role: "passstore/ansible_inventory"
-#      pass_l1: "snowdrop"
-#      pass_l2: "hetzner"
-#      pass_l3: "{{ vm_name }}"
-#      tags: [always]
-#
-#    - role: hetzner/start_server
-#      vm_name: "{{ vm_name }}"
-#      tags: [always]
-
-#    - role: generate_inventory
-#      filename: "hetzner_hosts"
-#      type: "hetzner"
-#      username: "{{ my_hostvars.ansible_user }}"
-#      inventory_relative_path: "../../ansible/inventory/"
-#      pass_provider: "hetzner"
-#      tags: [always]
 
   post_tasks:
 

@@ -84,25 +84,36 @@ for (dirpath, dirnames, filenames) in walk(password_store_dir):
                                     #     host_vars.update({'ansible_ssh_port':passEntry})
                                     else:
                                         host_vars.update({passEntryName:passEntry})
+                                    # for (hostDirName) in hostDirNames:
+                                    #     if (provDirName not in ['openshift-accounts', 'console']):
+                            for (hostGroupDirPath, hostGroupDirNames, hostGroupFileNames) in walk(path.join(hostDirPath, 'groups')):
+                                for (hostGroupFileName) in hostGroupFileNames:
+                                    hostGroupFileName = hostGroupFileName.split('.')[0]
+                                    # print(hostGroupFileName)
+                                    if (not hostGroupFileName in result):
+                                        result[hostGroupFileName] = {}
+                                        result[hostGroupFileName]['hosts'] = []
+                                    result[hostGroupFileName]['hosts'].append(provDirName)
+                            break
                         result['_meta']['hostvars'].update({provDirName:host_vars})
                 break
         # ansible folder
-        elif (dirname == 'ansible'):
-            for (ansibleInventoryDirPath, ansibleInventoryGroupNames, ansibleInventoryFileNames) in walk(password_store_dir + '/ansible/inventory'):
-                # Each folder is an ansible group
-                for (ansibleInventoryGroupName) in ansibleInventoryGroupNames:
-                    result[ansibleInventoryGroupName] = []
-                    # Each file inside a group is a host belonging to that group.
-                    for (hostDirPath, subgroupDirNames, hostFileNames) in walk(password_store_dir + '/ansible/inventory/' + ansibleInventoryGroupName):
-                        # for (subgroupDirName) in subgroupDirNames:
-                        #     if (subgroupDirName == 'vars' ):
-                        #         TODO: Process group variables in here
-                        #     else
-                        #         TODO: Process as subgroup folder
-                        for (hostFileName) in hostFileNames:
-                            result[ansibleInventoryGroupName].append(hostFileName.split('.')[0])
-                    break
-            break
+        # elif (dirname == 'ansible'):
+        #     for (ansibleInventoryDirPath, ansibleInventoryGroupNames, ansibleInventoryFileNames) in walk(password_store_dir + '/ansible/inventory'):
+        #         # Each folder is an ansible group
+        #         for (ansibleInventoryGroupName) in ansibleInventoryGroupNames:
+        #             result[ansibleInventoryGroupName] = []
+        #             # Each file inside a group is a host belonging to that group.
+        #             for (hostDirPath, subgroupDirNames, hostFileNames) in walk(password_store_dir + '/ansible/inventory/' + ansibleInventoryGroupName):
+        #                 # for (subgroupDirName) in subgroupDirNames:
+        #                 #     if (subgroupDirName == 'vars' ):
+        #                 #         TODO: Process group variables in here
+        #                 #     else
+        #                 #         TODO: Process as subgroup folder
+        #                 for (hostFileName) in hostFileNames:
+        #                     result[ansibleInventoryGroupName].append(hostFileName.split('.')[0])
+        #             break
+        #     break
     break
 
 if len(sys.argv) == 2 and sys.argv[1] == '--list':

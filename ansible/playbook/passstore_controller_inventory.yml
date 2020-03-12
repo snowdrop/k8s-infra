@@ -10,17 +10,60 @@
       prompt: Passwordstore Provider [hetzner,openstack,...]
       private: no
       when: " pass_provider is not defined "
+    - name: k8s_type
+      prompt: Kubernetes host type [masters,nodes], empty for no k8s installation
+      private: no
+      when: " k8s_type is not defined "
+    - name: k8s_version
+      prompt: Kubernetes version [115,116], empty for no k8s installation
+      private: no
+      when: " k8s_type is not defined "
 
-  roles:
-    - role: "passstore/ansible_inventory"
-      pass_l1: "{{ pass_db_name | default('snowdrop') }}"
-      pass_l2: "{{ pass_provider | default('hetzner') }}"
-      pass_l3: "{{ vm_name }}"
-      operation: "create"
-      tags: ['never','create']
-    - role: "passstore/ansible_inventory"
-      pass_l1: "{{ pass_db_name | default('snowdrop') }}"
-      pass_l2: "{{ pass_provider | default('hetzner') }}"
-      pass_l3: "{{ vm_name }}"
-      tags: ['always']
+  pre_tasks:
+    - name: Check k8s_type value
+      fail:
+        msg: "Invalid k8s type {{ k8s_type }}. Should be in [masters,nods]"
+      when: "k8s_type != 'masters' and k8s_type != 'nodes'"
+
+    - name: Check k8s_version value
+      fail:
+        msg: "Invalid k8s version {{ k8s_version }}. Should be in [115,116]"
+      when: "k8s_version != '115' and k8s_version != '116'"
+
+  tasks:
+    - name: "Execute create inventory, if tagged as so"
+      include_role:
+        name: "passstore/ansible_inventory"
+      vars:
+        pass_l1: "{{ pass_db_name | default('snowdrop') }}"
+        pass_l2: "{{ pass_provider | default('hetzner') }}"
+        pass_l3: "{{ vm_name }}"
+        operation: "create"
+      tags: [never,create]
+
+    - name: "Build inventory"
+      include_role:
+        name: "passstore/ansible_inventory"
+      vars:
+        pass_l1: "{{ pass_db_name | default('snowdrop') }}"
+        pass_l2: "{{ pass_provider | default('hetzner') }}"
+        pass_l3: "{{ vm_name }}"
+      tags: [always]
+
+    - name: "Add to k8s version"
+      include_role:
+        name: "passstore/ansible_inventory"
+        tasks_from: "add_variable"
+      vars:
+        pass_l1: "snowdrop"
+        pass_l2: "{{ pass_provider }}"
+        pass_l3: "{{ vm_name }}/groups/"
+        var_name: "{{ item }}"
+        var_value: "."
+      loop:
+        - "{{ k8s_type }}"
+        - "k8s_{{ k8s_version }}"
+      when: "k8s_type is defined and k8s_version is defined"
+      tags: [always]
+
 ...
