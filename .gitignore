@@ -15,10 +15,6 @@ ansible/inventory/*
 !ansible/inventory/template
 #ansible/roles/test
 ansible/inventory/group_vars
-!ansible/inventory/group_vars/k8s_115
-!ansible/inventory/group_vars/k8s_116
-!ansible/inventory/group_vars/k8s_nodes
-!ansible/inventory/group_vars/masters
 ansible/inventory/host_vars
 
 **/test.sh
