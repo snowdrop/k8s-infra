@@ -11,6 +11,7 @@
 #**/*.retry
 ansible/inventory/*
 !ansible/inventory/pass_inventory.py
+!ansible/inventory/hosts.yml
 !ansible/inventory/template
 #ansible/roles/test
 ansible/inventory/group_vars
