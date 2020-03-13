@@ -1,5 +1,6 @@
-- name: Grant cluster-role role to admin user
+- name: Grant cluster-role role to the admin user and add scc to group hostmount-anyuid
   shell: |
     oc login -u system:admin
     oc adm policy add-cluster-role-to-user cluster-admin admin
+    oc adm policy add-scc-to-group hostmount-anyuid system:serviceaccounts
     oc login -u admin -p admin
