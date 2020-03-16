@@ -22,3 +22,13 @@ _tmp
 
 # Testing purposes
 sandbox/cluster_up/test.sh
+
+############
+# Intellij #
+############
+*.iml
+.idea/
+.idea/**
+*.iws
+/out/
+.idea_modules/
