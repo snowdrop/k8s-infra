@@ -16,16 +16,6 @@
       prompt: Salt
       private: yes
       when: " salt_text is not defined "
-    - name: provider
-      prompt: Provider [hetzner]
-      private: false
-      when: " provider is not defined "
-    - name: k8s_version
-      prompt: Kubernetes version (if
-#    - name: hetzner_context_name
-#      prompt: Hetzner context name
-#      private: no
-#      when: " hetzner_context_name is not defined "
 
   pre_tasks:
 
