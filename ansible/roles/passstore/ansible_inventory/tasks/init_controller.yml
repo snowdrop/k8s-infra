@@ -1,0 +1,29 @@
+---
+- name: "Set pass facts for RSA keys"
+  set_fact:
+    pass_rsa_private_key: "{{ query('passwordstore', pass_l3_route + '/id_rsa returnall=true')[0] }}"
+    pass_rsa_public_key: "{{ query('passwordstore', pass_l3_route + '/id_rsa.pub returnall=true')[0] }}"
+  register: res_set_fact
+
+- name: "Create RSA private key from pass - Private key found in pass"
+  copy:
+    dest: "{{ '~/.ssh/id_rsa_'+ pass_l3_name }}"
+    content: "{{ pass_rsa_private_key }}"
+  when: "pass_rsa_private_key is defined and pass_rsa_private_key | length > 0"
+
+- name: "Change RSA private key permission"
+  file:
+    path: "~/.ssh/id_rsa_{{ pass_l3_name }}"
+    mode: "0600"
+
+- name: "Create RSA public key from pass - Public key found in pass"
+  copy:
+    dest: "{{ '~/.ssh/id_rsa_'+ pass_l3_name + '.pub'}}"
+    content: "{{ pass_rsa_public_key }}"
+  when: "pass_rsa_public_key is defined and pass_rsa_public_key | length > 0"
+
+- name: "Change RSA public key permission"
+  file:
+    path: "~/.ssh/id_rsa_{{ pass_l3_name }}.pub"
+    mode: "0600"
+...

@@ -1,0 +1,6 @@
+---
+- name: "Set the pass URL"
+  set_fact:
+    pass_l3_route: "{{  pass_l2 + '/' + pass_l3  }}"
+    pass_l3_name: "{{ pass_l1 + '_' + pass_l2 + '_' + pass_l3  }}"
+...

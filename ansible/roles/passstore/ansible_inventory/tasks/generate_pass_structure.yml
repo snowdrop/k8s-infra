@@ -1,22 +1,45 @@
 ---
-- set_fact:
+- name: "Check if a folder already exists in pass for this host"
+  stat:
+    path: "{{ my_passwordstore_folder }}/{{ pass_l3_route }}"
+  register: host_folder_stat
+
+- name: "If the folder already exists, fail!"
+  fail:
+    msg:
+      - "The {{ pass_l3 }} host folder already exists in pass, to execute the creation first remove that folder using the required playbook."
+      - "$ ansible-playbook ansible/playbook/passstore_controller_inventory_remove.yml -e vm_name={{ pass_l3 }} -e pass_provider={{ pass_l2 }}"
+  when: "host_folder_stat.stat.exists"
+
+- name: "Build the password creation statement"
+  set_fact:
     pass_os_password_tmp: "{{  (' userpaserpass=' + os_password) if os_password is defined else (' length=16') }}"
 
-- name: "Set pass facts (user, ssh_port)"
+- name: "Set pass facts (user, pw, ssh_port)"
   set_fact:
+    # ansible_user
     pass_os_user: "{{ query('passwordstore', pass_l3_route + '/os_user create=True userpass=' + username)[0] }}"
     pass_os_password: "{{ query('passwordstore', pass_l3_route + '/os_password create=True ' + pass_os_password_tmp )[0] }}"
+    # new_ssh_port_number, ansible_ssh_port
     pass_ssh_port: "{{ query('passwordstore', pass_l3_route + '/ssh_port create=True userpass=' + custom_ssh_port_number)[0] }}"
+    ansible_ssh_port: "{{ query('passwordstore', pass_l3_route + '/ansible_ssh_port create=True userpass=22')[0] }}"
     pass_rsa_private_key: "{{ query('passwordstore', pass_l3_route + '/id_rsa returnall=true', errors='ignore')[0] | default('') }}"
     pass_rsa_public_key: "{{ query('passwordstore', pass_l3_route + '/id_rsa.pub returnall=true', errors='ignore')[0] | default('') }}"
+  ignore_errors: true
   failed_when: false
   register: res_set_fact
 
-- name: "Create RSA private key from pass - Private key found in pass"
-  copy:
-    dest: "{{ '~/.ssh/id_rsa_'+ pass_l3_name }}"
-    content: "{{ pass_rsa_private_key }}"
-  when: "pass_rsa_private_key is defined and pass_rsa_private_key | length > 0"
+- name: "Set pass facts ssh keys"
+  set_fact:
+  ignore_errors: true
+  failed_when: false
+  register: res_set_ssh_key_fact
+
+#- name: "Create RSA private key from pass - Private key found in pass"
+#  copy:
+#    dest: "{{ '~/.ssh/id_rsa_'+ pass_l3_name }}"
+#    content: "{{ pass_rsa_private_key }}"
+#  when: "pass_rsa_private_key is defined and pass_rsa_private_key | length > 0"
 
 - name: "Generate new RSA private key"
   openssl_privatekey:
@@ -29,20 +52,20 @@
     pass_rsa_private_key: "{{ query('file', '~/.ssh/id_rsa_'+ pass_l3_name) }}"
   when: "(pass_rsa_private_key is not defined or pass_rsa_private_key | length == 0)"
 
-- name: "Change RSA private key permission"
-  file:
-    path: "~/.ssh/id_rsa_{{ pass_l3_name }}"
-    mode: "0600"
+#- name: "Change RSA private key permission"
+#  file:
+#    path: "~/.ssh/id_rsa_{{ pass_l3_name }}"
+#    mode: "0600"
 
 - name: "Add the contents of the private key to pass"
   shell: "cat ~/.ssh/id_rsa_{{ pass_l3_name }} | pass insert -m {{ pass_l3_route}}/id_rsa "
   when: "(res_set_fact.ansible_facts.pass_rsa_private_key is not defined or res_set_fact.ansible_facts.pass_rsa_private_key | length == 0)"
 
-- name: "Create RSA public key from pass - Public key found in pass"
-  copy:
-    dest: "{{ '~/.ssh/id_rsa_'+ pass_l3_name + '.pub'}}"
-    content: "{{ pass_rsa_public_key }}"
-  when: "pass_rsa_public_key is defined and pass_rsa_public_key | length > 0"
+#- name: "Create RSA public key from pass - Public key found in pass"
+#  copy:
+#    dest: "{{ '~/.ssh/id_rsa_'+ pass_l3_name + '.pub'}}"
+#    content: "{{ pass_rsa_public_key }}"
+#  when: "pass_rsa_public_key is defined and pass_rsa_public_key | length > 0"
 
 - name: "Generate an OpenSSL public key from the private key, if the RSA key was generated."
   openssl_publickey:
@@ -55,9 +78,9 @@
   shell: "cat ~/.ssh/id_rsa_{{ pass_l3_name }}.pub | pass insert -m {{ pass_l3_route }}/id_rsa.pub "
   when: "(res_set_fact.ansible_facts.pass_rsa_public_key is not defined or res_set_fact.ansible_facts.pass_rsa_public_key | length == 0)"
 
-- name: "Change RSA public key permission"
-  file:
-    path: "~/.ssh/id_rsa_{{ pass_l3_name }}.pub"
-    mode: "0600"
+#- name: "Change RSA public key permission"
+#  file:
+#    path: "~/.ssh/id_rsa_{{ pass_l3_name }}.pub"
+#    mode: "0600"
 
 ...

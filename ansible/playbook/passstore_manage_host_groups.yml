@@ -1,0 +1,74 @@
+- name: "Generate inventory files on the controller"
+  hosts: localhost
+  gather_facts: no
+  vars_prompt:
+    - name: vm_name
+      prompt: vm name
+      private: no
+      when: "vm_name is not defined"
+    - name: group_name
+      prompt: Group name
+      private: no
+      when: "group_name is not defined"
+    - name: operation
+      prompt: Operation [add,remove]
+      private: no
+      when: "operation is not defined"
+
+  pre_tasks:
+    - name: Get vm host vars
+      set_fact:
+        my_hostvars: "{{ hostvars[vm_name] }}"
+
+    - name: Set provider from host vars
+      set_fact:
+        vm_pass_provider: "{{ my_hostvars['pass_provider'] }}"
+      when: "vm_pass_provider is not defined or vm_pass_provider"
+
+    - name: Check vm_name value
+      fail:
+        msg: "Missing vm_name"
+      when: "vm_name is not defined or vm_name | length == 0"
+
+    - name: Check vm_pass_provider value
+      fail:
+        msg: "Missing or invalid vm_pass_provider {{ vm_pass_provider }}. Should be in [hetzner]"
+      when: "vm_pass_provider is not defined or vm_pass_provider | length == 0"
+
+    - name: Check operation value
+      fail:
+        msg: "Invalid operation {{ operation }}. Should be in [add,remove]"
+      when: "(operation != 'add' and operation != 'remove') or operation | length == 0"
+
+    - name: Check group_name value
+      fail:
+        msg: "Missing group_name"
+      when: "group_name is not defined or group_name | length == 0"
+
+  tasks:
+    - name: "Add host to group version"
+      include_role:
+        name: "passstore/ansible_inventory"
+        tasks_from: "add_variable"
+      vars:
+        pass_l1: "snowdrop"
+        pass_l2: "{{ vm_pass_provider }}"
+        pass_l3: "{{ vm_name }}/groups"
+        var_name: "{{ group_name }}"
+        var_value: "."
+      when: "operation == 'add' "
+      tags: [always]
+
+    - name: "Remove host from group"
+      include_role:
+        name: "passstore/ansible_inventory"
+        tasks_from: "remove_variable"
+      vars:
+        pass_l1: "snowdrop"
+        pass_l2: "{{ vm_pass_provider }}"
+        pass_l3: "{{ vm_name }}/groups"
+        var_name: "{{ group_name }}"
+      when: "operation == 'remove' "
+      tags: [always]
+
+...

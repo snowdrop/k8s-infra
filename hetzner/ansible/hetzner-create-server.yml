@@ -16,10 +16,6 @@
       prompt: Salt
       private: yes
       when: " salt_text is not defined "
-    - name: hetzner_context_name
-      prompt: Hetzner context name
-      private: no
-      when: " hetzner_context_name is not defined "
 
   pre_tasks:
 
@@ -28,27 +24,40 @@
         my_hostvars: "{{ hostvars[vm_name] }}"
       tags: [always]
 
-  roles:
-    - role: hetzner/activate_context
-      context_name: "{{ hetzner_context_name }}"
+  tasks:
+    - name: "Actuvate hetzner context"
+      include_role:
+        name: "hetzner/activate_context"
+      vars:
+        context_name: "{{ hetzner_context_name }}"
 
-    - role: hetzner/create_server
-      vm_name: "{{ vm_name }}"
-      os_user: "{{ my_hostvars.ansible_user }}"
-      context_name: "{{ hetzner_context_name }}"
+    - include_role:
+        name: hetzner/create_server
+      vars:
+        vm_name: "{{ vm_name }}"
+        os_user: "{{ my_hostvars.ansible_user }}"
+        context_name: "{{ hetzner_context_name }}"
+
+    - name: Update inventory
+      include_role:
+        name: "passstore/ansible_inventory"
+        tasks_from: "add_variable"
+      vars:
+        pass_l1: "snowdrop"
+        pass_l2: "hetzner"
+        pass_l3: "{{ vm_name }}"
+        var_name: "ansible_ssh_host"
+        var_value: "{{ ip_address }}"
+
+  post_tasks:
+
+    - name: Refresh the inventory
+      meta: refresh_inventory
       tags: [always]
 
-    - role: hetzner/start_server
-      vm_name: "{{ vm_name }}"
-      tags: [always]
-
-    - role: generate_inventory
-      filename: "hetzner_hosts"
-#      ssh_private_key_path: "~/.ssh/id_rsa_hetzner_{{ vm_name }}"
-      type: "hetzner"
-      username: "{{ my_hostvars.ansible_user }}"
-      inventory_relative_path: "../../ansible/inventory/"
-      pass_provider: "hetzner"
+    - name: Get vm host vars
+      set_fact:
+        my_hostvars: "{{ hostvars[vm_name] }}"
       tags: [always]
 
 - name:  Wait for the VM to boot and we can ssh

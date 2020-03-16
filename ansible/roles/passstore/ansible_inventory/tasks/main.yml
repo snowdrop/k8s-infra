@@ -11,23 +11,33 @@
   when: "password_store_dir is not defined or password_store_dir | length <= 0"
 
 - name: "Set the pass URL"
-  set_fact:
-    pass_l3_route: "{{  pass_l2 + '/' + pass_l3  }}"
-    pass_l3_name: "{{ pass_l1 + '_' + pass_l2 + '_' + pass_l3  }}"
+  include_tasks: "set_pass_facts.yml"
+#- name: "Set the pass URL"
+#  set_fact:
+#    pass_l3_route: "{{  pass_l2 + '/' + pass_l3  }}"
+#    pass_l3_name: "{{ pass_l1 + '_' + pass_l2 + '_' + pass_l3  }}"
 
-- name: "Generate pass structure if it doesn't exist"
+- name: "Generate pass structure"
   include_tasks: "generate_pass_structure.yml"
   vars:
     username: "{{ vm_user | default('snowdrop') }}"
     custom_ssh_port_number: "{{ vm_custom_ssh_port | default('47286') }}"
+  when: "operation is defined and operation == 'create'"
 
-- name: Call generate_inventory role
-  include_role:
-    name: generate_inventory
-  vars:
-    type: "{{ pass_l2 }}"
-    vm_name: "{{ pass_l3 }}"
-    os_user: "{{ pass_os_user }}"
-    new_ssh_port_number: "{{ pass_ssh_port }}"
-#    override_ssh_private_key_file: "~/.ssh/id_rsa_{{ pass_l3_name }}"
+- name: "Adds to the controller the required information"
+  include_tasks: "init_controller.yml"
+#  vars:
+#    username: "{{ vm_user | default('snowdrop') }}"
+#    custom_ssh_port_number: "{{ vm_custom_ssh_port | default('47286') }}"
+#  when: "operation is defined and operation == 'init'"
+
+#- name: Call generate_inventory role
+#  include_role:
+#    name: generate_inventory
+#  vars:
+#    type: "{{ pass_l2 }}"
+#    vm_name: "{{ pass_l3 }}"
+#    os_user: "{{ pass_os_user }}"
+#    new_ssh_port_number: "{{ pass_ssh_port }}"
+#  when: "operation is defined and operation == 'create'"
 ...
