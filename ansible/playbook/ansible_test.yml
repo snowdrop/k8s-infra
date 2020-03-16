@@ -1,6 +1,6 @@
 - name: "Generate inventory files on the controller"
   hosts: localhost
-  gather_facts: yes
+  gather_facts: no
   tasks:
     - name: Test multi-line shell
       shell: |
@@ -24,4 +24,14 @@
           - "inventory_dir: {{ ansible_inventory_dir }}"
       tags: ['bbb']
 
-...
+    - name: Iterate loops
+      vars:
+        volume_name: "pv{{ item }}"
+        storage_size: "{{ item.storage }}"
+      debug:
+        msg: "{{ 'pv%03d' | format(item.range) }}, Storage: {{ item.storage }}"
+      loop:
+       - "{ range: 'range(0, 5 + 1)|list', size: '3Gi' }"
+       - "{ range: 'range(6, 5 + 1)|list', size: '20Gi' }"
+       - "{ range: 'range(11, 5 + 1)|list', size: '100Gi' }"
+      tags: ['ccc']
