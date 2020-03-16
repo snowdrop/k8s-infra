@@ -23,12 +23,14 @@
     - name: Check k8s_type value
       fail:
         msg: "Invalid k8s type {{ k8s_type }}. Should be in [masters,nods]"
-      when: "k8s_type != 'masters' and k8s_type != 'nodes'"
+      when: "k8s_type != 'masters' and k8s_type != 'nodes' and k8s_type | length > 0"
+      tags: [always]
 
     - name: Check k8s_version value
       fail:
         msg: "Invalid k8s version {{ k8s_version }}. Should be in [115,116]"
-      when: "k8s_version != '115' and k8s_version != '116'"
+      when: "k8s_version != '115' and k8s_version != '116' and k8s_version | length > 0"
+      tags: [always]
 
   tasks:
     - name: "Execute create inventory, if tagged as so"
@@ -63,7 +65,7 @@
       loop:
         - "{{ k8s_type }}"
         - "k8s_{{ k8s_version }}"
-      when: "k8s_type is defined and k8s_version is defined"
+      when: "k8s_type is defined and k8s_type | length > 0 and k8s_version is defined and k8s_version | length > 0"
       tags: [always]
 
 ...

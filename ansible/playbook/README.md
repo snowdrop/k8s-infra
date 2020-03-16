@@ -45,27 +45,30 @@ For information regarding retrieving the existing inventory to the local control
 
 ## Groups
 
-Ansible hosts can be grouped into...well groups. This allows the execution of playbooks and the definition of variables in a common matter for different hosts. 
+Ansible hosts can be grouped into...well groups. This allows the execution of playbooks and the definition of variables in a common matter for different hosts.
 
-Host group assignment is made by adding folders and records to the passstore project, inside the  `/ansible/inventory`. Folders inside the inventory are considered 
- groups and records inside these folders are considered hosts in a structure like:
- 
+Group definition is done inside the `ansible/inventory/hosts.yml` file using `yaml` format. In this file are the definitions of groups as well as the variable 
+values assigned to each group. 
+
+Host group assignment is made in `passstore` by managing entries in the `provider/host/groups` folder being each entry a group to which the host belongs. 
+
 ```text
-+ --- ansible/inventory
-       + --- group_1
-       |     + host_1
-       |     + host_2
-       |     + host_3
-       |
-       + --- group_2
-             + host_1
-             + host_3
-             + host_4
++ --- provider
+       + --- host_1
+              + --- groups
+                    |     + group_1
+                    |     + group_2
+                    |     + group_3
+                    |
+       + --- host_2
+              + --- groups
+                    |     + group_2
+                    |     + group_3
 ```
 
-So if we want to define the ports that a k8s master should have open we can create a file named `masters` for instance in the `group_vars` folder and add there
-every definition required such as:
-
+For instance, we wanted to define the ports that a k8s master needs to open. This has been done in the `hosts.yml` file having the following varaible assigned to 
+the `masters` group, which is also inside a group structure so other variables are inherited. 
+  
 ```
 firewalld_public_ports:
   - 6443/tcp
@@ -75,28 +78,28 @@ firewalld_public_ports:
   - 30000-32767/tcp
 ```
 
-The assignment of hosts to groups is done in the passwordstore by adding an entry with the name of the host to a folder with the name of the group, regardless of it's content.
+The assignment of hosts to groups is done in the passwordstore by adding an entry with the name of the group to the `groups` folder inside the hosts.
 
 ```bash
-$ pass generate ansible/inventory/<group_name>/<host_name> 5
+$ ansible-playbook ansible/playbook/passstore_manage_host_groups.yml -e operation=add -e group_name=<my_group> -e vm_name=<my_host>
 ```
 
 For instance, adding a host named `n01-k115` to the `k8s_115` group would be done the following way:
 
 ```bash
-$ pass generate ansible/inventory/k8s_115/n01-k115 5
+$ ansible-playbook ansible/playbook/passstore_manage_host_groups.yml -e operation=add -e group_name=k8s_115 -e vm_name=n01-k115
 ```
 
 To remove the host from the group just remove the entry from the group folder as following...
 
 ```bash
-$ pass rm ansible/inventory/<group_name>/<host_name>
+$ ansible-playbook ansible/playbook/passstore_manage_host_groups.yml -e operation=remove -e group_name=<my_group> -e vm_name=<my_host>
 ```
 
-For instance, to remove the previously added host:
+For instance, to undo the previous host operation:
 
 ```bash
-$ pass generate ansible/inventory/k8s_115/n01-k115 5
+$ ansible-playbook ansible/playbook/passstore_manage_host_groups.yml -e operation=remove -e group_name=k8s_115 -e vm_name=n01-k115
 ```
 
 # Host management in Ansible
@@ -111,7 +114,16 @@ To create a host first the host must be added to the Ansible inventory. This is 
 $ ansible-playbook ansible/playbook/passstore_controller_inventory.yml -e vm_name=<vm_name> -e pass_provider=<provider> --tag "create"
 ```
 
-The VM name is the name that the host will have in the inventory and the provider is the cloud provider. 
+The VM name is the name that the host will have in the inventory and the provider is the cloud provider.
+
+Additional information can be added so that the host is automatically added to k8s groups:
+
+| Variable | Values | Description |
+| --- | --- | --- | 
+| vm_name |  | Name that will be assigned to the host, both in the Ansible inventory as well as in the actual host provider. |
+| pass_provider | [hetzner] | Provider where the host will be installed |
+| k8s_type | [maters,nodes] | Type of k8s host. |
+| k8s_version | [115,116] | Version of k8s that will be installed in the host. |
 
 > NOTE: ATTOW the only provider tested is `hetzner`. 
 
