@@ -28,10 +28,28 @@
       vars:
         volume_name: "pv{{ item }}"
         storage_size: "{{ item.storage }}"
+        pv:
+          - { volume: '3Gi', start: '1' , max_num: '5' }
+          - { volume: '20Gi', start: '6' , max_num: '5' }
       debug:
-        msg: "{{ 'pv%03d' | format(item.range) }}, Storage: {{ item.storage }}"
-      loop:
-       - "{ range: 'range(0, 5 + 1)|list', size: '3Gi' }"
-       - "{ range: 'range(6, 5 + 1)|list', size: '20Gi' }"
-       - "{ range: 'range(11, 5 + 1)|list', size: '100Gi' }"
+        msg: "Volume_size={{ item[0] }}, {{ 'pv_name: %03d'|format(item[1]|int) }}"
+      with_nested:
+        - "{{ pv.volume }}"
+        - "{{ lookup('sequence','start=pv. end='+max_num|string,wantlist=True) }}"
       tags: ['ccc']
+
+    - name: Lool in a loop
+      set_fact:
+        pv_name: "{{ pv_name | default([]) | list + ['%03d' | format(item[1]|int) ] | list }}"
+        volume_size: "{{ volume_size | default([]) | list + [item[0]] | list }}"
+      vars:
+        max_num: 5
+      loop: "{{ (['3Gi'] | product(query('sequence','start=1 end=' + max_num | string)) | list) + (['20Gi'] | product(query('sequence','start=' + (max_num + 1) | string + ' end=' + (max_num * 2) | string)) | list) + (['100Gi'] | product(query('sequence','start=' + (max_num * 2 + 1) | string  + ' end=' + (max_num * 3) | string)) | list)}}"
+      tags: ['ddd']
+
+    - name: Debug pv
+      debug:
+        msg:
+          - "pv_name: {{ pv_name }}"
+          - "volume_size: {{ volume_size }}"
+      tags: ['ddd']
