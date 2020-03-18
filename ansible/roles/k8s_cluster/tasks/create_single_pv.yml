@@ -10,7 +10,6 @@
     chcon -Rt svirt_sandbox_file_t {{ pv_mount_directory }}
   ignore_errors: true
 
-
 - name: Copy pv file to master
   template:
     src: "pv.yml.j2"
