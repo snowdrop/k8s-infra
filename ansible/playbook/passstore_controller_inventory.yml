@@ -36,6 +36,9 @@
     - name: "Execute create inventory, if tagged as so"
       include_role:
         name: "passstore/ansible_inventory"
+        apply:
+          tags:
+            - always
       vars:
         pass_l1: "{{ pass_db_name | default('snowdrop') }}"
         pass_l2: "{{ pass_provider | default('hetzner') }}"
@@ -46,6 +49,9 @@
     - name: "Build inventory"
       include_role:
         name: "passstore/ansible_inventory"
+        apply:
+          tags:
+            - always
       vars:
         pass_l1: "{{ pass_db_name | default('snowdrop') }}"
         pass_l2: "{{ pass_provider | default('hetzner') }}"
@@ -56,6 +62,9 @@
       include_role:
         name: "passstore/ansible_inventory"
         tasks_from: "add_variable"
+        apply:
+          tags:
+            - always
       vars:
         pass_l1: "snowdrop"
         pass_l2: "{{ pass_provider }}"

@@ -1,6 +1,7 @@
 # Table of Contents
 
    * [Introduction](#introduction)
+   * [Installation guide](#installation-guide)
    * [Ansible Inventory](#ansible-inventory)
       * [Updating and retrieving the inventory](#updating-and-retrieving-the-inventory)
       * [Groups](#groups)
@@ -22,6 +23,21 @@ machine that clones this project.
 The `hosts` are the machines where the playbooks and roles are executed against. 
 
 The exception goes to the playbooks that are executed against `localhost`. This special host is referred to the `controller`. 
+
+# Installation guide
+
+To install a fully functional project the following is required:
+
+* Install Ansible version 2.8 or later
+  * For more installation check the [Ansible Installation Guide](https://docs.ansible.com/ansible/latest/installation_guide/index.html)
+  * Ansible uses Python, so check the Ansible [Python 3 Support](https://docs.ansible.com/ansible/latest/reference_appendices/python_3_support.html) page for more information.
+* Install passwordstore
+  * This project uses [pass](https://www.passwordstore.org/) to store passwords and certificates related to the project itself.
+  * More information on installing pass in the Download section of the [passwordstore web page](https://www.passwordstore.org/)
+* Clone the `passstore` project from GitLab.
+
+> **NOTE**: Since passwordstore is integrated with [git](https://git-scm.com/), all changes made locally to a pass repository are automatically commited to the local git repo.
+> Don't forget to `git push` and `git pull` often in order to have your local repository synchronized with other team members as well as publish to the team your changes. 
 
 # Ansible Inventory
 
@@ -108,7 +124,7 @@ The section describes how to maintain hosts in Ansible and their use. It's execu
 
 ## Create a host
 
-To create a host first the host must be added to the Ansible inventory. This is done using the following statement:
+To perform actions against a host, first the host must be added to the Ansible inventory. This is done using the following statement:
 
 ```bash
 $ ansible-playbook ansible/playbook/passstore_controller_inventory.yml -e vm_name=<vm_name> -e pass_provider=<provider> --tag "create"
@@ -196,3 +212,9 @@ $ pass show hetzner/my_host/ansible_ssh_port
 # k8s
 
 For information on k8s playbooks and roles check [here](../../kubernetes/README.md)
+
+# Playbooks
+
+## `passstore_controller_inventory` and `passstore_controller_inventory_remove`
+
+These playbooks add and remove a host to the ansible inventory located in the passstore project.
