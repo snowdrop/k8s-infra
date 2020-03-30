@@ -5,6 +5,7 @@ Table of Contents
       * [Become a Docker Machine](#become-a-docker-machine)
       * [Provision the Cluster](#provision-the-cluster)
          * [Option 1 : Local](#option-1--local)
+            * [Kind](#kind)
             * [Minikube](#minikube)
             * [MiniShift](#minishift)
          * [Option 2 : Local - Customized VM](#option-2--local---customized-vm)
