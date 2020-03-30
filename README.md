@@ -2,24 +2,26 @@ Table of Contents
 =================
 
    * [Instructions to install a k8s cluster](#instructions-to-install-a-k8s-cluster)
-      * [Become a Docker Machine](#become-a-docker-machine)
-      * [Provision the Cluster](#provision-the-cluster)
-         * [Option 1 : Local](#option-1--local)
-            * [Kind](#kind)
-            * [Microk8s](#microk8s)
-            * [Minikube](#minikube)
-            * [MiniShift](#minishift)
-         * [Option 2 : Local - Customized VM](#option-2--local---customized-vm)
-            * [Create vdi file from Cloud ISO](#create-vdi-file-from-cloud-iso)
-            * [Create VM on VirtualBox](#create-vm-on-virtualbox)
-         * [Option 3 : Using a cloud provider](#option-3--using-a-cloud-provider)
-            * [Public : Hetzner](#public--hetzner)
-            * [Public : Hetzner Cloud](#public--hetzner-cloud)
-            * [VPN : OpenStack](#vpn--openstack)
-      * [Cluster Deployment (option 2, 3)](#cluster-deployment-option-2-3)
-         * [OpenShift](#openshift)
-         * [Kubernetes](#kubernetes)
-      * [Turn on your OpenShift machine into a Cloud Native Dev environment](#turn-on-your-openshift-machine-into-a-cloud-native-dev-environment)
+   * [Become a Docker Machine](#become-a-docker-machine)
+   * [Provision the Cluster](#provision-the-cluster)
+      * [Option 1 : Local](#option-1--local)
+         * [Kind](#kind)
+         * [Microk8s](#microk8s)
+         * [Minikube](#minikube)
+         * [MiniShift](#minishift)
+      * [Option 2 : Local - Customized VM](#option-2--local---customized-vm)
+         * [Create vdi file from Cloud ISO](#create-vdi-file-from-cloud-iso)
+         * [Create VM on VirtualBox](#create-vm-on-virtualbox)
+      * [Option 3 : Using a cloud provider](#option-3--using-a-cloud-provider)
+         * [Public : Hetzner](#public--hetzner)
+         * [Public : Hetzner Cloud](#public--hetzner-cloud)
+      * [Option 4 : Using a private cloud provider](#option-4--using-a-private-cloud-provider)
+         * [VPN : OpenStack](#vpn--openstack)
+   * [Cluster Deployment (option 3-4)](#cluster-deployment-option-3-4)
+      * [OpenShift](#openshift)
+      * [Kubernetes](#kubernetes)
+   * [Turn on your machine into a Cloud Native Dev environment](#turn-on-your-machine-into-a-cloud-native-dev-environment)
+
 
 # Instructions to install a k8s cluster
 
@@ -297,12 +299,14 @@ Warning: Permanently added '192.168.99.50' (ECDSA) to the list of known hosts.
 
 - See [hetzner-cloud](hetzner/README-cloud.md) page explaining how to create a cloud vm.
 
+### Option 4 : Using a private cloud provider
+
 #### VPN : OpenStack
 
 - See [OpenStack](openstack/README.md) page explaining how to create an OpenStack cloud vm.
 - Move to `OpenShift deployment` [section](#openshift-deployment) hereafter to see how to provision the local VM.
 
-## Cluster Deployment (option 2, 3)
+## Cluster Deployment (option 3-4)
 
 As the vm is now running and the docker daemon is up, you can install your `k8s` distribution using either one of the following approaches :
 
