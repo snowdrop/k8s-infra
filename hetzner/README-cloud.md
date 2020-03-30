@@ -86,7 +86,7 @@ Prior to launching the creation of the VMS the Ansible inventory must be in plac
 * The inventory file itself: `ansible/inventory/hetzner`
 * The host variables `ansible/inventory/host_vars/<ansible-hostname>`
 
-The inventory file should be somethine like:
+The inventory file should be something like:
 
 ```
 [masters]
