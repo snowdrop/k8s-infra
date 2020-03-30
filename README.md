@@ -12,11 +12,11 @@ Table of Contents
       * [Local - Customized VM](#local---customized-vm)
          * [Create vdi file from Cloud ISO](#create-vdi-file-from-cloud-iso)
          * [Create VM on VirtualBox](#create-vm-on-virtualbox)
-      * [Public Cloud provider](#public-cloud-provider)
-         * [Public : Hetzner - bare metal](#public--hetzner---bare-metal)
-         * [Public : Hetzner Cloud - virtualized](#public--hetzner-cloud---virtualized)
-      * [Private Cloud provider](#private-cloud-provider)
-         * [VPN : OpenStack](#vpn--openstack)
+         * [Public Cloud provider](#public-cloud-provider)
+            * [Hetzner - bare metal](#hetzner---bare-metal)
+            * [Hetzner Cloud - virtualized](#hetzner-cloud---virtualized)
+         * [Private Cloud provider](#private-cloud-provider)
+            * [OpenStack - vpn](#openstack---vpn)
    * [Cluster Deployment](#cluster-deployment)
       * [OpenShift](#openshift)
       * [Kubernetes](#kubernetes)
@@ -287,17 +287,17 @@ Warning: Permanently added '192.168.99.50' (ECDSA) to the list of known hosts.
 
 ### Public Cloud provider
 
-#### Public : Hetzner - bare metal
+#### Hetzner - bare metal
 
 - See [hetzner](hetzner/README.md) page explaining how to create a vm.
 
-#### Public : Hetzner Cloud - virtualized
+#### Hetzner Cloud - virtualized
 
 - See [hetzner-cloud](hetzner/README-cloud.md) page explaining how to create a cloud vm.
 
 ### Private Cloud provider
 
-#### VPN : OpenStack
+#### OpenStack - vpn
 
 - See [OpenStack](openstack/README.md) page explaining how to create an OpenStack cloud vm.
 
