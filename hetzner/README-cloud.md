@@ -15,21 +15,21 @@
 
 # Introduction
 
-This document describes the requirements and the process to execute the provisioning of an hetzner server.
+This document describes the requirements and the process to execute the provisioning of a Cloud VM on hetzner.
 
 ## Scope
 
-Describe the steps to install the hetzner client and provision hetzner servers.
+Describe the steps to install the hetzner client and provision hetzner cloud VMs.
 
 # Requirements
 
 First of all follow the instructions in the [Ansible Installation Guide section](../ansible/playbook/README.md#installation-guide).
 
-* Install the hcloud CLI
+Next, Install the `hcloud CLI` as covered hereafter.
 
 ## Install hcloud CLI
 
-This project is hosted on GitHub at [Hetzner CLI GitHub project](https://github.com/hetznercloud/cli).
+For more information on installing Hetzner CLI, check the [Installation section](https://github.com/hetznercloud/cli#installation).
  
 In MacOS you can install using the following brew command `brew install hcloud`.
 
@@ -37,8 +37,6 @@ For Linux installation, binaries are available at [releases](https://github.com/
 file into the `~/bin` directory. 
 
 That's it, the CLI is installed and ready to use.
-
-For more information on installing Hetzner CLI, check the [Installation section](https://github.com/hetznercloud/cli#installation).
 
 # Hetzner Cloud
 
