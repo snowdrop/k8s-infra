@@ -1,17 +1,14 @@
 # Table of Contents
 
-   * [Installation of k8s](#installation-of-k8s)
-      * [Introduction](#introduction)
+   * [Introduction](#introduction)
       * [Scope](#scope)
    * [Requirements](#requirements)
+      * [Ansible Inventory](#ansible-inventory)
+      * [Host provisioning](#host-provisioning)
+      * [Host-Group Association](#host-group-association)
    * [Installation](#installation)
-   * [Deprecated documentation](#deprecated-documentation)
-      * [Steps to create a k8s cluster](#steps-to-create-a-k8s-cluster)
-      * [Steps to create an okd cluster](#steps-to-create-an-okd-cluster)
 
-# Installation of k8s
-
-## Introduction
+# Introduction
 
 This document describes the requirements and the process to execute to install k8s on a host. The installation will be done using Ansible.
 

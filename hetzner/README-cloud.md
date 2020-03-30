@@ -1,10 +1,17 @@
 # Table of Contents
 
+   * [Introduction](#introduction)
+      * [Scope](#scope)
+   * [Requirements](#requirements)
+      * [Install hcloud CLI](#install-hcloud-cli)
    * [Hetzner Cloud](#hetzner-cloud)
       * [Init the hetzner context](#init-the-hetzner-context)
+   * [The inventory](#the-inventory)
+   * [The VM](#the-vm)
       * [Create the hetzner vm](#create-the-hetzner-vm)
-      * [Steps to create a k8s cluster](#steps-to-create-a-k8s-cluster)
-      * [Steps to create an okd cluster](#steps-to-create-an-okd-cluster)
+      * [Delete a hetzner server](#delete-a-hetzner-server)
+   * [Next steps](#next-steps)
+      * [Steps to create a k8s / okd cluster](#steps-to-create-a-k8s--okd-cluster)
 
 # Introduction
 

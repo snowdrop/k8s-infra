@@ -5,13 +5,20 @@
    * [Ansible Inventory](#ansible-inventory)
       * [Updating and retrieving the inventory](#updating-and-retrieving-the-inventory)
       * [Groups](#groups)
-   * [Host management in Ansible](#host-management-in-ansible)
-      * [Create a host](#create-a-host)
-      * [Remove a host](#remove-a-host)
-      * [Import a host](#import-a-host)
    * [Provision server](#provision-server)
-   * [sec_host](#sec_host)
-   * [k8s](#k8s)
+      * [Host management in Ansible](#host-management-in-ansible)
+         * [Create a host](#create-a-host)
+         * [Remove a host](#remove-a-host)
+         * [Import a host](#import-a-host)
+      * [Create Server](#create-server)
+      * [Secure host](#secure-host)
+      * [Install software](#install-software)
+         * [k8s](#k8s)
+   * [Playbooks](#playbooks)
+      * [passstore_controller_inventory](#passstore_controller_inventory)
+      * [passstore_controller_inventory_remove](#passstore_controller_inventory_remove)
+      * [sec_host](#sec_host)
+      * [passstore_manage_host_groups](#passstore_manage_host_groups)
 
 # Introduction
 
@@ -45,11 +52,26 @@ Ansible works against multiple systems in an infrastructure, called “hosts”,
 Once the inventory is defined, you use patterns to select the hosts or groups you want Ansible to run against.
 
 The inventory is comprised of several files and scripts based at the `k8s-infra/ansible/inventory` folder.
+* `hosts.yml`: YAML file with group structure information as well as group variable assignment
+* `pass_inventory.py`: Python script that dynamically builds the inventory from the `passwordstore` project for use in the Ansible Playbooks. This task is done automatically when Ansible is executed. 
 
-The inventory is built from the `passwordstore` project using the `pass_inventory.py` python script. This task is done automatically when Ansible is executed. 
 For more information on the `passwordstore` project check gitlab.
 
 More information on the Ansible Inventory and how to build it in the [Ansible User Guide](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html).
+
+# `hosts.yml`
+
+This file contains static information for the inventory such as:
+* Group 
+* Group hierarchy
+* Group variables
+* Host-Group assignment - although we won't use it in this project
+
+More information on these documents:
+* [yaml – Uses a specific YAML file as an inventory source](https://docs.ansible.com/ansible/latest/plugins/inventory/yaml.html)
+* [How to build your inventory](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html)
+
+This system already includes a static inventory.
 
 ## Updating and retrieving the inventory
 
@@ -69,22 +91,21 @@ values assigned to each group.
 Host group assignment is made in `passstore` by managing entries in the `provider/host/groups` folder being each entry a group to which the host belongs. 
 
 ```text
-+ --- provider
-       + --- host_1
-              + --- groups
-                    |     + group_1
-                    |     + group_2
-                    |     + group_3
-                    |
-       + --- host_2
-              + --- groups
-                    |     + group_2
-                    |     + group_3
+├── provider
+|   ├── host_1
+│   │   ├── groups
+│   │   │   ├── group_1
+│   │   │   ├── group_2
+│   │   │   ├── group_3
+|   ├── host_2
+│   │   ├── groups
+│   │   │   ├── group_2
+│   │   │   ├── group_3
 ```
 
 For instance, we wanted to define the ports that a k8s master needs to open. This has been done in the `hosts.yml` file having the following varaible assigned to 
 the `masters` group, which is also inside a group structure so other variables are inherited. 
-  
+
 ```
 firewalld_public_ports:
   - 6443/tcp
@@ -94,7 +115,186 @@ firewalld_public_ports:
   - 30000-32767/tcp
 ```
 
-The assignment of hosts to groups is done in the passwordstore by adding an entry with the name of the group to the `groups` folder inside the hosts.
+For information regarding actually managing host-group assignment check the [`passstore_manage_host_groups` section](#passstore_manage_host_groups). 
+
+# Provision server
+
+Provisioning a server requires several steps, each of which will be covered in this section
+
+1. Generate Ansible Inventory records [...](#host-management-in-ansible)
+1. Create Server in Cloud Provider [...](#create-server)
+1. Secure Host [...](#secure-host)
+1. Install Software [...](#install-software)
+
+## Host management in Ansible
+
+The section describes how to maintain hosts in Ansible and their use. It's execution goes against the `controller`.
+
+### Create a host
+
+To perform actions against a host, first the host must be added to the Ansible inventory. 
+
+This is done using the `passstore_controller_inventory` playbook. More information on how to use this playbook in the [`passstore_controller_inventory` section](#passstore_controller_inventory).
+
+> NOTE: ATTOW the only supported provider is `hetzner`. 
+
+### Remove a host 
+
+This is done using the `passstore_controller_inventory_remove` playbook. More information on how to use this playbook in the [`passstore_controller_inventory_remove` section](#passstore_controller_inventory_remove).
+
+```bash
+$ ansible-playbook ansible/playbook/passstore_controller_inventory_remove.yml -e vm_name=<vm_name> -e pass_provider=<provider>
+```
+
+> NOTE: ATTOW the only provider tested is `hetzner`. 
+
+### Import a host
+
+If a host has already been created it can be imported to the controller using:
+
+```bash
+$ ansible-playbook ansible/playbook/passstore_controller_inventory.yml -e vm_name=<vm_name> -e pass_provider=<provider>
+```
+
+It's the same as the previous statement but without the `create` *tag*.
+
+## Create Server
+
+Once the inventory is defined the server can be provisioned, if it isn't.
+
+There should be different playbooks for each of the providers so check the corresponding provider:
+
+* [Hetzner](../../hetzner/README-cloud.md)
+
+Once the server is created it must be securized. More information on the next section.
+
+## Secure host
+
+Host securization is of utmost importance. For this reason a specific playbook and roles have been generated to perform this task.
+
+For the execution of the securization check the [`sec_host` playbook section](#sec_host).  
+
+## Install software
+
+### k8s
+
+For information on k8s playbooks and roles check [here](../../kubernetes/README.md)
+
+# Playbooks
+
+List, description and usage of the implemented playbooks.
+
+## `passstore_controller_inventory`
+
+This playbook generates the local inventory for the host.
+
+Variables:
+
+| Var Name | Possible Values | Default Value | Meaning |
+| --- | --- | --- | --- |
+| vm_name | | | Name that will be assigned to  the host | 
+| pass_provider | [hetzner] | hetzner | Cloud or BereMetal provider that will host the VM |
+| k8s_type | [masters,nodes] | | k8s component, see the [k8s README](../../kubernetes/README.md#ansible-inventory) |
+| k8s_version | [115,116] | | k8s version to be installed, see the [k8s README](../../kubernetes/README.md#ansible-inventory) |
+
+This playbook will create a passwordstore folder structure that will be the base for the Ansible Inventory.
+
+An example:
+
+```bash
+$ ansible-playbook ansible/playbook/passstore_controller_inventory.yml -e vm_name=my-host -e pass_provider=hetzner -e k8s_type=masters -e k8s_version=115 --tags create
+```
+
+This execution would generate the following `pass` structure:
+
+```
+├── hetzner
+|   ├── my-host
+│   │   ├── ansible_ssh_port
+│   │   ├── groups
+│   │   │   ├── k8s_115
+│   │   │   └── masters
+│   │   ├── id_rsa
+│   │   ├── id_rsa.pub
+│   │   ├── os_password
+│   │   ├── os_user
+│   │   └── ssh_port
+```
+
+...and would also create the following ssh keys:
+
+```bash
+$ ls -l ~/.ssh/
+-rw-------. 1 me me  3242 jan 1 00:00 id_rsa_snowdrop_hetzner_my-host
+-rw-------. 1 me me   724 jan 1 00:00 id_rsa_snowdrop_hetzner_my-host.pub
+```
+
+
+## `passstore_controller_inventory_remove`
+
+This playbook will remove the records and files created by the [`passstore_controller_inventory`](#passstore_controller_inventory) playbook.
+
+```bash
+$ ansible-playbook ansible/playbook/passstore_controller_inventory_remove.yml -e vm_name=my-host -e pass_provider=hetzner
+```
+
+Variables:
+
+| Var Name | Possible Values | Default Value | Meaning |
+| --- | --- | --- | --- |
+| vm_name | | | Name that will be assigned to  the host | 
+| pass_provider | [hetzner] | hetzner | Cloud or BereMetal provider that will host the VM |
+
+## `sec_host`
+
+This playbook executes several tasks regarding the security of hosts.
+
+1. Install `firewalld` and close ports
+1. Applies `sysctl` rules as described [here](https://linoxide.com/how-tos/linux-sysctl-tuning/)
+    ```yaml
+    # ignore ICMP packets (ping requests)
+    net.ipv4.icmp_echo_ignore_all=1
+    
+    # This "sanity checking" helps against spoofing attack.
+    net.ipv4.conf.all.rp_filter=1
+    
+    # Syn Flood protection
+    net.ipv4.tcp_syncookies = 1
+    ```
+1. Sets the welcome message with proprietary information.
+1. Configures `journal` so messages will persist between reboots.
+1. Install `auditd`
+1. Changes default ssh port 
+1. Update all packages
+
+The securization is executed using:
+
+```bash
+$  ansible-playbook ansible/playbook/sec_host.yml -e vm_name=<vm_name> -e provider=<provider>
+```
+
+Take into consideration that at the end of the securization the SSH port might be different that the default 22. This can be checked using:
+
+```bash
+$ pass show <path/to_host>/ansible_ssh_port
+```
+
+...such as...
+
+```bash
+$ pass show hetzner/my_host/ansible_ssh_port
+```
+
+Variables:
+
+| Var Name | Possible Values | Default Value | Meaning |
+| --- | --- | --- | --- |
+| vm_name | | | Name of the host that must already exist in the Ansible inventory. | 
+| provider | [hetzner] |  | Cloud or BereMetal provider that hosts the VM |
+
+## `passstore_manage_host_groups`
+
+This playbook allows to easily add and remove hosts from a ansible group.
 
 ```bash
 $ ansible-playbook ansible/playbook/passstore_manage_host_groups.yml -e operation=add -e group_name=<my_group> -e vm_name=<my_host>
@@ -117,104 +317,3 @@ For instance, to undo the previous host operation:
 ```bash
 $ ansible-playbook ansible/playbook/passstore_manage_host_groups.yml -e operation=remove -e group_name=k8s_115 -e vm_name=n01-k115
 ```
-
-# Host management in Ansible
-
-The section describes how to maintain hosts in Ansible and their use. It's execution goes against the `controller`.
-
-## Create a host
-
-To perform actions against a host, first the host must be added to the Ansible inventory. This is done using the following statement:
-
-```bash
-$ ansible-playbook ansible/playbook/passstore_controller_inventory.yml -e vm_name=<vm_name> -e pass_provider=<provider> --tag "create"
-```
-
-The VM name is the name that the host will have in the inventory and the provider is the cloud provider.
-
-Additional information can be added so that the host is automatically added to k8s groups:
-
-| Variable | Values | Description |
-| --- | --- | --- | 
-| vm_name |  | Name that will be assigned to the host, both in the Ansible inventory as well as in the actual host provider. |
-| pass_provider | [hetzner] | Provider where the host will be installed |
-| k8s_type | [maters,nodes] | Type of k8s host. |
-| k8s_version | [115,116] | Version of k8s that will be installed in the host. |
-
-> NOTE: ATTOW the only provider tested is `hetzner`. 
-
-## Remove a host 
-
-```bash
-$ ansible-playbook ansible/playbook/passstore_controller_inventory_remove.yml -e vm_name=<vm_name> -e pass_provider=<provider>
-```
-
-> NOTE: ATTOW the only provider tested is `hetzner`. 
-
-## Import a host
-
-If a host has already been created it can be imported to the controller using:
-
-```bash
-$ ansible-playbook ansible/playbook/passstore_controller_inventory.yml -e vm_name=<vm_name> -e pass_provider=<provider>
-```
-
-It's the same as the previous statement but without the `create` *tag*.
-
-# Provision server
-
-Once the inventory is defined the server can be provisioned, if it isn't.
-
-There should be different playbooks for each of the providers so check the corresponding provider:
-
-* [Hetzner](../../hetzner/README-cloud.md)
-
-Once the server is created it must be securized. More information on the next section.
-
-# sec_host
-
-This playbook executes several tasks regarding the security of hosts.
-
-1. Updates all packages
-1. Applies `sysctl` rules as described [here](https://linoxide.com/how-tos/linux-sysctl-tuning/)
-    ```yaml
-    # ignore ICMP packets (ping requests)
-    net.ipv4.icmp_echo_ignore_all=1
-    
-    # This "sanity checking" helps against spoofing attack.
-    net.ipv4.conf.all.rp_filter=1
-    
-    # Syn Flood protection
-    net.ipv4.tcp_syncookies = 1
-    ```
-1. Sets the welcome message with proprietary information.
-1. Changes default ssh port 
-1. Installs lsof
-
-The securization is executed using:
-
-```bash
-$  ansible-playbook ansible/playbook/sec_host.yml -e vm_name=<vm_name> -e provider=<provider>
-```
-
-Take into consideration that at the end of the securization the SSH port might be different that the default 22. This can be checked using:
-
-```bash
-$ pass show <path/to_host>/ansible_ssh_port
-```
-
-...such as...
-
-```bash
-$ pass show hetzner/my_host/ansible_ssh_port
-```
-
-# k8s
-
-For information on k8s playbooks and roles check [here](../../kubernetes/README.md)
-
-# Playbooks
-
-## `passstore_controller_inventory` and `passstore_controller_inventory_remove`
-
-These playbooks add and remove a host to the ansible inventory located in the passstore project.
