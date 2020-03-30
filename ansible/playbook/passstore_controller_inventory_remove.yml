@@ -5,7 +5,7 @@
 #  . pass_provider: provider in the passstore project [hetzner]
 - name: Delete local inventory configuration
   hosts: localhost
-  gather_facts: yes
+  gather_facts: no
   vars_prompt:
     - name: vm_name
       prompt: vm name
@@ -22,24 +22,20 @@
       register: pass_rm_res
       changed_when: "pass_rm_res.rc == 0"
       failed_when: "pass_rm_res.rc != 0 and 'is not in the password store' not in pass_rm_res.stderr"
-      tags: [always]
 
     - name: Remove local ssh keys
       shell: "rm -f ~/.ssh/id_rsa_snowdrop_{{ pass_provider }}_{{ vm_name }}*"
       changed_when: "pass_rm_res.rc == 0"
       failed_when: "false"
-      tags: [always]
 
     - name: Remove host from Ansible Inventory
       shell: "rm ../inventory/host_vars/{{ vm_name }}"
       changed_when: "pass_rm_res.rc == 0"
       failed_when: "false"
-      tags: [always]
 
     - name: Remove host from the main inventory
       lineinfile:
         path: "../inventory/{{ pass_provider }}_hosts"
         regexp: "^{{ vm_name }}"
         state: absent
-      tags: [always]
 ...

@@ -1,25 +1,50 @@
 # Table of Contents
 
+   * [Introduction](#introduction)
+      * [Scope](#scope)
+   * [Requirements](#requirements)
+      * [Install hcloud CLI](#install-hcloud-cli)
    * [Hetzner Cloud](#hetzner-cloud)
       * [Init the hetzner context](#init-the-hetzner-context)
+   * [The inventory](#the-inventory)
+   * [The VM](#the-vm)
       * [Create the hetzner vm](#create-the-hetzner-vm)
-      * [Steps to create a k8s cluster](#steps-to-create-a-k8s-cluster)
-      * [Steps to create an okd cluster](#steps-to-create-an-okd-cluster)
+      * [Delete a hetzner server](#delete-a-hetzner-server)
+   * [Next steps](#next-steps)
+      * [Steps to create a k8s / okd cluster](#steps-to-create-a-k8s--okd-cluster)
 
+# Introduction
 
-# Hetzner Cloud
+This document describes the requirements and the process to execute the provisioning of an hetzner server.
 
-The following guide details how to provision a Hetzner VM using the [Hetzner Cloud APi](https://docs.hetzner.cloud/#overview) or the  [Hetzner Cloud client](https://github.com/hetznercloud/cli) that you can install using the 
-following brew command `brew install hcloud`.
+## Scope
+
+Describe the steps to install the hetzner client and provision hetzner servers.
+
+# Requirements
+
+First of all follow the instructions in the [Ansible Installation Guide section](../ansible/playbook/README.md#installation-guide).
+
+* Install the hcloud CLI
+
+## Install hcloud CLI
+
+This project is hosted on GitHub at [Hetzner CLI GitHub project](https://github.com/hetznercloud/cli).
+ 
+In MacOS you can install using the following brew command `brew install hcloud`.
 
 For Linux installation, binaries are available at [releases](https://github.com/hetznercloud/cli/releases). Download `hcloud-linux-amd64.tar.gz` and extract the `hcloud` 
 file into the `~/bin` directory. 
 
+That's it, the CLI is installed and ready to use.
+
+For more information on installing Hetzner CLI, check the [Installation section](https://github.com/hetznercloud/cli#installation).
+
+# Hetzner Cloud
+
+The following guide details how to provision a Hetzner VM using the [Hetzner Cloud APi](https://docs.hetzner.cloud/#overview) or the  [Hetzner Cloud client](https://github.com/hetznercloud/cli).
+
 All Ansible playbooks must be launched from the root of the project, at `k8s-infra`.
-
-## Requirements
-
-This project uses [pass](https://www.passwordstore.org/) to store passwords and certificates related to the project itself. To use the `passstore` project must be cloned.
 
 ## Init the hetzner context
 

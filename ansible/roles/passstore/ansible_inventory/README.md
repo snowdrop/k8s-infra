@@ -6,16 +6,19 @@ Obtains the keys for a server in a pass database.
 The structure of the database used is the following:
 
 ```
-\ l2: provider
-  |
-  \ l3: host
-    |
-    \ os_user: user to be created at OS level
-    \ os_password: password of the os_user
-    \ os_password: password of the os_user
-    \ ssh_port: custom ssh port to be used in ssh connections
-    \ id_rsa: RSA pivate key in PEM format
-    \ id_rsa.pub: RSA public key in OpenSSH format
+├── l2: provider
+|   ├── l3: host
+│   │   ├── ansible_ssh_host: host name or IPV4 address for the host. Used by Ansible to perform ssh connections
+│   │   ├── ansible_ssh_port: ssh port used by Ansible in the connections
+│   │   ├── groups
+│   │   │   ├── k8s_115
+│   │   │   └── masters
+│   │   │   └── other_ansible_groups
+│   │   ├── id_rsa: RSA pivate key in PEM format
+│   │   ├── id_rsa.pub: RSA public key in OpenSSH format
+│   │   ├── os_password: password of the os_user
+│   │   ├── os_user: user to be created at OS level
+│   │   └── ssh_port: custom ssh port to be used in ssh connections
 ```
 
 Requirements

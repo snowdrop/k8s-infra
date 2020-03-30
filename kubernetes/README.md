@@ -1,18 +1,14 @@
 # Table of Contents
 
-   * [Installation of k8s](#installation-of-k8s)
-      * [Introduction](#introduction)
+   * [Introduction](#introduction)
       * [Scope](#scope)
    * [Requirements](#requirements)
+      * [Ansible Inventory](#ansible-inventory)
+      * [Host provisioning](#host-provisioning)
+      * [Host-Group Association](#host-group-association)
    * [Installation](#installation)
-   * [Deprecated documentation](#deprecated-documentation)
-      * [Steps to create a k8s cluster](#steps-to-create-a-k8s-cluster)
-      * [Steps to create an okd cluster](#steps-to-create-an-okd-cluster)
 
-
-# Installation of k8s
-
-## Introduction
+# Introduction
 
 This document describes the requirements and the process to execute to install k8s on a host. The installation will be done using Ansible.
 
@@ -22,40 +18,101 @@ Describe the steps to execute to install k8s on a host.
 
 # Requirements
 
-In order to execute the installation of k8s several variables must be provided. More information on the variables [here](../ansible/roles/k8s_cluster/README.md).
+First of all follow the instructions in the [Ansible Installation Guide section](../ansible/playbook/README.md#installation-guide).
 
-To populate these variables, some groups, with the corresponding group variables, have been created. Information for each group exists in a single located at 
-`ansible/inventory/group_vars`. 
+## Ansible Inventory
+
+In order to execute the installation of k8s several variables must be provided. To standardize the installation several Ansible Groups have been created for different installations.
+
+To populate these variables, some groups, with the corresponding group variables, have been created in the [`hosts.yml`](../ansible/inventory/hosts.yml) inventory file.
 
 The following table shows the existing groups for k8s.
 
-| Group Name | Description |
-| --- | --- |
-| masters | Kubernetes masters. Includes information such as firewall ports to be open. |
-| k8s_nodes | Kubernetes nodes. |
-| k8s_116 | Information v 1.16 specific |
-| k8s_115 | Information v 1.15 specific |
+| Group Type| Group Name | Description |
+| --- | --- | --- |
+| Components | masters | Kubernetes control plane. Includes information such as firewall ports and services to be open as well as internal subnet information. |
+| Components | nodes | Kubernetes node. Similar to masters but for k8s nodes. |
+| Versions | k8s_116 | Information v 1.16 specific |
+| Versions | k8s_115 | Information v 1.15 specific |
 
-More information on actually adding and removing hosts from groups [here](../ansible/playbook/README.md#Groups).
+Installing kubernetes requires a host to be assigned to 2 groups, identified from the previous table as *Group Type*, a k8s component and a k8s version.
+
+## Host provisioning
+
+Provisioning a host is done using the appropriate Ansible Playbooks. 
+
+First create the Ansible Inventory records as indicated in the [Create a host](../ansible/playbook/README.md#create-a-host) section of the ansible playbook documentation.
+
+In this example we create the inventory for a new vm to be provisioned in the hetzner provider.
+
+```bash
+$ ansible-playbook ansible/playbook/passstore_controller_inventory.yml -e vm_name=my-host -e pass_provider=hetzner -e k8s_type=masters -e k8s_version=115 --tags create
+``` 
+
+In the pass database we can now see the following structure.
+
+```
+├── hetzner
+|   ├── my-host
+│   │   ├── ansible_ssh_port
+│   │   ├── groups
+│   │   │   ├── k8s_115
+│   │   │   └── masters
+│   │   ├── id_rsa
+│   │   ├── id_rsa.pub
+│   │   ├── os_password
+│   │   ├── os_user
+│   │   └── ssh_port
+```
+
+This host has already been added to the `masters` and `k8s_115` groups as parte of the script.
+
+To remove the host from the inventory...
+
+```bash
+$ ansible-playbook ansible/playbook/passstore_controller_inventory_remove.yml -e vm_name=my-host -e pass_provider=hetzner
+``` 
+
+## Host-Group Association
+
+Once the host is in the inventory it can be associated with groups.
+ 
+For instance, to install k8s control plane for version 1.15 in a newly created host (`my-host` in this example) we have to to add that host to the `masters` and `k8s_115` groups. 
+To perform this operation use the `passstore_manage_host_groups.yml` playbook, as shown in the following example.
+
+Add a host to the `masters` group and to the `k8s_115` group.
+
+```bash
+$ ansible-playbook ansible/playbook/passstore_manage_host_groups.yml -e operation=add -e group_name=masters -e vm_name=my-host
+$ ansible-playbook ansible/playbook/passstore_manage_host_groups.yml -e operation=add -e group_name=k8s_115 -e vm_name=my-host
+``` 
+
+To remove a host from the `k8s_115` group...
+
+```bash
+$ ansible-playbook ansible/playbook/passstore_manage_host_groups.yml -e operation=remove -e group_name=k8s_115 -e vm_name=my-host
+``` 
+
+More information on how hosts are assigned to groups and actually adding and removing hosts from groups [here](../ansible/playbook/README.md#groups).
 
 # Installation
 
 Once the host is defined in the inventory and also provisioned, execute the k8s creation playbook.
 
 ```bash
-$ ansible-playbook ansible/playbook/k8s_installation.yml --limit <host_name>
+$ ansible-playbook kubernetes/ansible/k8s.yml --limit <host_name>
 ```  
 
-The `limit` tells ansible to only execute the playbook to the hosts limited in the statement.
+The `limit` option tells ansible to only execute the playbook to the hosts limited in the statement.
 
 Example for installing a k8s server from scratch using a hetzner host.
  
 ```bash
 $ VM_NAME=xXx \
-  ; ansible-playbook hetzner/ansible/hetzner-delete-server.yml -e vm_name=${VM_NAME} -e hetzner_context_name=snowdrop  \
+  ; ansible-playbook hetzner/ansible/hetzner-delete-server.yml -e vm_name=${VM_NAME} -e hetzner_context_name=snowdrop \
   ; ansible-playbook ansible/playbook/passstore_controller_inventory_remove.yml -e vm_name=${VM_NAME} -e pass_provider=hetzner \
-  && ansible-playbook ansible/playbook/passstore_controller_inventory.yml -e vm_name=${VM_NAME} -e pass_provider=hetzner --tag "create" \
+  && ansible-playbook ansible/playbook/passstore_controller_inventory.yml -e vm_name=${VM_NAME} -e pass_provider=hetzner -e k8s_type=masters -e k8s_version=115 --tags create \
   && ansible-playbook hetzner/ansible/hetzner-create-server.yml -e vm_name=${VM_NAME} -e salt_text=$( gpg --gen-random --armor 1 20) -e hetzner_context_name=snowdrop \
   && ansible-playbook ansible/playbook/sec_host.yml -e vm_name=${VM_NAME} -e provider=hetzner \
-  && ansible-playbook ansible/playbook/k8s_installation.yml --limit ${VM_NAME}
+  && ansible-playbook kubernetes/ansible/k8s.yml --limit ${VM_NAME}
 ```
