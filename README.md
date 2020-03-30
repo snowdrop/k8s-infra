@@ -13,8 +13,8 @@ Table of Contents
          * [Create vdi file from Cloud ISO](#create-vdi-file-from-cloud-iso)
          * [Create VM on VirtualBox](#create-vm-on-virtualbox)
       * [Option 3 : Using a cloud provider](#option-3--using-a-cloud-provider)
-         * [Public : Hetzner](#public--hetzner)
-         * [Public : Hetzner Cloud](#public--hetzner-cloud)
+         * [Public : Hetzner - bare metal](#public--hetzner---bare-metal)
+         * [Public : Hetzner Cloud - virtualized](#public--hetzner-cloud---virtualized)
       * [Option 4 : Using a private cloud provider](#option-4--using-a-private-cloud-provider)
          * [VPN : OpenStack](#vpn--openstack)
    * [Cluster Deployment (option 3-4)](#cluster-deployment-option-3-4)
@@ -286,16 +286,13 @@ Warning: Permanently added '192.168.99.50' (ECDSA) to the list of known hosts.
 [root@cloud ~]# 
 ```
 
-- Move to `OpenShift deployment` [section](#openshift-deployment) to see how to provision the local VM.
-
 ### Option 3 : Using a cloud provider
 
-#### Public : Hetzner
+#### Public : Hetzner - bare metal
 
 - See [hetzner](hetzner/README.md) page explaining how to create a vm.
-- Move to `OpenShift deployment` [section](#openshift-deployment) to see how to provision the local VM.
 
-#### Public : Hetzner Cloud
+#### Public : Hetzner Cloud - virtualized
 
 - See [hetzner-cloud](hetzner/README-cloud.md) page explaining how to create a cloud vm.
 
@@ -304,7 +301,6 @@ Warning: Permanently added '192.168.99.50' (ECDSA) to the list of known hosts.
 #### VPN : OpenStack
 
 - See [OpenStack](openstack/README.md) page explaining how to create an OpenStack cloud vm.
-- Move to `OpenShift deployment` [section](#openshift-deployment) hereafter to see how to provision the local VM.
 
 ## Cluster Deployment (option 3-4)
 
