@@ -4,20 +4,20 @@ Table of Contents
    * [Instructions to install a k8s cluster](#instructions-to-install-a-k8s-cluster)
    * [Become a Docker Machine](#become-a-docker-machine)
    * [Provision the Cluster](#provision-the-cluster)
-      * [Option 1 : Local](#option-1--local)
+      * [Local](#local)
          * [Kind](#kind)
          * [Microk8s](#microk8s)
          * [Minikube](#minikube)
          * [MiniShift](#minishift)
-      * [Option 2 : Local - Customized VM](#option-2--local---customized-vm)
+      * [Local - Customized VM](#local---customized-vm)
          * [Create vdi file from Cloud ISO](#create-vdi-file-from-cloud-iso)
          * [Create VM on VirtualBox](#create-vm-on-virtualbox)
-      * [Option 3 : Using a cloud provider](#option-3--using-a-cloud-provider)
+      * [Public Cloud provider](#public-cloud-provider)
          * [Public : Hetzner - bare metal](#public--hetzner---bare-metal)
          * [Public : Hetzner Cloud - virtualized](#public--hetzner-cloud---virtualized)
-      * [Option 4 : Using a private cloud provider](#option-4--using-a-private-cloud-provider)
+      * [Private Cloud provider](#private-cloud-provider)
          * [VPN : OpenStack](#vpn--openstack)
-   * [Cluster Deployment (option 3-4)](#cluster-deployment-option-3-4)
+   * [Cluster Deployment](#cluster-deployment)
       * [OpenShift](#openshift)
       * [Kubernetes](#kubernetes)
    * [Turn on your machine into a Cloud Native Dev environment](#turn-on-your-machine-into-a-cloud-native-dev-environment)
@@ -43,21 +43,20 @@ The documentation has been designed around the following topics :
 As different tools / bootstrapping methods are available and serve different purposes to install a cluster, the following table 
 summarizes and presents the possibilities offered:
 
-| Option  | Cloud Provider             | Purpose                                              | Tool        | ISO                     |  Hypervisor       |
-| ------: | ---------------------------| ---------------------------------------------------- | ----------- | ------------------------| :---------------: |
-| 1       | Local Machine              | Local dvlpt                                          | Kind, Microk8s   | -   | Hyperkit, native |
-| 1       | Local Machine              | Local dvlpt                                          | Minishift/Minikube   | CentOS or boot2docker   | Xhyve, Hyperkit, Virtualbox |
-| 2       | Local Machine              | Local dvlpt, test new oc release, validate playbooks | Ansible     | CentOS                  | Virtualbox        |
-| 3       | Remote Public  - Hetzner   | Demo, Hands On Lab machine                           | Ansible     | CentOS, Fedora, RHEL    | -                 |
-| 4       | Remote Private - OpenStack | Testing, Productization                              | Ansible     | CentOS, Fedora, RHEL    | -                 |
+| Cloud Provider             | Purpose                                              | Tool        | ISO                     |  Hypervisor       |
+| ---------------------------| ---------------------------------------------------- | ----------- | ------------------------| :---------------: |
+| Local Machine              | Local dvlpt                                          | Kind, Microk8s   | -   | Hyperkit, native |
+| Local Machine              | Local dvlpt                                          | Minishift/Minikube   | CentOS or boot2docker   | Xhyve, Hyperkit, Virtualbox |
+| Local Machine              | Local dvlpt, test new oc release, validate playbooks | Ansible     | CentOS                  | Virtualbox        |
+| Remote Public  - Hetzner   | Demo, Hands On Lab machine                           | Ansible     | CentOS, Fedora, RHEL    | -                 |
+| Remote Private - OpenStack | Testing, Productization                              | Ansible     | CentOS, Fedora, RHEL    | -                 |
 
 **NOTE**: 
-- `Kind` tool needs a local `Docker server` running on your laptop.
-- `Minishift/Minikube` tools manages the whole process to create the vm and next install Docker, the other `options` only require a Linux VM and Docker.
-- For `option 2`, the Linux VM must be accessible using `ssh`
-- The `option 3, 4` can also performed using `fedora`, `rhel` or `ubuntu` operating system but they haven't been tested and will not be presented here.
+- `Kind, microk8s` tools needs a local `Docker server` running on your laptop
+- `Minishift/Minikube` tools manages the whole process to create the vm, next to install Docker
+- For `Ansible` tool, the Linux VM must be accessible using `ssh`
 
-### Option 1 : Local
+### Local
 
 For local development on your machine, you can install a `K8s` cluster using `kind`, `minikube` or `microk8s`.
 
@@ -121,7 +120,7 @@ See the [official documentation](https://kubernetes.io/docs/tasks/tools/install-
      
      **NOTE** : Once the virtual machine has been created, it can be stopped/started using the commands `minishift stop|start --profile demo`.
 
-### Option 2 : Local - Customized VM
+### Local - Customized VM
 
 When it is needed to customize the `Linux VM` locally, you cannot rely on the VM installed with mini(kube/shift) or docker destop tools as they dont offer the possibility 
 to install additional packages, to customize easily the firewall, host adapters, ...
@@ -286,7 +285,7 @@ Warning: Permanently added '192.168.99.50' (ECDSA) to the list of known hosts.
 [root@cloud ~]# 
 ```
 
-### Option 3 : Using a cloud provider
+### Public Cloud provider
 
 #### Public : Hetzner - bare metal
 
@@ -296,13 +295,13 @@ Warning: Permanently added '192.168.99.50' (ECDSA) to the list of known hosts.
 
 - See [hetzner-cloud](hetzner/README-cloud.md) page explaining how to create a cloud vm.
 
-### Option 4 : Using a private cloud provider
+### Private Cloud provider
 
 #### VPN : OpenStack
 
 - See [OpenStack](openstack/README.md) page explaining how to create an OpenStack cloud vm.
 
-## Cluster Deployment (option 3-4)
+## Cluster Deployment
 
 As the vm is now running and the docker daemon is up, you can install your `k8s` distribution using either one of the following approaches :
 
