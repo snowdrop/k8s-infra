@@ -41,19 +41,25 @@ summarizes and presents the possibilities offered:
 
 | Option  | Cloud Provider             | Purpose                                              | Tool        | ISO                     |  Hypervisor       |
 | ------: | ---------------------------| ---------------------------------------------------- | ----------- | ------------------------| :---------------: |
-| 1       | Local Machine              | Local dvlpt                                          | Minishift/Minikube   | CentOS or boot2docker   | Xhyve, Virtualbox |
-| 2       | Local Machine              | Local dvlpt, test new oc release, validate playbooks | Ansible     | CentOS                  | Virtualbox        |
-| 3       | Remote Public  - Hetzner   | Demo, Hands On Lab machine                           | Ansible     | CentOS, Fedora, RHEL    | -                 |
-| 4       | Remote Private - OpenStack | Testing, Productization                              | Ansible     | CentOS, Fedora, RHEL    | -                 |
+| 1       | Local Machine              | Local dvlpt                                          | Kind   | -   | Hyperkit |
+| 2       | Local Machine              | Local dvlpt                                          | Minishift/Minikube   | CentOS or boot2docker   | Xhyve, Virtualbox |
+| 3       | Local Machine              | Local dvlpt, test new oc release, validate playbooks | Ansible     | CentOS                  | Virtualbox        |
+| 4       | Remote Public  - Hetzner   | Demo, Hands On Lab machine                           | Ansible     | CentOS, Fedora, RHEL    | -                 |
+| 5       | Remote Private - OpenStack | Testing, Productization                              | Ansible     | CentOS, Fedora, RHEL    | -                 |
 
 **NOTE**: 
-- Aside from `option 1` where the `Minishift` tool manages the whole process to create the vm and next install the docker server, the other `options` only require a Linux VM and Docker server.
-- For `option 3`, the Linux VM must be accessible using `ssh`
-- The `option 2, 3` can also performed using `fedora`, `rhel` or `ubuntu` operating system but they haven't been tested and will not be presented here.
+- For `option 1`, `Kind` tool needs a local `Docker server` running on your laptop.
+- Aside from `option 2` where `Minishift/Minikube` tools manages the whole process to create the vm and next install Docker, the other `options` only require a Linux VM and Docker.
+- For `option 4`, the Linux VM must be accessible using `ssh`
+- The `option 3, 4` can also performed using `fedora`, `rhel` or `ubuntu` operating system but they haven't been tested and will not be presented here.
 
 ### Option 1 : Local
 
-For local development on your machine, you can install a `K8s` cluster using `minikube` or `minishift` depending which flavor you prefer to use as distribution
+For local development on your machine, you can install a `K8s` cluster using `minikube` or `minishift` depending which flavor you prefer to use as distribution.
+
+#### Kind
+
+See instructions - https://kind.sigs.k8s.io/docs/user/quick-start/
 
 #### Minikube
 
