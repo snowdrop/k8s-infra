@@ -106,7 +106,7 @@ More information on these documents:
 * [yaml – Uses a specific YAML file as an inventory source](https://docs.ansible.com/ansible/latest/plugins/inventory/yaml.html)
 * [How to build your inventory](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html)
 
-This system already includes a static inventory.
+This system already includes a static inventory, at [../inventory/hosts.yml](../inventory/hosts.yml) file.
 
 ## Groups
 
@@ -156,7 +156,7 @@ Provisioning and accessing a server requires several steps, each of which will b
 
 ## Group management in ansible
 
-Groups are defined in the `hosts.yml` file that exists in the inventory folder. The 2 main goals of groups is to apply variable values and filter playbook execution. 
+Groups are defined in the `hosts.yml` file that exists in the inventory folder [../inventory/hosts.yml](../inventory/hosts.yml). The 2 main goals of groups is to apply variable values and filter playbook execution. 
 
 There can are different groups for the providers, ATTOW only one exists which is hetzner. The goal is one and only to fill the provider variable.
 
