@@ -12,17 +12,23 @@ Table of Contents
 As the MacOS operating system doesn't natively support `Linux container`, it is then required to run a `Linux` vm using either `Virtualbox`, `Xhyve` or `Hyperkit` as 
 hypervisor.
 
-Various tools, approaches exist to turn your mac into a `Containerized` platform and are presented hereafter.
+Various tools, approaches exist to turn your mac into a `Containerized` platform and are presented hereafter. 
+
+The recommended approach is to use the new `Docker client desktop`.
 
 ### Docker Desktop
 
 The new `Docker Machine` tool is available now as a `Client desktop` which can be installed as described here: https://docs.docker.com/docker-for-mac/install/
+
 This new client replaces `docker-machine or docker tools` and uses natively `Hyperkit` which is lightweight macOS virtualization solution built on top of `Hypervisor.framework` in macOS.
-Docker Desktop does not use [docker-machine](https://docs.docker.com/docker-for-mac/docker-toolbox/) to provision its VM. The Docker Engine API is exposed on a socket available to the Mac host at /var/run/docker.sock
+
+Docker Desktop does not use [docker-machine](https://docs.docker.com/docker-for-mac/docker-toolbox/) to provision its VM. 
+
+The Docker Engine API is exposed on a socket available to the Mac host at /var/run/docker.sock
 
 ### Docker machine
 
-Deprecated !
+**Deprecated !**
 
 Docker machine is a client Tool communicating with the `Virtualbox` hypervisor and able to manage Linux VMs.
 Using docker-machine commands, you can start, inspect, stop, and restart a managed host, upgrade the Docker client and daemon, and configure a Docker client to talk to your host.
