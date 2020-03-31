@@ -1,9 +1,6 @@
 ---
-# file: hetzner-delete-server.yml
+# file: hetzner-create-server.yml
 # Optional variables:
-#  . vm_delete: Deletes the virtual machine prior to creating it.
-#  . pass_store_dir: Directory containing the password store.
-#  . server_type:
 - name:  Create hetzner server
   hosts: localhost
   gather_facts: yes
@@ -12,6 +9,7 @@
       prompt: Name of the VM being created [vm_name]
       private: no
       when: " vm_name is not defined "
+
     - name: salt_text
       prompt: Salt
       private: yes
@@ -22,7 +20,11 @@
     - name: Get vm host vars
       set_fact:
         my_hostvars: "{{ hostvars[vm_name] }}"
-      tags: [always]
+
+    - name: Set default hetzner_context_name if it is not defined
+      set_fact:
+        hetzner_context_name: "snowdrop"
+      when: hetzner_context_name is not defined
 
   tasks:
     - name: "Actuvate hetzner context"
@@ -53,12 +55,10 @@
 
     - name: Refresh the inventory
       meta: refresh_inventory
-      tags: [always]
 
     - name: Get vm host vars
       set_fact:
         my_hostvars: "{{ hostvars[vm_name] }}"
-      tags: [always]
 
 - name:  Wait for the VM to boot and we can ssh
   hosts: "{{ vm_name }}"
@@ -68,11 +68,9 @@
     - name: ping hosts
       wait_for_connection:
         timeout: 60
-      tags: [always]
 
   post_tasks:
     - name: "DON'T FORGET TO SECURE YOUR SERVER"
       debug:
         msg: "Trying to start start server securization automatically For manual execution: $ ansible-playbook ansible/playbook/sec_host.yml -e vm_name={{ vm_name }} -e provider=hetzner"
-      tags: [always]
 ...

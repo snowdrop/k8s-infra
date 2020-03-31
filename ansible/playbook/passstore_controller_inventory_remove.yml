@@ -11,6 +11,7 @@
       prompt: vm name
       private: no
       when: " vm_name is not defined "
+      
     - name: pass_provider
       prompt: Provider [hetzner,...]
       private: no
@@ -27,15 +28,4 @@
       shell: "rm -f ~/.ssh/id_rsa_snowdrop_{{ pass_provider }}_{{ vm_name }}*"
       changed_when: "pass_rm_res.rc == 0"
       failed_when: "false"
-
-    - name: Remove host from Ansible Inventory
-      shell: "rm ../inventory/host_vars/{{ vm_name }}"
-      changed_when: "pass_rm_res.rc == 0"
-      failed_when: "false"
-
-    - name: Remove host from the main inventory
-      lineinfile:
-        path: "../inventory/{{ pass_provider }}_hosts"
-        regexp: "^{{ vm_name }}"
-        state: absent
 ...

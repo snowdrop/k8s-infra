@@ -14,6 +14,11 @@
       set_fact:
         my_hostvars: "{{ hostvars[vm_name] }}"
 
+    - name: Set default hetzner_context_name if it is not defined
+      set_fact:
+        hetzner_context_name: "snowdrop"
+      when: hetzner_context_name is not defined
+
   roles:
     - role: hetzner/activate_context
       context_name: "{{ hetzner_context_name }}"
