@@ -72,45 +72,16 @@ The context can be verified reviewing the configuration file.
 ```bash
 $ cat  ~/.config/hcloud/cli.toml
 
-active_context = "oneofmycontexts"
+active_context = "mycontext"
 
 [[contexts]]
-  name = "oneofmycontexts"
+  name = "mycontext"
   token = "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
 ```
 
 # The inventory
 
-Prior to launching the creation of the VMS the Ansible inventory must be in place. The inventory consists of 2 files:
-
-* The inventory file itself: `ansible/inventory/hetzner`
-* The host variables `ansible/inventory/host_vars/<ansible-hostname>`
-
-The inventory file should be something like:
-
-```
-[masters]
-<ansible-hostname>
-```
-
-The host variable file should start with the following entries:
-
-```
-#####################
-# Ansible inventory #
-#####################
-#ansible_ssh_port: <my-custom-ssh-port>
-ansible_user: <user used by ansible to connect to the server>
-#ansible_ssh_host: <host name / ip address to the host>
-ansible_ssh_private_key_file: ~/.ssh/id_rsa_<ansible-hostname>
-
-############
-# Security #
-############
-new_ssh_port_number: <my-custom-ssh-port>
-```
-
-The `ansible_user` is obtained from the `passstore` using `pass get snowdrop/hetzner/username`.
+Prior to launching the creation of the VMS the Ansible inventory must be in place. For this check the documentation regarding [initializing a host](../ansible/playbook/README.md#user-guide)
 
 > NOTE: Upon installation, Ansible will use the default SSH port to apply security scripts. One of this scripts is changing the ssh port to a non default one. 
 > See the corresponding [README](../ansible/playbook/README.md).
@@ -125,26 +96,19 @@ It's used so Ansible can connect to the server without requiring password.
 The task of creating the hetzner context is also available through an Ansible playbook.
 
 ```bash
-$ ansible-playbook hetzner/ansible/hetzner-create-hcloud-server.yml
+$ ansible-playbook hetzner/ansible/hetzner-create-server.yml
 ```
 
 This will present some prompts which can be replaced by environment variables. 
 
 | Variable | Required | Default | Prompt | Meaning |
 | --- | :---: | :---: | :---: | --- |
-| vm_name | x | | x | Name of the VM to be created at hetzner. |
+| hetzner_context_name | x | snowdrop | | Context name for hcloud. |
+| override_public_key |  | |  | Use a *local custom key* instead the default one. |
+| salt_text | x | | x | Salt and pepper. |
 | server_type | | cx31 |  | Server type. The list can be obtained using `hcloud server-type list`. Usually cx31 |
 | vm_image | | centos-7 |  | Hetzner image to be used as source (centos-7,...) | 
-| salt_text | x | | x | Salt and pepper. |
-| password_text | x | | x | Password of the created user. |
-| hetzner_context_name | x | | x | Context name for hcloud. |
-| override_public_key |  | |  | Use a *local custom key* instead the default one. |
-
-Tags:
-
-| Tag | Meaning |
-| --- | --- |
-| vm_delete | Deletes the VM prior to creating it. |
+| vm_name | x | | x | Name of the VM to be created at hetzner. |
 
 Each of the Ansible prompts can be replaced by defining it's value as an extra variable of the playbook.
 
@@ -158,8 +122,15 @@ Once this task is finished it's mandatory to launch server securization, see the
 
 ## Delete a hetzner server
 
+Delete a hetzner server vm.
+
+| Variable | Required | Default | Prompt | Meaning |
+| --- | :---: | :---: | :---: | --- |
+| hetzner_context_name | x | snowdrop | | Context name for hcloud. |
+| vm_name | x | | x | Name of the VM to be deleted from hetzner. |
+
 ```bash
-$ ansible-playbook hetzner/ansible/hetzner-delete-server.yml -e vm_name=my-name -e hetzner_context_name=snowdrop --tag "vm_delete"
+$ ansible-playbook hetzner/ansible/hetzner-delete-server.yml -e vm_name=my-name -e hetzner_context_name=snowdrop
 ```
 
 After that, remove the pass entries for the server.
