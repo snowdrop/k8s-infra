@@ -18,7 +18,7 @@ public class CreateTableTreeProcessor extends Treeprocessor {
 
     private final static String KEYWORD_ROLE = cfg.getRoleKeyword();
     private final static String KEYWORD_TYPE = cfg.getClusterTypeKeyword();
-    private final static String KEYWORD_DESCRIPTION = cfg.getDescriptionKeywork();
+    private final static String KEYWORD_DESCRIPTION = cfg.getDescriptionKeyword();
     private final static String ROLE_ATTRIBUTE_NAME = cfg.getRoleAttributeName();
 
     @Override

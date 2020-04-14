@@ -4,7 +4,7 @@ public class Config {
     private String asciidoctorFile;
     private String roleKeyword;
     private String clusterTypeKeyword;
-    private String descriptionKeywork;
+    private String descriptionKeyword;
     private String roleAttributeName;
 
     public String getRoleKeyword() {
@@ -23,12 +23,12 @@ public class Config {
         this.clusterTypeKeyword = clusterTypeKeyword;
     }
 
-    public String getDescriptionKeywork() {
-        return descriptionKeywork;
+    public String getDescriptionKeyword() {
+        return descriptionKeyword;
     }
 
-    public void setDescriptionKeywork(String descriptionKeywork) {
-        this.descriptionKeywork = descriptionKeywork;
+    public void setDescriptionKeyword(String descriptionKeyword) {
+        this.descriptionKeyword = descriptionKeyword;
     }
 
     public String getRoleAttributeName() {
