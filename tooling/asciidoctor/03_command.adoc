@@ -1,0 +1,7 @@
+=== Command: Role 2
+
+Cluster target type: ocp
+
+==== Description
+
+Lorem 21 ipsum dolor sit amet, consectetur adipiscing elit. Nulla fermentum vel magna ac tincidunt. Nam nec ultrices est. Proin volutpat purus sem, non pharetra erat sodales eget. Ut vulputate maximus odio eu laoreet. Nulla tempor turpis a neque t

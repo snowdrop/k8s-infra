@@ -1,0 +1,8 @@
+=== Command: Role 1
+
+Cluster target type: K8s
+
+==== Description
+
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla fermentum vel magna ac tincidunt. Nam nec ultrices est. Proin volutpat purus sem, non pharetra erat sodales eget. Ut vulputate maximus odio eu laoreet. Nulla tempor turpis a neque tempor dignissim. Ut cursus feugiat nunc id sagittis. Sed in orci eu.
