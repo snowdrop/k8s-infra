@@ -1,4 +1,5 @@
 :ansible-doc: https://docs.ansible.com/
+:path: ../../ansible/roles/k8s_cluster
 
 :toc:
 
@@ -18,6 +19,6 @@ After mytable. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent
 
 include::02_command.adoc[]
 
-include::03_command.adoc[]
+include::{path}/README.adoc[]
 
 include::04_conclusion.adoc[]

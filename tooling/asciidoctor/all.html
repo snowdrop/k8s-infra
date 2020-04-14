@@ -443,10 +443,21 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
 <li><a href="#_introduction">Introduction</a></li>
-<li><a href="#_roles_features">Roles - Features</a>
+<li><a href="#_roles_features">Roles - Features</a></li>
+<li><a href="#_command_role_kubernetes">Command: Role Kubernetes</a>
 <ul class="sectlevel2">
-<li><a href="#_command_role_1">Command: Role 1</a></li>
-<li><a href="#_command_role_2">Command: Role 2</a></li>
+<li><a href="#_description">Description</a></li>
+</ul>
+</li>
+<li><a href="#_command_role_name_1">Command: Role Name 1</a>
+<ul class="sectlevel2">
+<li><a href="#_description_2">Description</a></li>
+<li><a href="#_requirements">Requirements</a></li>
+<li><a href="#_role_variables">Role Variables</a></li>
+<li><a href="#_dependencies">Dependencies</a></li>
+<li><a href="#_example_playbook">Example Playbook</a></li>
+<li><a href="#_license">License</a></li>
+<li><a href="#_author_information">Author Information</a></li>
 </ul>
 </li>
 <li><a href="#_conclusion">Conclusion</a></li>
@@ -489,42 +500,93 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-center valign-bottom"><p class="tableblock">Role 1</p></td>
+<td class="tableblock halign-center valign-bottom"><p class="tableblock">Role Kubernetes</p></td>
 <td class="tableblock halign-center valign-bottom"><p class="tableblock">K8s</p></td>
 <td class="tableblock halign-center valign-bottom"><p class="tableblock">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla fermentum vel magna ac tincidunt. Nam nec ultrices est. Proin volutpat purus sem, non pharetra erat sodales eget. Ut vulputate maximus odio eu laoreet. Nulla tempor turpis a neque tempor dignissim. Ut cursus feugiat nunc id sagittis. Sed in orci eu.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-center valign-bottom"><p class="tableblock">Role 2</p></td>
-<td class="tableblock halign-center valign-bottom"><p class="tableblock">ocp</p></td>
-<td class="tableblock halign-center valign-bottom"><p class="tableblock">Lorem 21 ipsum dolor sit amet, consectetur adipiscing elit. Nulla fermentum vel magna ac tincidunt. Nam nec ultrices est. Proin volutpat purus sem, non pharetra erat sodales eget. Ut vulputate maximus odio eu laoreet. Nulla tempor turpis a neque t</p></td>
+<td class="tableblock halign-center valign-bottom"><p class="tableblock">Role Name 1</p></td>
+<td class="tableblock halign-center valign-bottom"><p class="tableblock">K8s</p></td>
+<td class="tableblock halign-center valign-bottom"><p class="tableblock">A brief description of the role goes here.</p></td>
 </tr>
 </tbody>
 </table>
 <div class="paragraph">
 <p>After mytable. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent ac nibh ac lectus lobortis molestie sit amet a purus. Cras eu augue a augue maximus fringilla sit amet quis turpis. Phasellus a nisl ut sem fermentum hendrerit. Praesent volutpat pulvinar consequat. Nullam et tellus bibendum, rhoncus dui lobortis, vestibulum neque. Aliquam sit amet egestas nisl. Duis vitae aliquet augue. Integer at bibendum ex. Vestibulum nec nunc quis augue ullamcorper sollicitudin nec quis augue. Morbi purus velit, maximus at fermentum quis, faucibus nec augue. Quisque ac felis finibus, dapibus odio vel, aliquam lacus.</p>
 </div>
-<div class="sect2">
-<h3 id="_command_role_1">Command: Role 1</h3>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_command_role_kubernetes">Command: Role Kubernetes</h2>
+<div class="sectionbody">
 <div class="paragraph">
 <p>Cluster target type: K8s</p>
 </div>
-<div class="sect3">
-<h4 id="_description">Description</h4>
+<div class="sect2">
+<h3 id="_description">Description</h3>
 <div class="paragraph">
 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla fermentum vel magna ac tincidunt. Nam nec ultrices est. Proin volutpat purus sem, non pharetra erat sodales eget. Ut vulputate maximus odio eu laoreet. Nulla tempor turpis a neque tempor dignissim. Ut cursus feugiat nunc id sagittis. Sed in orci eu.</p>
 </div>
 </div>
 </div>
+</div>
+<div class="sect1">
+<h2 id="_command_role_name_1">Command: Role Name 1</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Cluster target type: K8s</p>
+</div>
 <div class="sect2">
-<h3 id="_command_role_2">Command: Role 2</h3>
+<h3 id="_description_2">Description</h3>
 <div class="paragraph">
-<p>Cluster target type: ocp</p>
+<p>A brief description of the role goes here.</p>
 </div>
-<div class="sect3">
-<h4 id="_description_2">Description</h4>
+</div>
+<div class="sect2">
+<h3 id="_requirements">Requirements</h3>
 <div class="paragraph">
-<p>Lorem 21 ipsum dolor sit amet, consectetur adipiscing elit. Nulla fermentum vel magna ac tincidunt. Nam nec ultrices est. Proin volutpat purus sem, non pharetra erat sodales eget. Ut vulputate maximus odio eu laoreet. Nulla tempor turpis a neque t</p>
+<p>Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.</p>
 </div>
+</div>
+<div class="sect2">
+<h3 id="_role_variables">Role Variables</h3>
+<div class="paragraph">
+<p>A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_dependencies">Dependencies</h3>
+<div class="paragraph">
+<p>A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_example_playbook">Example Playbook</h3>
+<div class="paragraph">
+<p>Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>hosts: servers
+roles:</p>
+</li>
+<li>
+<p>{ role: username.rolename, x: 42 }</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_license">License</h3>
+<div class="paragraph">
+<p>APL</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_author_information">Author Information</h3>
+<div class="paragraph">
+<p>An optional section for the role authors to include contact information, or a website (HTML is not allowed).</p>
 </div>
 </div>
 </div>
@@ -543,7 +605,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-04-14 12:47:30 +0200
+Last updated 2020-04-14 17:21:56 +0200
 </div>
 </div>
 </body>
