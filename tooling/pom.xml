@@ -2,68 +2,113 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+  <modelVersion>4.0.0</modelVersion>
 
-    <groupId>dev.snowdrop</groupId>
-    <artifactId>playbook-doc</artifactId>
-    <version>1.0-SNAPSHOT</version>
+  <groupId>dev.snowdrop</groupId>
+  <artifactId>playbook-doc</artifactId>
+  <version>1.0-SNAPSHOT</version>
 
-    <properties>
-        <asciidoctorj.version>2.2.0</asciidoctorj.version>
-        <asciidoctorj.pdf.version>1.5.3</asciidoctorj.pdf.version>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <maven.compiler.source>1.8</maven.compiler.source>
-    </properties>
+  <properties>
+    <asciidoctorj.version>2.2.0</asciidoctorj.version>
+    <asciidoctorj.pdf.version>1.5.3</asciidoctorj.pdf.version>
+    <snakeyaml.version>1.26</snakeyaml.version>
+    <maven.compiler.target>1.8</maven.compiler.target>
+    <maven.compiler.source>1.8</maven.compiler.source>
+  </properties>
 
+  <dependencies>
+    <dependency>
+      <groupId>org.asciidoctor</groupId>
+      <artifactId>asciidoctorj</artifactId>
+      <version>${asciidoctorj.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.asciidoctor</groupId>
+      <artifactId>asciidoctorj-pdf</artifactId>
+      <version>${asciidoctorj.pdf.version}</version>
+    </dependency>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.asciidoctor</groupId>
-            <artifactId>asciidoctorj</artifactId>
-            <version>${asciidoctorj.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.asciidoctor</groupId>
-            <artifactId>asciidoctorj-pdf</artifactId>
-            <version>${asciidoctorj.pdf.version}</version>
-        </dependency>
+    <!-- YAML parser -->
+    <dependency>
+      <groupId>org.yaml</groupId>
+      <artifactId>snakeyaml</artifactId>
+      <version>${snakeyaml.version}</version>
+    </dependency>
 
-        <!-- Test -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.12</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest-library</artifactId>
-            <version>1.3</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
+    <!-- Test -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.12</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-library</artifactId>
+      <version>1.3</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.6.0</version>
-                <executions>
-                    <execution>
-                        <phase>install</phase>
-                        <goals>
-                            <goal>java</goal>
-                        </goals>
-                        <configuration>
-                            <mainClass>dev.snowdrop.AsciidoctorGenerator</mainClass>
-                            <arguments>
-                                <argument>asciidoctor/test.adoc</argument>
-                            </arguments>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>1.6.0</version>
+        <executions>
+          <execution>
+            <phase>install</phase>
+            <goals>
+              <goal>java</goal>
+            </goals>
+            <configuration>
+              <mainClass>dev.snowdrop.AsciidoctorGenerator</mainClass>
+              <arguments>
+                <argument>./etc/config.yml</argument>
+              </arguments>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- Make this jar executable -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <!-- DO NOT include log4j.properties file in your Jar -->
+          <excludes>
+            <exclude>**/log4j.properties</exclude>
+          </excludes>
+          <archive>
+            <manifest>
+              <!-- Jar file entry point -->
+              <mainClass>dev.snowdrop.AsciidoctorGenerator</mainClass>
+              <addClasspath>true</addClasspath>
+              <classpathPrefix>dependency-jars/</classpathPrefix>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+      <!-- Copy project dependency -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-dependencies</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <!-- exclude junit, we need runtime dependency only -->
+              <includeScope>runtime</includeScope>
+              <outputDirectory>${project.build.directory}/dependency-jars/</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

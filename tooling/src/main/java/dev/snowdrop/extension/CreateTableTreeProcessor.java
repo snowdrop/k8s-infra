@@ -11,14 +11,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static dev.snowdrop.Helper.cfg;
 import static dev.snowdrop.Helper.roles;
 
 public class CreateTableTreeProcessor extends Treeprocessor {
 
-    private final static String KEYWORD_ROLE = "Command";
-    private final static String KEYWORD_TYPE = "Cluster target type";
-    private final static String KEYWORD_DESCRIPTION = "Description";
-    private final static String ROLE_ATTRIBUTE_NAME = "role-table";
+    private final static String KEYWORD_ROLE = cfg.getRoleKeyword();
+    private final static String KEYWORD_TYPE = cfg.getClusterTypeKeyword();
+    private final static String KEYWORD_DESCRIPTION = cfg.getDescriptionKeywork();
+    private final static String ROLE_ATTRIBUTE_NAME = cfg.getRoleAttributeName();
 
     @Override
     public Document process(Document document) {
