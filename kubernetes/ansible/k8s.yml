@@ -17,7 +17,5 @@
       tags: [always,k8s_config]
     - role: 'ingress'
       tags: [always,ingress]
-    - role: 'cert_manager'
-      tags: [always,cert_manager]
     - role: 'k8s_dashboard'
       tags: [always,k8s_dashboard]
