@@ -41,7 +41,7 @@
 
 - name: Copy CertificateSigningRequest yml j2
   template:
-    src: "./templates/csr.yml.j2"
+    src: "../templates/csr.yml.j2"
     dest: /tmp/csr.yml
 
 - name: Create a CertificateSigningRequest on the k8s cluster
@@ -68,12 +68,12 @@
 
 - name: Copy Ingress yml j2
   template:
-    src: "./templates/ingress-dashboard.yml.j2"
+    src: "../templates/ingress-dashboard.yml.j2"
     dest: /tmp/ingress-dashboard.yml
 
 - name: Copy RBAC yml j2
   template:
-    src: "./templates/rbac.yml.j2"
+    src: "../templates/rbac.yml.j2"
     dest: /tmp/rbac.yml
 
 - name: "Create the Service Account, ClusterRoleBinding for the K8s Dashboard admin-user like also the Ingress route"
