@@ -1,0 +1,20 @@
+{
+  "hosts": [
+    "{{ k8s_dashboard_name }}.{{ k8s_dashboard_namespace }}.svc",
+    "{{ k8s_dashboard_name }}.{{ k8s_dashboard_namespace }}.svc.cluster",
+    "{{ k8s_dashboard_name }}.{{ k8s_dashboard_namespace }}.svc.cluster.local",
+    "{{ ansible_ssh_host }}.nip.io"
+  ],
+  "CN": "{{ ansible_ssh_host }}.nip.io",
+  "key": {
+    "algo": "ecdsa",
+    "size": 256
+  },
+  "names": [{
+    "C": "BE",
+    "ST": "Namur",
+    "L": "Florennes",
+    "O": "Red Hat Middleware",
+    "OU": "Snowdrop"
+  }]
+}

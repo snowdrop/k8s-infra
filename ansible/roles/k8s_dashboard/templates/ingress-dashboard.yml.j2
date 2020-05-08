@@ -12,7 +12,7 @@ spec:
   tls:
   - hosts:
     - k8s-console.{{ k8s_dashboard_ingress_host }}
-    secretName: kubernetes-dashboard-certs
+    secretName: {{ k8s_dashboard_secret_name }}
   rules:
   - host: k8s-console.{{ k8s_dashboard_ingress_host }}
     http:

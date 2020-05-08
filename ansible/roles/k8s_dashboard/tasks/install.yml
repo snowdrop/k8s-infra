@@ -9,25 +9,77 @@
     k8s_dashboard_token_public: "{{ query('passwordstore', pass_provider + '/' + ansible_hostname + '/k8s_dashboard_token_public overwrite=yes length=6 nosymbols=true userpass=' + k8s_dashboard_token_public )[0] | lower }}"
     k8s_dashboard_token_secret: "{{ query('passwordstore', pass_provider + '/' + ansible_hostname + '/k8s_dashboard_token_secret overwrite=yes length=16 nosymbols=true userpass=' + k8s_dashboard_token_secret )[0] | lower }}"
 
+- name: Install cfssl tool
+  include_role:
+    name: cfssl_tool
+
+- name: Delete any previous CSR
+  shell: |
+    kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config \
+      delete csr {{ k8s_dashboard_name }}
+  ignore_errors: true
+
 - name: Install Dashboard Version - {{ k8s_dashboard_version }}
   shell: |
     kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config \
       apply -f \
       https://raw.githubusercontent.com/kubernetes/dashboard/{{ k8s_dashboard_version }}/aio/deploy/recommended.yaml
 
-- name: Copy Template files
+- name: Copy cfssl json j2
   template:
-    src: "{{ item }}"
-    dest: "/tmp/{{ item | basename | regex_replace('.j2','') }}"
-  with_fileglob:
-    - "../templates/*.j2"
+    src: "../templates/cfssl.json.j2"
+    dest: /tmp/cfssl.json
+
+- name: Generate the pem and csr files
+  shell: |
+    cat /tmp/cfssl.json | /usr/local/bin/cfssl genkey - | /usr/local/bin/cfssljson -bare server
+
+- name: Convert Self Signed Certificate to base64 string
+  shell: |
+    cat server.csr | base64 | tr -d '\n'
+  register: csr_base64
+
+- name: Copy CertificateSigningRequest yml j2
+  template:
+    src: "./templates/csr.yml.j2"
+    dest: /tmp/csr.yml
+
+- name: Create a CertificateSigningRequest on the k8s cluster
+  shell: |
+    kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config \
+      apply -f /tmp/csr.yml
+
+- name: Approve the CSR request
+  shell: |
+    kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config \
+      certificate approve {{ k8s_dashboard_name }}
+
+- name: Get the server certificate
+  shell: |
+    kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config \
+      get csr {{ k8s_dashboard_name }} -o jsonpath='{.status.certificate}' | base64 --decode > server.crt
+
+- name: Delete and re-create the Kubernetes Dashboard containing the Self Signed certificate
+  shell: |
+    kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config \
+      delete secret/{{ k8s_dashboard_secret_name }} -n {{ k8s_dashboard_namespace }}
+    kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config \
+      create secret tls {{ k8s_dashboard_secret_name }} -n {{ k8s_dashboard_namespace }} --cert=server.crt --key=server-key.pem
+
+- name: Copy Ingress yml j2
+  template:
+    src: "./templates/ingress-dashboard.yml.j2"
+    dest: /tmp/ingress-dashboard.yml
+
+- name: Copy RBAC yml j2
+  template:
+    src: "./templates/rbac.yml.j2"
+    dest: /tmp/rbac.yml
 
 - name: "Create the Service Account, ClusterRoleBinding for the K8s Dashboard admin-user like also the Ingress route"
   shell: |
     kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config apply -f /tmp/rbac.yml
     kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config apply -f /tmp/ingress-dashboard.yml
-    kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config apply -f /tmp/letsencrypt-http01-issuer.yml
-    kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config --validate=false apply -f /tmp/certificate.yml
 
 - name: Print kubernetes dashboard URL & Token
   debug:
