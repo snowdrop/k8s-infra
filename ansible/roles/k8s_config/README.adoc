@@ -1,4 +1,4 @@
-== Command: Kubernets Config
+== Command: Kubernetes Config
 
 Cluster target type: K8s
 

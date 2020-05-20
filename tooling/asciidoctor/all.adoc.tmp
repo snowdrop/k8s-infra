@@ -16,8 +16,4 @@ include::01_introduction.adoc[]
 
 After mytable. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent ac nibh ac lectus lobortis molestie sit amet a purus. Cras eu augue a augue maximus fringilla sit amet quis turpis. Phasellus a nisl ut sem fermentum hendrerit. Praesent volutpat pulvinar consequat. Nullam et tellus bibendum, rhoncus dui lobortis, vestibulum neque. Aliquam sit amet egestas nisl. Duis vitae aliquet augue. Integer at bibendum ex. Vestibulum nec nunc quis augue ullamcorper sollicitudin nec quis augue. Morbi purus velit, maximus at fermentum quis, faucibus nec augue. Quisque ac felis finibus, dapibus odio vel, aliquam lacus.
 
-include::02_command.adoc[]
-
 INCLUDES
-
-include::04_conclusion.adoc[]
