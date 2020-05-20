@@ -1,4 +1,4 @@
-== Command: Kubernetes Cluster
+== Role: Kubernetes Cluster
 
 Cluster target type: K8s
 
