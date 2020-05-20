@@ -2,10 +2,19 @@ package dev.snowdrop.type;
 
 public class Config {
     private String asciidoctorFile;
+    private String destinationFile;
     private String roleKeyword;
     private String clusterTypeKeyword;
     private String descriptionKeyword;
     private String roleAttributeName;
+
+    public String getDestinationFile() {
+        return destinationFile;
+    }
+
+    public void setDestinationFile(String destinationFile) {
+        this.destinationFile = destinationFile;
+    }
 
     public String getRoleKeyword() {
         return roleKeyword;

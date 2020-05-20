@@ -34,7 +34,7 @@ public class AsciidoctorGenerator {
                 asciidoctor.convertFile(
                         new File(adocFile),
                         OptionsBuilder.options()
-                                .toFile(true)
+                                .toFile(new File(cfg.getDestinationFile()))
                                 .safe(SafeMode.UNSAFE));
 
                 // Generate PDF

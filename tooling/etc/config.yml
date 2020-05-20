@@ -1,4 +1,5 @@
 asciidoctorFile: asciidoctor/all.adoc
+destinationFile: ../doc/all.html
 
 roleKeyword: Command
 clusterTypeKeyword: Cluster target type
