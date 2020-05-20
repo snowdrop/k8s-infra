@@ -455,12 +455,16 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_author_information">Author Information</a></li>
 </ul>
 </li>
-<li><a href="#_role_kubernetes_cluster">Role: Kubernetes Cluster</a>
+<li><a href="#_role_docker">Role: Docker</a>
 <ul class="sectlevel2">
 <li><a href="#_description_2">Description</a></li>
+</ul>
+</li>
+<li><a href="#_role_kubernetes_cluster">Role: Kubernetes Cluster</a>
+<ul class="sectlevel2">
+<li><a href="#_description_3">Description</a></li>
 <li><a href="#_requirements_2">Requirements</a></li>
 <li><a href="#_role_variables_2">Role Variables</a></li>
-<li><a href="#_dependencies_2">Dependencies</a></li>
 <li><a href="#_example_playbook_2">Example Playbook</a></li>
 <li><a href="#_license_2">License</a></li>
 <li><a href="#_author_information_2">Author Information</a></li>
@@ -510,9 +514,15 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <td class="tableblock halign-center valign-bottom"><p class="tableblock">A brief description of the role goes here.</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-center valign-bottom"><p class="tableblock">Docker</p></td>
+<td class="tableblock halign-center valign-bottom"><p class="tableblock">K8s</p></td>
+<td class="tableblock halign-center valign-bottom"><p class="tableblock">TODO</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-center valign-bottom"><p class="tableblock">Kubernetes Cluster</p></td>
 <td class="tableblock halign-center valign-bottom"><p class="tableblock">K8s</p></td>
-<td class="tableblock halign-center valign-bottom"><p class="tableblock">A brief description of the role goes here.</p></td>
+<td class="tableblock halign-center valign-bottom"><p class="tableblock">This role will install a Kubernetes cluster on a linux machine using &lt;code&gt;kubelet&lt;/code&gt; and &lt;code&gt;kubeadmin&lt;/code&gt;.
+A docker daemon will be installed using the following &lt;a href="../ansible/roles/docker/README.adoc"&gt;docker role&lt;/a&gt; if no there.</p></td>
 </tr>
 </tbody>
 </table>
@@ -583,7 +593,7 @@ roles:</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_role_kubernetes_cluster">Role: Kubernetes Cluster</h2>
+<h2 id="_role_docker">Role: Docker</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Cluster target type: K8s</p>
@@ -591,42 +601,42 @@ roles:</p>
 <div class="sect2">
 <h3 id="_description_2">Description</h3>
 <div class="paragraph">
-<p>A brief description of the role goes here.</p>
+<p>TODO</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_role_kubernetes_cluster">Role: Kubernetes Cluster</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Cluster target type: K8s</p>
+</div>
+<div class="sect2">
+<h3 id="_description_3">Description</h3>
+<div class="paragraph">
+<p>This role will install a Kubernetes cluster on a linux machine using <code>kubelet</code> and <code>kubeadmin</code>.
+A docker daemon will be installed using the following <a href="../ansible/roles/docker/README.adoc">docker role</a> if no there.</p>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_requirements_2">Requirements</h3>
 <div class="paragraph">
-<p>Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.</p>
+<p>TODO</p>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_role_variables_2">Role Variables</h3>
 <div class="paragraph">
-<p>A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_dependencies_2">Dependencies</h3>
-<div class="paragraph">
-<p>A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.</p>
+<p>TODO</p>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_example_playbook_2">Example Playbook</h3>
-<div class="paragraph">
-<p>Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>ansible-playbook ....</code></pre>
 </div>
-<div class="ulist">
-<ul>
-<li>
-<p>hosts: servers
-roles:</p>
-</li>
-<li>
-<p>{ role: username.rolename, x: 42 }</p>
-</li>
-</ul>
 </div>
 </div>
 <div class="sect2">
@@ -646,7 +656,7 @@ roles:</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-05-20 18:34:19 +0200
+Last updated 2020-05-20 18:57:47 +0200
 </div>
 </div>
 </body>

@@ -4,8 +4,8 @@ Cluster target type: K8s
 
 === Description
 
-This role will install a Kubernetes cluster on a linux machine using `kubelet` and `kubeadmin`. If no docker daemon is installed, then
-the ../docker/README.adoc[docker role] will be executed.
+This role will install a Kubernetes cluster on a linux machine using `kubelet` and `kubeadmin`.
+A docker daemon will be installed using the following link:../ansible/roles/docker/README.adoc[docker role] if no there.
 
 === Requirements
 
