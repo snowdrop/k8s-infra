@@ -4,6 +4,7 @@
 **/openshift-ansible/
 **/.vagrant/
 **/user-data
+tooling/target
 
 ###########
 # Ansible #

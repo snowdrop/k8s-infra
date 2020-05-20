@@ -1,0 +1,6 @@
+asciidoctorFile: asciidoctor/all.adoc
+
+roleKeyword: Command
+clusterTypeKeyword: Cluster target type
+descriptionKeyword: Description
+roleAttributeName: role-table
