@@ -8,6 +8,6 @@ find ${path} -name **.adoc -print0 |
         echo "$paths include::$line[]"
     done
 
-sed -i -e 's/INCLUDES/'"${paths}"'/g' ./asciidoctor/all.adoc
+sed "s|INCLUDES|${paths}|g" ./asciidoctor/all.adoc.tmp > ./asciidoctor/all.adoc
 
 echo ${paths}
