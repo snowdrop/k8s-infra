@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 path=../ansible/roles
 paths=""
 
@@ -13,6 +14,3 @@ awk -v paths=$paths '{gsub(/INCLUDES/,paths)}1' ./asciidoctor/all.adoc.tmp > ./a
 
 echo "### Generate the HTML asciidoctor file containing the table of the roles and each role"
 mvn clean package -DskipTests=true
-
-
-
