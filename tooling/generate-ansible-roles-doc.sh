@@ -4,7 +4,7 @@
 path=../ansible/roles
 paths=""
 
-for FILE in $(find ${path} -name **.adoc)
+for FILE in $(find ${path} -name '**.adoc')
 do
   paths+="include::../$FILE[]\n\n"
 done
