@@ -2,10 +2,10 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-path=../ansible/roles
+readonly PATH='../ansible/roles'
 paths=""
 
-for FILE in $(find ${path} -name '**.adoc')
+for FILE in $(find ${PATH} -name '**.adoc')
 do
   paths+="include::../$FILE[]\n\n"
 done
