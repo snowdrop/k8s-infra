@@ -1,4 +1,8 @@
 kind_cluster_name: snowdrop
-kind_version: v0.4.0
-kind_k8s_version: v1.14.3
+kind_version: v0.8.1
+kind_k8s_version: v1.18.1
 remove: false
+
+kind_binary_directory: /usr/local/bin
+kind_archive_name: "{{ kind_version }}/kind-{{ ansible_system | lower }}-amd64"
+kind_binary: "{{ kind_binary_directory}}/kind"

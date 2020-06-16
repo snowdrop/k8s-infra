@@ -1,0 +1,30 @@
+== Role: Kubernetes Kind Tool
+
+Cluster target type: K8s
+
+=== Description
+
+This role will install the Kubernetes `Kind` tool, next create a Kubernetes cluster.
+
+=== Requirements
+
+A docker daemon must be installed using the following link:../ansible/roles/docker/README.adoc[docker role] if no there.
+
+=== Role Variables
+
+TODO
+
+=== Example Playbook
+
+```bash
+ansible-playbook ./kubernetes/ansible/k8s-misc.yml -t kind
+ansible-playbook ./kubernetes/ansible/k8s-local.yml -t kind -i ./ansible/inventory/local --connection=local
+```
+
+=== License
+
+APL
+
+=== Author Information
+
+An optional section for the role authors to include contact information, or a website (HTML is not allowed).
