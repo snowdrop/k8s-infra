@@ -11,15 +11,12 @@
   when: not kind_binary_present.stat.exists
 
 - name: Create Kubernetes Cluster
-  shell: |
-    kind create cluster \
-      --image=kindest/node:{{ kind_k8s_version }} \
-      --name {{ kind_cluster_name }}
+  command: kind create cluster --image="kindest/node:{{ kind_k8s_version }}" --name="{{ kind_cluster_name }}"
   register: result
 
 - name: Show what kind generated as stdout
   debug:
-    var: result.stdout
+    var: result.stderr_lines
 
 
 #- name: Setup kube config
