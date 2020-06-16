@@ -3,23 +3,19 @@
     path: "{{ kind_binary }}"
   register: kind_binary_present
 
-- name: Unarchive Kind binary
-  unarchive:
-    src: "https://github.com/kubernetes-sigs/kind/releases/download/{{ kind_archive_name }}"
-    dest: "{{ kind_binary_directory }}"
-    remote_src: yes
+- name: Download Kind binary from github release
+  get_url:
+    url: "https://github.com/kubernetes-sigs/kind/releases/download/{{ kind_archive_name }}"
+    dest: "{{ kind_binary }}"
+    mode: '0755'
   when: not kind_binary_present.stat.exists
 
-# - name: Install Kind
-#   shell: |
-#     KIND_BINARY_URL="https://github.com/kubernetes-sigs/kind/releases/download/{{ kind_version }}/kind-linux-amd64"
-#     wget -O kind "${KIND_BINARY_URL}"
-#     chmod +x ./kind
-#     sudo mv ./kind /usr/local/bin/kind
-
-# - name: Create Cluster
-#   shell: |
-#     kind create cluster --image=kindest/node:{{ kind_k8s_version }} --name {{ kind_cluster_name }} --loglevel=debug
+- name: Create Cluster
+  shell: |
+    kind create cluster \
+      --image=kindest/node:{{ kind_k8s_version }} \
+      --name {{ kind_cluster_name }} \
+      --loglevel=debug
 
 #- name: Setup kube config
 #  shell: |
