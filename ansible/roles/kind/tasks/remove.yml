@@ -1,3 +1,3 @@
 - name: Remove Kind cluster
   shell: |
-    kind delete {{ kind_cluster_name }}
+    kind delete cluster --name={{ kind_cluster_name }}
