@@ -14,10 +14,9 @@
   command: kind create cluster --image="kindest/node:{{ kind_k8s_version }}" --name="{{ kind_cluster_name }}"
   register: result
 
-- name: Show what kind generated as stdout
+- name: Show what kind generated during command execution
   debug:
-    var: result.stderr_lines
-
+    msg: "{{ result.stderr.split('\n') }}"
 
 #- name: Setup kube config
 #  shell: |
