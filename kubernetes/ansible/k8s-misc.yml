@@ -1,5 +1,5 @@
 - name: "Install misc kubernetes modules"
-  hosts: "masters"
+  hosts: "{{ override_host | default('masters') }}"
   gather_facts: "{{ gathering_host_info | default('true') | bool == true }}"
 
   environment:
