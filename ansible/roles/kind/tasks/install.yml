@@ -1,3 +1,8 @@
+- set_fact:
+    sha: "{{ k8s_version | selectattr('release', 'equalto', '1.18') | list | count > 0 }}"
+- debug:
+    msg: "The sha is {{ sha }}"
+
 - name: Check if Kind Binary is Present
   stat:
     path: "{{ kind_binary }}"
@@ -10,13 +15,13 @@
     mode: '0755'
   when: not kind_binary_present.stat.exists
 
-- name: Create Kubernetes Cluster
-  command: kind create cluster --image="kindest/node:{{ kind_k8s_version }}" --name="{{ kind_cluster_name }}"
-  register: result
-
-- name: Show what kind generated during command execution
-  debug:
-    msg: "{{ result.stderr.split('\n') }}"
+#- name: Create Kubernetes Cluster
+#  command: kind create cluster --image="kindest/node:{{ kind_k8s_version }}" --name="{{ kind_cluster_name }}"
+#  register: result
+#
+#- name: Show what kind generated during command execution
+#  debug:
+#    msg: "{{ result.stderr.split('\n') }}"
 
 #- name: Setup kube config
 #  shell: |
