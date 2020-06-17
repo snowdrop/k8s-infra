@@ -1,4 +1,4 @@
-kind_cluster_name: snowdrop
+kind_cluster_name: my-cluster
 kind_version: v0.8.1
 kind_k8s_version: v1.18.2
 remove: false
