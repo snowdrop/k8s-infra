@@ -1,8 +1,10 @@
 kind_cluster_name: my-cluster
 kind_version: v0.8.1
-kind_k8s_version: v1.18.2
 remove: false
 
 kind_binary_directory: /usr/local/bin
 kind_archive_name: "{{ kind_version }}/kind-{{ ansible_system | lower }}-amd64"
 kind_binary: "{{ kind_binary_directory}}/kind"
+
+# Set the variable k8s_version otherwise ansible will thrown an error during the execution
+k8s_version: ""

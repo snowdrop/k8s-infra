@@ -22,8 +22,18 @@
     kind_params: "--image {{ image[0].sha }} --name {{ kind_cluster_name }}"
   when: image|length > 0
 
-- name: Create Kubernetes Cluster
-  command: "kind create cluster {{ kind_params }}"
+- name: Make temp directory for files
+  command: mktemp -d /tmp/ansible-XXXXXX
+  register: mktemp
+  changed_when: False
+
+- name: Copy the kind config file
+  copy:
+    src: files/config.yml
+    dest: "{{ mktemp.stdout }}/config.yml"
+
+- name: Create Kubernetes Cluster using the config file
+  command: "kind create cluster {{ kind_params }} --config {{ mktemp.stdout }}/config.yml"
   register: result
 
 - name: Show what kind generated during command execution
