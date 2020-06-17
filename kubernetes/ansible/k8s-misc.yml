@@ -2,9 +2,6 @@
   hosts: "{{ override_host | default('masters') }}"
   gather_facts: "{{ gathering_host_info | default('true') | bool == true }}"
 
-  environment:
-    KUBECONFIG: /etc/kubernetes/admin.conf
-
   # Define default values for variables that are common between roles
   vars:
     client_tool: kubectl
@@ -15,7 +12,7 @@
     - { role: 'ingress',   tags: 'ingress'}
     - { role: 'k8s_dashboard',   tags: 'k8s_dashboard'}
     - { role: 'docker_registry',   tags: 'docker_registry'}
-    - { role: 'cert_manager', tags: 'always,cert_manager' }
+    - { role: 'cert_manager', tags: 'cert_manager' }
     # Team web sites: snowdrop.me|dev, halkyon.io -> redirect to github.io
     - { role: 'k8s_halkyon_site',       tags: 'k8s_halkyon_site'}
     - { role: 'k8s_snowdrop_site',      tags: 'k8s_snowdrop_site'}

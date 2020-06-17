@@ -1,0 +1,29 @@
+== Role: Ingress Nginx controller
+
+Cluster target type: K8s
+
+=== Description
+
+This role will install the ingress nginx controller on a Kubernetes cluster. It can be deployed on `kind` or `baremetal` k8s cluster.
+
+=== Requirements
+
+A Kubernetes cluster or Kind kubernetes cluster is needed.
+
+=== Role Variables
+
+TODO
+
+=== Example Playbook
+
+```bash
+ansible-playbook ./kubernetes/ansible/k8s-misc.yml -t ingress --connection=local -e override_host=localhost -e target_platform=kind
+```
+
+=== License
+
+APL
+
+=== Author Information
+
+An optional section for the role authors to include contact information, or a website (HTML is not allowed).
