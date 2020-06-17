@@ -1,0 +1,2 @@
+- name: Install Ingress Nginx controller
+  command: kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/ingress-nginx-{{ ingress_version }}/deploy/static/provider/{{ target_platform }}/deploy.yaml
