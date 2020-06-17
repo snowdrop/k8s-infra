@@ -1,27 +1,34 @@
-- set_fact:
-    sha: "{{ k8s_version | selectattr('release', 'equalto', '1.18') | list | count > 0 }}"
-- debug:
-    msg: "The sha is {{ sha }}"
-
 - name: Check if Kind Binary is Present
   stat:
     path: "{{ kind_binary }}"
   register: kind_binary_present
 
-- name: Download Kind binary from github release
+- name: Download Kind binary from github release & install it if missing from /usr/local/bin directory
   get_url:
     url: "https://github.com/kubernetes-sigs/kind/releases/download/{{ kind_archive_name }}"
     dest: "{{ kind_binary }}"
     mode: '0755'
   when: not kind_binary_present.stat.exists
 
-#- name: Create Kubernetes Cluster
-#  command: kind create cluster --image="kindest/node:{{ kind_k8s_version }}" --name="{{ kind_cluster_name }}"
-#  register: result
-#
-#- name: Show what kind generated during command execution
-#  debug:
-#    msg: "{{ result.stderr.split('\n') }}"
+- name: Lookup to find the image sha to be used to create the k8s cluster on docker
+  set_fact:
+    image: "{{ kubernetes | selectattr('release', 'match', k8s_version) | list }}"
+
+- set_fact:
+    kind_params: "--name {{ kind_cluster_name }}"
+  when: image|length == 0
+
+- set_fact:
+    kind_params: "--image {{ image[0].sha }} --name {{ kind_cluster_name }}"
+  when: image|length > 0
+
+- name: Create Kubernetes Cluster
+  command: "kind create cluster {{ kind_params }}"
+  register: result
+
+- name: Show what kind generated during command execution
+  debug:
+    msg: "{{ result.stderr.split('\n') }}"
 
 #- name: Setup kube config
 #  shell: |
