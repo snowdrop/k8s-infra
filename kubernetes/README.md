@@ -116,3 +116,5 @@ $ VM_NAME=xXx \
   && ansible-playbook ansible/playbook/sec_host.yml -e vm_name=${VM_NAME} -e provider=hetzner \
   && ansible-playbook kubernetes/ansible/k8s.yml --limit ${VM_NAME}
 ```
+
+> NOTE: Both kubernetes playbooks (`k8s` and `k8s-misc`) can have it's host overriden using the `override_host` variable, e.g., `-e override_host=localhost` to launch it on the controller itself.
