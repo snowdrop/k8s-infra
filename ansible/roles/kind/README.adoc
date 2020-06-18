@@ -8,7 +8,7 @@ This role will install the Kubernetes `Kind` tool, next create a Kubernetes clus
 
 === Requirements
 
-A docker daemon must be installed using the following link:../ansible/roles/docker/README.adoc[docker role] if no there.
+A docker daemon must be installed using the following link:../docker/README.adoc[docker role] if no there.
 
 The following python packages should be installed using `pip` tool:
 - docker
