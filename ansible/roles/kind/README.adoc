@@ -48,7 +48,12 @@ ansible-playbook ./kubernetes/ansible/k8s-misc.yml \
     --connection=local -e override_host=localhost \
     -t kind
 ```
-
+To use a kubernetes cluster previously released, specify the version to be used:
+```bash
+ansible-playbook ./kubernetes/ansible/k8s-misc.yml \
+    -e k8s_version=1.16 \
+    -t kind
+```
 === Check if kind cluster is working
 
 To verify if `kind` is well installed and running, if it can process `ingress route` or `docker` pull/push using the local registry,
