@@ -4,7 +4,7 @@ Cluster target type: K8s
 
 === Description
 
-This role will install the Kubernetes `Kind` tool, next create a Kubernetes cluster.
+This role will install the Kubernetes `Kind` tool, next create a Kubernetes cluster and optionally a docker container registry.
 
 === Requirements
 
