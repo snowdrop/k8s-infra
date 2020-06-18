@@ -1,12 +1,3 @@
-- name: Install missing python lib for docker, openshift, kubernetes ...
-  pip:
-    name:
-    - docker
-    - openshift
-    - PyYAML
-    - requests
-    virtualenv: ~/.venvs/ansible
-
 - name: Create a registry container and attach to the network of the kind cluster
   docker_container:
     name: "{{ registry_name }}"
