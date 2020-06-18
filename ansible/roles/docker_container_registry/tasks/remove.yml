@@ -1,0 +1,4 @@
+- name: Remove the registry container
+  docker_container:
+    name: "{{ registry_name }}"
+    state: absent

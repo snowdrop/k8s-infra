@@ -1,0 +1,5 @@
+registry_name: kind-registry
+registry_port: 5000
+registry_image: registry:2
+
+cluster_network_name: kind

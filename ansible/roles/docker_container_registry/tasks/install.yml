@@ -1,0 +1,44 @@
+- name: Install missing python lib for docker, openshift, kubernetes ...
+  pip:
+    name:
+    - docker
+    - openshift
+    - PyYAML
+    - requests
+    virtualenv: ~/.venv/ansible
+
+- name: Create a registry container and attach to the network of the kind cluster
+  docker_container:
+    name: "{{ registry_name }}"
+    image: "{{ registry_image }}"
+    state: started
+    detach: true
+    restart: true
+    ports:
+      - "{{ registry_port }}:5000"
+    networks:
+      - name: "{{ cluster_network_name }}"
+    networks_cli_compatible: yes
+
+- name: Get a list of node objects
+  k8s_info:
+    api_version: v1
+    kind: Node
+    kubeconfig: $HOME/.kube/config
+  register: node_list
+
+- name: Patch the node to apply annotations to let the cluster to use the reigstry
+  command: kubectl --kubeconfig=$HOME/.kube/config annotate node {{ node_list.resources[0].metadata.name }} "kind.x-k8s.io/registry=localhost:{{ registry_port }}" "kind.x-k8s.io/registry-from-cluster={{ registry_name }}:{{ registry_port }}"
+  when: node_list | length > 0
+
+# create a cluster with the local registry enabled in containerd
+# cat <<EOF | kind create cluster --config=-
+# kind: Cluster
+# apiVersion: kind.x-k8s.io/v1alpha4
+# containerdConfigPatches:
+#  - |-
+#    [plugins."io.containerd.grpc.v1.cri".registry.mirrors."localhost:${registry_port}"]
+#      endpoint = ["http://${registry_name}:${registry_port}"]
+#    [plugins."io.containerd.grpc.v1.cri".registry.mirrors."${registry_name}:${registry_port}"]
+#      endpoint = ["http://${registry_name}:${registry_port}"]
+#   EOF
