@@ -16,17 +16,34 @@ The following python packages should be installed using `pip` tool:
 
 === Role Variables
 
-TODO
+The full set of variables can be found in the link:defaults/main.yml[default file].
 
 === Example Playbook
+
+To use this role, create a playbook and pass it as parameter under the `roles` section
+```yaml
+  - hosts: "{{ override_host | default('masters') }}"
+    roles:
+    - { role: kind }
+```
+You can also configure the role with a tag
+```yaml
+    - { role: 'kind', tags: 'kind'}
+```
+
+=== Usage
+
+To play with this role, call your playbook and pas the tag to execute your role :
 
 ```bash
 ansible-playbook ./kubernetes/ansible/k8s-misc.yml -t kind
 ```
 
-To execute on the host machine, the playbook
+To execute the playbook on the host machine, override the `host` and setup the connection as `local`
 ```bash
-ansible-playbook ./kubernetes/ansible/k8s-misc.yml -t kind --connection=local -e override_host=localhost
+ansible-playbook ./kubernetes/ansible/k8s-misc.yml \
+    --connection=local -e override_host=localhost \
+    -t kind
 ```
 
 === How to check
