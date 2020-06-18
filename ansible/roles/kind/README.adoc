@@ -33,7 +33,7 @@ You can also configure the role with a tag
 
 === Usage
 
-To play with this role, call your playbook and pas the tag to execute your role :
+To play with this role, call your playbook and pass the tag to execute your role :
 
 ```bash
 ansible-playbook ./kubernetes/ansible/k8s-misc.yml -t kind
@@ -46,10 +46,10 @@ ansible-playbook ./kubernetes/ansible/k8s-misc.yml \
     -t kind
 ```
 
-=== How to check
+=== Check if kind cluster is working
 
 To verify if `kind` is well installed and running, if it can process `ingress route` or `docker` pull/push using the local registry,
-please execute the following commands on your local machine:
+please execute the following commands on your local machine to create the cluster and deploy the link:../ingress/README.adoc[ingress role]:
 
 ```bash
 ansible-playbook ./kubernetes/ansible/k8s-misc.yml \
