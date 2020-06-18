@@ -37,6 +37,7 @@ To verify if `kind` is well installed, can process `ingress route` or `docker` p
 ansible-playbook ./kubernetes/ansible/k8s-misc.yml \
    --connection=local -e override_host=localhost \
    -t kind
+
 ansible-playbook ./kubernetes/ansible/k8s-misc.yml  \
    --connection=local -e override_host=localhost \
    -t ingress \
