@@ -54,4 +54,4 @@ Including an example of how to use your role (for instance, with variables passe
 Author Information
 ------------------
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+This role has been created by the Snowdrop team

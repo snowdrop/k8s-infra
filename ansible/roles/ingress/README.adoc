@@ -22,8 +22,8 @@ ansible-playbook ./kubernetes/ansible/k8s-misc.yml -t ingress --connection=local
 
 === License
 
-APL
+https://www.apache.org/licenses/LICENSE-2.0[Apache License 2.0]
 
 === Author Information
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+This role has been created by the https://github.com/orgs/snowdrop/teams[Snowdrop team].
