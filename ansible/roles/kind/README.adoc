@@ -18,6 +18,14 @@ The following python packages should be installed using `pip` tool:
 
 The full set of variables can be found in the link:defaults/main.yml[default file].
 
+The version of the cluster created can be changed using the parameter `k8s_version`. The following versions are currently supported:
+
+[source,yaml,indent=0]
+----
+include::vars/main.yml[lines=2..15]
+----
+
+
 === Example Playbook
 
 To use this role, create a playbook and pass it as parameter under the `roles` section
