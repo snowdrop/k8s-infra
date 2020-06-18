@@ -1,6 +1,8 @@
+# ###############
+# Kind variables
+# ###############
 kind_cluster_name: my-cluster
 kind_version: v0.8.1
-remove: false
 
 kind_binary_directory: /usr/local/bin
 kind_archive_name: "{{ kind_version }}/kind-{{ ansible_system | lower }}-amd64"
@@ -8,3 +10,17 @@ kind_binary: "{{ kind_binary_directory}}/kind"
 
 # Set the variable k8s_version otherwise ansible will thrown an error during the execution
 k8s_version: ""
+
+# Boolean variable
+remove: false
+
+# ##########################
+# Docker registry variables
+# ##########################
+registry_name: kind-registry
+registry_port: 5000
+registry_image: registry:2
+cluster_network_name: kind
+
+# Boolean variable
+registry: true

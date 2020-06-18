@@ -1,3 +1,6 @@
 - name: Remove Kind cluster
-  shell: |
-    kind delete cluster --name={{ kind_cluster_name }}
+  command: kind delete cluster --name={{ kind_cluster_name }}
+
+- name: Remove the docker registry container when requested.
+  include_tasks: docker_container_registry.yml
+  when: registry | bool

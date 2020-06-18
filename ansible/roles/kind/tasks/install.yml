@@ -40,6 +40,10 @@
   debug:
     msg: "{{ result.stderr.split('\n') }}"
 
+- name: Setup the docker registry container when requested. Default is YES
+  include_tasks: docker_container_registry.yml
+  when: registry | bool
+
 #- name: Setup kube config
 #  shell: |
 #    kind get kubeconfig-path --name={{ kind_cluster_name }}

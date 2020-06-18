@@ -12,7 +12,6 @@
     - { role: 'ingress',   tags: 'ingress'}
     - { role: 'k8s_dashboard',   tags: 'k8s_dashboard'}
     - { role: 'docker_registry',   tags: 'docker_registry'}
-    - { role: 'docker_container_registry', tags: 'docker_container_registry'}
     - { role: 'cert_manager', tags: 'cert_manager' }
     # Team web sites: snowdrop.me|dev, halkyon.io -> redirect to github.io
     - { role: 'k8s_halkyon_site',       tags: 'k8s_halkyon_site'}

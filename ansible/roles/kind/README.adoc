@@ -31,22 +31,19 @@ ansible-playbook ./kubernetes/ansible/k8s-misc.yml -t kind --connection=local -e
 
 === How to check
 
-To verify if `kind` is well installed, can process `ingress route` or `docker` pull/push using the local registry, please execute the following commands:
+To verify if `kind` is well installed and running, if it can process `ingress route` or `docker` pull/push using the local registry,
+please execute the following commands on your local machine:
 
 ```bash
 ansible-playbook ./kubernetes/ansible/k8s-misc.yml \
    --connection=local -e override_host=localhost \
+   -e registry=true \
    -t kind
 
 ansible-playbook ./kubernetes/ansible/k8s-misc.yml  \
    --connection=local -e override_host=localhost \
    -t ingress \
    -e target_platform=kind
-
-ansible-playbook ./kubernetes/ansible/k8s-misc.yml \
-   --connection=local -e override_host=localhost \
-   -t docker_container_registry \
-   -e remove=false
 ```
 
 Next, pull a docker image, tag it
@@ -56,7 +53,7 @@ docker tag gcr.io/google-samples/hello-app:1.0 localhost:5000/hello-app:1.0
 docker push localhost:5000/hello-app:1.0
 ```
 
-and create a `Hello world` applicqtion to verify if it works
+and create a `Hello world` application to verify if it works
 ```bash
 kubectl create ns demo
 kubectl create deployment hello-server --image=localhost:5000/hello-app:1.0 -n demo
