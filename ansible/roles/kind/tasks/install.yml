@@ -27,9 +27,9 @@
   register: mktemp
   changed_when: False
 
-- name: Copy the kind config file
-  copy:
-    src: files/config.yml
+- name: Populate the kind config file from the template
+  template:
+    src: config.yml.j2
     dest: "{{ mktemp.stdout }}/config.yml"
 
 - name: Create Kubernetes Cluster using the config file

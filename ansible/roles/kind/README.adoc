@@ -18,7 +18,11 @@ TODO
 
 ```bash
 ansible-playbook ./kubernetes/ansible/k8s-misc.yml -t kind
-ansible-playbook ./kubernetes/ansible/k8s-local.yml -t kind -i ./ansible/inventory/local --connection=local
+```
+
+To execute on the host machine, the playbook
+```bash
+ansible-playbook ./kubernetes/ansible/k8s-misc.yml -t kind --connection=local -e override_host=localhost
 ```
 
 === License
