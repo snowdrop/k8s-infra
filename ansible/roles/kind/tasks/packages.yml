@@ -1,0 +1,6 @@
+- name: Install module dependencies
+  pip:
+    name:
+      - docker==4.2.1
+      - openshift==0.11.2
+    executable: pip3
