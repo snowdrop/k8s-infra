@@ -10,7 +10,7 @@
 
 # Introduction
 
-This document describes the requirements and the process to execute to install k8s on a host. The installation will be done using Ansible.
+This document describes the requirements, and the process to execute to install a k8s cluster on a host. The installation will be done using Ansible.
 
 ## Scope
 

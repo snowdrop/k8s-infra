@@ -10,9 +10,12 @@ This role will install the Kubernetes https://github.com/kubernetes-sigs/kind[`K
 
 A docker daemon must be installed using the following link:../docker/README.adoc[docker role] if no there.
 
-The following python packages should be installed using `pip` tool:
+The following python3 packages should be installed using `pip` tool:
 - docker
 - openshift
+
+**REMARK**: Configure the following ENV VAR `export ANSIBLE_PYTHON_INTERPRETER=$(which python3)` to be sure that ansible use `Python3`
+
 
 === Role Variables
 
