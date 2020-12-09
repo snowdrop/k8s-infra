@@ -3,4 +3,4 @@ name: "k8s-infra"
 version: "0.0.1"
 readme: "README.md"
 authors:
-  - "snowDrop <snowdrop-team@redhat.com"
+  - "SnowDrop <snowdrop-team@redhat.com"
