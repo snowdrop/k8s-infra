@@ -118,3 +118,59 @@ $ VM_NAME=xXx \
 ```
 
 > NOTE: Both kubernetes playbooks (`k8s` and `k8s-misc`) can have it's host overriden using the `override_host` variable, e.g., `-e override_host=localhost` to launch it on the controller itself.
+
+# Troublehsooting
+
+## Expired k8s certificate
+
+### Problem
+
+- kubelet service shows connection errors. 
+- The docker container running the k8s API server cannot be started
+
+### Cause
+
+```bash
+$ docker logs xxxxxxxxxxxx
+...
+W0121 11:09:31.447982       1 clientconn.go:1251] grpc: addrConn.createTransport failed to connect to {127.0.0.1:2379 0  <nil>}. Err :connection error: desc = "transport: authentication handshake failed: x509: certificate has expired or is not yet valid". Reconnecting...
+```
+
+```bash
+$ openssl x509 -in /etc/kubernetes/pki/apiserver.crt -noout -text |grep ' Not '
+```
+
+### Solution
+
+Renew the certificate.
+
+Reference: https://www.ibm.com/support/knowledgecenter/SSCKRH_1.1.0/platform/t_certificate_renewal.html
+
+```bash
+$ kubeadm alpha certs renew all
+```
+
+## Cannot login using kubelet
+
+### Problem
+
+```bash
+$ kubectl get pods
+error: You must be logged in to the server (Unauthorized)
+```
+
+This might happen for instance after renewing the certificates.
+
+### Cause
+
+The `~/.kube/config` is not correctly updated.
+
+### Solution
+
+```bash
+$ cd /etc/kubernetes
+$ sudo kubeadm alpha kubeconfig user --org system:nodes --client-name system:node:$(hostname) > kubelet.conf
+$ diff $HOME/fcik8s-old-certs/kubelet.conf /etc/kubernetes/kubelet.conf
+```
+
+
