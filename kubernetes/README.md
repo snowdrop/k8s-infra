@@ -1,12 +1,22 @@
 # Table of Contents
 
-   * [Introduction](#introduction)
-      * [Scope](#scope)
-   * [Requirements](#requirements)
-      * [Ansible Inventory](#ansible-inventory)
-      * [Host provisioning](#host-provisioning)
-      * [Host-Group Association](#host-group-association)
-   * [Installation](#installation)
+- [Table of Contents](#table-of-contents)
+- [Introduction](#introduction)
+  - [Scope](#scope)
+- [Requirements](#requirements)
+  - [Ansible Inventory](#ansible-inventory)
+  - [Host provisioning](#host-provisioning)
+  - [Host-Group Association](#host-group-association)
+- [Installation](#installation)
+- [Troublehsooting](#troublehsooting)
+  - [Expired k8s certificate](#expired-k8s-certificate)
+    - [Problem](#problem)
+    - [Cause](#cause)
+    - [Solution](#solution)
+  - [Cannot login using kubelet](#cannot-login-using-kubelet)
+    - [Problem](#problem-1)
+    - [Cause](#cause-1)
+    - [Solution](#solution-1)
 
 # Introduction
 
