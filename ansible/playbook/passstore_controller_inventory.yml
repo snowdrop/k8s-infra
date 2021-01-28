@@ -5,19 +5,19 @@
     - name: vm_name
       prompt: vm name
       private: no
-      when: " vm_name is not defined "
+      #when: " vm_name is not defined "
     - name: pass_provider
       prompt: Passwordstore Provider [hetzner,openstack,...]
       private: no
-      when: " pass_provider is not defined "
+      #when: " pass_provider is not defined "
     - name: k8s_type
       prompt: Kubernetes host type [masters,nodes], empty for no k8s installation
       private: no
-      when: " k8s_type is not defined "
+      #when: " k8s_type is not defined "
     - name: k8s_version
       prompt: Kubernetes version [115,116], empty for no k8s installation
       private: no
-      when: " k8s_type is not defined "
+      #when: " k8s_type is not defined "
 
   pre_tasks:
     - name: Check k8s_type value
@@ -28,8 +28,8 @@
 
     - name: Check k8s_version value
       fail:
-        msg: "Invalid k8s version {{ k8s_version }}. Should be in [115,116]"
-      when: "k8s_version != '115' and k8s_version != '116' and k8s_version | length > 0"
+        msg: "Invalid k8s version {{ k8s_version }}. Should be in [115,120]"
+      when: "k8s_version != '115' and k8s_version != '116' and k8s_version != '117' and k8s_version != '118' and k8s_version != '119' and k8s_version != '120' and k8s_version | length > 0"
       tags: [always]
 
   tasks:
@@ -76,5 +76,3 @@
         - "k8s_{{ k8s_version }}"
       when: "k8s_type is defined and k8s_type | length > 0 and k8s_version is defined and k8s_version | length > 0"
       tags: [always]
-
-...
