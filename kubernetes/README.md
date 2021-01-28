@@ -1,12 +1,22 @@
 # Table of Contents
 
-   * [Introduction](#introduction)
-      * [Scope](#scope)
-   * [Requirements](#requirements)
-      * [Ansible Inventory](#ansible-inventory)
-      * [Host provisioning](#host-provisioning)
-      * [Host-Group Association](#host-group-association)
-   * [Installation](#installation)
+- [Table of Contents](#table-of-contents)
+- [Introduction](#introduction)
+  - [Scope](#scope)
+- [Requirements](#requirements)
+  - [Ansible Inventory](#ansible-inventory)
+  - [Host provisioning](#host-provisioning)
+  - [Host-Group Association](#host-group-association)
+- [Installation](#installation)
+- [Troublehsooting](#troublehsooting)
+  - [Expired k8s certificate](#expired-k8s-certificate)
+    - [Problem](#problem)
+    - [Cause](#cause)
+    - [Solution {#k8s-cert-sol}](#solution-k8s-cert-sol)
+  - [Cannot login using kubelet](#cannot-login-using-kubelet)
+    - [Problem](#problem-1)
+    - [Cause](#cause-1)
+    - [Solution](#solution)
 
 # Introduction
 
@@ -118,3 +128,71 @@ $ VM_NAME=xXx \
 ```
 
 > NOTE: Both kubernetes playbooks (`k8s` and `k8s-misc`) can have it's host overriden using the `override_host` variable, e.g., `-e override_host=localhost` to launch it on the controller itself.
+
+# Troublehsooting
+
+## Expired k8s certificate
+
+### Problem
+
+- kubelet service shows connection errors. 
+- The docker container running the k8s API server cannot be started
+
+### Cause
+
+```bash
+$ docker logs xxxxxxxxxxxx
+...
+W0121 11:09:31.447982       1 clientconn.go:1251] grpc: addrConn.createTransport failed to connect to {127.0.0.1:2379 0  <nil>}. Err :connection error: desc = "transport: authentication handshake failed: x509: certificate has expired or is not yet valid". Reconnecting...
+```
+
+ Check the validity of the kubernetes certificate using the following command. If they have been expired, then apply the trick as defined at the [Solution](#solution-k8s-cert-sol) section
+
+```bash
+$ openssl x509 -in /etc/kubernetes/pki/apiserver.crt -noout -text |grep ' Not '
+```
+### Solution {#k8s-cert-sol}
+
+The solution applied was the [this answer on stackoverflow thread](https://stackoverflow.com/questions/56320930/renew-kubernetes-pki-after-expired/56334732#56334732) applied to our k8s 1.14 cluster.
+
+Other references: 
+* https://www.ibm.com/support/knowledgecenter/SSCKRH_1.1.0/platform/t_certificate_renewal.html
+
+```bash
+$ cd /etc/kubernetes/pki/
+$ mv {apiserver.crt,apiserver-etcd-client.key,apiserver-kubelet-client.crt,front-proxy-ca.crt,front-proxy-client.crt,front-proxy-client.key,front-proxy-ca.key,apiserver-kubelet-client.key,apiserver.key,apiserver-etcd-client.crt} ~/
+$ kubeadm init phase certs all --apiserver-advertise-address <IP>
+$ cd /etc/kubernetes/
+$ mv {admin.conf,controller-manager.conf,kubelet.conf,scheduler.conf} ~/
+$ kubeadm init phase kubeconfig all
+$ reboot
+```
+
+And then update the user's kube config.
+
+```bash
+$ cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+```
+
+## Cannot login using kubelet
+
+### Problem
+
+```bash
+$ kubectl get pods
+error: You must be logged in to the server (Unauthorized)
+```
+
+This might happen for instance after renewing the certificates.
+
+### Cause
+
+The `~/.kube/config` does not content the client-certificate-data and client-key-data updated after renewing the certificate.
+
+### Solution
+
+```bash
+$ cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+```
+
+
