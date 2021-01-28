@@ -12,11 +12,11 @@
   - [Expired k8s certificate](#expired-k8s-certificate)
     - [Problem](#problem)
     - [Cause](#cause)
-    - [Solution](#solution)
+    - [Solution {#k8s-cert-sol}](#solution-k8s-cert-sol)
   - [Cannot login using kubelet](#cannot-login-using-kubelet)
     - [Problem](#problem-1)
     - [Cause](#cause-1)
-    - [Solution](#solution-1)
+    - [Solution](#solution)
 
 # Introduction
 
@@ -146,18 +146,32 @@ $ docker logs xxxxxxxxxxxx
 W0121 11:09:31.447982       1 clientconn.go:1251] grpc: addrConn.createTransport failed to connect to {127.0.0.1:2379 0  <nil>}. Err :connection error: desc = "transport: authentication handshake failed: x509: certificate has expired or is not yet valid". Reconnecting...
 ```
 
+ Check the validity of the kubernetes certificate using the following command. If they have been expired, then apply the trick as defined at the [Solution](#solution-k8s-cert-sol) section
+
 ```bash
 $ openssl x509 -in /etc/kubernetes/pki/apiserver.crt -noout -text |grep ' Not '
 ```
+### Solution {#k8s-cert-sol}
 
-### Solution
+The solution applied was the [this answer on stackoverflow thread](https://stackoverflow.com/questions/56320930/renew-kubernetes-pki-after-expired/56334732#56334732) applied to our k8s 1.14 cluster.
 
-Renew the certificate.
-
-Reference: https://www.ibm.com/support/knowledgecenter/SSCKRH_1.1.0/platform/t_certificate_renewal.html
+Other references: 
+* https://www.ibm.com/support/knowledgecenter/SSCKRH_1.1.0/platform/t_certificate_renewal.html
 
 ```bash
-$ kubeadm alpha certs renew all
+$ cd /etc/kubernetes/pki/
+$ mv {apiserver.crt,apiserver-etcd-client.key,apiserver-kubelet-client.crt,front-proxy-ca.crt,front-proxy-client.crt,front-proxy-client.key,front-proxy-ca.key,apiserver-kubelet-client.key,apiserver.key,apiserver-etcd-client.crt} ~/
+$ kubeadm init phase certs all --apiserver-advertise-address <IP>
+$ cd /etc/kubernetes/
+$ mv {admin.conf,controller-manager.conf,kubelet.conf,scheduler.conf} ~/
+$ kubeadm init phase kubeconfig all
+$ reboot
+```
+
+And then update the user's kube config.
+
+```bash
+$ cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 ```
 
 ## Cannot login using kubelet
@@ -173,14 +187,12 @@ This might happen for instance after renewing the certificates.
 
 ### Cause
 
-The `~/.kube/config` is not correctly updated.
+The `~/.kube/config` does not content the client-certificate-data and client-key-data updated after renewing the certificate.
 
 ### Solution
 
 ```bash
-$ cd /etc/kubernetes
-$ sudo kubeadm alpha kubeconfig user --org system:nodes --client-name system:node:$(hostname) > kubelet.conf
-$ diff $HOME/fcik8s-old-certs/kubelet.conf /etc/kubernetes/kubelet.conf
+$ cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 ```
 
 
