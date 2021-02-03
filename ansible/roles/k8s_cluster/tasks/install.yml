@@ -58,6 +58,10 @@
 - include_tasks: docker.yml
   when: install_docker | bool
 
+- name: "Install containerd"
+  include_tasks: "install_containerd.yml"
+  when: install_containerd | bool
+  
 - name: Add kubernetes repository
   yum_repository:
     name: kubernetes

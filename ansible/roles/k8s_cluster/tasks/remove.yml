@@ -13,3 +13,6 @@
       - kubectl-{{k8s_version}}
       - kubelet-{{k8s_version}}
   become: yes
+
+- name: "Remove containerd"
+  include_tasks: "remove_containerd.yml"
