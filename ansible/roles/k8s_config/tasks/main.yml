@@ -56,9 +56,17 @@
     dest: "/tmp/{{ k8s_config_filename }}"
   delegate_to: localhost
 
+- name: Get K8S config
+  shell: |
+    cat /tmp/{{ k8s_config_filename }}
+  register: get_config
+  delegate_to: localhost
+
 - name: Print kubernetes config file location
   debug:
     msg:
       - "You can use the following Kubernetes config file to interact with remote cluster via kubectl"
       - "{{ inventory_location }}/{{ k8s_config_filename }}"
+      - "or copy/paste the following config included between the [...] in a file"
+      - "{{ get_config.stdout_lines }}"
 ...
