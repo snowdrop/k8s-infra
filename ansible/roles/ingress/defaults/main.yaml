@@ -1,1 +1,2 @@
 ingress_version: 2.6.0
+target_platform: cloud
