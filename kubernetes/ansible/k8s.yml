@@ -3,9 +3,6 @@
   hosts: "{{ override_host | default('masters') }}"
   gather_facts: "{{ gathering_host_info | default('true') | bool == true }}"
 
-  environment:
-    KUBECONFIG: /etc/kubernetes/admin.conf
-
   # Define default values for variables that are common between roles
   vars:
     client_tool: kubectl

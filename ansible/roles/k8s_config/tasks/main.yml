@@ -13,23 +13,22 @@
     group: "{{ ansible_user }}"
     mode: '0644'
     remote_src: yes
+    force: no
   become: yes
 
 - set_fact:
     k8s_server: "https://{{ ansible_ssh_host }}:6443"
     inventory_location: "{{ lookup('env', 'PWD') }}/inventory"
-
-- name: Get secret name
-  shell: |
-    kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config -n kube-system get secret | grep default-token | awk '{print $1}'
-  register: get_secret_out
+  when: apiserver_address is undefined
 
 - set_fact:
-    k8s_secret_name: "{{ get_secret_out.stdout }}"
+    k8s_server: "https://{{ apiserver_address }}:6443"
+    inventory_location: "{{ lookup('env', 'PWD') }}/inventory"
+  when: (apiserver_address is defined) and (apiserver_address|length > 0)
 
 - name: Get CA
   shell: |
-    kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config -n kube-system get secret/{{ k8s_secret_name }} -o jsonpath='{.data.ca\.crt}'
+    kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config get secrets -o jsonpath="{.items[?(@.metadata.annotations['kubernetes\.io/service-account\.name']=='default')].data.ca\.crt}"
   register: get_ca_out
 
 - set_fact:
@@ -37,7 +36,7 @@
 
 - name: Get token
   shell: |
-    kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config -n kube-system get secret/{{ k8s_secret_name }} -o jsonpath='{.data.token}' | base64 -d
+    kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config get secrets -o jsonpath="{.items[?(@.metadata.annotations['kubernetes\.io/service-account\.name']=='default')].data.token}" | base64 -d
   register: get_token_out
 
 - set_fact:
@@ -45,7 +44,7 @@
 
 - name: Get namespace
   shell: |
-    kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config -n kube-system get secret/{{ k8s_secret_name }} -o jsonpath='{.data.namespace}' | base64 -d
+    kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config get secrets -o jsonpath="{.items[?(@.metadata.annotations['kubernetes\.io/service-account\.name']=='default')].data.namespace}" | base64 -d
   register: get_namespace_out
 
 - set_fact:
@@ -55,9 +54,7 @@
   template:
     src: "k8s-config.yml.j2"
     dest: "/tmp/{{ k8s_config_filename }}"
-#    dest: "{{ inventory_location }}/{{ k8s_config_filename }}"
   delegate_to: localhost
-  become: no
 
 - name: Print kubernetes config file location
   debug:

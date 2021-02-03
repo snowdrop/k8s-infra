@@ -1,4 +1,11 @@
 ---
+- set_fact:
+    api_server: "{{ ansible_ssh_host }}"
+  when: apiserver_address is undefined
+
+- set_fact:
+    api_server: "{{ apiserver_address }}"
+  when: (apiserver_address is defined) and (apiserver_address|length > 0)
 
 - name: Include firewalld handlers
   include_role:
@@ -103,21 +110,35 @@
   become: yes
 
 - name: Initialize cluster for k8s - {{ k8s_version }}
-  command: "kubeadm init --pod-network-cidr={{ pod_subnet }} --apiserver-advertise-address={{ ansible_ssh_host }} --kubernetes-version {{ k8s_version }}"
+  command: "kubeadm init --pod-network-cidr={{ pod_subnet }} --apiserver-advertise-address={{ api_server }} --kubernetes-version {{ k8s_version }}"
   register: kubeadm_init_res
   changed_when: "kubeadm_init_res.rc == 0"
   failed_when: "kubeadm_init_res.rc != 0  and 'already exists' not in kubeadm_init_res.stderr"
+  become: yes
+
+- name: Create k8s config folder for os user
+  file:
+    path: ".kube"
+    state: directory
+    mode: '0755'
+
+- name: Copy k8s config file to the user home
+  copy:
+    src: "/etc/kubernetes/admin.conf"
+    dest: ".kube/config"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0644'
+    remote_src: yes
   become: yes
 
 - name: "Install Flannel Virtual Network for pod communication"
   shell: |
     kubectl -n kube-system get deployment coredns -o yaml | sed 's/allowPrivilegeEscalation: false/allowPrivilegeEscalation: true/g' | kubectl apply -f -
     kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/{{ coreos_flannel_sha_commit }}/Documentation/kube-flannel.yml
-  become: yes
 
 - name: Taint the node
   command: "kubectl taint nodes --all node-role.kubernetes.io/master-"
-  become: yes
 
 - name: Generate ClusterRole file for the sa default and namespace kube-system
   template:
@@ -128,33 +149,11 @@
 - name: Grant Cluster Admin role to the serviceaccount default of kube-system
   shell: |
     kubectl apply -f /tmp/clusterrole-admin.yml
-  become: yes
 
 - name: Create persistence volume
   include_tasks: create_single_pv.yml
   vars:
     volume_name: "pv{{ item }}"
   with_sequence: start=1 count=5 format=%03d
-
-- name: Create k8s config folder for os user
-  file:
-    path: ".kube"
-    state: directory
-    mode: '0755'
-
-- name: Copy k8s config file
-  copy:
-    src: "/etc/kubernetes/admin.conf"
-    dest: ".kube/config"
-    owner: "{{ ansible_user }}"
-    group: "{{ ansible_user }}"
-    mode: '0644'
-    remote_src: yes
-  become: yes
-
-- name: Execute k8s_config role
-  include_role:
-    name: k8s_config
-  when: remote | bool
 
 ...

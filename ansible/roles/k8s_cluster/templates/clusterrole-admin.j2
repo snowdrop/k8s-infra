@@ -1,7 +1,7 @@
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
 metadata:
-  name: system:kube-system:default
+  name: system:default:default
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -9,4 +9,4 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: default
-    namespace: kube-system
+    namespace: default
