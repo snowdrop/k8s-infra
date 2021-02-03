@@ -26,6 +26,17 @@
     inventory_location: "{{ lookup('env', 'PWD') }}/inventory"
   when: (apiserver_address is defined) and (apiserver_address|length > 0)
 
+- name: Get namespace
+  shell: |
+    kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config get secrets -o jsonpath="{.items[?(@.metadata.annotations['kubernetes\.io/service-account\.name']=='default')].data.namespace}" | base64 -d
+  register: get_namespace_out
+  until: get_namespace_out.stdout != ""
+  retries: 10
+  delay: 5
+
+- set_fact:
+    k8s_namespace: "{{ get_namespace_out.stdout }}"
+
 - name: Get CA
   shell: |
     kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config get secrets -o jsonpath="{.items[?(@.metadata.annotations['kubernetes\.io/service-account\.name']=='default')].data.ca\.crt}"
@@ -41,14 +52,6 @@
 
 - set_fact:
     k8s_token: "{{ get_token_out.stdout }}"
-
-- name: Get namespace
-  shell: |
-    kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config get secrets -o jsonpath="{.items[?(@.metadata.annotations['kubernetes\.io/service-account\.name']=='default')].data.namespace}" | base64 -d
-  register: get_namespace_out
-
-- set_fact:
-    k8s_namespace: "{{ get_namespace_out.stdout }}"
 
 - name: Save config
   template:
