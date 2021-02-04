@@ -4,8 +4,6 @@ k8s_dashboard_secret_name: kubernetes-dashboard-certs
 
 k8s_dashboard_version: v2.0.0
 
-k8s_dashboard_ingress_host: "{{ ansible_ssh_host }}.nip.io"
-
 k8s_dashboard_token_public: changeme
 k8s_dashboard_token_secret: changeme
 k8s_dashboard_token_ttl: 0
