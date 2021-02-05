@@ -58,10 +58,9 @@
   local_action: template src="k8s-config.yml.j2" dest={{ lookup('env', 'PWD') }}/{{ k8s_config_filename }}
 
 - name: Get K8S config
-  shell: |
-    cat kube.cfg
+  connection: local
+  local_action: cat {{ lookup('env', 'PWD') }}/{{ k8s_config_filename }}
   register: get_config
-  delegate_to: localhost
 
 - name: Print kubernetes config file location
   debug:
