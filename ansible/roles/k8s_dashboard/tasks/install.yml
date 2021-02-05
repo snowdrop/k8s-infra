@@ -88,6 +88,10 @@
   shell: |
     kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config apply -f /tmp/rbac.yml
     kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config apply -f /tmp/ingress-dashboard.yml
+  register: result
+  retries: 3
+  delay: 10
+  until: result is not failed
 
 - name: Print kubernetes dashboard URL & Token
   debug:
