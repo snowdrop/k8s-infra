@@ -26,10 +26,10 @@ ansible-playbook -i ansible/local ../kubernetes/ansible/k8s.yml -e pass_provider
 ```
 - Patch the Ingress controller service to add an `externalIP` as no external Loadbalancer has been deployed. Without such an IP address, then the status of the service will stay equal to `pending`
 ```bash
-kubectl --kubeconfig=./kube.cfg patch svc/ingress-nginx-controller -n ingress-nginx -p '{"spec": {"type": "LoadBalancer", "externalIPs":["<IP_ADDRESS>>"]}}'
+kubectl --kubeconfig=./remote-k8s-config.yml patch svc/ingress-nginx-controller -n ingress-nginx -p '{"spec": {"type": "LoadBalancer", "externalIPs":["<IP_ADDRESS>>"]}}'
 
 Example
-kubectl --kubeconfig=./kube.cfg patch svc/ingress-nginx-controller -n ingress-nginx -p '{"spec": {"type": "LoadBalancer", "externalIPs":["192.168.99.50"]}}'
+kubectl --kubeconfig=./remote-k8s-config.yml patch svc/ingress-nginx-controller -n ingress-nginx -p '{"spec": {"type": "LoadBalancer", "externalIPs":["192.168.99.50"]}}'
 ```
 - To install separately some features, use these ansible commands
 ```bash
