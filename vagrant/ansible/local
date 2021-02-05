@@ -1,0 +1,22 @@
+[k8s:children]
+masters
+
+[k8s:vars]
+host_key_checking=false
+remote=false
+
+ansible_port=2222
+ansible_ssh_host=127.0.0.1
+ansible_user=vagrant
+ansible_user_dir=/home/${ansible_user}
+ansible_ssh_private_key_file=.vagrant/machines/default/virtualbox/private_key
+
+apiserver_address=192.168.99.50
+pod_subnet=10.244.0.0/16
+service_subnet=10.96.0.0/12
+
+firewalld_public_ports=['6443/tcp','10250/tcp','10255/tcp','8472/udp','30000-32767/tcp']
+firewalld_public_services=['http','https']
+
+[masters]
+127.0.0.1 k8s_dashboard_version=v2.1.0

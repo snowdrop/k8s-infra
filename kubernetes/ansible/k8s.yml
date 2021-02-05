@@ -15,4 +15,4 @@
     - role: 'ingress'
       tags: [always,ingress]
     - role: 'k8s_dashboard'
-      tags: [always,k8s_dashboard]
+      tags: [k8s_dashboard]

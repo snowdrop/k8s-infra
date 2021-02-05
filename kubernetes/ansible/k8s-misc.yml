@@ -6,19 +6,6 @@
   vars:
     client_tool: kubectl
 
-  pre_tasks:
-    - name: Install Python3 if missing
-      yum:
-        name:
-        - python3
-        - python3-pip
-        state: present
-        use_backend: yum
-      become: yes
-      vars:
-        ansible_python_interpreter: /usr/bin/python
-      tags: always
-
   roles:
     - { role: 'k8s_cluster',   tags: 'k8s_cluster'}
     - { role: 'k8s_config',   tags: 'k8s_config'}

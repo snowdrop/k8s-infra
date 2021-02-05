@@ -1,26 +1,26 @@
 Table of Contents
 =================
 
-   * [Instructions to install a k8s cluster](#instructions-to-install-a-k8s-cluster)
-   * [Become a Docker Machine](#become-a-docker-machine)
-   * [Provision the Cluster](#provision-the-cluster)
-      * [Local](#local)
-         * [Kind](#kind)
-         * [Microk8s](#microk8s)
-         * [Minikube](#minikube)
-         * [MiniShift](#minishift)
-      * [Local - Customized VM](#local---customized-vm)
-         * [Create vdi file from Cloud ISO](#create-vdi-file-from-cloud-iso)
-         * [Create VM on VirtualBox](#create-vm-on-virtualbox)
-         * [Public Cloud provider](#public-cloud-provider)
+* [Instructions to install a k8s cluster](#instructions-to-install-a-k8s-cluster)
+    * [Become a Docker Machine](#become-a-docker-machine)
+    * [Provision the Cluster](#provision-the-cluster)
+        * [Local](#local)
+            * [Kind](#kind)
+            * [Microk8s](#microk8s)
+            * [Minikube](#minikube)
+        * [Local - Vagrant](#local---vagrant)
+        * [Local - Customized VM](#local---customized-vm)
+            * [Create vdi file from Cloud ISO](#create-vdi-file-from-cloud-iso)
+            * [Create VM on VirtualBox](#create-vm-on-virtualbox)
+        * [Public Cloud provider](#public-cloud-provider)
             * [Hetzner - bare metal](#hetzner---bare-metal)
             * [Hetzner Cloud - virtualized](#hetzner-cloud---virtualized)
-         * [Private Cloud provider](#private-cloud-provider)
+        * [Private Cloud provider](#private-cloud-provider)
             * [OpenStack - vpn](#openstack---vpn)
-   * [Cluster Deployment](#cluster-deployment)
-      * [OpenShift](#openshift)
-      * [Kubernetes](#kubernetes)
-   * [Turn on your machine into a Cloud Native Dev environment](#turn-on-your-machine-into-a-cloud-native-dev-environment)
+    * [Cluster Deployment](#cluster-deployment)
+        * [OpenShift](#openshift)
+        * [Kubernetes](#kubernetes)
+    * [Turn on your machine into a Cloud Native Dev environment](#turn-on-your-machine-into-a-cloud-native-dev-environment)
 
 # Instructions to install a k8s cluster
 
@@ -73,51 +73,9 @@ See instructions - https://github.com/ubuntu/microk8s
 
 See the [official documentation](https://kubernetes.io/docs/tasks/tools/install-minikube/) to install `minikube` on Macos, Linux or Windows
 
-#### MiniShift
+### Local - Vagrant
 
-**Deprecated as minishift it only supports ocp3 !**
-
-`Minishift` is a tool that helps you to run `OpenShift` locally by launching a single-node `OpenShift` cluster inside a virtual machine.
-
-- Why or when to use it ? 
-  - To try out `OpenShift` or develop with it, day-to-day, on your local machine
-  - `ansible playbooks` can't be use to perform post installation tasks
-  - `addons` exist to install additional features but syntax is very basic
-
-- Prerequisites
-  - [Xhyve](https://docs.openshift.org/latest/minishift/getting-started/setting-up-virtualization-environment.html#setting-up-xhyve-driver) OR 
-  - [Virtualbox](https://docs.openshift.org/latest/minishift/getting-started/setting-up-virtualization-environment.html#setting-up-virtualbox-driver) OR 
-  - [Hyperkit](https://docs.openshift.org/latest/minishift/getting-started/setting-up-virtualization-environment.html#setting-up-hyperkit-driver) hypervisor is installed
-
-- How To
-
-  1. Download and [install](https://docs.openshift.org/latest/minishift/getting-started/installing.html) `Minishift` using latest release available
-  
-  2. Start it locally
-  
-     ```bash
-     minishift start
-     ```
- 
-  3. For a more complex scenario where additional features are required, then you can (re)use the following bash script - `bootstrap_vm.sh <image_cache_boolean> <ocp_version>`. 
-     It will create a `centos7` vm using `xhyve` hypervisor and next execute this list of tasks
-  
-     - Create a MiniShift `demo` profile
-     - Git clone `MiniShift addons` repo to install the `ansible-service-broker`
-     - Enable/disable `MiniShift` cache (according to the `boolean` parameter)
-     - Install the docker images within the OpenShift registry, according to the ocp version defined
-     - Start `MiniShift` using the experimental features
-     
-     ```bash
-     cd minishift    
-     ./bootstrap_vm.sh true 3.11.0
-     ```
-     
-     **NOTE** : The caching option can be used in order to export the docker images locally, which will speed up the bootstrap process next time you recreate the OpenShift virtual machine / installation.
-     
-     **NOTE** : The user to use to access the OpenShift installation is `admin` with the password `admin`. This user has been granted the OpenShift Cluster Admin role.
-     
-     **NOTE** : Once the virtual machine has been created, it can be stopped/started using the commands `minishift stop|start --profile demo`.
+See the [vagrant](vagrant/README.md)
 
 ### Local - Customized VM
 

@@ -1,0 +1,46 @@
+script = <<-SCRIPT
+sudo swapoff -a
+sudo sed -i '/-swap/ s/^/#/' /etc/fstab
+touch rollout_k8s.sh && chmod +x rollout_k8s.sh
+cat <<EOF > rollout_k8s.sh
+#!/bin/bash
+
+declare -a Versions=("1.14.10" "1.15.12" "1.16.15" "1.17.17" "1.18.15" "1.19.7" "1.20.2")
+MASTER=centos7.localdomain
+
+for VERSION in \${Versions[@]}; do
+   echo "#######################################################"
+   echo "##### K8s version to be upgraded to : \$VERSION ########"
+   echo "#######################################################"
+   sudo yum install -y kubeadm-\$VERSION --disableexcludes=kubernetes
+   sudo kubeadm upgrade apply v\$VERSION
+   sudo kubectl --kubeconfig=.kube/config drain \$MASTER --ignore-daemonsets --delete-local-data
+   sudo yum install -y kubelet-\$VERSION kubectl-\$VERSION --disableexcludes=kubernetes
+   sudo systemctl daemon-reload
+   sudo systemctl restart kubelet
+   sudo kubectl --kubeconfig=.kube/config uncordon \$MASTER
+done
+EOF
+sudo chown vagrant:vagrant rollout_k8s.sh
+SCRIPT
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "generic/centos7"
+  config.vm.provision "shell", inline: script
+  #config.vm.provision :shell do |s|
+  #  s.path = "scripts/provisionscript.sh"
+  #  s.env = {
+  #      K8S_VERSION:ENV['K8S_VERSION'],
+  #      IP_ADDRESS:ENV['IP_ADDRESS'],
+  #      VM_USER:ENV['VM_USER']
+  #  }
+  #end
+  config.vm.network :private_network, ip: '192.168.99.50'
+  #config.vm.network "forwarded_port", guest: 6443, host: 6443
+  #config.vm.network "forwarded_port", guest: 32641, host: 32641
+
+  config.vm.provider :virtualbox do |v|
+    v.name = "centos-k8s"
+    v.memory = 3600
+  end
+end
