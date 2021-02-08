@@ -53,23 +53,20 @@
 - set_fact:
     k8s_token: "{{ get_token_out.stdout }}"
 
-- name: Save config
-  template:
-    src: "k8s-config.yml.j2"
-    dest: "/tmp/{{ k8s_config_filename }}"
-  delegate_to: localhost
+- name: Save locally (= your laptop) the kube config
+  connection: local
+  local_action: template src="k8s-config.yml.j2" dest={{ lookup('env', 'PWD') }}/{{ k8s_config_filename }}
 
 - name: Get K8S config
-  shell: |
-    cat /tmp/{{ k8s_config_filename }}
+  connection: local
+  local_action: command cat {{ lookup('env', 'PWD') }}/{{ k8s_config_filename }}
   register: get_config
-  delegate_to: localhost
 
 - name: Print kubernetes config file location
   debug:
     msg:
       - "You can use the following Kubernetes config file to interact with remote cluster via kubectl"
-      - "{{ inventory_location }}/{{ k8s_config_filename }}"
+      - "{{ k8s_config_filename }}"
       - "or copy/paste the following config included between the [...] in a file"
       - "{{ get_config.stdout_lines }}"
 ...
