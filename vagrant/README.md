@@ -1,4 +1,4 @@
-# Vagrabt project
+# Vagrant project
 
 The goal of this project is to help you to launch locally using vagrant a Centos VM and next to create a kubernetes cluster 
 using `kubeadml` and `kubelet` tools
