@@ -4,7 +4,8 @@ remove: false
 remote: true
 
 ingress_host: "{{ ansible_ssh_host }}.nip.io"
-install_docker: true
+install_docker: false
+install_containerd: true
 
 firewalld_public_ports:
   - 6443/tcp

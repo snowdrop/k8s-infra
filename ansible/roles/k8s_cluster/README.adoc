@@ -5,7 +5,6 @@ Cluster target type: K8s
 === Description
 
 This role will install a Kubernetes cluster on a linux machine using `kubelet` and `kubeadmin`.
-A docker daemon will be installed using the following link:../ansible/roles/docker/README.adoc[docker role] if no there.
 
 === Requirements
 
@@ -13,7 +12,13 @@ TODO
 
 === Role Variables
 
-TODO
+To play with a Kubernetes cluster, you must deploy a [container runtime](https://kubernetes.io/docs/setup/production-environment/container-runtimes/).
+We support 2 of them: docker, containerd which can be configured using the following variables:
+
+| Name | Type | Value |
+| ---- | ---- | ----- |
+| install_docker | bool | false (default) |
+| install_containerd | bool | true |
 
 === Example Playbook
 
