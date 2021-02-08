@@ -9,7 +9,3 @@ k8s_dashboard_token_secret: changeme
 k8s_dashboard_token_ttl: 0
 k8s_dashboard_token_description: snowdrop-admin-user
 k8s_dashboard_token_auth_extra_group: system:bootstrappers
-
-letsencrypt_env: staging
-letsencrypt_email:
-letsencrypt_name: http01

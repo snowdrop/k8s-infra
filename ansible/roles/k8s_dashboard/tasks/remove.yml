@@ -2,7 +2,6 @@
   shell: |
     kubectl --kubeconfig=$HOME/.kube/config delete ingress/k8s-dashboard -n {{ k8s_dashboard_namespace }}
     kubectl --kubeconfig=$HOME/.kube/config delete clusterrolebinding/cluster-admin-for-bootstrappers
-    kubectl --kubeconfig=$HOME/.kube/config delete issuer/letsencrypt-{{ letsencrypt_env }}-{{ letsencrypt_name }} -n {{ k8s_dashboard_namespace }}
     kubectl --kubeconfig=$HOME/.kube/config delete certificate/k8s-dashboard-certificate -n {{ k8s_dashboard_namespace }}
   ignore_errors: true
 
