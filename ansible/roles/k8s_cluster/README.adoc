@@ -13,12 +13,13 @@ TODO
 === Role Variables
 
 To play with a Kubernetes cluster, you must deploy a [container runtime](https://kubernetes.io/docs/setup/production-environment/container-runtimes/).
-We support 2 of them: docker, containerd which can be configured using the following variables:
+We support 2 of them: `docker`, `containerd` which can be configured using the following variables:
 
-| Name | Type | Value |
-| ---- | ---- | ----- |
-| install_docker | bool | false (default) |
-| install_containerd | bool | true |
+|===
+| Name | Type | Value
+| install_docker | bool | false (default)
+| install_containerd | bool | true
+|===
 
 === Example Playbook
 
