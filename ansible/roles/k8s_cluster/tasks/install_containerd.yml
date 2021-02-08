@@ -61,13 +61,6 @@
   when: "containerd_root_dir is defined"
   become: yes
 
-# - name: "Enable systemd cgroug"
-#   lineinfile:
-#     path: "/etc/containerd/config.toml"
-#     regexp: '^    systemd_cgroup = false'
-#     line: "    systemd_cgroup = true"
-#   become: yes
-
 - name: "Set cni folder"
   lineinfile:
     path: "/etc/containerd/config.toml"
