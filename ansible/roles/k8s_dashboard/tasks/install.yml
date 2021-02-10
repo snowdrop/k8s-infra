@@ -25,12 +25,6 @@
     k8s_dashboard_token_secret: "{{ lookup('password', '/dev/null length=16 chars=digits,ascii_lowercase' ) }}"
   when: not passwordstore | bool
 
-- name: Update k8s dasbboard tokens
-  set_fact:
-    k8s_dashboard_token_public: "{{ lookup('password', '/dev/null length=6 chars=digits,ascii_lowercase' ) }}"
-    k8s_dashboard_token_secret: "{{ lookup('password', '/dev/null length=16 chars=digits,ascii_lowercase' ) }}"
-  when: not passwordstore | bool
-
 - name: Install cfssl tool
   include_role:
     name: cfssl_tool
