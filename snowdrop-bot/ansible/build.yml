@@ -7,7 +7,6 @@
     - name: bot_version
       prompt: "snowdrop-bot version to be installed [bot_version]"
       private: no
-      when: "bot_version is undefined"
 
   vars:
     build_folder: "/tmp/snowdrop-bot-deployment/{{ bot_version }}/"
@@ -22,12 +21,19 @@
 
     - name: "Download the bot release"
       get_url: 
-        url: "https://github.com/snowdrop-bot/snowdrop-bot/releases/tag/{{ bot_version }}"
+        url: "https://github.com/snowdrop-bot/snowdrop-bot/archive/{{ bot_version }}.tar.gz"
         dest: "{{ build_folder }}"
       when: "skip_dw is not defined or not (skip_dw|bool)"
+      register: bot_dw_res
+
+    - name: "Extract the archive"
+      unarchive: 
+        src: "{{ build_folder }}/snowdrop-bot-{{ bot_version }}.tar.gz"
+        dest: "{{ build_folder }}"
+      when: "(skip_dw is not defined or not (skip_dw|bool)) and (bot_dw_res.changed)"
 
     - name: "Build the project"
       shell: "./mvnw clean package"
       args:
-        chdir: "{{ build_folder }}"
+        chdir: "{{ build_folder }}/snowdrop-bot-{{ bot_version }}"
 ...

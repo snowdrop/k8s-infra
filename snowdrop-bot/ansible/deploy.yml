@@ -10,17 +10,14 @@
     - name: bot_version
       prompt: "snowdrop-bot version to be installed [bot_version]"
       private: no
-      when: "bot_version is undefined"
 
     - name: quay_io_user
       prompt: "quay_io_user"
       private: no
-      when: "quay_io_user is undefined"
 
     - name: quay_io_password
       prompt: "quay_io_password"
       private: yes
-      when: "quay_io_password is undefined"
 
   # Define default values for variables that are common between roles
   vars:
