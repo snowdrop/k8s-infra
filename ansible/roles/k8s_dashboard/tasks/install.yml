@@ -11,11 +11,19 @@
   set_fact:
     k8s_dashboard_token_public: "{{ query('passwordstore', pass_provider + '/' + ansible_hostname + '/k8s_dashboard_token_public create=yes length=6 nosymbols=true')[0] | lower }}"
     k8s_dashboard_token_secret: "{{ query('passwordstore', pass_provider + '/' + ansible_hostname + '/k8s_dashboard_token_secret create=yes length=16 nosymbols=true' )[0] | lower }}"
+  when: passwordstore | bool
 
 - name: Update k8s dasbboard tokens
   set_fact:
     k8s_dashboard_token_public: "{{ query('passwordstore', pass_provider + '/' + ansible_hostname + '/k8s_dashboard_token_public overwrite=yes length=6 nosymbols=true userpass=' + k8s_dashboard_token_public )[0] | lower }}"
     k8s_dashboard_token_secret: "{{ query('passwordstore', pass_provider + '/' + ansible_hostname + '/k8s_dashboard_token_secret overwrite=yes length=16 nosymbols=true userpass=' + k8s_dashboard_token_secret )[0] | lower }}"
+  when: passwordstore | bool
+
+- name: Generate k8s dasbboard tokens
+  set_fact:
+    k8s_dashboard_token_public: "{{ lookup('password', '/dev/null length=6 chars=digits,ascii_lowercase' ) }}"
+    k8s_dashboard_token_secret: "{{ lookup('password', '/dev/null length=16 chars=digits,ascii_lowercase' ) }}"
+  when: not passwordstore | bool
 
 - name: Install cfssl tool
   include_role:
@@ -89,7 +97,7 @@
     kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config apply -f /tmp/rbac.yml
     kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config apply -f /tmp/ingress-dashboard.yml
   register: result
-  retries: 3
+  retries: 10
   delay: 10
   until: result is not failed
 
