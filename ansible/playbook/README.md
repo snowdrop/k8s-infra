@@ -24,6 +24,9 @@
 
 # Introduction
 
+This document introduces some of the key concepts that you should be aware when you play with Ansible in order to configure
+the environment to let Ansible to access the different machines.
+
 When we refer to the `controller`, that means that we speak about the machine that executes the `Ansible playbooks` and `roles`
 and which owns the inventory. The `hosts` are the machines where the playbooks and roles are executed against. 
 
