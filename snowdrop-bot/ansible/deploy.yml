@@ -1,0 +1,58 @@
+---
+- name: "Deploy the snowdrop-bot n k8so"
+  hosts: "{{ override_host | default('localhost') }}"
+  gather_facts: "{{ gathering_host_info | default('true') | bool == true }}"
+
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+
+  vars_prompt:
+    - name: bot_version
+      prompt: "snowdrop-bot version to be installed [bot_version]"
+      private: no
+
+    - name: quay_io_user
+      prompt: "quay_io_user"
+      private: no
+
+    - name: quay_io_password
+      prompt: "quay_io_password"
+      private: yes
+
+  # Define default values for variables that are common between roles
+  vars:
+    kube_cli_tool: kubectl
+    build_folder: "/tmp/snowdrop-bot-deployment/{{ bot_version }}/"
+    kube_cfg_append: ""
+
+
+  tasks:
+    - name: "Login to quay - buildah"
+      shell: "buildah login --username {{ quay_io_user }} --password {{ quay_io_password }} quay.io"
+
+    - name: "Build kubectl statement"
+      set_fact:
+        kube_cfg_append: "--kubeconfig {{ kube_config }}"
+      when: "kube_config is defined"
+
+    - name: "Create image - buildah"
+      shell: "buildah bud -f src/main/docker/Dockerfile.jvm -t quarkus/snowdrop-bot ."
+      args:
+        chdir: "{{ build_folder }}"
+
+    - name: "Push image to quay.io ({{ bot_version }}) - buildah"
+      shell: buildah push localhost/quarkus/snowdrop-bot:latest docker://quay.io/snowdrop/snowdrop-bot:{{ item }}
+      loop:
+        - "{{ bot_version }}"
+        - "latest"
+
+    - name: "Scale down pod"
+      shell: "{{ kube_cli_tool }} scale --replicas=0 deployment snowdrop-bot -n bot {{ kube_cfg_append }}"
+
+    - name: "Wait 10 seconds"
+      pause:
+        seconds: 10
+
+    - name: "Scale up pod"
+      shell: "{{ kube_cli_tool }} scale --replicas=1 deployment snowdrop-bot -n bot {{ kube_cfg_append }}"
+...

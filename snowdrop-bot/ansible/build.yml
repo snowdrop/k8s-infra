@@ -1,0 +1,39 @@
+---
+- name: "Deploy the snowdrop-bot n k8so"
+  hosts: "{{ override_host | default('localhost') }}"
+  gather_facts: "{{ gathering_host_info | default('true') | bool == true }}"
+
+  vars_prompt:
+    - name: bot_version
+      prompt: "snowdrop-bot version to be installed [bot_version]"
+      private: no
+
+  vars:
+    build_folder: "/tmp/snowdrop-bot-deployment/{{ bot_version }}/"
+
+  tasks:
+    - name: "Create temp deployment folder"
+      file: 
+        path: "{{ build_folder }}"
+        state: directory
+        recurse: true
+      when: "skip_dw is not defined or not (skip_dw|bool)"
+
+    - name: "Download the bot release"
+      get_url: 
+        url: "https://github.com/snowdrop-bot/snowdrop-bot/archive/{{ bot_version }}.tar.gz"
+        dest: "{{ build_folder }}"
+      when: "skip_dw is not defined or not (skip_dw|bool)"
+      register: bot_dw_res
+
+    - name: "Extract the archive"
+      unarchive: 
+        src: "{{ build_folder }}/snowdrop-bot-{{ bot_version }}.tar.gz"
+        dest: "{{ build_folder }}"
+      when: "(skip_dw is not defined or not (skip_dw|bool)) and (bot_dw_res.changed)"
+
+    - name: "Build the project"
+      shell: "./mvnw clean package"
+      args:
+        chdir: "{{ build_folder }}/snowdrop-bot-{{ bot_version }}"
+...
