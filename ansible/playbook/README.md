@@ -67,9 +67,7 @@ This file contains static information for the inventory such as:
 * Group variables
 * Host-Group assignment - although we won't use it in this project
 
-Several files can exist in the inventory folder. 
-
-This is a sample *hosts yaml* file. 
+Here is a sample of a *hosts yaml* file designed using YAML. 
 
 ```yaml
 all: # keys must be unique, i.e. only one 'hosts' per group
@@ -100,8 +98,8 @@ all: # keys must be unique, i.e. only one 'hosts' per group
                 group_last_var: value
 ```
 
-More information on these documents:
-* [yaml – Uses a specific YAML file as an inventory source](https://docs.ansible.com/ansible/latest/plugins/inventory/yaml.html)
+More information on these documents are available:
+* [yaml – Uses a specific YAML file as an inventory source](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/yaml_inventory.html)
 * [How to build your inventory](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html)
 
 This system already includes a static inventory, at [../inventory/hosts.yml](../inventory/hosts.yml) file.
