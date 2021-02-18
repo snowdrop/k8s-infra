@@ -49,10 +49,11 @@ In order to play with the playbooks/roles of this project, it is needed to:
 
 # Introduction to Ansible Inventory
 
-Ansible can work against multiple systems or machines in an infrastructure, called `hosts`, at the same time, using a list or group of lists know as an inventory. 
+Ansible can work against multiple systems or machines in an infrastructure, called `hosts` at the same time, using a list or group of lists know as an inventory. 
 
-Once the inventory is defined, you can select the `hosts` or `groups` where you want that Ansible runs against. The inventory is comprised of several files and scripts located under this `k8s-infra/ansible/inventory` folder.
-Two files have been created: 
+Once the inventory is defined, you can select the `hosts` or `groups` where you want that Ansible runs against. The inventory is comprised of several files and scripts located under the `k8s-infra/ansible/inventory` folder.
+
+The two most important files are: 
 * `hosts.yml`: YAML file with group structure information as well as group variable assignment
 * `pass_inventory.py`: Python script that dynamically builds the inventory from the `passwordstore` project. This task is done automatically when Ansible is executed. 
 
