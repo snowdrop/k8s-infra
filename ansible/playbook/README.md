@@ -102,7 +102,7 @@ More information on these documents are available:
 * [yaml – Uses a specific YAML file as an inventory source](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/yaml_inventory.html)
 * [How to build your inventory](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html)
 
-This system already includes a static inventory, at [../inventory/hosts.yml](../inventory/hosts.yml) file.
+This project already includes a static inventory, at [../inventory/hosts.yml](../inventory/hosts.yml) file.
 
 ## Groups
 
