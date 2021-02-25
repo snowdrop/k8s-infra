@@ -64,18 +64,12 @@
     state: absent
   when: "hcloud_server_create_res.rc == 0"
 
-#- name: "Add the server to the known_hosts file"
-#  known_hosts:
-#    path: "{{ user_home + '/.ssh/known_hosts' }}"
-#    name: "{{ ip_address }}"
-#    key: "{{ ip_address }} {{ ssh_public_key }}"
-#    state: present
-#  when: "hcloud_server_create_res.rc == 0"
-
-- name: "Add server key to local authorized keys"
-  authorized_key:
-    user: "{{ ansible_user }}"
-    key: "{{ hetzner_public_key }}"
-  when: "hcloud_server_create_res.rc == 0 or 'uniqueness_error' in hcloud_server_create_res.stderr"
+# - name: "Add the server to the known_hosts file"
+#   known_hosts:
+#     path: "{{ user_home + '/.ssh/known_hosts' }}"
+#     name: "{{ ip_address }}"
+#     key: "{{ ip_address }} {{ ssh_public_key }}"
+#     state: present
+#   when: "hcloud_server_create_res.rc == 0"
 
 ...
