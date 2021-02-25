@@ -1,4 +1,16 @@
 ---
+- name: "Obtain user home"
+  set_fact:
+    user_home: "{{ lookup('env','HOME') }}"
+
+- name: "Remove the server from the known_hosts file"
+  known_hosts:
+    path: "{{ user_home + '/.ssh/known_hosts' }}"
+    name: "{{ ip_address }}"
+    state: absent
+  when: "ip_address is defined"
+  failed_when: false
+
 # tasks for hetzner/delete_server
 - name: Delete cloud server
   shell: "hcloud server delete {{ vm_name }}"
