@@ -4,7 +4,7 @@
 
 - set_fact:
     k8s_dashboard_ingress_host: "{{ ansible_ssh_host }}.nip.io"
-  when: apiserver_address is undefined
+  when: (apiserver_address is undefined) or (apiserver_address|length == 0) 
 
 - set_fact:
     k8s_dashboard_ingress_host: "{{ apiserver_address }}.nip.io"
