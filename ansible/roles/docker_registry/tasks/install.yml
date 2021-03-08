@@ -1,3 +1,7 @@
+- name: Create the infra k8s namespace
+  shell: |
+     {{ client_tool }} --kubeconfig={{ ansible_user_dir }}/.kube/config create ns {{ registry.namespace }} --dry-run=client -o yaml | {{ client_tool }} --kubeconfig={{ ansible_user_dir }}/.kube/config apply -f -
+
 - name: Generate PVC file
   template:
     src: pvc.yml.j2
@@ -8,6 +12,17 @@
     src: service.yml.j2
     dest: /tmp/service.yml
 
+- name: install the latest version of httpd-tools
+  yum:
+    name: httpd-tools
+    state: latest
+  become: yes
+
+- name: Create htpasswd file
+  shell: |
+    touch /tmp/htpasswd
+    htpasswd -Bbc /tmp/htpasswd {{ registry.user }} {{ registry.pwd }}
+
 - name: Install PVC
   shell: |
     {{ client_tool }} --kubeconfig={{ ansible_user_dir }}/.kube/config apply -f /tmp/pvc.yml -n {{ registry.namespace }}
@@ -15,6 +30,11 @@
 - name: Install Service
   shell: |
     {{ client_tool }} --kubeconfig={{ ansible_user_dir }}/.kube/config apply -f /tmp/service.yml -n {{ registry.namespace }}
+
+- name: Create the secret containing the htpasswd file
+  shell: |
+    {{ client_tool }} --kubeconfig={{ ansible_user_dir }}/.kube/config create secret generic htpasswd -n {{ registry.namespace }} --from-file=/tmp/htpasswd
+  become: yes
 
 - name: Generate Server crt
   import_tasks: generate_server_crt.yml

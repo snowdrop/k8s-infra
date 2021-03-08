@@ -1,6 +1,12 @@
+- name: Delete the htpasswd file
+  file:
+    path: /tmp/htpasswd
+    state: absent
 - name: Uninstall Docker Registry
   shell: |
     {{ client_tool }} --kubeconfig={{ ansible_user_dir }}/.kube/config delete ReplicationController/{{ registry.service_name}} -n {{ registry.namespace }}
     {{ client_tool }} --kubeconfig={{ ansible_user_dir }}/.kube/config delete pvc/{{ registry.service_name}}-pvc               -n {{ registry.namespace }}
     {{ client_tool }} --kubeconfig={{ ansible_user_dir }}/.kube/config delete svc/{{ registry.service_name}}                   -n {{ registry.namespace }}
+    {{ client_tool }} --kubeconfig={{ ansible_user_dir }}/.kube/config delete secret/cert-key                                  -n {{ registry.namespace }}
+    {{ client_tool }} --kubeconfig={{ ansible_user_dir }}/.kube/config delete secret/htpasswd                                  -n {{ registry.namespace }}
   ignore_errors: true

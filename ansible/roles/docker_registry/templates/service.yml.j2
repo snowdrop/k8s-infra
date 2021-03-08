@@ -4,14 +4,17 @@ metadata:
   name: {{ registry.service_name}}
   namespace: {{ registry.namespace }}
   labels:
-    k8s-app: {{ registry.service_name}}
+    k8s-app: {{ registry.service_name }}
     kubernetes.io/cluster-service: "true"
-    kubernetes.io/name: "KubeRegistry"
+    kubernetes.io/name: {{ registry.service_name }}
 spec:
-  type: ClusterIP
-  selector:
-    k8s-app: {{ registry.service_name}}
+  {% if registry_nodePort is defined %}type: NodePort
+  {% else %}type: ClusterIP
+{% endif %}selector:
+    k8s-app: {{ registry.service_name }}
   ports:
     - name: registry
       port: 5000
       protocol: TCP
+      {% if registry_nodePort is defined %}nodePort: {{ registry_nodePort }}
+      {% endif %}

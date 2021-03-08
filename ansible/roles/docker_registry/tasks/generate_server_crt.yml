@@ -70,21 +70,19 @@
     state: directory
   become: yes
 
-- name: Creates Registry docker Certs that we will mount
-  file:
-    path: /root/docker-certs
-    state: directory
-  become: yes
-
 - name: "Add the certificate populated for the registry to the certificates supported by the docker daemon"
   shell: |
     cp server.crt /etc/docker/certs.d/{{ registry.service_name}}.{{ registry.namespace }}.svc:5000/
   become: yes
 
-- name: Copy the self signed Certificate and Private keys under the folder that we will mount within the docker registry
+- name: "Add the certificate populated for the registry to the certificates directory watched by containerd"
   shell: |
-    cp server.crt /root/docker-certs
-    cp server-key.pem /root/docker-certs
+     cp server.crt /etc/pki/tls/certs
+  become: yes
+
+- name: Create a secret to mount the self signed Certificate and Private key
+  shell: |
+    {{ client_tool }} --kubeconfig={{ ansible_user_dir }}/.kube/config create secret generic cert-key -n {{ registry.namespace }} --from-file=server.crt --from-file=server-key.pem
   become: yes
 
 - name: Add IP address of the Registry to the /etc/hosts/file

@@ -3,18 +3,20 @@
     "{{ registry.service_name }}.{{ registry.namespace }}.svc",
     "{{ registry.service_name }}.{{ registry.namespace }}.svc.cluster",
     "{{ registry.service_name }}.{{ registry.namespace }}.svc.cluster.local",
+    "{{ ansible_default_ipv4.address }}.nip.io",
+    "{{ ansible_default_ipv4.address }}",
     "{{ registry_ip_address.stdout }}"
   ],
-  "CN": "{{ registry.service_name}}",
+  "CN": "{{ registry.service_name }}",
   "key": {
     "algo": "ecdsa",
     "size": 256
   },
   "names": [{
-    "C": "BE",
+    "C":  "BE",
     "ST": "Namur",
-    "L": "Florennes",
-    "O": "Red Hat Middleware",
+    "L":  "Florennes",
+    "O":  "Red Hat Middleware",
     "OU": "Snowdrop"
   }]
 }
