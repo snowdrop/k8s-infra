@@ -35,11 +35,19 @@ spec:
               value: /certs/server.crt
             - name: REGISTRY_HTTP_TLS_KEY
               value: /certs/server-key.pem
+            - name: REGISTRY_AUTH
+              value: htpasswd
+            - name: REGISTRY_AUTH_HTPASSWD_REALM
+              value: Registry Realm
+            - name: REGISTRY_AUTH_HTPASSWD_PATH
+              value: /auth/htpasswd
           volumeMounts:
             - name: image-store
               mountPath: /var/lib/registry
             - name: certs
               mountPath: /certs
+            - name: auth
+              mountPath: /auth
           ports:
             - containerPort: 5000
               name: registry
@@ -49,5 +57,8 @@ spec:
           persistentVolumeClaim:
             claimName: kube-registry-pvc
         - name: certs
-          hostPath:
-            path: /root/docker-certs
+          secret:
+            secretName: cert-key
+        - name: auth
+          secret:
+            secretName: htpasswd
