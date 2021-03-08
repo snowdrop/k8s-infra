@@ -3,3 +3,5 @@ remove: false
 registry:
   service_name: kube-registry
   namespace: kube-system
+  user: admin
+  pwd: snowdrop
