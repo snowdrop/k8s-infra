@@ -1,9 +1,6 @@
 - name: Create the infra k8s namespace
-  k8s:
-    name: {{ registry.namespace }}
-    api_version: v1
-    kind: Namespace
-    state: present
+  shell: |
+     {{ client_tool }} --kubeconfig={{ ansible_user_dir }}/.kube/config create ns {{ registry.namespace }} --dry-run=client -o yaml | {{ client_tool }} --kubeconfig={{ ansible_user_dir }}/.kube/config apply -f -
 
 - name: Generate PVC file
   template:
