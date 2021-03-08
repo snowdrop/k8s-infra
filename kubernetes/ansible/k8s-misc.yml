@@ -24,3 +24,6 @@
     - { role: 'helm',   tags: 'helm'}
     # Kubernetes SIG Kind project/tool which allows to install a k8s cluster without kubeadm, kubelet
     - { role: 'kind',   tags: 'kind'}
+
+    # Role created for testing purposes
+    - { role: 'test',   tags: 'test'}
