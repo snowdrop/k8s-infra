@@ -19,10 +19,23 @@
         hetzner_context_name: "snowdrop"
       when: hetzner_context_name is not defined
 
+    - name: "Pull pass git database"
+      shell: "git pull"
+      args:
+        chdir: "{{ lookup('env', 'PASSWORD_STORE_DIR') }}"
+
   roles:
     - role: hetzner/activate_context
       context_name: "{{ hetzner_context_name }}"
 
     - role: hetzner/delete_server
       vm_name: "{{ vm_name }}"
+
+  post_tasks:
+
+    - name: "Push changes to the pass git database"
+      shell: "git push"
+      args:
+        chdir: "{{ lookup('env', 'PASSWORD_STORE_DIR') }}"
+
 ...

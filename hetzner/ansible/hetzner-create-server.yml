@@ -4,18 +4,29 @@
 - name:  Create hetzner server
   hosts: localhost
   gather_facts: yes
-  vars_prompt:
-    - name: vm_name
-      prompt: Name of the VM being created [vm_name]
-      private: no
-      when: " vm_name is not defined "
+  # vars_prompt:
+  #   - name: vm_name
+  #     prompt: Name of the VM being created [vm_name]
+  #     private: no
 
-    - name: salt_text
-      prompt: Salt
-      private: yes
-      when: " salt_text is not defined "
+  #   - name: salt_text
+  #     prompt: Salt
+  #     private: yes
 
   pre_tasks:
+
+    - name: "Validate required variables"
+      assert:
+        that:
+          - "vm_name is defined"
+          - "salt_text is defined"
+        fail_msg: "'vm_name' and 'salt_text' must be defined"
+
+    - name: "Validate host is initialized in passwordstore"
+      assert:
+        that:
+          - "hostvars[vm_name] is defined"
+        fail_msg: "Host must be initialized in the passwordstore. Run 'ansible-playbook ansible/playbook/passstore_controller_inventory.yml -e vm_name={{ vm_name }} -e pass_provider=hetzner'"
 
     - name: Get vm host vars
       set_fact:
@@ -25,6 +36,11 @@
       set_fact:
         hetzner_context_name: "snowdrop"
       when: hetzner_context_name is not defined
+
+    - name: "Pull pass git database"
+      shell: "git pull"
+      args:
+        chdir: "{{ lookup('env', 'PASSWORD_STORE_DIR') }}"
 
   tasks:
     - name: "Actuvate hetzner context"
@@ -52,13 +68,17 @@
         var_value: "{{ ip_address }}"
 
   post_tasks:
-
     - name: Refresh the inventory
       meta: refresh_inventory
 
     - name: Get vm host vars
       set_fact:
         my_hostvars: "{{ hostvars[vm_name] }}"
+
+    - name: "Push changes to the pass git database"
+      shell: "git push"
+      args:
+        chdir: "{{ lookup('env', 'PASSWORD_STORE_DIR') }}"
 
 - name:  Wait for the VM to boot and we can ssh
   hosts: "{{ vm_name }}"
@@ -73,4 +93,5 @@
     - name: "DON'T FORGET TO SECURE YOUR SERVER"
       debug:
         msg: "Trying to start start server securization automatically For manual execution: $ ansible-playbook ansible/playbook/sec_host.yml -e vm_name={{ vm_name }} -e provider=hetzner"
+
 ...
