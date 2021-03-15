@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 2.0.10">
+<meta name="generator" content="Asciidoctor 2.0.12">
 <title>Playbook documentation</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -47,7 +47,7 @@ textarea{overflow:auto;vertical-align:top}
 table{border-collapse:collapse;border-spacing:0}
 *,*::before,*::after{-moz-box-sizing:border-box;-webkit-box-sizing:border-box;box-sizing:border-box}
 html,body{font-size:100%}
-body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;font-weight:400;font-style:normal;line-height:1;position:relative;cursor:auto;tab-size:4;-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased}
+body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;font-weight:400;font-style:normal;line-height:1;position:relative;cursor:auto;tab-size:4;word-wrap:anywhere;-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased}
 a:hover{cursor:pointer}
 img,object,embed{max-width:100%;height:auto}
 object,embed{height:100%}
@@ -62,10 +62,8 @@ img{-ms-interpolation-mode:bicubic}
 img,object,svg{display:inline-block;vertical-align:middle}
 textarea{height:auto;min-height:50px}
 select{width:100%}
-.center{margin-left:auto;margin-right:auto}
-.stretch{width:100%}
 .subheader,.admonitionblock td.content>.title,.audioblock>.title,.exampleblock>.title,.imageblock>.title,.listingblock>.title,.literalblock>.title,.stemblock>.title,.openblock>.title,.paragraph>.title,.quoteblock>.title,table.tableblock>.title,.verseblock>.title,.videoblock>.title,.dlist>.title,.olist>.title,.ulist>.title,.qlist>.title,.hdlist>.title{line-height:1.45;color:#7a2518;font-weight:400;margin-top:0;margin-bottom:.25em}
-div,dl,dt,dd,ul,ol,li,h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6,pre,form,p,blockquote,th,td{margin:0;padding:0;direction:ltr}
+div,dl,dt,dd,ul,ol,li,h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6,pre,form,p,blockquote,th,td{margin:0;padding:0}
 a{color:#2156a5;text-decoration:underline;line-height:inherit}
 a:hover,a:focus{color:#1d4b8f}
 a img{border:0}
@@ -105,19 +103,22 @@ h1{font-size:2.75em}
 h2{font-size:2.3125em}
 h3,#toctitle,.sidebarblock>.content>.title{font-size:1.6875em}
 h4{font-size:1.4375em}}
-table{background:#fff;margin-bottom:1.25em;border:solid 1px #dedede}
+table{background:#fff;margin-bottom:1.25em;border:solid 1px #dedede;word-wrap:normal}
 table thead,table tfoot{background:#f7f8f7}
 table thead tr th,table thead tr td,table tfoot tr th,table tfoot tr td{padding:.5em .625em .625em;font-size:inherit;color:rgba(0,0,0,.8);text-align:left}
 table tr th,table tr td{padding:.5625em .625em;font-size:inherit;color:rgba(0,0,0,.8)}
 table tr.even,table tr.alt{background:#f8f8f7}
-table thead tr th,table tfoot tr th,table tbody tr td,table tr td,table tfoot tr td{display:table-cell;line-height:1.6}
+table thead tr th,table tfoot tr th,table tbody tr td,table tr td,table tfoot tr td{line-height:1.6}
 h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{line-height:1.2;word-spacing:-.05em}
 h1 strong,h2 strong,h3 strong,#toctitle strong,.sidebarblock>.content>.title strong,h4 strong,h5 strong,h6 strong{font-weight:400}
+.center{margin-left:auto;margin-right:auto}
+.stretch{width:100%}
 .clearfix::before,.clearfix::after,.float-group::before,.float-group::after{content:" ";display:table}
 .clearfix::after,.float-group::after{clear:both}
-:not(pre):not([class^=L])>code{font-size:.9375em;font-style:normal!important;letter-spacing:0;padding:.1em .5ex;word-spacing:-.15em;background:#f7f7f8;-webkit-border-radius:4px;border-radius:4px;line-height:1.45;text-rendering:optimizeSpeed;word-wrap:break-word}
-:not(pre)>code.nobreak{word-wrap:normal}
-:not(pre)>code.nowrap{white-space:nowrap}
+:not(pre).nobreak{word-wrap:normal}
+:not(pre).nowrap{white-space:nowrap}
+:not(pre).pre-wrap{white-space:pre-wrap}
+:not(pre):not([class^=L])>code{font-size:.9375em;font-style:normal!important;letter-spacing:0;padding:.1em .5ex;word-spacing:-.15em;background:#f7f7f8;-webkit-border-radius:4px;border-radius:4px;line-height:1.45;text-rendering:optimizeSpeed}
 pre{color:rgba(0,0,0,.9);font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;line-height:1.45;text-rendering:optimizeSpeed}
 pre code,pre pre{color:inherit;font-size:inherit;line-height:inherit}
 pre>code{display:block}
@@ -182,7 +183,7 @@ body.toc2.toc-right{padding-left:0;padding-right:20em}}
 #content #toc{border-style:solid;border-width:1px;border-color:#e0e0dc;margin-bottom:1.25em;padding:1.25em;background:#f8f8f7;-webkit-border-radius:4px;border-radius:4px}
 #content #toc>:first-child{margin-top:0}
 #content #toc>:last-child{margin-bottom:0}
-#footer{max-width:100%;background:rgba(0,0,0,.8);padding:1.25em}
+#footer{max-width:none;background:rgba(0,0,0,.8);padding:1.25em}
 #footer-text{color:rgba(255,255,255,.8);line-height:1.44}
 #content{margin-bottom:.625em}
 .sect1{padding-bottom:.625em}
@@ -205,7 +206,7 @@ table.tableblock #preamble>.sectionbody>[class="paragraph"]:first-of-type p{font
 .admonitionblock>table td.icon{text-align:center;width:80px}
 .admonitionblock>table td.icon img{max-width:none}
 .admonitionblock>table td.icon .title{font-weight:bold;font-family:"Open Sans","DejaVu Sans",sans-serif;text-transform:uppercase}
-.admonitionblock>table td.content{padding-left:1.125em;padding-right:1.25em;border-left:1px solid #dddddf;color:rgba(0,0,0,.6)}
+.admonitionblock>table td.content{padding-left:1.125em;padding-right:1.25em;border-left:1px solid #dddddf;color:rgba(0,0,0,.6);word-wrap:anywhere}
 .admonitionblock>table td.content>:last-child>:last-child{margin-bottom:0}
 .exampleblock>.content{border-style:solid;border-width:1px;border-color:#e6e6e6;margin-bottom:1.25em;padding:1.25em;background:#fff;-webkit-border-radius:4px;border-radius:4px}
 .exampleblock>.content>:first-child{margin-top:0}
@@ -215,7 +216,7 @@ table.tableblock #preamble>.sectionbody>[class="paragraph"]:first-of-type p{font
 .sidebarblock>:last-child{margin-bottom:0}
 .sidebarblock>.content>.title{color:#7a2518;margin-top:0;text-align:center}
 .exampleblock>.content>:last-child>:last-child,.exampleblock>.content .olist>ol>li:last-child>:last-child,.exampleblock>.content .ulist>ul>li:last-child>:last-child,.exampleblock>.content .qlist>ol>li:last-child>:last-child,.sidebarblock>.content>:last-child>:last-child,.sidebarblock>.content .olist>ol>li:last-child>:last-child,.sidebarblock>.content .ulist>ul>li:last-child>:last-child,.sidebarblock>.content .qlist>ol>li:last-child>:last-child{margin-bottom:0}
-.literalblock pre,.listingblock>.content>pre{-webkit-border-radius:4px;border-radius:4px;word-wrap:break-word;overflow-x:auto;padding:1em;font-size:.8125em}
+.literalblock pre,.listingblock>.content>pre{-webkit-border-radius:4px;border-radius:4px;overflow-x:auto;padding:1em;font-size:.8125em}
 @media screen and (min-width:768px){.literalblock pre,.listingblock>.content>pre{font-size:.90625em}}
 @media screen and (min-width:1280px){.literalblock pre,.listingblock>.content>pre{font-size:1em}}
 .literalblock pre,.listingblock>.content>pre:not(.highlight),.listingblock>.content>pre[class="highlight"],.listingblock>.content>pre[class^="highlight "]{background:#f7f7f8}
@@ -261,21 +262,20 @@ pre.pygments .lineno::before{content:"";margin-right:-.125em}
 .quoteblock.excerpt,.quoteblock .quoteblock{margin-left:0}
 .quoteblock.excerpt blockquote,.quoteblock.excerpt p,.quoteblock .quoteblock blockquote,.quoteblock .quoteblock p{color:inherit;font-size:1.0625rem}
 .quoteblock.excerpt .attribution,.quoteblock .quoteblock .attribution{color:inherit;text-align:left;margin-right:0}
-table.tableblock{max-width:100%;border-collapse:separate}
 p.tableblock:last-child{margin-bottom:0}
+td.tableblock>.content{margin-bottom:1.25em;word-wrap:anywhere}
 td.tableblock>.content>:last-child{margin-bottom:-1.25em}
-td.tableblock>.content>:last-child.sidebarblock{margin-bottom:0}
 table.tableblock,th.tableblock,td.tableblock{border:0 solid #dedede}
-table.grid-all>thead>tr>.tableblock,table.grid-all>tbody>tr>.tableblock{border-width:0 1px 1px 0}
-table.grid-all>tfoot>tr>.tableblock{border-width:1px 1px 0 0}
-table.grid-cols>*>tr>.tableblock{border-width:0 1px 0 0}
-table.grid-rows>thead>tr>.tableblock,table.grid-rows>tbody>tr>.tableblock{border-width:0 0 1px}
-table.grid-rows>tfoot>tr>.tableblock{border-width:1px 0 0}
-table.grid-all>*>tr>.tableblock:last-child,table.grid-cols>*>tr>.tableblock:last-child{border-right-width:0}
-table.grid-all>tbody>tr:last-child>.tableblock,table.grid-all>thead:last-child>tr>.tableblock,table.grid-rows>tbody>tr:last-child>.tableblock,table.grid-rows>thead:last-child>tr>.tableblock{border-bottom-width:0}
+table.grid-all>*>tr>*{border-width:1px}
+table.grid-cols>*>tr>*{border-width:0 1px}
+table.grid-rows>*>tr>*{border-width:1px 0}
 table.frame-all{border-width:1px}
+table.frame-ends{border-width:1px 0}
 table.frame-sides{border-width:0 1px}
-table.frame-topbot,table.frame-ends{border-width:1px 0}
+table.frame-none>colgroup+*>:first-child>*,table.frame-sides>colgroup+*>:first-child>*{border-top-width:0}
+table.frame-none>:last-child>:last-child>*,table.frame-sides>:last-child>:last-child>*{border-bottom-width:0}
+table.frame-none>*>tr>:first-child,table.frame-ends>*>tr>:first-child{border-left-width:0}
+table.frame-none>*>tr>:last-child,table.frame-ends>*>tr>:last-child{border-right-width:0}
 table.stripes-all tr,table.stripes-odd tr:nth-of-type(odd),table.stripes-even tr:nth-of-type(even),table.stripes-hover tr:hover{background:#f8f8f7}
 th.halign-left,td.halign-left{text-align:left}
 th.halign-right,td.halign-right{text-align:right}
@@ -284,7 +284,7 @@ th.valign-top,td.valign-top{vertical-align:top}
 th.valign-bottom,td.valign-bottom{vertical-align:bottom}
 th.valign-middle,td.valign-middle{vertical-align:middle}
 table thead th,table tfoot th{font-weight:bold}
-tbody tr th{display:table-cell;line-height:1.6;background:#f7f8f7}
+tbody tr th{background:#f7f8f7}
 tbody tr th,tbody tr th p,tfoot tr th,tfoot tr th p{color:rgba(0,0,0,.8);font-weight:bold}
 p.tableblock>code:only-child{background:none;padding:0}
 p.tableblock{font-size:1em}
@@ -313,6 +313,7 @@ ol.lowergreek{list-style-type:lower-greek}
 .hdlist>table>tbody>tr,.colist>table>tbody>tr{background:none}
 td.hdlist1,td.hdlist2{vertical-align:top;padding:0 .625em}
 td.hdlist1{font-weight:bold;padding-bottom:1.25em}
+td.hdlist2{word-wrap:anywhere}
 .literalblock+.colist,.listingblock+.colist{margin-top:-.5em}
 .colist td:not([class]):first-child{padding:.4em .75em 0;line-height:1;vertical-align:top}
 .colist td:not([class]):first-child img{max-width:none}
@@ -385,7 +386,7 @@ a span.icon>.fa{cursor:inherit}
 .admonitionblock td.icon .icon-warning::before{content:"\f071";color:#bf6900}
 .admonitionblock td.icon .icon-caution::before{content:"\f06d";color:#bf3400}
 .admonitionblock td.icon .icon-important::before{content:"\f06a";color:#bf0000}
-.conum[data-value]{display:inline-block;color:#fff!important;background:rgba(0,0,0,.8);-webkit-border-radius:100px;border-radius:100px;text-align:center;font-size:.75em;width:1.67em;height:1.67em;line-height:1.67em;font-family:"Open Sans","DejaVu Sans",sans-serif;font-style:normal;font-weight:bold}
+.conum[data-value]{display:inline-block;color:#fff!important;background:rgba(0,0,0,.8);-webkit-border-radius:50%;border-radius:50%;text-align:center;font-size:.75em;width:1.67em;height:1.67em;line-height:1.67em;font-family:"Open Sans","DejaVu Sans",sans-serif;font-style:normal;font-weight:bold}
 .conum[data-value] *{color:#fff!important}
 .conum[data-value]+b{display:none}
 .conum[data-value]::after{content:attr(data-value)}
@@ -412,6 +413,7 @@ thead{display:table-header-group}
 svg{max-width:100%}
 p,blockquote,dt,td.content{font-size:1em;orphans:3;widows:3}
 h2,h3,#toctitle,.sidebarblock>.content>.title{page-break-after:avoid}
+#header,#content,#footnotes,#footer{max-width:none}
 #toc,.sidebarblock,.exampleblock>.content{background:none!important}
 #toc{border-bottom:1px solid #dddddf!important;padding-bottom:0!important}
 body.book #header{text-align:center}
@@ -435,29 +437,29 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 #footer-text{color:rgba(0,0,0,.6);font-size:.9em}}
 @media amzn-kf8{#header,#content,#footnotes,#footer{padding:0}}
 </style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
-<body class="article">
+<body class="article toc2 toc-left">
 <div id="header">
 <h1>Playbook documentation</h1>
-<div id="toc" class="toc">
+<div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
 <li><a href="#_introduction">Introduction</a></li>
 <li><a href="#_roles_features">Roles - Features</a></li>
-<li><a href="#_role_kubernetes_config">Role: Kubernetes Config</a>
+<li><a href="#_role_docker">Role: Docker</a>
 <ul class="sectlevel2">
 <li><a href="#_description">Description</a></li>
+</ul>
+</li>
+<li><a href="#_role_ingress_nginx_controller">Role: Ingress Nginx controller</a>
+<ul class="sectlevel2">
+<li><a href="#_description_2">Description</a></li>
 <li><a href="#_requirements">Requirements</a></li>
 <li><a href="#_role_variables">Role Variables</a></li>
-<li><a href="#_dependencies">Dependencies</a></li>
 <li><a href="#_example_playbook">Example Playbook</a></li>
 <li><a href="#_license">License</a></li>
 <li><a href="#_author_information">Author Information</a></li>
-</ul>
-</li>
-<li><a href="#_role_docker">Role: Docker</a>
-<ul class="sectlevel2">
-<li><a href="#_description_2">Description</a></li>
 </ul>
 </li>
 <li><a href="#_role_kubernetes_cluster">Role: Kubernetes Cluster</a>
@@ -468,6 +470,29 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_example_playbook_2">Example Playbook</a></li>
 <li><a href="#_license_2">License</a></li>
 <li><a href="#_author_information_2">Author Information</a></li>
+</ul>
+</li>
+<li><a href="#_role_kubernetes_config">Role: Kubernetes Config</a>
+<ul class="sectlevel2">
+<li><a href="#_description_4">Description</a></li>
+<li><a href="#_requirements_3">Requirements</a></li>
+<li><a href="#_role_variables_3">Role Variables</a></li>
+<li><a href="#_dependencies">Dependencies</a></li>
+<li><a href="#_example_playbook_3">Example Playbook</a></li>
+<li><a href="#_license_3">License</a></li>
+<li><a href="#_author_information_3">Author Information</a></li>
+</ul>
+</li>
+<li><a href="#_role_kubernetes_kind">Role: Kubernetes Kind</a>
+<ul class="sectlevel2">
+<li><a href="#_description_5">Description</a></li>
+<li><a href="#_requirements_4">Requirements</a></li>
+<li><a href="#_role_variables_4">Role Variables</a></li>
+<li><a href="#_example_playbook_4">Example Playbook</a></li>
+<li><a href="#_usage">Usage</a></li>
+<li><a href="#_check_if_kind_cluster_is_working">Check if kind cluster is working</a></li>
+<li><a href="#_license_4">License</a></li>
+<li><a href="#_author_information_4">Author Information</a></li>
 </ul>
 </li>
 </ul>
@@ -496,9 +521,6 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <col style="width: 33.3333%;">
 <col style="width: 33.3333%;">
 <col style="width: 33.3334%;">
-<col style="width: %;">
-<col style="width: %;">
-<col style="width: %;">
 </colgroup>
 <thead>
 <tr>
@@ -507,27 +529,151 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <th class="tableblock halign-center valign-top">Description</th>
 </tr>
 </thead>
-<tbody>
-<tr>
-<td class="tableblock halign-center valign-bottom"><p class="tableblock">Kubernetes Config</p></td>
-<td class="tableblock halign-center valign-bottom"><p class="tableblock">K8s</p></td>
-<td class="tableblock halign-center valign-bottom"><p class="tableblock">A brief description of the role goes here.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-center valign-bottom"><p class="tableblock">Docker</p></td>
-<td class="tableblock halign-center valign-bottom"><p class="tableblock">K8s</p></td>
-<td class="tableblock halign-center valign-bottom"><p class="tableblock">TODO</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-center valign-bottom"><p class="tableblock">Kubernetes Cluster</p></td>
-<td class="tableblock halign-center valign-bottom"><p class="tableblock">K8s</p></td>
-<td class="tableblock halign-center valign-bottom"><p class="tableblock">This role will install a Kubernetes cluster on a linux machine using &lt;code&gt;kubelet&lt;/code&gt; and &lt;code&gt;kubeadmin&lt;/code&gt;.
-A docker daemon will be installed using the following &lt;a href="../ansible/roles/docker/README.adoc"&gt;docker role&lt;/a&gt; if no there.</p></td>
-</tr>
-</tbody>
 </table>
 <div class="paragraph">
 <p>After mytable. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent ac nibh ac lectus lobortis molestie sit amet a purus. Cras eu augue a augue maximus fringilla sit amet quis turpis. Phasellus a nisl ut sem fermentum hendrerit. Praesent volutpat pulvinar consequat. Nullam et tellus bibendum, rhoncus dui lobortis, vestibulum neque. Aliquam sit amet egestas nisl. Duis vitae aliquet augue. Integer at bibendum ex. Vestibulum nec nunc quis augue ullamcorper sollicitudin nec quis augue. Morbi purus velit, maximus at fermentum quis, faucibus nec augue. Quisque ac felis finibus, dapibus odio vel, aliquam lacus.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_role_docker">Role: Docker</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Cluster target type: K8s</p>
+</div>
+<div class="sect2">
+<h3 id="_description">Description</h3>
+<div class="paragraph">
+<p>One description</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_role_ingress_nginx_controller">Role: Ingress Nginx controller</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Cluster target type: K8s</p>
+</div>
+<div class="sect2">
+<h3 id="_description_2">Description</h3>
+<div class="paragraph">
+<p>This role will install the ingress nginx controller on a Kubernetes cluster. It can be deployed on a k8s cluster which has been created using <code>kind</code> tool
+or the standard approach: kubeadm, kubelet.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_requirements">Requirements</h3>
+<div class="paragraph">
+<p>A Kubernetes cluster or Kind kubernetes cluster is needed.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_role_variables">Role Variables</h3>
+<div class="paragraph">
+<p>2 options are available for the parameter <code>target_platform</code> :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>kind</p>
+</li>
+<li>
+<p>cloud (default)</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_example_playbook">Example Playbook</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">ansible-playbook ./kubernetes/ansible/k8s-misc.yml -t ingress --connection=local -e override_host=localhost -e target_platform=kind</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_license">License</h3>
+<div class="paragraph">
+<p><a href="https://www.apache.org/licenses/LICENSE-2.0">Apache License 2.0</a></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_author_information">Author Information</h3>
+<div class="paragraph">
+<p>This role has been created by the <a href="https://github.com/orgs/snowdrop/teams">Snowdrop team</a>.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_role_kubernetes_cluster">Role: Kubernetes Cluster</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Cluster target type: K8s</p>
+</div>
+<div class="sect2">
+<h3 id="_description_3">Description</h3>
+<div class="paragraph">
+<p>This role will install a Kubernetes cluster on a linux machine using <code>kubelet</code> and <code>kubeadmin</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_requirements_2">Requirements</h3>
+<div class="paragraph">
+<p>TODO</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_role_variables_2">Role Variables</h3>
+<div class="paragraph">
+<p>To play with a Kubernetes cluster, you must deploy a <a href="https://kubernetes.io/docs/setup/production-environment/container-runtimes/">container runtime</a>.
+We support 2 of them: <code>docker</code>, <code>containerd</code> which can be configured using the following variables:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Value</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">install_docker</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">bool</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false (default)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">install_containerd</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">bool</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_example_playbook_2">Example Playbook</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>ansible-playbook ....</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_license_2">License</h3>
+<div class="paragraph">
+<p><a href="https://www.apache.org/licenses/LICENSE-2.0">Apache License 2.0</a></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_author_information_2">Author Information</h3>
+<div class="paragraph">
+<p>This role has been created by the <a href="https://github.com/orgs/snowdrop/teams">Snowdrop team</a>.</p>
+</div>
 </div>
 </div>
 </div>
@@ -538,19 +684,19 @@ A docker daemon will be installed using the following &lt;a href="../ansible/rol
 <p>Cluster target type: K8s</p>
 </div>
 <div class="sect2">
-<h3 id="_description">Description</h3>
+<h3 id="_description_4">Description</h3>
 <div class="paragraph">
 <p>A brief description of the role goes here.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_requirements">Requirements</h3>
+<h3 id="_requirements_3">Requirements</h3>
 <div class="paragraph">
 <p>Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_role_variables">Role Variables</h3>
+<h3 id="_role_variables_3">Role Variables</h3>
 <div class="paragraph">
 <p>A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.</p>
 </div>
@@ -562,7 +708,7 @@ A docker daemon will be installed using the following &lt;a href="../ansible/rol
 </div>
 </div>
 <div class="sect2">
-<h3 id="_example_playbook">Example Playbook</h3>
+<h3 id="_example_playbook_3">Example Playbook</h3>
 <div class="paragraph">
 <p>Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:</p>
 </div>
@@ -579,76 +725,191 @@ roles:</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_license">License</h3>
+<h3 id="_license_3">License</h3>
 <div class="paragraph">
-<p>APL</p>
+<p><a href="https://www.apache.org/licenses/LICENSE-2.0">Apache License 2.0</a></p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_author_information">Author Information</h3>
+<h3 id="_author_information_3">Author Information</h3>
 <div class="paragraph">
-<p>An optional section for the role authors to include contact information, or a website (HTML is not allowed).</p>
+<p>This role has been created by the <a href="https://github.com/orgs/snowdrop/teams">Snowdrop team</a>.</p>
 </div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_role_docker">Role: Docker</h2>
+<h2 id="_role_kubernetes_kind">Role: Kubernetes Kind</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Cluster target type: K8s</p>
 </div>
 <div class="sect2">
-<h3 id="_description_2">Description</h3>
+<h3 id="_description_5">Description</h3>
 <div class="paragraph">
-<p>TODO</p>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_role_kubernetes_cluster">Role: Kubernetes Cluster</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>Cluster target type: K8s</p>
-</div>
-<div class="sect2">
-<h3 id="_description_3">Description</h3>
-<div class="paragraph">
-<p>This role will install a Kubernetes cluster on a linux machine using <code>kubelet</code> and <code>kubeadmin</code>.
-A docker daemon will be installed using the following <a href="../ansible/roles/docker/README.adoc">docker role</a> if no there.</p>
+<p>This role will install the Kubernetes <a href="https://github.com/kubernetes-sigs/kind"><code>Kind</code></a> tool, next create a Kubernetes cluster and optionally a docker container registry.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_requirements_2">Requirements</h3>
+<h3 id="_requirements_4">Requirements</h3>
 <div class="paragraph">
-<p>TODO</p>
+<p>A docker daemon must be installed using the following <a href="../docker/README.adoc">docker role</a> if no there.</p>
+</div>
+<div class="paragraph">
+<p>The following python3 packages should be installed using <code>pip</code> tool:
+- docker
+- openshift</p>
+</div>
+<div class="paragraph">
+<p><strong>REMARK</strong>: Configure the following ENV VAR <code>export ANSIBLE_PYTHON_INTERPRETER=$(which python3)</code> to be sure that ansible use <code>Python3</code></p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_role_variables_2">Role Variables</h3>
+<h3 id="_role_variables_4">Role Variables</h3>
 <div class="paragraph">
-<p>TODO</p>
+<p>The full set of variables can be found in the <a href="defaults/main.yml">default file</a>.</p>
+</div>
+<div class="paragraph">
+<p>The version of the cluster to be installed can be changed using the parameter <code>k8s_version</code>.
+The following versions are currently <a href="vars/main.yml">supported</a>.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_example_playbook_2">Example Playbook</h3>
+<h3 id="_example_playbook_4">Example Playbook</h3>
+<div class="paragraph">
+<p>To use this role, create a playbook and pass it as parameter under the <code>roles</code> section</p>
+</div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>ansible-playbook ....</code></pre>
+<pre class="highlight"><code class="language-yaml" data-lang="yaml">  - hosts: "{{ override_host | default('masters') }}"
+    roles:
+    - { role: kind }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can also configure the role with a tag</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-yaml" data-lang="yaml">    - { role: 'kind', tags: 'kind'}</code></pre>
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_license_2">License</h3>
+<h3 id="_usage">Usage</h3>
 <div class="paragraph">
-<p>APL</p>
+<p>To play with this role, call your playbook and pass the tag to execute your role :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">ansible-playbook ./kubernetes/ansible/k8s-misc.yml -t kind</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To execute the playbook on the host machine, override the <code>host</code> and setup the connection as <code>local</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">ansible-playbook ./kubernetes/ansible/k8s-misc.yml \
+    --connection=local -e override_host=localhost \
+    -t kind</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To use a kubernetes cluster previously released, specify the version to be used:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">ansible-playbook ./kubernetes/ansible/k8s-misc.yml \
+    -e k8s_version=1.16 \
+    -t kind</code></pre>
+</div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_author_information_2">Author Information</h3>
+<h3 id="_check_if_kind_cluster_is_working">Check if kind cluster is working</h3>
 <div class="paragraph">
-<p>An optional section for the role authors to include contact information, or a website (HTML is not allowed).</p>
+<p>To verify if <code>kind</code> is well installed and running, if it can process <code>ingress route</code> or <code>docker</code> pull/push using the local registry,
+please execute the following commands on your local machine to create the cluster and deploy the <a href="../ingress/README.adoc">ingress role</a>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">ansible-playbook ./kubernetes/ansible/k8s-misc.yml \
+   --connection=local -e override_host=localhost \
+   -e registry=true \
+   -t kind
+
+ansible-playbook ./kubernetes/ansible/k8s-misc.yml  \
+   --connection=local -e override_host=localhost \
+   -t ingress \
+   -e target_platform=kind</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Next, pull a docker image, tag it</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">docker pull gcr.io/google-samples/hello-app:1.0
+docker tag gcr.io/google-samples/hello-app:1.0 localhost:5000/hello-app:1.0
+docker push localhost:5000/hello-app:1.0</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>and create a <code>Hello world</code> application to verify if it works</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">kubectl create ns demo
+kubectl create deployment hello-server --image=localhost:5000/hello-app:1.0 -n demo
+
+cat &lt;&lt;EOF | kubectl apply -n demo -f -
+kind: Service
+apiVersion: v1
+metadata:
+  name: hello-server
+spec:
+    selector:
+      app: hello-server
+    ports:
+      - port: 8080
+EOF
+
+cat &lt;&lt;EOF | kubectl apply -n demo -f -
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: hello-server
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /hello
+        backend:
+          serviceName: hello-server
+          servicePort: 8080
+EOF</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Call the service using <code>curl</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">curl -v http://localhost/hello</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_license_4">License</h3>
+<div class="paragraph">
+<p><a href="https://www.apache.org/licenses/LICENSE-2.0">Apache License 2.0</a></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_author_information_4">Author Information</h3>
+<div class="paragraph">
+<p>This role has been created by the <a href="https://github.com/orgs/snowdrop/teams">Snowdrop team</a>.</p>
 </div>
 </div>
 </div>
@@ -656,7 +917,7 @@ A docker daemon will be installed using the following <a href="../ansible/roles/
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-05-20 18:57:47 +0200
+Last updated 2021-03-15 10:55:31 +0100
 </div>
 </div>
 </body>
