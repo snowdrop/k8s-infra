@@ -24,6 +24,11 @@ _tmp
 # Testing purposes
 sandbox/cluster_up/test.sh
 
+#######
+# IDE #
+#######
+tooling/.*
+
 ############
 # Intellij #
 ############
