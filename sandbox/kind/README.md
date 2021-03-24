@@ -107,12 +107,12 @@ kubectl get secret "$secretname" --namespace=kubernetes-dashboard -o template --
 - Open your browser at this address `http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/#/login`, copy/paste the token
   and enjoy your K8s experience
   
-The script [kind-reg-ingress.sh](kind-reg-ingress.sh) allows to create a kind cluster with a local registry and install an Ingress controller in the cluster.
-You need the following tools:
+The bash script [kind-reg-ingress.sh](kind-reg-ingress.sh) allows to create a Kubernetes cluster using the `kind` tool, integrated with a container private registry where an Ingress controller is deployed.
+The following tools are needed as prerequisite: 
  - Have python-yq: https://kislyuk.github.io/yq/
  - Install kind: https://github.com/kubernetes-sigs/kind/releases
  
-Once the prerequisites have been installed you can call the bash script without passing parameters:
+Once they have been installed you can execute the bash script as follows:
 ```bash
 ./kind-reg-ingress.sh
 ```
