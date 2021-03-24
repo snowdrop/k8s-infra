@@ -13,7 +13,7 @@ The following bash script [kind-reg-ingress.sh](./kind-reg-ingress.sh) allows to
 - Launch a local container registry using the port `5000`,
 - Set up an Ingress controller to route the traffic.
 
-**Remark**: The list of the `kind - kubernetes` images/versions is available [here](https://registry.hub.docker.com/v1/repositories/kindest/node/tags)
+**Remark**: The list of the `kind - kubernetes` images/versions to be used such as (1.14.x, 1.15.y,...) is available [here](https://registry.hub.docker.com/v1/repositories/kindest/node/tags)
 
 Once the tools have been installed, you can execute the bash script as follows:
 ```bash
