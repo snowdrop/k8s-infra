@@ -1,16 +1,10 @@
 #!/bin/sh
+
 set -o errexit
 
 #
 # Script creating a Kubernetes cluster using kind tool
 # deploying a private docker registry and ingress to route the traffic
-#
-# Prerequisites:
-# - Have python-yq: https://kislyuk.github.io/yq/
-# - Install kind: https://github.com/kubernetes-sigs/kind/releases
-#
-# Call the bash script without passing parameters
-# ./kind-reg-ingress.sh
 #
 # Creation: March 17th - 2021
 # Add hereafter changes done post creation date as a backlog
