@@ -10,7 +10,7 @@
 
 The following bash script [kind-reg-ingress.sh](./kind-reg-ingress.sh) allows to :
 - Create/delete a Kubernetes cluster using the latest cluster version of the one you specify, 
-- Launch a local container registry using the port 5000
+- Launch a local container registry using the port `5000`,
 - Set up an Ingress controller to route the traffic.
 
 Once the tools have been installed, you can execute the bash script as follows:
