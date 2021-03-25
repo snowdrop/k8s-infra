@@ -50,7 +50,7 @@ EOF
 
 if [ "$cluster_delete" == "yes" ]; then
   echo "Deleting kind cluster ..."
-   kind delete cluster
+  kind delete cluster
 fi
 
 # Create a kind cluster
