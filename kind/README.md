@@ -38,4 +38,4 @@ Creating a Kind cluster with Kubernetes version : v1.20. and logging verbosity: 
 ## How to check
 
 To verify if the ingress route is working, use the following example part of the [kind](https://kind.sigs.k8s.io/docs/user/ingress/#using-ingress) documentation
-like [this page](https://kind.sigs.k8s.io/docs/user/local-registry/#using-the-registry) too for to tag/push a container image to the `localhost:5000` registry
+like [this page](https://kind.sigs.k8s.io/docs/user/local-registry/#using-the-registry) too to tag/push a container image to the `localhost:5000` registry
