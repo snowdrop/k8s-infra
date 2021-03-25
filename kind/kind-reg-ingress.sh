@@ -20,10 +20,11 @@ k8s_minor_version=${version:-1.20}
 read -p "What logging verbosity do you want (0..9) - A verbosity setting of 0 logs only critical events - Default: 0 ? " logging_verbosity
 logging_verbosity=${logging_verbosity:-0}
 
-kindCmd="kind -v ${logging_verbosity} create cluster"
+kindCmd="kind -v ${logging_verbosity} "
+containerCmd="docker exec -it kubetools "
 
 # Kind cluster config template
-kindCfg=$(cat <<EOF
+cat <<EOF > cfgFile
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 containerdConfigPatches:
@@ -46,11 +47,26 @@ nodes:
     hostPort: 443
     protocol: TCP
 EOF
-)
+
+# Check if docker client is installed
+if ! command -v docker &> /dev/null
+then
+    echo "docker client could not be found"
+    exit
+fi
+
+echo "Download the kubetools image & launch it as container"
+docker rm -f kubetools
+docker run -it -d \
+   --net host --name kubetools \
+   -v ~/.kube:/root/.kube \
+   -v /var/run/docker.sock:/var/run/docker.sock \
+   -v $(pwd)/cfgFile:/root/cfgFile \
+   snowdrop/kubetools
 
 if [ "$cluster_delete" == "yes" ]; then
-  echo "Deleting kind cluster ..."
-  kind delete cluster
+  echo "Deleting the kind cluster ..."
+  ${containerCmd} kind -v ${logging_verbosity} delete cluster
 fi
 
 # Create a kind cluster
@@ -61,13 +77,13 @@ if [ "$k8s_minor_version" != "default" ]; then
   jq -r '.[].name' | grep -E "^v${k8s_minor_version}.[0-9]+$" | \
   cut -d. -f3 | sort -rn | head -1)
   k8s_version="v${k8s_minor_version}.${patch_version}"
-  kindCmd+=" --image kindest/node:${k8s_version}"
+  kindCmd+="create cluster --image kindest/node:${k8s_version}"
 else
   k8s_version=$k8s_minor_version
 fi
 
 echo "Creating a Kind cluster with Kubernetes version : ${k8s_version} and logging verbosity: ${logging_verbosity}"
-echo "${kindCfg}" | ${kindCmd} --config=-
+${containerCmd} ${kindCmd} --config /root/cfgFile
 
 # Start a local Docker registry (unless it already exists)
 running="$(docker inspect -f '{{.State.Running}}' "${reg_name}" 2>/dev/null || true)"
@@ -95,4 +111,38 @@ data:
 EOF
 
 # Deploy the nginx Ingress controller
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/kind/deploy.yaml
+${containerCmd} kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/kind/deploy.yaml
+
+# Install the Kubernetes dashboard
+
+while [[ $(${containerCmd} kubectl get pods -n ingress-nginx -lapp.kubernetes.io/instance=ingress-nginx,app.kubernetes.io/component=controller -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do echo "waiting for pod" && sleep 5; done
+
+cat <<EOF | docker exec --interactive kubetools sh
+kubectl create ns console
+
+helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard
+
+helm repo update && helm uninstall k8s-dashboard -n console
+
+helm install k8s-dashboard kubernetes-dashboard/kubernetes-dashboard \
+--namespace console \
+--set ingress.enabled=true
+
+kubectl create clusterrolebinding kubernetes-dashboard \
+--clusterrole=cluster-admin \
+--serviceaccount=console:k8s-dashboard-kubernetes-dashboard
+EOF
+
+echo "****************************************************************************************************"
+echo "Copy/paste the following token when you will log in: https://k8s-dashboard.127.0.0.1.nip.io/#/login "
+echo "****************************************************************************************************"
+cat <<EOF | docker exec --interactive kubetools sh
+kubectl -n console get sa/k8s-dashboard-kubernetes-dashboard \
+  -o=jsonpath='{.secrets[0].name}' | xargs kubectl -n console get secret \
+  -o=jsonpath='{.data.token}' | base64 -d
+EOF
+
+echo ""
+echo "**************************************************"
+echo "Enjoy to play with your K8s cluster and dashboard"
+echo "**************************************************"

@@ -2,8 +2,6 @@
 
 ## Prerequisite
 
-- jq: https://stedolan.github.io/jq/download/
-- Kind: https://github.com/kubernetes-sigs/kind/releases
 - Docker desktop: https://www.docker.com/products/docker-desktop
 
 ## How to install/uninstall the cluster
@@ -38,6 +36,27 @@ Creating a Kind cluster with Kubernetes version : v1.20. and logging verbosity: 
 To verify if the ingress route is working, use the following example part of the [kind](https://kind.sigs.k8s.io/docs/user/ingress/#using-ingress) documentation
 like [this page](https://kind.sigs.k8s.io/docs/user/local-registry/#using-the-registry) too to tag/push a container image to the `localhost:5000` registry
 
+## Trick: To execute a command inside the container ...
+```bash
+docker rm -f kubetools
+docker run -it -d \
+   --net host --name kubetools \
+   -v ~/.kube:/root/.kube \
+   -v /var/run/docker.sock:/var/run/docker.sock \
+   <USER>/kubetools
+   
+docker exec -it kubetools <COMMAND>
+```
+## To build a new image packaging the Kubernetes tools
+
+```bash
+docker build \
+  --build-arg KIND_VERSION=0.10.0 \
+  --build-arg KUBECTX_VERSION=0.9.3 \
+  -t <USER>/kubetools .
+docker tag snowdrop/kubetools quay.io/snowdrop/kubetools
+docker push quay.io/snowdrop/kubetools  
+```
 ---
 **<a name="version-note">1</a>**: The kubernetes `default version` depends on the version of the kind tool installed (e.g. 1.20.2 corresponds to kind 0.10.0). See the release note to find such information like the list of the [supported images](https://github.com/kubernetes-sigs/kind/releases).
 The list of the `kind - kubernetes` images and their version (1.14.x, 1.15.y,...) can be consulted [here](https://registry.hub.docker.com/v1/repositories/kindest/node/tags)
