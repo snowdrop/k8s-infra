@@ -62,7 +62,7 @@ docker run -it -d \
    -v ~/.kube:/root/.kube \
    -v /var/run/docker.sock:/var/run/docker.sock \
    -v $(pwd)/cfgFile:/root/cfgFile \
-   snowdrop/kubetools
+   quay.io/snowdrop/kubetools
 
 if [ "$cluster_delete" == "yes" ]; then
   echo "Deleting the kind cluster ..."
