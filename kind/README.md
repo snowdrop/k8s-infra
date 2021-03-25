@@ -9,7 +9,7 @@
 ## How to install/uninstall the cluster
 
 The following bash script [kind-reg-ingress.sh](./kind-reg-ingress.sh) allows to :
-- Create/delete a Kubernetes cluster using the latest cluster version of the one you specify, 
+- Create/delete a Kubernetes cluster using the latest cluster version as defined, or the one you specify, 
 - Launch a local container registry using the port `5000`,
 - Set up an Ingress controller to route the traffic.
 
@@ -35,3 +35,7 @@ What logging verbosity do you want (0..9) - A verbosity setting of 0 logs only c
 ...
 Creating a Kind cluster with Kubernetes version : v1.20. and logging verbosity: 0
 ```
+## How to check
+
+To verify if the ingress route is working, use the following example part of the [kind](https://kind.sigs.k8s.io/docs/user/ingress/#using-ingress) documentation
+like [this page](https://kind.sigs.k8s.io/docs/user/local-registry/#using-the-registry) too for to tag/push a container image to the `localhost:5000` registry
