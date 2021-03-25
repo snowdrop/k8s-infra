@@ -15,9 +15,16 @@ The following bash script [kind-reg-ingress.sh](./kind-reg-ingress.sh) allows to
 
 **Remark**: The list of the `kind - kubernetes` images/versions to be used such as (1.14.x, 1.15.y,...) is available [here](https://registry.hub.docker.com/v1/repositories/kindest/node/tags)
 
-Once the tools have been installed, you can execute the bash script as follows:
+Once the tools have been installed, you can install it on your machine under a bin executable folder
 ```bash
-./kind-reg-ingress.sh
+wget https://raw.githubusercontent.com/snowdrop/k8s-infra/master/kind/kind-reg-ingress.sh
+chmod +x ./kind-reg-ingress.sh
+mv kind-reg-ingress.sh /usr/local/bin
+```
+
+Next, launch it:
+```bash
+kind-reg-ingress.sh
 ```
 You can accept the `defaults` proposed or change the values as proposed hereafter:
 ```bash
