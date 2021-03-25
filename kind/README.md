@@ -38,5 +38,6 @@ Creating a Kind cluster with Kubernetes version : v1.20. and logging verbosity: 
 To verify if the ingress route is working, use the following example part of the [kind](https://kind.sigs.k8s.io/docs/user/ingress/#using-ingress) documentation
 like [this page](https://kind.sigs.k8s.io/docs/user/local-registry/#using-the-registry) too to tag/push a container image to the `localhost:5000` registry
 
+---
 **<a name="version-note">1</a>**: The kubernetes `default version` depends on the version of the kind tool installed (e.g. 1.20.2 corresponds to kind 0.10.0). See the release note to find such information like the list of the [supported images](https://github.com/kubernetes-sigs/kind/releases).
 The list of the `kind - kubernetes` images and their version (1.14.x, 1.15.y,...) can be consulted [here](https://registry.hub.docker.com/v1/repositories/kindest/node/tags)
