@@ -28,7 +28,7 @@ kind-reg-ingress.sh
 ```
 You can accept the `defaults` proposed or change the values as proposed hereafter:
 ```bash
-./kind-reg-ingress.sh 
+kind-reg-ingress.sh 
 Do you want to delete the kind cluster (yes|no) - Default: no ? 
 Which kubernetes version should we install (1.14 .. 1.20) - Default: 1.20 ? 
 What logging verbosity do you want (0..9) - A verbosity setting of 0 logs only critical events - Default: 0 ? 
