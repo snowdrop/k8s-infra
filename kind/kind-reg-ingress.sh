@@ -89,7 +89,9 @@ fi
 # - Configures containerd to use the local Docker registry
 # - Enables Ingress on ports 80 and 443
 if [ "$k8s_minor_version" != "default" ]; then
-  patch_version=$(docker exec -it kubetools wget -q https://registry.hub.docker.com/v1/repositories/kindest/node/tags -O - | jq -r '.[].name' | grep -E "^v${k8s_minor_version}.[0-9]+$" | cut -d. -f3 | sort -rn | head -1)
+  # See how to pipe commands here: https://gist.github.com/ElijahLynn/72cb111c7caf32a73d6f#file-pipe_to_docker_examples-L7
+  fetchTags="wget -q https://registry.hub.docker.com/v1/repositories/kindest/node/tags -O - | jq -r '.[].name' | grep -E \"^v${k8s_minor_version}.[0-9]+$\" | cut -d. -f3 | sort -rn | head -1"
+  patch_version=$(echo $fetchTags | docker exec --interactive kubetools /bin/bash -)
   k8s_version="v${k8s_minor_version}.${patch_version}"
   kindCmd+="create cluster --image kindest/node:${k8s_version}"
 else
