@@ -52,9 +52,9 @@ EOF
 
 # Detect the OS
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-   volumeCfgFile="$(pwd)/cfgFile:/config/cfgFile:z"
+   dockerVolumeSuffix=":z"
 elif [[ "$OSTYPE" == "darwin"* ]]; then
-   volumeCfgFile="$(pwd)/cfgFile:/config/cfgFile"
+   dockerVolumeSuffix=""
 fi
 
 # Check if docker client is installed
@@ -76,8 +76,8 @@ echo "Download the kubetools image & launch it as container"
 docker run -it -d \
    --net host --name $container_name \
    -v ~/.kube:/root/.kube \
-   -v /var/run/docker.sock:/var/run/docker.sock \
-   -v ${volumeCfgFile} \
+   -v /var/run/docker.sock:/var/run/docker.sock${dockerVolumeSuffix} \
+   -v $(pwd)/cfgFile:/config/cfgFile${dockerVolumeSuffix} \
    quay.io/snowdrop/kubetools
 
 if [ "$cluster_delete" == "yes" ]; then
