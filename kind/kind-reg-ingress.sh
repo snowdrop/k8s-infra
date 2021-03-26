@@ -8,7 +8,10 @@ set -o errexit
 #
 # Creation: March 17th - 2021
 # Add hereafter changes done post creation date as a backlog
-#
+# - Test the OS where the script is running to append :z suffix
+# - Review the piped commands to be executed by docker exec
+# - Safe the kind config to a local file
+# - Check if the kubetool container is running to delete it
 
 reg_name='kind-registry'
 reg_port='5000'
