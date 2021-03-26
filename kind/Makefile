@@ -26,3 +26,5 @@ docker_build:
 docker_push:
 	# Push to quay.io
 	docker push quay.io/$(DOCKER_IMAGE):$(DOCKER_TAG)
+
+
