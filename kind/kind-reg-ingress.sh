@@ -22,6 +22,8 @@ logging_verbosity=${logging_verbosity:-0}
 
 kindCmd="kind -v ${logging_verbosity} "
 containerCmd="docker exec -it kubetools "
+container_name=kubetools
+
 
 # Kind cluster config template
 cat <<EOF > cfgFile
@@ -55,10 +57,17 @@ then
     exit
 fi
 
+echo "Delete the kubetools container if it runs"
+if [ "$( docker container inspect -f '{{.State.Running}}' $container_name )" == "true" ]; then
+  echo "We are deleting the '$container_name' ..."
+  docker rm --force $container_name
+else
+  echo "'$container_name' does not exist."
+fi
+
 echo "Download the kubetools image & launch it as container"
-docker rm -f kubetools
 docker run -it -d \
-   --net host --name kubetools \
+   --net host --name $container_name \
    -v ~/.kube:/root/.kube \
    -v /var/run/docker.sock:/var/run/docker.sock \
    -v $(pwd)/cfgFile:/root/cfgFile \

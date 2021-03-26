@@ -13,7 +13,7 @@ The following bash script [kind-reg-ingress.sh](./kind-reg-ingress.sh) allows to
 
 Once the tools have been installed, you can download and move the script on your machine under a bin executable folder
 ```bash
-wget https://raw.githubusercontent.com/snowdrop/k8s-infra/master/kind/kind-reg-ingress.sh
+wget https://github.com/snowdrop/k8s-infra/blob/containerize-script/kind/kind-reg-ingress.sh
 chmod +x ./kind-reg-ingress.sh
 sudo mv kind-reg-ingress.sh /usr/local/bin
 ```
