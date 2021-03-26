@@ -50,6 +50,13 @@ nodes:
     protocol: TCP
 EOF
 
+# Detect the OS
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+   volumeCfgFile="$(pwd)/cfgFile:/config/cfgFile:z"
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+   volumeCfgFile="$(pwd)/cfgFile:/config/cfgFile"
+fi
+
 # Check if docker client is installed
 if ! command -v docker &> /dev/null
 then
@@ -70,7 +77,7 @@ docker run -it -d \
    --net host --name $container_name \
    -v ~/.kube:/root/.kube \
    -v /var/run/docker.sock:/var/run/docker.sock \
-   -v $(pwd)/cfgFile:/root/cfgFile \
+   -v ${volumeCfgFile} \
    quay.io/snowdrop/kubetools
 
 if [ "$cluster_delete" == "yes" ]; then
@@ -90,7 +97,7 @@ else
 fi
 
 echo "Creating a Kind cluster with Kubernetes version : ${k8s_version} and logging verbosity: ${logging_verbosity}"
-${containerCmd} ${kindCmd} --config /root/cfgFile
+${containerCmd} ${kindCmd} --config /config/cfgFile
 
 # Start a local Docker registry (unless it already exists)
 running="$(docker inspect -f '{{.State.Running}}' "${reg_name}" 2>/dev/null || true)"
