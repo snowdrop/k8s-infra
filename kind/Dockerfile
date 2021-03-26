@@ -1,4 +1,4 @@
-FROM dtzar/helm-kubectl
+FROM dtzar/helm-kubectl:latest
 
 ARG KIND_VERSION
 ARG KUBECTX_VERSION
