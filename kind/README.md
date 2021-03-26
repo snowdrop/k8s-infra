@@ -15,7 +15,7 @@ Once the tools have been installed, you can download and move the script on your
 ```bash
 wget https://raw.githubusercontent.com/snowdrop/k8s-infra/master/kind/kind-reg-ingress.sh
 chmod +x ./kind-reg-ingress.sh
-mv kind-reg-ingress.sh /usr/local/bin
+sudo mv kind-reg-ingress.sh /usr/local/bin
 ```
 
 Next, launch it:
