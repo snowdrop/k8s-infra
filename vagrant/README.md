@@ -22,7 +22,7 @@ vagrant destroy -f && vagrant up && ssh-keygen -R '[127.0.0.1]:2222'
 ```bash
 export PASSWORD_STORE_DIR=~/.password-store-work
 export ANSIBLE_ROLES_PATH="../ansible/roles"
-ansible-playbook -i ansible/local ../kubernetes/ansible/k8s.yml -e pass_provider=vagrant
+ansible-playbook -i ansible/local ../kubernetes/ansible/k8s.yml -e pass_provider=vagrant -e k8s_version=1.19.7
 ```
 - Patch the Ingress controller service to add an `externalIP` as no external Loadbalancer has been deployed. Without such an IP address, then the status of the service will stay equal to `pending`
 ```bash
