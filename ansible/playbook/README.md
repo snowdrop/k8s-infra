@@ -309,7 +309,7 @@ Variables:
 | Var Name | Possible Values | Default Value | Meaning |
 | --- | --- | --- | --- |
 | vm_name | | | Name that will be assigned to  the host | 
-| pass_provider | [hetzner] | hetzner | Cloud or BereMetal provider that will host the VM |
+| pass_provider | [hetzner] | hetzner | Cloud or Bare-metal provider that will host the VM |
 | k8s_type | [masters,nodes] | | k8s component, see the [k8s README](../../kubernetes/README.md#ansible-inventory) |
 | k8s_version | [115,116] | | k8s version to be installed, see the [k8s README](../../kubernetes/README.md#ansible-inventory) |
 
@@ -359,7 +359,7 @@ Variables:
 | Var Name | Possible Values | Default Value | Meaning |
 | --- | --- | --- | --- |
 | vm_name | | | Name that will be assigned to  the host | 
-| pass_provider | [hetzner] | hetzner | Cloud or BereMetal provider that will host the VM |
+| pass_provider | [hetzner] | hetzner | Cloud or Bare-metal provider that will host the VM |
 
 ## `sec_host`
 
@@ -406,7 +406,7 @@ Variables:
 | Var Name | Possible Values | Default Value | Meaning |
 | --- | --- | --- | --- |
 | vm_name | | | Name of the host that must already exist in the Ansible inventory. | 
-| provider | [hetzner] |  | Cloud or BereMetal provider that hosts the VM |
+| provider | [hetzner] |  | Cloud or Bare-metal provider that hosts the VM |
 
 ## `passstore_manage_host_groups`
 
