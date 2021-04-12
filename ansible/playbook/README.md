@@ -202,7 +202,7 @@ It's execution goes against the `controller`.
 
 ### Updating and retrieving the inventory
 
-As comented before, Ansible host information is obtained from `passwordstore`. 
+As commented before, Ansible host information is obtained from `passwordstore`. 
 
 Because a host can already be defined, prior to execute host creation check that the host doesn't exist already in our inventory. 
 
@@ -210,7 +210,7 @@ Because a host can already be defined, prior to execute host creation check that
 
 With this in mind, whenever any statement that manages pass is executed, the corresponding `git push` must be manually issued by the user.
 
-At this point one of 2 things can happen, either the host already exists and it only needs to be imported or it must be created from scratch.
+At this point one of 2 things can happen, either the host already exists, and it only needs to be imported, or it must be created from scratch.
 
 First identify if the host already exists in pass.
 
@@ -237,7 +237,7 @@ If a host has already been created it can be imported to the controller.
 First identify the host name from pass.
 
 ```bash
-$ pàss
+$ pass
 
 Password Store
 ├── hetzner
@@ -309,7 +309,7 @@ Variables:
 | Var Name | Possible Values | Default Value | Meaning |
 | --- | --- | --- | --- |
 | vm_name | | | Name that will be assigned to  the host | 
-| pass_provider | [hetzner] | hetzner | Cloud or Bare-metal provider that will host the VM |
+| pass_provider | [hetzner,openstack] | hetzner | Cloud or Bare-metal provider that will host the VM |
 | k8s_type | [masters,nodes] | | k8s component, see the [k8s README](../../kubernetes/README.md#ansible-inventory) |
 | k8s_version | [115,116] | | k8s version to be installed, see the [k8s README](../../kubernetes/README.md#ansible-inventory) |
 
