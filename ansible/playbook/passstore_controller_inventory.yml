@@ -30,7 +30,7 @@
 
     - name: Check k8s_type value
       fail:
-        msg: "Invalid k8s type {{ k8s_type }}. Should be in [masters,nods]"
+        msg: "Invalid k8s type {{ k8s_type }}. Should be in [masters,nodes]"
       when: "k8s_type != 'masters' and k8s_type != 'nodes' and k8s_type | length > 0"
       tags: [always]
 
