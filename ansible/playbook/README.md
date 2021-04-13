@@ -410,7 +410,9 @@ Variables:
 
 ## `passstore_manage_host_groups`
 
-This playbook allows to easily add and remove hosts from a ansible group.
+This playbook allows to easily add and remove hosts from an ansible group managed under the password store.
+
+**WARNING**: No entries will be added or removed using this playbook within the `hosts.yaml` file !
 
 ```bash
 $ ansible-playbook ansible/playbook/passstore_manage_host_groups.yml -e operation=add -e group_name=<my_group> -e vm_name=<my_host>
