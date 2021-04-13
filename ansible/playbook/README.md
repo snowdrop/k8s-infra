@@ -126,7 +126,7 @@ Host group assignment is made in `passstore` by managing entries in the `provide
 │   │   │   ├── group_3
 ```
 
-For instance, we wanted to define the ports that a k8s master needs to open. This has been done in the `hosts.yml` file having the following varaible assigned to 
+For instance, we wanted to define the ports that a k8s master needs to open. This has been done in the `hosts.yml` file having the following variable assigned to 
 the `masters` group, which is also inside a group structure so other variables are inherited. 
 
 ```
