@@ -43,7 +43,7 @@
         chdir: "{{ lookup('env', 'PASSWORD_STORE_DIR') }}"
 
   tasks:
-    - name: "Actuvate hetzner context"
+    - name: "Activate hetzner context"
       include_role:
         name: "hetzner/activate_context"
       vars:
