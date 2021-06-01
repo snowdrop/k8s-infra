@@ -15,7 +15,7 @@ reg_port='5000'
 
 read -p "Do you want to delete the kind cluster (yes|no) - Default: no ? " cluster_delete
 cluster_delete=${cluster_delete:-no}
-read -p "Which kubernetes version should we install (1.14 .. 1.20) - Default: 1.20 ? " version
+read -p "Which kubernetes version should we install (1.14 .. 1.21) - Default: 1.21 ? " version
 k8s_minor_version=${version:-1.20}
 read -p "What logging verbosity do you want (0..9) - A verbosity setting of 0 logs only critical events - Default: 0 ? " logging_verbosity
 logging_verbosity=${logging_verbosity:-0}
