@@ -7,8 +7,13 @@ set -o errexit
 # deploying a private docker registry and ingress to route the traffic
 #
 # Creation: March 17th - 2021
-# Add hereafter changes done post creation date as a backlog
 #
+# Add hereafter changes done post creation date as backlog
+#
+# June 2nd: 
+# - Bump version of k8s to 1.21. Check then locally that you have installed kind 0.11
+# - Fix k8s_minor_version from 1.20 to 1.21 
+# - Add 2 external NodePort: 30000, 31000 which could be used instead using K8s Service instead of Ingress
 
 reg_name='kind-registry'
 reg_port='5000'
@@ -16,7 +21,7 @@ reg_port='5000'
 read -p "Do you want to delete the kind cluster (yes|no) - Default: no ? " cluster_delete
 cluster_delete=${cluster_delete:-no}
 read -p "Which kubernetes version should we install (1.14 .. 1.21) - Default: 1.21 ? " version
-k8s_minor_version=${version:-1.20}
+k8s_minor_version=${version:-1.21}
 read -p "What logging verbosity do you want (0..9) - A verbosity setting of 0 logs only critical events - Default: 0 ? " logging_verbosity
 logging_verbosity=${logging_verbosity:-0}
 
@@ -45,6 +50,12 @@ nodes:
   - containerPort: 443
     hostPort: 443
     protocol: TCP
+  - containerPort: 30000
+    hostPort: 30000
+    protocol: tcp
+  - containerPort: 31000
+    hostPort: 31000
+    protocol: tcp
 EOF
 )
 
