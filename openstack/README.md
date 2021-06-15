@@ -21,7 +21,9 @@ The playbook also uses the variables defined in `roles/openstack/defaults/main.y
 For example to override the VM flavor, network and security group, one would execute the following command:
 
 ```
-ansible-playbook playbook/openstack.yml -e type=cloude -e '{"state": "present", "hostname": "somehostname", "openstack": {"os_username": "username", "os_password": "password", "os_domain": "domain", "os_auth_url": "https://somehost:13000/v3", "os_project_id": "someprojectid", "vm": {"network": "some_network", "security_group": "some_security_group", "flavor": "m1.medium"}}}'`
+ansible-playbook playbook/openstack.yml \
+   -e type=cloude \
+   -e '{"state": "present", "hostname": "somehostname", "openstack": {"timeout": "600","os_username": "username", "os_password": "password", "os_domain": "domain", "os_auth_url": "https://somehost:13000/v3", "os_project_id": "someprojectid", "vm": {"network": "some_network", "security_group": "some_security_group", "flavor": "m1.medium"}}}'`
 ```
 
 To delete a VM, simply replace `"state": "present"` with `"state": "absent"`
@@ -32,5 +34,5 @@ as well as the private key of the new VM as `inventory/id_openstack.rsa`
 **IMPORTANT** : The Ansible commands should be executed within the ansible folder !
 
 ```
-ansible-playbook playbook/openstack.yml -e type=cloude -e '{"state": "present", "hostname": "n311-prod", "openstack": {"os_username": "psi-spring-boot-jenkins", "os_password": "xxxxxxxx", "os_domain":  "redhat.com", "os_auth_url": "https://rhos-d.infra.prod.upshift.rdu2.redhat.com:13000/v3/", "vm": {"network": "provider_net_shared", "security_group": "spring-boot",  "flavor": "ci.m5.large", "volumes" : ["ceph-volume"]}}}'
+ansible-playbook playbook/openstack.yml -e type=cloude -e '{"state": "present", "hostname": "n311-prod", "openstack": {"timeout": "300", "os_username": "psi-spring-boot-jenkins", "os_password": "xxxxxxxx", "os_domain":  "redhat.com", "os_auth_url": "https://rhos-d.infra.prod.upshift.rdu2.redhat.com:13000/v3/", "vm": {"network": "provider_net_shared", "security_group": "spring-boot",  "flavor": "ci.m5.large", "volumes" : ["ceph-volume"]}}}'
 ```
