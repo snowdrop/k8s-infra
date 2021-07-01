@@ -105,7 +105,10 @@ data:
     help: "https://kind.sigs.k8s.io/docs/user/local-registry/"
 EOF
 
-# Deploy the nginx Ingress controller
-# Due to ingress API change and webhook admission error: https://github.com/snowdrop/k8s-infra/issues/211
+# Issue : https://github.com/kubernetes/ingress-nginx/issues/7305
 # kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/kind/deploy.yaml
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.47.0/deploy/static/provider/cloud/deploy.yaml
+# !! Will install the image of the controller v0.46
+# kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.47.0/deploy/static/provider/cloud/deploy.yaml
+
+# Deploy the nginx Ingress controller
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/release-v1beta1/deploy/static/provider/kind/deploy.yaml
