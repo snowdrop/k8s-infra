@@ -14,13 +14,16 @@ set -o errexit
 # - Bump version of k8s to 1.21. Check then locally that you have installed kind 0.11
 # - Fix k8s_minor_version from 1.20 to 1.21 
 # - Add 2 external NodePort: 30000, 31000 which could be used instead using K8s Service instead of Ingress
+# Aug 20
+# - Change the URL to install nginx ingress - https://github.com/snowdrop/k8s-infra/issues/212
+# - Mention v1.22. Still use as default v1.21
 
 reg_name='kind-registry'
 reg_port='5000'
 
 read -p "Do you want to delete the kind cluster (yes|no) - Default: no ? " cluster_delete
 cluster_delete=${cluster_delete:-no}
-read -p "Which kubernetes version should we install (1.14 .. 1.21) - Default: 1.21 ? " version
+read -p "Which kubernetes version should we install (1.14 .. 1.22) - Default: 1.21 ? " version
 k8s_minor_version=${version:-1.21}
 read -p "What logging verbosity do you want (0..9) - A verbosity setting of 0 logs only critical events - Default: 0 ? " logging_verbosity
 logging_verbosity=${logging_verbosity:-0}
