@@ -117,6 +117,7 @@ $ ansible-playbook hetzner/ansible/hetzner-create-server.yml -e vm_name=${VM_NAM
 -e salt_text=$(head -c 500 /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 20 | head -n 1) \
 -e hetzner_context_name=snowdrop
 ```
+**REMARK**: For mac's users, please execute the following command before `export LC_ALL=C`
 
 Once this task is finished it's mandatory to launch server securization, see the [Next steps](#next-steps) section.
 
