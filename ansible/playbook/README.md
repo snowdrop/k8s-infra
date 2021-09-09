@@ -202,59 +202,37 @@ It's execution goes against the `controller`.
 
 ### Updating and retrieving the inventory
 
-As commented before, Ansible host information is obtained from `passwordstore`. 
-
-Because a host can already be defined, prior to execute host creation check that the host doesn't exist already in our inventory. 
-
-> NOTE: Check the [passstore gitlab project documentation](https://gitlab.cee.redhat.com/snowdrop/passstore) for the installation guide for the first execution. 
-
-With this in mind, whenever any statement that manages pass is executed, the corresponding `git push` must be manually issued by the user.
-
-At this point one of 2 things can happen, either the host already exists, and it only needs to be imported, or it must be created from scratch.
-
-First identify if the host already exists in pass.
+As commented before, the host information (user, pwd, ssh port, ...) is obtained from the team github `passwordstore` project. 
+Because a host can already be defined under the store, prior to execute the playbook creating a host, check the content of the hetzner store key using the following command
 
 ```bash
-$ pàss
-
-Password Store
-├── hetzner
+$ pass hetzner
+hetzner
+├── ...
+├── host-1
 │   ├── ...
-│   ├── host-1
-│   │   ├── ...
-│   ├── host-2
-│   │   ├── ...
+├── host-2
+│   ├── ...
 ```
 
 Then:
-1. The host exists. For information regarding retrieving the existing inventory to the local controller jump to the [Import a host](#Import-a-host) section;
-1. The host doesn't exist. To create a host from scratch follow the next section [Create a host](#Create-a-host)
+1. The host exists. Jump to the [Import a host](#Import-a-host) section;
+2. The host doesn't exist. Create a new host as documented under the section [Create a host](#Create-a-host)
+
+> NOTE: Check the [passstore gitlab project documentation](https://gitlab.cee.redhat.com/snowdrop/passstore) for the installation guide for the first execution.
+> 
+> WARNING: Whenever any command to create a host and password entries took place, the command `pass git push` must be manually issued by the user to push to github the information.
 
 ### Import a host
 
-If a host has already been created it can be imported to the controller. 
-
-First identify the host name from pass.
+If a host has already been created, it can be imported within the inventory using the command: 
 
 ```bash
-$ pass
-
-Password Store
-├── hetzner
-│   ├── ...
-│   ├── host-1
-│   │   ├── ...
-│   ├── host-2
-│   │   ├── ...
+$ ansible-playbook ansible/playbook/passstore_controller_inventory.yml -e vm_name=<VM_NAME> -e pass_provider=hetzner
 ```
+where `<VM_NAME>` corresponds to the host key created under `hetzner`
 
-Once the host is identified, execute the initialization playbook with the host name and the provider. 
-
-```bash
-$ ansible-playbook ansible/playbook/passstore_controller_inventory.yml -e vm_name=host-1 -e pass_provider=hetzner
-```
-
-It's the same playbook as the one described in the [Create a host](#Create-a-host) section but without the `create` *tag*.
+**REMARK**: It's the same playbook `passstore_controller_inventory` which is executed as the one described in the [Create a host](#Create-a-host) section but without the `create` *tag*.
 
 ### Create a host
 
