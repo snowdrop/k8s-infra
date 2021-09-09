@@ -201,7 +201,8 @@ The first step is to add the host to the Ansible inventory but also to create th
 
 ### Updating and retrieving the inventory
 
-As commented before, the host information (user, pwd, ssh port, ...) is obtained from the github `passwordstore` team project. 
+As commented before, the host information (user, pwd, ssh port, ...) is obtained from the gitlab `passwordstore` team project. 
+
 Because a host can already be defined under the store, prior to execute the playbook creating a host, check the content of the store using the following command
 
 ```bash
@@ -219,9 +220,9 @@ According to what you will find under the `Hetzner` level, then 2 scenario will 
 1. The host exists. Jump to the [Import a host](#Import-a-host) section;
 2. The host doesn't exist. Create a new host as documented under the section [Create a host](#Create-a-host)
 
-> NOTE: Check the [passstore gitlab project documentation](https://gitlab.cee.redhat.com/snowdrop/passstore) for the installation guide for the first execution.
+> NOTE: Check the [passstore gitlab project documentation](https://gitlab.cee.redhat.com/snowdrop/passstore) if password store ins not yet installed on your laptop.
 > 
-> WARNING: Whenever any command to create a host and password entries took place, the command `pass git push` must be manually issued by the user to push to github the information.
+> WARNING: Whenever a command to create host and password entries took place, then push the content using the command `pass git push` manually !!
 
 ### Import a host
 
