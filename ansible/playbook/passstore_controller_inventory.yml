@@ -36,8 +36,8 @@
 
     - name: Check k8s_version value
       fail:
-        msg: "Invalid k8s version {{ k8s_version }}. Should be in [115,120]"
-      when: "k8s_version != '115' and k8s_version != '116' and k8s_version != '117' and k8s_version != '118' and k8s_version != '119' and k8s_version != '120' and k8s_version | length > 0"
+        msg: "Invalid k8s version {{ k8s_version }}. Should be in [117 ... 121]"
+      when: "k8s_version != '117' and k8s_version != '118' and k8s_version != '119' and k8s_version != '120' k8s_version != '121' and k8s_version | length > 0"
       tags: [always]
 
   tasks:
