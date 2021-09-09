@@ -220,7 +220,7 @@ According to what you will find under the `Hetzner` level, then 2 scenario will 
 1. The host exists. Jump to the [Import a host](#Import-a-host) section;
 2. The host doesn't exist. Create a new host as documented under the section [Create a host](#Create-a-host)
 
-> NOTE: Check the [passstore gitlab project documentation](https://gitlab.cee.redhat.com/snowdrop/passstore) if password store ins not yet installed on your laptop.
+> NOTE: Check the [team password store documentation](https://gitlab.cee.redhat.com/snowdrop/passstore) if it is not yet installed on your laptop.
 > 
 > WARNING: Whenever a command to create host and password entries took place, then push the content using the command `pass git push` manually !!
 
