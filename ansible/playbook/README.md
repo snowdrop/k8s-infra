@@ -197,8 +197,7 @@ installation for version `1.17` would require adding a new group as child of the
 
 ## Host management in Ansible
 
-The first step is to add the host to our Ansible implementation. The section describes how to maintain our hosts in Ansible and their use. 
-It's execution goes against the `controller`.
+The first step is to add the host to the Ansible inventory but also to create the needed keys under the password store. The section describes how to maintain our hosts and their use.
 
 ### Updating and retrieving the inventory
 
