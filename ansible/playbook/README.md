@@ -197,11 +197,11 @@ installation for version `1.17` would require adding a new group as child of the
 
 ## Host management in Ansible
 
-The first step is to add the host to the Ansible inventory but also to create the needed keys under the password store. The section describes how to maintain our hosts and their use.
+The first step is to add the host to the Ansible inventory but also to create the needed keys under the password store. This section describes how to maintain our hosts and their use.
 
 ### Updating and retrieving the inventory
 
-As commented before, the host information (user, pwd, ssh port, ...) is obtained from the team github `passwordstore` project. 
+As commented before, the host information (user, pwd, ssh port, ...) is obtained from the github `passwordstore` team project. 
 Because a host can already be defined under the store, prior to execute the playbook creating a host, check the content of the hetzner store key using the following command
 
 ```bash
@@ -214,7 +214,8 @@ hetzner
 │   ├── ...
 ```
 
-Then:
+According to what you will find under the `Hetzner` level, then 2 scenario will take place:
+
 1. The host exists. Jump to the [Import a host](#Import-a-host) section;
 2. The host doesn't exist. Create a new host as documented under the section [Create a host](#Create-a-host)
 
