@@ -202,7 +202,7 @@ The first step is to add the host to the Ansible inventory but also to create th
 ### Updating and retrieving the inventory
 
 As commented before, the host information (user, pwd, ssh port, ...) is obtained from the github `passwordstore` team project. 
-Because a host can already be defined under the store, prior to execute the playbook creating a host, check the content of the hetzner store key using the following command
+Because a host can already be defined under the store, prior to execute the playbook creating a host, check the content of the store using the following command
 
 ```bash
 $ pass hetzner
