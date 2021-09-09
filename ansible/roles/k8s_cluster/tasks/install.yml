@@ -80,8 +80,8 @@
     disable_excludes: kubernetes
   vars:
     packages:
-      - kubeadm-{{ k8s_version }}
       - kubectl-{{ k8s_version }}
+      - kubeadm-{{ k8s_version }}
       - kubelet-{{ k8s_version }}
   become: yes
 
@@ -96,6 +96,7 @@
   systemd:
     state: started
     name: kubelet
+    daemon_reload: yes
     enabled: yes
   become: yes
 
