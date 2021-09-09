@@ -222,7 +222,7 @@ According to what you will find under the `Hetzner` level, then 2 scenario will 
 
 > NOTE: Check the [team password store documentation](https://gitlab.cee.redhat.com/snowdrop/passstore) if it is not yet installed on your laptop.
 > 
-> WARNING: Whenever a command to create host and password entries took place, then push the content using the command `pass git push` manually !!
+> WARNING: Whenever a command to create a host and password entries took place, then push the content using the command `pass git push` manually !!
 
 ### Import a host
 
