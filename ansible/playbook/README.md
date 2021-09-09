@@ -233,7 +233,7 @@ $ ansible-playbook ansible/playbook/passstore_controller_inventory.yml -e vm_nam
 ```
 where `<VM_NAME>` corresponds to the host key created under `hetzner`
 
-**REMARK**: It's the same playbook `passstore_controller_inventory` which is executed as the one described in the [Create a host](#Create-a-host) section but without the `create` *tag*.
+**REMARK**: The playbook used is the same as the one described in the [Create a host](#Create-a-host) section but without the `create` *tag*.
 
 ### Create a host
 
