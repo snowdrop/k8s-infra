@@ -127,9 +127,9 @@ $ VM_NAME=xXx \
   && ansible-playbook kubernetes/ansible/k8s.yml --limit ${VM_NAME}
 ```
 
-> NOTE: Both kubernetes playbooks (`k8s` and `k8s-misc`) can have it's host overriden using the `override_host` variable, e.g., `-e override_host=localhost` to launch it on the controller itself.
+> NOTE: Both kubernetes playbooks (`k8s` and `k8s-misc`) can have its host overridden using the `override_host` variable, e.g., `-e override_host=localhost` to launch it on the controller itself.
 
-# Troublehsooting
+# Troubleshooting
 
 ## Expired k8s certificate
 
