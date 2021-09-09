@@ -114,6 +114,15 @@ $ ansible-playbook kubernetes/ansible/k8s.yml --limit <host_name>
 ```  
 
 The `limit` option tells ansible to only execute the playbook to the hosts limited in the statement.
+Kubernetes version can be changed using the parameter `-e k8s_version=1.21.4`
+
+**WARNING**: Be sure that a host group entry exists for the version you want to install within the `inventory/hosts` file
+```yaml
+        k8s_121:
+          vars:
+            k8s_version: 1.21.4
+            k8s_dashboard_version: v2.3.1
+```
 
 Example for installing a k8s server from scratch using a hetzner host.
  
@@ -128,6 +137,11 @@ $ VM_NAME=xXx \
 ```
 
 > NOTE: Both kubernetes playbooks (`k8s` and `k8s-misc`) can have its host overridden using the `override_host` variable, e.g., `-e override_host=localhost` to launch it on the controller itself.
+
+To delete the kubernetes cluster (kubeadmin, kubelet, ..), execute this comma,d
+```bash
+ansible-playbook kubernetes/ansible/k8s.yml --limit ${VM_NAME} -e remove=true
+```
 
 # Troubleshooting
 
@@ -174,7 +188,7 @@ And then update the user's kube config.
 $ cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 ```
 
-## Cannot login using kubelet
+## Cannot log in using kubelet
 
 ### Problem
 
@@ -187,7 +201,7 @@ This might happen for instance after renewing the certificates.
 
 ### Cause
 
-The `~/.kube/config` does not content the client-certificate-data and client-key-data updated after renewing the certificate.
+The `~/.kube/config` does not contain the client-certificate-data and client-key-data updated after renewing the certificate.
 
 ### Solution
 
