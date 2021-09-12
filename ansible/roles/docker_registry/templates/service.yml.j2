@@ -10,7 +10,8 @@ metadata:
 spec:
   {% if registry_nodePort is defined %}type: NodePort
   {% else %}type: ClusterIP
-{% endif %}selector:
+{% endif %}
+  selector:
     k8s-app: {{ registry.service_name }}
   ports:
     - name: registry
