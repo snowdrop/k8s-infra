@@ -3,7 +3,7 @@
     name: cfssl_tool
 
 - name: Get Kube Registry Service ClusterIP
-  command: "{{ client_tool }} --kubeconfig={{ ansible_user_dir }}/.kube/config get service/kube-registry -n kube-system -o jsonpath='{.spec.clusterIP}'"
+  command: "{{ client_tool }} --kubeconfig={{ ansible_user_dir }}/.kube/config get service/{{ k8s_dns_service_name }} -n kube-system -o jsonpath='{.spec.clusterIP}'"
   register: registry_ip_address
 
 - name: Set fact
@@ -11,7 +11,7 @@
     registry_ip: registry_ip_address.stdout
 
 - name: Delete any previous CSR send to k8s
-  command: "{{ client_tool }} --kubeconfig={{ ansible_user_dir }}/.kube/config delete csr {{ registry.service_name}}.{{ registry.namespace }}"
+  command: "{{ client_tool }} --kubeconfig={{ ansible_user_dir }pass}/.kube/config delete csr {{ registry.service_name}}.{{ registry.namespace }}"
   ignore_errors: true
 
 - name: Copy cfssljson file with the Hosts names and IP addresses to be certified
