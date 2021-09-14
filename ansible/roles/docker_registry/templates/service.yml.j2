@@ -9,7 +9,7 @@ metadata:
     kubernetes.io/name: {{ registry.service_name }}
 spec:
   {% if registry_nodePort is defined %}type: NodePort
-  {% else %}type: ClusterIP
+{% else %}type: ClusterIP
 {% endif %}
   selector:
     k8s-app: {{ registry.service_name }}
