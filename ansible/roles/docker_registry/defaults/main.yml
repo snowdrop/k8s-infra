@@ -3,6 +3,7 @@ remove: false
 k8s_dns_service_name: kube-dns
 
 registry:
+  image_version: 2.6
   service_name: kube-registry
   namespace: infra
   user: admin

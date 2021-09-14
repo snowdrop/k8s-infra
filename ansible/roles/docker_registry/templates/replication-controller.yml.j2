@@ -15,13 +15,13 @@ spec:
   template:
     metadata:
       labels:
-        k8s-app: {{ registry.service_name}}
+        k8s-app: {{ registry.service_name }}
         version: v0
         kubernetes.io/cluster-service: "true"
     spec:
       containers:
         - name: registry
-          image: registry:2
+          image: registry:{{ registry.image_version }}
           resources:
             limits:
               cpu: 100m
