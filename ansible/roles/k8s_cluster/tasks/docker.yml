@@ -24,7 +24,10 @@
 
 - name: Install docker
   yum:
-    name: docker-ce-18.06.2.ce
+    name:
+     - docker-ce
+     - docker-ce-client
+     - containerd
     state: present
   become: yes
 
