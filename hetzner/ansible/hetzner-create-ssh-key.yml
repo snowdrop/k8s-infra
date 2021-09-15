@@ -1,0 +1,29 @@
+---
+# file: hetzner-create-ssh-key.yml
+# Optional variables:
+- name: "Create hetzner ssh key"
+  hosts: localhost
+  gather_facts: yes
+
+  pre_tasks:
+
+    - name: Set default hetzner_context_name if it is not defined
+      set_fact:
+        hetzner_context_name: "snowdrop"
+      when: hetzner_context_name is not defined
+
+  tasks:
+    - name: "Activate hetzner context"
+      include_role:
+        name: "hetzner/activate_context"
+      vars:
+        context_name: "{{ hetzner_context_name }}"
+
+    - include_role:
+        name: hetzner/create_ssh_key
+      vars:
+        vm_name: "{{ vm_name }}"
+        os_user: "{{ my_hostvars.ansible_user }}"
+        context_name: "{{ hetzner_context_name }}"
+
+...
