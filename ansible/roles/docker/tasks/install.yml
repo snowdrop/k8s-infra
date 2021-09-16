@@ -31,13 +31,6 @@
   file: path=/etc/docker state=directory
   become: yes
 
-# This template has been removed because docker fails to start with it.
-# - name: "Copy docker daemon.json file"
-#   template:
-#     src: "daemon.json.j2"
-#     dest: /etc/docker/daemon.json
-#   become: yes
-
 - name: "Start docker"
   systemd:
     state: restarted
