@@ -1,0 +1,47 @@
+---
+- name: Ensure no old docker version is installed
+  yum:
+    name: "{{ docker_old_packages }}"
+    state: absent
+  become: yes
+
+- name: Install dependencies needed by docker
+  yum:
+    name: "{{ docker_dependencies }}"
+    state: present
+  become: yes
+
+- name: Add docker repository
+  yum_repository:
+    name: docker
+    description: Docker
+    baseurl: https://download.docker.com/linux/centos/7/$basearch/stable
+    enabled: 1
+    gpgcheck: 1
+    gpgkey: https://download.docker.com/linux/centos/gpg
+  become: yes
+
+- name: Install docker
+  yum: 
+    name: "{{ docker_packages }}"
+    state: present
+  become: yes
+
+- name: "Ensures /etc/docker dir exists"
+  file: path=/etc/docker state=directory
+  become: yes
+
+# This template has been removed because docker fails to start with it.
+# - name: "Copy docker daemon.json file"
+#   template:
+#     src: "daemon.json.j2"
+#     dest: /etc/docker/daemon.json
+#   become: yes
+
+- name: "Start docker"
+  systemd:
+    state: restarted
+    name: docker
+    enabled: yes
+  become: yes
+...

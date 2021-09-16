@@ -1,0 +1,48 @@
+== Role: Kubernetes Cluster
+
+Cluster target type: K8s
+
+=== Description
+
+This role will install a Kubernetes cluster on a linux machine using `kubelet` and `kubeadmin`.
+
+=== Requirements
+
+TODO
+
+=== Role Variables
+
+To play with a Kubernetes cluster, you must deploy a https://kubernetes.io/docs/setup/production-environment/container-runtimes/[container runtime].
+We support 2 of them: `docker`, `containerd` which can be configured using the following variables:
+
+|===
+| Name | Type | Value
+| install_docker | bool | false (default)
+| install_containerd | bool | true
+|===
+
+=== Example Playbook
+
+.Sample Playbook
+[source,yaml]
+-----
+---
+- name: "Install containerd"
+  hosts: "a_host"
+  gather_facts: "{{ gathering_host_info | default('true') | bool == true }}"
+
+  tasks:
+    - import_role:
+      name: 'containerd'
+      vars:
+        state: present
+...
+-----
+
+=== License
+
+https://www.apache.org/licenses/LICENSE-2.0[Apache License 2.0]
+
+=== Author Information
+
+This role has been created by the https://github.com/orgs/snowdrop/teams[Snowdrop team].
