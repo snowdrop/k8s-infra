@@ -22,7 +22,7 @@
       tags: [docker]
     # - name: "Execute docker configuration role"
     #   import_role:
-    #     name: 'k8s_docker'
+    #     name: 'docker_config'
     #   tags: [docker]
     - name: "Execute k8s_cluster installation role"
       import_role:
