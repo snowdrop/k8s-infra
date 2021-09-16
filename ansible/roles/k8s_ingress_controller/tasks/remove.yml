@@ -1,0 +1,5 @@
+---
+- name: Remove Ingress Nginx controller
+  command: kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config delete -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-{{ ingress_controller_version }}/deploy/static/provider/{{ target_platform }}/deploy.yaml
+  ignore_errors: true
+...

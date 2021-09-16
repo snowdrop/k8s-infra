@@ -10,3 +10,4 @@
     kubectl --kubeconfig=$HOME/.kube/config \
       delete -f \
       https://raw.githubusercontent.com/kubernetes/dashboard/{{ k8s_dashboard_version }}/aio/deploy/recommended.yaml
+  ignore_errors: true

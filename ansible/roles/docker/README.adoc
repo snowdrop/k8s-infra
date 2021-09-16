@@ -1,7 +1,51 @@
-== Role: Docker
+= Role: Docker
+:toc:left
+:doctype: article
+:source-highlighter: rouge
 
-Cluster target type: K8s
 
-=== Description
+
+Installs docker on host.
+
+== Description
+
+This role will install a Docker on a linux machine.
+
+== Requirements
 
 TODO
+
+== Role Variables
+
+|===
+| Name | Type | Value | Description
+| install | bool | true (default) | Install docker
+| remove | bool | false (default) | Remove docker
+|===
+
+== Example Playbook
+
+
+.Sample Playbook
+[source,yaml]
+-----
+---
+- name: "Install docker"
+  hosts: "a_host"
+  gather_facts: "{{ gathering_host_info | default('true') | bool == true }}"
+
+  tasks:
+    - import_role:
+      name: 'docker'
+      vars:
+        state: present
+...
+-----
+
+== License
+
+https://www.apache.org/licenses/LICENSE-2.0[Apache License 2.0]
+
+== Author Information
+
+This role has been created by the https://github.com/orgs/snowdrop/teams[Snowdrop team].

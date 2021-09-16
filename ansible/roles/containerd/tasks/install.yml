@@ -37,8 +37,6 @@
 
 - name: Install containerd
   package:
-    # name: docker-ce-18.06.2.ce
-    # name: docker-ce
     name: "{{ containerd_packages }}"
     state: present
   become: yes

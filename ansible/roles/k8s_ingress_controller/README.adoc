@@ -1,0 +1,112 @@
+= Role: Ingress Nginx controller
+
+:toc: left
+:icons: font
+:source-highlighter: rouge
+:description: Ingress Nginx controller role.
+
+Cluster target type: K8s
+
+== Description
+
+This role will install the ingress nginx controller on a Kubernetes cluster. It can be deployed on a k8s cluster which has been created using `kind` tool or the standard approach: kubeadm, kubelet.
+
+== Requirements
+
+A Kubernetes cluster or Kind kubernetes cluster is needed.
+
+== Role Variables
+
+.Role Variables
+[cols="2,1,1,6",stripes=even]
+|===
+| Variable | Default Value | Possible values | Description
+
+| ingress_controller_version 
+| link:defaults/main.yaml[as in the defaults/main.yaml file]
+| N/A
+| Version of the NGINX Ingress Controller. See the https://github.com/kubernetes/ingress-nginx/tags[kubernetes/ingress-nginx GitHub project]
+
+|target_platform
+|cloud
+|cloud, kind
+| 
+
+|fix_ingress_access
+|false
+|true, false
+|Instead of downloading the deployment file from internet apply the local one which replaces the `LoadBalancer` Service Type with `NodePort`.
+
+|use_host_network
+|false
+|true, false
+|Allow the NGINX Ingress POD to use the Host Network. Check the <<hostnetwork_security_warning>>.
+|===
+
+[#hostnetwork_security_warning,reftext="hostNetwork Security Warning"]
+WARNING: Enabling the `hostNetwork=true` option exposes every system daemon to the NGINX Ingress controller on any network interface, including the host's loopback. Please evaluate the impact this may have on the security of your system carefully.
+
+== Example Playbook
+
+To install the Kubernetes Ingress Controller.
+
+```bash
+---
+- name: "Install Ingress Controler"
+  hosts: "{{ override_host | default('masters') }}"
+  gather_facts: "{{ gathering_host_info | default('true') | bool == true }}"
+
+  tasks:
+    - name: "Execute Ingress Controller installation role"
+      import_role:
+        name: 'k8s_ingress_controller'
+      vars:
+        - remove: false
+      tags: [always,ingress]
+...
+```
+
+To install the Kubernetes Ingress Controller with the access fix.
+
+```bash
+---
+- name: "Install Ingress Controler"
+  hosts: "{{ override_host | default('masters') }}"
+  gather_facts: "{{ gathering_host_info | default('true') | bool == true }}"
+
+  tasks:
+    - name: "Execute Ingress Controller installation role"
+      import_role:
+        name: 'k8s_ingress_controller'
+      vars:
+        - remove: false
+        - fix_ingress_access: true
+      tags: [always,ingress]
+...
+```
+
+To uninstall the Kubernetes Ingress Controller.
+
+```bash
+---
+- name: "Install Ingress Controler"
+  hosts: "{{ override_host | default('masters') }}"
+  gather_facts: "{{ gathering_host_info | default('true') | bool == true }}"
+
+  tasks:
+    - name: "Execute Ingress Controller installation role"
+      import_role:
+        name: 'k8s_ingress_controller'
+      vars:
+        - remove: true
+      tags: [always,ingress]
+...
+```
+
+== License
+
+https://www.apache.org/licenses/LICENSE-2.0[Apache License 2.0]
+
+== Author Information
+
+This role has been created by the https://github.com/orgs/snowdrop/teams[Snowdrop team].

@@ -1,14 +1,13 @@
+---
 - name: Ensure no old docker version is installed
   yum:
-    name: docker,docker-client,docker-client-latest,docker-common,docker-latest,docker-latest-logrotate,docker-logrotate,docker-engine
+    name: "{{ docker_old_packages }}"
     state: absent
-    # THIS OPTION OLY WORKS WITH ANSIBLE 2.8
-    # lock_timeout: 1000
   become: yes
 
 - name: Install dependencies needed by docker
   yum:
-    name: yum-utils,device-mapper-persistent-data,lvm2
+    name: "{{ docker_dependencies }}"
     state: present
   become: yes
 
@@ -23,27 +22,26 @@
   become: yes
 
 - name: Install docker
-  yum:
-    name:
-     - docker-ce
-     - docker-ce-client
-     - containerd
+  yum: 
+    name: "{{ docker_packages }}"
     state: present
   become: yes
 
-- name: Ensures /etc/docker dir exists
+- name: "Ensures /etc/docker dir exists"
   file: path=/etc/docker state=directory
   become: yes
 
-- name: Copy docker daemon.json file
-  template:
-    src: "daemon.json.j2"
-    dest: /etc/docker/daemon.json
-  become: yes
+# This template has been removed because docker fails to start with it.
+# - name: "Copy docker daemon.json file"
+#   template:
+#     src: "daemon.json.j2"
+#     dest: /etc/docker/daemon.json
+#   become: yes
 
-- name: Start docker
+- name: "Start docker"
   systemd:
     state: restarted
     name: docker
     enabled: yes
   become: yes
+...

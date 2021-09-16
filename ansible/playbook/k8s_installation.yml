@@ -10,16 +10,34 @@
   vars:
     client_tool: kubectl
 
-  roles:
-    - role: 'k8s_cluster'
+  tasks:
+    - import_role:
+      name: 'containerd'
+      vars:
+        state: present
+      tags: [containerd]
+    - import_role:
+      name: 'docker'
+      vars:
+        state: present
+      tags: [docker]
+    - import_role:
+      name: 'k8s_docker'
+      tags: [docker]
+    - import_role:
+      name: 'k8s_cluster'
       tags: [always,k8s_cluster]
-    - role: 'k8s_config'
+    - import_role:
+      name: 'k8s_config'
       tags: [always,k8s_config]
-    - role: 'ingress'
+    - import_role:
+      name: 'ingress'
       tags: [always,ingress]
-    - role: 'cert_manager'
+    - import_role:
+      name: 'cert_manager'
       tags: [always,cert_manager]
-    - role: 'k8s_dashboard'
+    - import_role:
+      name: 'k8s_dashboard'
       tags: [always,k8s_dashboard]
 
 - name: "Install misc kubernetes modules"

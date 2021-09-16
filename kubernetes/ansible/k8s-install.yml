@@ -1,0 +1,57 @@
+---
+- name: "Install kubernetes"
+  hosts: "{{ override_host | default('masters') }}"
+  gather_facts: "{{ gathering_host_info | default('true') | bool == true }}"
+
+  # Define default values for variables that are common between roles
+  vars:
+    client_tool: kubectl
+
+  tasks:
+    - name: "Execute containerd installation role"
+      import_role:
+        name: 'containerd'
+      vars:
+        state: present
+      tags: [containerd]
+    - name: "Execute docker installation role"
+      import_role:
+        name: 'docker'
+      vars:
+        state: present
+      tags: [docker]
+    # - name: "Execute docker configuration role"
+    #   import_role:
+    #     name: 'k8s_docker'
+    #   tags: [docker]
+    - name: "Execute k8s_cluster installation role"
+      import_role:
+        name: 'k8s_cluster'
+      vars:
+        - remove: false
+      tags: [always,k8s_cluster]
+    - name: "Execute k8s_config installation role"
+      import_role:
+        name: 'k8s_config'
+      vars:
+        - remove: false
+      tags: [always,k8s_config]
+    - name: "Execute Ingress Controller installation role"
+      import_role:
+        name: 'k8s_ingress_controller'
+      vars:
+        - remove: false
+      tags: [always,ingress]
+    # - name: "Execute ingress installation role"
+    #   import_role:
+    #     name: 'ingress'
+    #   vars:
+    #     - remove: false
+    #   tags: [always,ingress]
+    - name: "Execute k8s_dashboard installation role"
+      import_role:
+        name: 'k8s_dashboard'
+      vars:
+        - remove: false
+      tags: [k8s_dashboard]
+...

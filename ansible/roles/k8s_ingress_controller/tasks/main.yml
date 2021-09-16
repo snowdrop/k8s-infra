@@ -1,0 +1,14 @@
+---
+- name: "Install Ingress Controller"
+  include_tasks: install.yml
+  when: (not remove | bool) and not (fix_ingress_access)
+
+- name: "Install Ingress Controller (Access Fix)"
+  include_tasks: install_fix_access.yml
+  when: (not remove | bool) and (fix_ingress_access)
+
+- name: "Remove Ingress Controller"
+  include_tasks: remove.yml
+  when: remove | bool
+...
+

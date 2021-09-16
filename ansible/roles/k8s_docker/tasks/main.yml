@@ -1,0 +1,17 @@
+- name: "Apply daemon.json file to define extra docker parameters such as insecure-registries"
+  copy:
+    src: "files/daemon.json.j2"
+    dest: /etc/docker/daemon.json
+  become: yes
+
+- name: Configure IpTables to accept incoming trafic on port 2376
+  shell: |
+    iptables -I INPUT -p tcp --dport 2376 -j ACCEPT
+    #service iptables restart
+    iptables-save > /etc/sysconfig/iptables
+
+- name: Reload systemctl daemon and restart docker service
+  shell: |
+    systemctl enable docker
+    systemctl daemon-reload
+    systemctl restart docker

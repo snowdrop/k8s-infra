@@ -1,6 +1,7 @@
 - name: Reset kubeadm
   command: kubeadm reset -f
   become: yes
+  ignore_errors: true
 
 - name: Remove Kubernetes packages - kubeadm, kubelet, kubectl
   yum:
@@ -13,6 +14,3 @@
       - kubectl-{{k8s_version}}
       - kubelet-{{k8s_version}}
   become: yes
-
-- name: "Remove containerd"
-  include_tasks: "remove_containerd.yml"

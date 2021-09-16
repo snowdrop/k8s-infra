@@ -1,0 +1,20 @@
+# default values required
+k8s_version: 1.14.9
+remove: false
+install: true
+remote: true
+
+ingress_host: "{{ ansible_ssh_host }}.nip.io"
+install_docker: false
+install_containerd: true
+
+firewalld_public_ports:
+  - 6443/tcp
+  - 10250/tcp
+  - 10255/tcp
+  - 8472/udp
+  - 30000-32767/tcp
+
+firewalld_public_services:
+  - http
+  - https

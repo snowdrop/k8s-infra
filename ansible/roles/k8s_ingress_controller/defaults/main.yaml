@@ -1,0 +1,5 @@
+ingress_controller_version: v0.47.0
+target_platform: cloud
+
+fix_ingress_access: true
+use_host_network: false

@@ -1,0 +1,9 @@
+---
+- name: "Download NGINX Ingress Controller YAML file"
+  template: 
+    src: "nginx_ingress_controller_{{ ingress_controller_version }}_{{ target_platform }}_deploy.yaml"
+    dest: "/tmp/nginx_ingress_controller_{{ ingress_controller_version }}_{{ target_platform }}_deploy.yaml"
+ 
+- name: "Install Ingress Nginx Controller"
+  command: kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config apply -f /tmp/nginx_ingress_controller_{{ ingress_controller_version }}_{{ target_platform }}_deploy.yaml
+...
