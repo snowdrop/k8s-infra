@@ -22,14 +22,6 @@
         - remove: true
       tags: [always,ingress]
 
-    # k8s_config doesn't have a remove task.
-    # - name: "Execute k8s_config uninstall role"
-    #   import_role:
-    #     name: 'k8s_config'
-    #   vars:
-    #     - remove: true
-    #   tags: [always,k8s_config]
-
     - name: "Execute k8s_cluster uninstall role"
       import_role:
         name: 'k8s_cluster'
