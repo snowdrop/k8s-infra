@@ -1,15 +1,17 @@
 = Role: Docker
+
 :toc:left
 :doctype: article
 :source-highlighter: rouge
-
-
 
 Installs docker on host.
 
 == Description
 
-This role will install a Docker on a linux machine.
+This role will install a Docker on a linux machine. It will install the following components:
+
+* docker engine
+* docker cli
 
 == Requirements
 
@@ -17,10 +19,16 @@ TODO
 
 == Role Variables
 
+[cols="1,1,1,4"]
 |===
 | Name | Type | Value | Description
-| install | bool | true (default) | Install docker
-| remove | bool | false (default) | Remove docker
+
+| state | string | [present,absent] 
+a|
+
+  * `present` will install docker 
+  * `absent` will remove it
+
 |===
 
 == Example Playbook

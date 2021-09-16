@@ -1,10 +1,11 @@
 == Role: Kubernetes Cluster
 
-Cluster target type: K8s
+Install containerd on host.
 
 === Description
 
-This role will install a Kubernetes cluster on a linux machine using `kubelet` and `kubeadmin`.
+This role will install a containerd on a linux machine.
+
 
 === Requirements
 
@@ -12,13 +13,16 @@ TODO
 
 === Role Variables
 
-To play with a Kubernetes cluster, you must deploy a https://kubernetes.io/docs/setup/production-environment/container-runtimes/[container runtime].
-We support 2 of them: `docker`, `containerd` which can be configured using the following variables:
-
+[cols="1,1,1,4"]
 |===
-| Name | Type | Value
-| install_docker | bool | false (default)
-| install_containerd | bool | true
+| Name | Type | Value | Description
+
+| state | string | [present,absent] 
+a|
+
+  * `present` will install docker 
+  * `absent` will remove it
+
 |===
 
 === Example Playbook
