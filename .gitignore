@@ -5,6 +5,7 @@
 **/.vagrant/
 **/user-data
 tooling/target
+remote-k8s-config.yml
 
 ###########
 # Ansible #
@@ -19,8 +20,6 @@ ansible/inventory/host_vars
 
 ansible/playbook/test.yml
 ansible/roles/test/
-
-ansible/remote-k8s-config.yml
 
 **/test.sh
 _tmp
