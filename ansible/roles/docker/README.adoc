@@ -1,6 +1,6 @@
 = Role: Docker
 
-:toc:left
+:toc: left
 :doctype: article
 :source-highlighter: rouge
 
@@ -15,7 +15,7 @@ This role will install a Docker on a linux machine. It will install the followin
 
 == Requirements
 
-TODO
+None.
 
 == Role Variables
 
