@@ -1,17 +1,20 @@
-== Role: Kubernetes Cluster
+= Role: Containerd
 
-Install containerd on host.
+:toc: left
+:doctype: article
+:source-highlighter: rouge
 
-=== Description
+Installs containerd on host.
 
-This role will install a containerd on a linux machine.
+== Description
 
+This role will install containerd on a host.
 
-=== Requirements
+== Requirements
 
-TODO
+None.
 
-=== Role Variables
+== Role Variables
 
 [cols="1,1,1,4"]
 |===
@@ -25,9 +28,9 @@ a|
 
 |===
 
-=== Example Playbook
+== Example Playbook
 
-.Sample Playbook
+.Sample containerd installation playbook
 [source,yaml]
 -----
 ---
@@ -43,10 +46,26 @@ a|
 ...
 -----
 
+.Sample containerd removal playbook
+[source,yaml]
+-----
+---
+- name: "Install containerd"
+  hosts: "a_host"
+  gather_facts: "{{ gathering_host_info | default('true') | bool == true }}"
+
+  tasks:
+    - import_role:
+      name: 'containerd'
+      vars:
+        state: absent
+...
+-----
+
 === License
 
 https://www.apache.org/licenses/LICENSE-2.0[Apache License 2.0]
 
-=== Author Information
+== Author Information
 
 This role has been created by the https://github.com/orgs/snowdrop/teams[Snowdrop team].
