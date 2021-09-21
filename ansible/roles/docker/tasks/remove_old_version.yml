@@ -1,0 +1,7 @@
+---
+- name: Ensure no old docker version is installed
+  yum:
+    name: "{{ docker_old_packages }}"
+    state: absent
+  become: yes
+...

@@ -13,11 +13,10 @@
   shell: "modprobe br_netfilter"
   become: yes
 
-- name: Ensure no old docker version is installed
-  yum:
-    name: "{{ docker_old_packages }}"
-    state: absent
-  become: yes
+- name: "Remove any existing old docker version"
+  include_role:
+    name: docker
+    tasks_from: remove_old_version
 
 - name: Install dependencies needed by containerd
   package:

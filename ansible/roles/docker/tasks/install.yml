@@ -1,9 +1,6 @@
 ---
-- name: Ensure no old docker version is installed
-  yum:
-    name: "{{ docker_old_packages }}"
-    state: absent
-  become: yes
+- name: "Call the old docker removal tasks"
+  include_tasks: remove_old_version.yml
 
 - name: Install dependencies needed by docker
   yum:
