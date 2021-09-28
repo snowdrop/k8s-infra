@@ -50,7 +50,7 @@ a|
 [source,yaml]
 -----
 ---
-- name: "Install containerd"
+- name: "Remove containerd"
   hosts: "a_host"
   gather_facts: "{{ gathering_host_info | default('true') | bool == true }}"
 
