@@ -42,3 +42,4 @@ tooling/.*
 *.iws
 /out/
 .idea_modules/
+/kind/dummy.sh
