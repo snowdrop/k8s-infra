@@ -11,15 +11,15 @@ deploy_hello() {
   reg_username=${reg_username:-admin}
   reg_password=${reg_password:-snowdrop}
 
-  kubectl delete secret local-registry -n default
+  kubectl delete secret local-registry -n default || true
   kubectl create secret docker-registry local-registry \
     -n default \
-    --docker-server='"https://${reg_name}:5000/' \
+    --docker-server="https://${reg_name}:5000/" \
     --docker-username=$reg_username \
     --docker-password=$reg_password
 
-  kubectl delete deployment/hello-app -n default
-  kubectl create deployment hello-app --image=${reg_server}:${reg_port}/hello-app:1.0 --replicas=1 -n default
+  kubectl delete deployment/hello-app -n default || true
+  kubectl create deployment hello-app --image=${reg_name}:${reg_port}/hello-app:1.0 --replicas=1 -n default
   kubectl patch deployment hello-app -n default -p '{"spec": {"template": {"spec": {"imagePullSecrets": [{"name": "local-registry"}]}}}}'
 
   watch "kubectl -n default describe pod -l app=hello-app | grep -A20 Events"

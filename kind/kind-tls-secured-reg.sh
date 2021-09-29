@@ -15,8 +15,8 @@ temp_cert_dir=$(mktemp -d 2>/dev/null || mktemp -d -t 'temp_cert_dir')
 
 echo "==== Deleting kind cluster ..."
 kind delete cluster
-echo "==== Deleting kind docker network and cluster ..."
-docker network rm kind
+echo "==== Deleting kind docker network ..."
+docker network rm kind || true
 
 pushd $temp_cert_dir
 echo "==== Generate a self-signed certificate and user/pwd to secure the local registry"
@@ -40,7 +40,7 @@ mkdir -p auth
 docker run --entrypoint htpasswd registry:2.7.0 -Bbn admin snowdrop > auth/htpasswd
 
 echo "==== Stopping the container registry"
-docker stop ${reg_name} || true && docker rm ${reg_name}
+docker stop ${reg_name} || true && docker rm ${reg_name} || true
 
 echo "==== Creating a new container registry"
 docker run -d \
@@ -105,7 +105,7 @@ if [[ "$containers" == "" ]]; then
 fi
 
 CERT_DIR=/usr/local/share/ca-certificates
-certfile="certs/$certs_directory/client.crt"
+certfile="certs/${reg_server}/client.crt"
 
 while IFS= read -r container; do
   echo "==== Copying ${certfile} to ${container}:${CERT_DIR}"
@@ -118,13 +118,9 @@ while IFS= read -r container; do
   docker exec "$container" systemctl restart containerd
 done <<< "$containers"
 
+popd
+
 # Deploy the nginx Ingress controller on k8s >= 1.19
 # echo "==== Deploy the nginx Ingress controller"
 # VERSION=$(curl https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/stable.txt)
 # kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/$VERSION/deploy/static/provider/kind/deploy.yaml
-
-popd
-
-pull_push_hello
-deploy_hello
-
