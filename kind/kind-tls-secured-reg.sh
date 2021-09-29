@@ -10,7 +10,6 @@ reg_image_version='2.6.2'
 current_dir=$(pwd)
 temp_cert_dir=$(mktemp -d 2>/dev/null || mktemp -d -t 'temp_cert_dir')
 
-. ./functions/hello_demo.sh
 . ./functions/openssl.sh
 
 echo "==== Deleting kind cluster ..."
@@ -24,8 +23,8 @@ mkdir -p certs/${reg_server}
 
 echo "==== Generate the openssl config"
 create_openssl_cfg > req.cnf
-# cat req.cnf
 
+echo "==== Create the self signed certificate certificate and client key files"
 openssl req -x509 \
   -nodes \
   -days 365 \
@@ -35,27 +34,6 @@ openssl req -x509 \
   -config req.cnf \
   -sha256
 
-echo "==== Create the htpasswd file where user: admin and password: snowdrop"
-mkdir -p auth
-docker run --entrypoint htpasswd registry:2.7.0 -Bbn admin snowdrop > auth/htpasswd
-
-echo "==== Stopping the container registry"
-docker stop ${reg_name} || true && docker rm ${reg_name} || true
-
-echo "==== Creating a new container registry"
-docker run -d \
-  -p 5000:5000 \
-  --restart=always \
-  --name ${reg_name} \
-  -v $(pwd)/auth:/auth \
-  -v $(pwd)/certs/${reg_server}:/certs \
-  -e REGISTRY_AUTH=htpasswd \
-  -e REGISTRY_AUTH_HTPASSWD_REALM="Registry Realm" \
-  -e REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd \
-  -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/client.crt \
-  -e REGISTRY_HTTP_TLS_KEY=/certs/client.key \
-  registry:${reg_image_version}
-
 kindCfg=$(cat <<EOF
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
@@ -64,6 +42,7 @@ containerdConfigPatches:
   #[plugins."io.containerd.grpc.v1.cri".registry]
   #  config_path = "/etc/containerd/certs.d"
   [plugins."io.containerd.grpc.v1.cri".registry.mirrors."localhost:${reg_port}"]
+    # endpoint = ["https://${reg_name}:${reg_port}"]
     endpoint = ["https://localhost:${reg_port}"]
   [plugins."io.containerd.grpc.v1.cri".registry.configs."localhost:${reg_port}".tls]
     #insecure_skip_verify = true
@@ -92,9 +71,44 @@ EOF
 echo "==== Creating a Kind cluster"
 echo "${kindCfg}" | kind create cluster --config=-
 
+# Document the local registry
+# https://github.com/kubernetes/enhancements/tree/master/keps/sig-cluster-lifecycle/generic/1755-communicating-a-local-registry
+cat <<EOF | kubectl apply -f -
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: local-registry-hosting
+  namespace: kube-public
+data:
+  localRegistryHosting.v1: |
+    host: "localhost:${reg_port}"
+    help: "https://kind.sigs.k8s.io/docs/user/local-registry/"
+EOF
+
+echo "==== Create the htpasswd file where user: admin and password: snowdrop"
+mkdir -p auth
+docker run --entrypoint htpasswd registry:2.7.0 -Bbn admin snowdrop > auth/htpasswd
+
+echo "==== Stopping the container registry"
+docker stop ${reg_name} || true && docker rm ${reg_name} || true
+
+echo "==== Creating a new container registry"
+docker run -d \
+  -p 5000:5000 \
+  --restart=always \
+  --name ${reg_name} \
+  -v $(pwd)/auth:/auth \
+  -v $(pwd)/certs/${reg_server}:/certs \
+  -e REGISTRY_AUTH=htpasswd \
+  -e REGISTRY_AUTH_HTPASSWD_REALM="Registry Realm" \
+  -e REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd \
+  -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/client.crt \
+  -e REGISTRY_HTTP_TLS_KEY=/certs/client.key \
+  registry:${reg_image_version}
+
 # connect the container registry to the cluster network
 # (the network may already be connected)
-docker network connect "kind" "${reg_name}" --alias registry.local
+docker network connect kind "${reg_name}"
 
 # Upload the self-signed certificate to the kind container
 name="${name:-"kind"}"
@@ -117,6 +131,10 @@ while IFS= read -r container; do
   echo "==== Restarting containerd"
   docker exec "$container" systemctl restart containerd
 done <<< "$containers"
+
+# Copy the client.cert to $HOME directory
+echo "==== Copy the client.cert generated for the docker registry to $HOME/local-registry.crt"
+cp ${certfile} $HOME/local-registry.crt
 
 popd
 
