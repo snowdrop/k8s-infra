@@ -42,8 +42,8 @@ containerdConfigPatches:
   #[plugins."io.containerd.grpc.v1.cri".registry]
   #  config_path = "/etc/containerd/certs.d"
   [plugins."io.containerd.grpc.v1.cri".registry.mirrors."localhost:${reg_port}"]
-    # endpoint = ["https://${reg_name}:${reg_port}"]
-    endpoint = ["https://localhost:${reg_port}"]
+    # Issue 219 due to this definition --> endpoint = ["https://localhost:${reg_port}"]
+    endpoint = ["https://${reg_name}:${reg_port}"]
   [plugins."io.containerd.grpc.v1.cri".registry.configs."localhost:${reg_port}".tls]
     #insecure_skip_verify = true
     cert_file = "/etc/docker/certs.d/${reg_server}/client.crt"
