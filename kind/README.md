@@ -4,9 +4,10 @@ The goal of this project is to simplify our life when we use kubernetes on a lap
 - Create/delete a K8s cluster using the latest cluster version<sup>[1](#version-note)</sup>, or the one you specify,
 - Launch a local container registry exposed on port `localhost:5000`,
 - Set up an Ingress controller to route the traffic.
+- Provide 2 additional NodePorts (30000, 31000)
 
 2 bash scripts have been developed supporting the installation of a docker registry according to the following options:
-- [Unsecure](#unsecure) plain HTTP]
+- [Unsecure](#unsecure) plain HTTP
 - [Secured](#secured-and-tls) and HTTP/HTTPS endpoints available
 
 ## Prerequisite
