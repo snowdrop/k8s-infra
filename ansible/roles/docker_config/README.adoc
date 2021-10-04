@@ -1,0 +1,9 @@
+== Role: Docker K8s Configuration
+
+docker_config: Docker k8s configuration
+
+=== Description
+
+Docker configuration for Kubernetes.
+
+

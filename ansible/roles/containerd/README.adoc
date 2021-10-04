@@ -1,17 +1,14 @@
-= Role: Docker
+= Role: Containerd
 
 :toc: left
 :doctype: article
 :source-highlighter: rouge
 
-Installs docker on host.
+Installs containerd on host.
 
 == Description
 
-This role will install a Docker on a linux machine. It will install the following components:
-
-* docker engine
-* docker cli
+This role will install containerd on a host.
 
 == Requirements
 
@@ -26,31 +23,46 @@ None.
 | state | string | [present,absent] 
 a|
 
-  * `present` will install docker 
+  * `present` will install containerd 
   * `absent` will remove it
 
 |===
 
 == Example Playbook
 
-
-.Sample Playbook
+.Sample containerd installation playbook
 [source,yaml]
 -----
 ---
-- name: "Install docker"
+- name: "Install containerd"
   hosts: "a_host"
   gather_facts: "{{ gathering_host_info | default('true') | bool == true }}"
 
   tasks:
     - import_role:
-      name: 'docker'
+      name: 'containerd'
       vars:
         state: present
 ...
 -----
 
-== License
+.Sample containerd removal playbook
+[source,yaml]
+-----
+---
+- name: "Remove containerd"
+  hosts: "a_host"
+  gather_facts: "{{ gathering_host_info | default('true') | bool == true }}"
+
+  tasks:
+    - import_role:
+      name: 'containerd'
+      vars:
+        state: absent
+...
+-----
+
+=== License
 
 https://www.apache.org/licenses/LICENSE-2.0[Apache License 2.0]
 

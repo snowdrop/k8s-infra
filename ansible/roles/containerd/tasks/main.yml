@@ -12,6 +12,5 @@
   when: state == "present"
 
 - include_tasks: install.yml
-  when: (state == "present") and not ('docker.service' in ansible_facts.services )
-
+  when: (state == "present") and not ('containerd.service' in ansible_facts.services )
 ...

@@ -1,0 +1,31 @@
+---
+- name: "Stop Docker"
+  systemd:
+    name: containerd
+    state: stopped
+    enabled: false
+    daemon_reload: yes
+  become: yes
+  failed_when: false
+
+- name: "Remove docker packages"
+  package:
+    name: "{{ docker_packages }}"
+    state: absent
+  become: yes
+  failed_when: false
+
+- name: "Remove docker dependencies"
+  package:
+    name: "{{ docker_dependencies }}"
+    state: absent
+  become: yes
+  failed_when: false
+
+- name: "Remove docker files - {{ containerd_root_dir }}"
+  file:
+    path: "/etc/docker"
+    state: absent
+  become: yes
+
+...

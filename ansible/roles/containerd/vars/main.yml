@@ -1,0 +1,9 @@
+# containerd
+containerd_packages:
+  - containerd.io
+  - containernetworking-plugins
+
+containerd_dependencies:
+  - yum-utils
+  - device-mapper-persistent-data
+  - lvm2  

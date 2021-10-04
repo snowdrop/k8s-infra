@@ -1,0 +1,71 @@
+---
+- name: Copy containerd containerd.conf file
+  template:
+    src: "containerd.conf.j2"
+    dest: "/etc/modules-load.d/containerd.conf"
+  become: yes
+
+- name: "modprobe overlay"
+  shell: "modprobe overlay"
+  become: yes
+
+- name: "modprobe br_netfilter"
+  shell: "modprobe br_netfilter"
+  become: yes
+
+- name: Install dependencies needed by containerd
+  package:
+    name: "{{ containerd_dependencies }}"
+    state: present
+  become: yes
+
+- name: Add docker repository
+  yum_repository:
+    name: docker
+    description: Docker
+    baseurl: https://download.docker.com/linux/centos/7/$basearch/stable
+    enabled: 1
+    gpgcheck: 1
+    gpgkey: https://download.docker.com/linux/centos/gpg
+  become: yes
+
+- name: Install containerd
+  package:
+    name: "{{ containerd_packages }}"
+    state: present
+  become: yes
+
+- name: Ensures /etc/containerd dir exists
+  file: 
+    path: "/etc/containerd"
+    state: "directory"
+  become: yes
+
+- name: "Configure containerd"
+  shell: "containerd config default > /etc/containerd/config.toml"
+  become: yes
+
+- name: "Set root folder"
+  lineinfile:
+    path: "/etc/containerd/config.toml"
+    regexp: '^root = "/var/lib/containerd"'
+    line: 'root = "{{ containerd_root_dir }}"'
+  when: "containerd_root_dir is defined"
+  become: yes
+
+- name: "Set cni folder"
+  lineinfile:
+    path: "/etc/containerd/config.toml"
+    regexp: '^      bin_dir = "/opt/cni/bin"'
+    line: '      bin_dir = "/usr/libexec/cni"'
+  become: yes
+
+- name: Start containerd
+  systemd:
+    state: restarted
+    name: containerd
+    enabled: yes
+    daemon_reload: yes
+  become: yes
+
+...
