@@ -13,11 +13,6 @@
   shell: "modprobe br_netfilter"
   become: yes
 
-- name: "Remove any existing old docker version"
-  include_role:
-    name: docker
-    tasks_from: remove_old_version
-
 - name: Install dependencies needed by containerd
   package:
     name: "{{ containerd_dependencies }}"
