@@ -23,7 +23,7 @@ None.
 | state | string | [present,absent] 
 a|
 
-  * `present` will install docker 
+  * `present` will install containerd 
   * `absent` will remove it
 
 |===

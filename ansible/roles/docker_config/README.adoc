@@ -1,6 +1,6 @@
-== Role: Docker
+== Role: Docker K8s Configuration
 
-k8s_docker: Docker k8s configuration
+docker_config: Docker k8s configuration
 
 === Description
 
