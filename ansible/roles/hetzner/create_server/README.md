@@ -6,7 +6,8 @@ Provision a new hetzner server using the API (`hcloud`)
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+1. `hcloud` Hetzner CLI installed and in the PATH.The Hetzner Cloud ssh key already exists.
+1. The **Hetzner Cloud ssh key** must exists already (see the [create_ssh_key](../create_ssh_key/README.md) role).
 
 Role Variables
 --------------
