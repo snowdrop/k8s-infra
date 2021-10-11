@@ -26,7 +26,7 @@
       assert:
         that:
           - "hostvars[vm_name] is defined"
-        fail_msg: "Host must be initialized in the passwordstore. Run 'ansible-playbook ansible/playbook/passstore_controller_inventory.yml -e vm_name={{ vm_name }} -e pass_provider=hetzner -e k8s_type=masters -e k8s_version=121'"
+        fail_msg: "Host must be initialized in the passwordstore. Run 'ansible-playbook ansible/playbook/passstore_controller_inventory.yml -e vm_name={{ vm_name }} -e pass_provider=hetzner -e k8s_type=masters -e k8s_version=121 -e operation=create'"
 
     - name: Get vm host vars
       set_fact:

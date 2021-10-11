@@ -6,13 +6,13 @@
       * [Install hcloud CLI](#install-hcloud-cli)
    * [Hetzner Cloud](#hetzner-cloud)
       * [Init the hetzner context](#init-the-hetzner-context)
+      * [Create the hetzner SSH key](#create-the-hetzner-ssh-key)
    * [The inventory](#the-inventory)
    * [The VM](#the-vm)
       * [Create the hetzner vm](#create-the-hetzner-vm)
       * [Delete a hetzner server](#delete-a-hetzner-server)
    * [Next steps](#next-steps)
       * [Steps to create a k8s / okd cluster](#steps-to-create-a-k8s--okd-cluster)
-
 # Introduction
 
 This document describes the requirements and the process to execute the provisioning of a Cloud VM on hetzner.
@@ -77,6 +77,14 @@ active_context = "mycontext"
 [[contexts]]
   name = "mycontext"
   token = "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
+```
+
+## Create the hetzner SSH key
+
+To create a new Hetzner SSH key use the [hetzner-create-ssh-key](ansible/hetzner-create-ssh-key.yml) playbook.
+
+```bash
+$ ansible-playbook hetzner/ansible/hetzner-create-ssh-key.yml
 ```
 
 # The inventory
