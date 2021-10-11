@@ -1,0 +1,63 @@
+---
+
+- name: Generate SSH keys
+  shell: ssh-keygen -b 2048 -t rsa -f {{ key_path }} -q -N ""
+  when: st.stat.exists == false
+
+- name: "Change RSA public key permission"
+  file:
+    path: "{{ item }}"
+    mode: "0600"
+  loop:
+    - "{{ key_path }}.pub"
+    - "{{ key_path }}.pub"
+
+- name: Load key information
+  set_fact:
+    rsa_key: "{{lookup('file', key_path) }}"
+    rsa_key_pub: "{{lookup('file', key_path + '.pub') }}"
+
+- name: OpenStack params
+  debug:
+    verbosity: 2
+    msg:
+      - project_name: "{{ openstack.os_project_name }}"
+      - username: "{{ openstack_console_user }}"
+      - password: "{{ openstack_console_password }}"
+      - auth_url: "{{ openstack.os_auth_url }}"
+
+- name: Remove existing SSH key to use with instance {{ openstack.vm.name }}
+  os_keypair:
+    state: absent
+    auth:
+      project_name: "{{ openstack.os_project_name }}"
+      # username: "{{ openstack.os_username }}"
+      # password: "{{ openstack.os_password }}"
+      username: "{{ openstack_console_user }}"
+      password: "{{ openstack_console_password }}"
+      # user_domain_name: "{{ openstack.os_domain }}"
+      # project_domain_name: "{{ openstack.os_domain }}"
+      user_domain_name: "{{ openstack_os_domain }}"
+      project_domain_name: "{{ openstack_os_domain }}"
+      auth_url: "{{ openstack.os_auth_url }}"
+    name: "{{ openstack.sshkey_name }}"
+  ignore_errors: true
+
+- name: Create SSH key to use with instance {{ openstack.vm.name }}
+  os_keypair:
+    state: present
+    auth:
+      project_name: "{{ openstack.os_project_name }}"
+      # username: "{{ openstack.os_username }}"
+      # password: "{{ openstack.os_password }}"
+      username: "{{ openstack_console_user }}"
+      password: "{{ openstack_console_password }}"
+      # user_domain_name: "{{ openstack.os_domain }}"
+      # project_domain_name: "{{ openstack.os_domain }}"
+      user_domain_name: "{{ openstack_os_domain }}"
+      project_domain_name: "{{ openstack_os_domain }}"
+      auth_url: "{{ openstack.os_auth_url }}"
+    name: "{{ openstack.sshkey_name }}"
+    public_key_file: "{{ key_path }}.pub"
+  ignore_errors: true
+

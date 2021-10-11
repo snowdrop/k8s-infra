@@ -1,0 +1,100 @@
+---
+- name: Find admin user home folder
+  local_action: shell echo "{{ lookup('env','HOME') }}"
+  register: admin_home
+
+- name: Set admin ssh key path
+  set_fact: 
+    key_path: "{{ admin_home.stdout }}/.ssh/id_rsa_snowdrop_openstack_{{ openstack.vm.name }}"
+  no_log: True
+
+- stat:
+    path: "{{ key_path }}"
+  register: st
+
+- name: "Set pass facts from passwordstore"
+  set_fact:
+    openstack_console_user:     "{{ query('passwordstore', '/openstack/host/console_user' )[0] }}"
+    openstack_console_password: "{{ query('passwordstore', '/openstack/host/console_pw ')[0] }}"
+    openstack_os_domain:        "{{ query('passwordstore', '/openstack/host/console_domain ')[0] }}"
+    # openstack_console_user: "{{ openstack.os_username }}"
+    # openstack_console_password: "{{ openstack.os_password }}"
+
+- name: "Gather information about a previously created image named {{ openstack.vm.name }}"
+  openstack.cloud.server_info:
+    auth:
+      project_name: "{{ openstack.os_project_name }}"
+      username: "{{ openstack_console_user }}"
+      password: "{{ openstack_console_password }}"
+      user_domain_name: "{{ openstack_os_domain }}"
+      project_domain_name: "{{ openstack_os_domain }}"
+      auth_url: "{{ openstack.os_auth_url }}"
+    filters:
+      name: "{{ openstack.vm.name }}"
+  register: server_info_result
+
+- name: Print Openstack output
+  debug:
+    var: server_info_result
+
+- name: "Delete {{ openstack.vm.name }} - {{ openstack.vm.title }}"
+  os_server:
+    state: "absent"
+    auth:
+      project_name: "{{ openstack.os_project_name }}"
+      # username: "{{ openstack.os_username }}"
+      # password: "{{ openstack.os_password }}"
+      username: "{{ openstack_console_user }}"
+      password: "{{ openstack_console_password }}"
+      # user_domain_name: "{{ openstack.os_domain }}"
+      # project_domain_name: "{{ openstack.os_domain }}"
+      user_domain_name: "{{ openstack_os_domain }}"
+      project_domain_name: "{{ openstack_os_domain }}"
+      auth_url: "{{ openstack.os_auth_url }}"
+    name: "{{ openstack.vm.name }}"
+    # image: "{{ openstack.vm.image }}"
+    # key_name: "{{ openstack.vm.key_name }}"
+    # timeout: 200
+    # flavor: "{{ openstack.vm.flavor }}"
+    # auto_floating_ip: yes
+    # network: "{{ openstack.vm.network }}"
+    # security_groups: "{{ openstack.vm.security_group }}"
+    # volumes: "{{ openstack.vm.volumes }}"
+    # boot_from_volume: "{{ openstack.vm.boot_from_volume }}"
+  register: openstack_output
+  ignore_errors: true
+
+- name: Delete key {{ openstack.sshkey_name }} from server
+  os_keypair:
+    state: absent
+    auth:
+      project_name: "{{ openstack.os_project_name }}"
+      # username: "{{ openstack.os_username }}"
+      # password: "{{ openstack.os_password }}"
+      username: "{{ openstack_console_user }}"
+      password: "{{ openstack_console_password }}"
+      # user_domain_name: "{{ openstack.os_domain }}"
+      # project_domain_name: "{{ openstack.os_domain }}"
+      user_domain_name: "{{ openstack_os_domain }}"
+      project_domain_name: "{{ openstack_os_domain }}"
+      auth_url: "{{ openstack.os_auth_url }}"
+    name: "{{ openstack.sshkey_name }}"
+  # when: state == "absent"
+  ignore_errors: true
+
+- name: "Remove the host from the known_hosts"
+  known_hosts:
+    name: "{{ openstack_vm_ipv4 }}"
+    state: absent
+  ignore_errors: true
+
+- name: Remove existing SSH key to use with instance {{ openstack.vm.name }}
+  file:
+    state: absent
+    path: "{{ item }}"
+  loop:
+    - "{{ key_path }}"
+    - "{{ key_path }}.pub"
+  ignore_errors: true
+
+...

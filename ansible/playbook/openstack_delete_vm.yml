@@ -1,0 +1,18 @@
+---
+#  - "hostname": "n311-test"
+#  - "openstack": {
+#      "os_username": "'$(pass show openstack/host/console_user)'"
+#      "os_password": "'$(pass show openstack/host/console_pw)'"
+#      "os_domain":  "'$(pass show openstack/host/console_domain)'"
+#      "os_auth_url": "https://rhos-d.infra.prod.upshift.rdu2.redhat.com:13000/v3/"
+#    }
+
+- name: "Openstack VM delete"
+  hosts: localhost
+  gather_facts: False
+
+  roles:
+    - role: "openstack/delete_vm"
+      vars: 
+        state: "absent"
+...

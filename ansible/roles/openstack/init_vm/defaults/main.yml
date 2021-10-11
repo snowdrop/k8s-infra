@@ -1,0 +1,17 @@
+hostname: openstackVM
+
+openstack:
+  os_project_name: spring-boot-jenkins
+  
+  sshkey_name: "{{ hostname }}"
+
+  vm:
+    title: CentOS 7 Generic Cloud Latest
+    name: "{{ hostname }}"
+    image: CentOS-7-x86_64-GenericCloud-released-latest
+    key_name: "{{ hostname }}"
+    flavor: m1.xlarge
+    network: default_network
+    security_group: default_security_group
+    volumes: []
+    boot_from_volume: false

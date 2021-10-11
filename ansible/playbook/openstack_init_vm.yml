@@ -1,0 +1,11 @@
+---
+
+- name: "Openstack VM init"
+  hosts: "{{ hostname }}"
+  gather_facts: yes
+
+  roles:
+    - role: "openstack/init_vm"
+      vars: 
+        state: "present"
+...

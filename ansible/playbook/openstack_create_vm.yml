@@ -1,0 +1,37 @@
+---
+# Variables:
+#  - "hostname": "n311-test"
+#  - "openstack": {
+#      "os_username": "'$(pass show openstack/host/console_user)'"
+#      "os_password": "'$(pass show openstack/host/console_pw)'"
+#      "os_domain":  "'$(pass show openstack/host/console_domain)'"
+#      "os_auth_url": "https://rhos-d.infra.prod.upshift.rdu2.redhat.com:13000/v3/"
+#      "vm": {
+#        "network": "provider_net_shared"
+#        "security_group": "spring-boot"
+#        "flavor": "ci.m5.large"
+#        "volumes" : ["test-volume"]
+#      }
+#    }}
+- name: "Openstack VM create"
+  hosts: localhost
+  gather_facts: False
+
+  roles:
+    - role: "openstack/create_vm"
+      vars: 
+        state: "present"
+
+  post_tasks:
+    - name: Refresh the inventory so the newly added host is available
+      meta: refresh_inventory
+
+- name: "Openstack VM init"
+  hosts: "{{ hostname }}"
+  gather_facts: yes
+
+  roles:
+    - role: "openstack/init_vm"
+
+
+...
