@@ -10,12 +10,6 @@
     hetzner_public_key: "{{ lookup('file', override_public_key ) }}"
   when: "override_public_key is defined"
 
-- name: "Create cloud server key"
-  shell: "hcloud ssh-key create --name {{ context_name }} --public-key \"{{ hetzner_public_key }}\""
-  register: hcloud_ssh_key_res
-  changed_when: "hcloud_ssh_key_res.rc == 0"
-  failed_when: "hcloud_ssh_key_res.rc != 0 and ('SSH key with the same fingerprint already exists' not in hcloud_ssh_key_res.stderr)"
-
 - name: "Get user password from pass"
   set_fact:
     user_pw: "{{ query('passwordstore', 'hetzner/'+vm_name+'/os_password')[0] }}"
