@@ -7,7 +7,7 @@ Requirements
 ------------
 
 1. `hcloud` Hetzner CLI installed and on the PATH.The Hetzner Cloud ssh key already exists.
-1. The **Hetzner Cloud ssh key** must already exists (see the [create_ssh_key](../create_ssh_key/README.md) role).
+1. The **Hetzner Cloud ssh key** must already exist (see the [create_ssh_key](../create_ssh_key/README.md) role).
 
 Role Variables
 --------------
