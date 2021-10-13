@@ -6,7 +6,7 @@ Create a new Hetzner SSH key.
 Requirements
 ------------
 
-1. `hcloud` Hetzner CLI installed and in the PATH.
+1. `hcloud` Hetzner CLI installed and on the PATH.
 
 Role Variables
 --------------
