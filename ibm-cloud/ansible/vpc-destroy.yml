@@ -1,0 +1,38 @@
+---
+- name: Destroy IBM Cloud VPC VSI
+  hosts: localhost
+
+  collections:
+   - ibm.cloudcollection
+
+  tasks:
+    - name: Fetch the variables from var file
+      include_vars:
+        file: vpc-vars.yml
+
+    - name: Get the vpc details
+      ibm_is_vpc_info:
+        name: "{{ name_prefix }}-vpc"
+      register: vpc_output
+
+    - name: set subnet in fact
+      set_fact:
+        cacheable: True
+        vpc: "{{ vpc_output.resource }}"
+
+    - name: "Print VPC facts"
+      debug:
+        msg: "{{ vpc_output.resource }}"
+
+    - name: Remove VPC Subnet
+      ibm_is_subnet:
+        state: absent
+        id: "{{ item.id }}"
+      loop: "{{ vpc.subnets }}"
+
+    - name: Remove VPC
+      ibm_is_vpc:
+        state: absent
+        id: "{{ vpc.id }}"
+      when: vpc is defined
+...
