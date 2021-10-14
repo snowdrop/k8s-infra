@@ -14,7 +14,7 @@
 
 ## Introduction
 
-The goal of this project is to maintain IBM Cloud VPC
+The goal of this project is to manage IBM Cloud VPC (Virtual Private cloud)
 
 ## References
 
@@ -25,7 +25,7 @@ The goal of this project is to maintain IBM Cloud VPC
 
 ## Install 
 
-Download and insall the Ansible collection.
+Download and install the IBM Ansible collection.
 
 ```bash
 $ ansible-galaxy collection install ibm.cloudcollection
@@ -33,9 +33,9 @@ $ ansible-galaxy collection install ibm.cloudcollection
 
 ### Create API Key
 
-These playbooks requires that an IBM Cloud API key is available.
+These playbooks require that an IBM Cloud API key exists.
 
-Using the [API Keys section](https://cloud.ibm.com/iam/apikeys) of the web site, create a new API key.
+Using the [API Keys section](https://cloud.ibm.com/iam/apikeys) of the IBM Cloud web site, create a new API key.
 
 ## Usage Guide
 
