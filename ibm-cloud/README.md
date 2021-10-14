@@ -33,21 +33,27 @@ $ ansible-galaxy collection install ibm.cloudcollection
 
 ### Create API Key
 
-This playbooks required that an API key is available to be used.
+his playbooks requires that an IBM Cloud API key is available.
 
-In the [API Keys section](https://cloud.ibm.com/iam/apikeys) create a new API key.
+Using the [API Keys section](https://cloud.ibm.com/iam/apikeys) of the web site, create a new API key.
 
 ## Usage Guide
 
-Before using these playbooks make sure the following environment variables are defined.
+Before using these playbooks, make sure that the following environment variables are defined.
 
-Export your API key to the IC_API_KEY environment variable:
+Export the API key using the `IC_API_KEY` environment variable:
 
 ```bash
 export IC_API_KEY=<YOUR_API_KEY_HERE>
 ```
 
-Export desired IBM Cloud region to the `IC_REGION` environment variable:
+e.g.
+
+```bash
+export IC_API_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+```
+
+Export the IBM Cloud region using the `IC_REGION` environment variable:
 
 ```bash
 export IC_REGION=<REGION_NAME_HERE>
@@ -58,8 +64,6 @@ e.g.
 ```bash
 export IC_REGION=eu-de
 ```
-
-Note: Modules also support the `ibmcloud_region` parameter.
 
 ### VPC - Virtual Private Cloud
 
