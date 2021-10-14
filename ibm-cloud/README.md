@@ -33,7 +33,7 @@ $ ansible-galaxy collection install ibm.cloudcollection
 
 ### Create API Key
 
-his playbooks requires that an IBM Cloud API key is available.
+These playbooks requires that an IBM Cloud API key is available.
 
 Using the [API Keys section](https://cloud.ibm.com/iam/apikeys) of the web site, create a new API key.
 
@@ -67,11 +67,11 @@ export IC_REGION=eu-de
 
 ### VPC - Virtual Private Cloud
 
-The VPC playbooks gather information from the `vpc-vars.yml` variables file. The variables used are the following:
+The VPC playbooks gather the information from the `vpc-vars.yml` variables file. The variables used are the following:
 
 | Variable | Value | Description |
 | --- | --- | --- |
-| **name_prefix** | `snowdrop` | Prefix used in the different resources. |
+| **name_prefix** | `snowdrop` | Prefix used to name the different resources. |
 | **zone** | `eu-de-1` | Zone where the resources will be created. |
 | **ipv4_cidr_block** | `10.243.0.0/24` | The IPv4 range of the subnet. |
 
@@ -87,7 +87,7 @@ This command will also create a VPC Subnet.
 
 #### Destroy an existing VPC
 
-Destry an existing VPC and it's subnets.
+Destroy an existing VPC and it's subnets.
 
 ```bash
 $ ansible-playbook vpc-destroy.yml
