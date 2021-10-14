@@ -1,0 +1,38 @@
+---
+- name: Create IBM Cloud VPC VSI
+  hosts: localhost
+  collections:
+   - ibm.cloudcollection
+  tasks:
+    - name: Fetch the variables from var file
+      include_vars:
+        file: vpc-vars.yml
+  
+    - name: Configure VPC
+      ibm_is_vpc:
+        name: "{{ name_prefix }}-vpc"
+        state: available
+        id: "{{ vpc.id | default(omit) }}"
+      register: vpc_create_output
+
+    - name: Save VPC as fact
+      set_fact:
+        cacheable: True
+        vpc: "{{ vpc_create_output.resource }}"
+
+    - name: Configure VPC Subnet
+      ibm_is_subnet:
+        name: "{{ name_prefix }}-subnet"
+        state: available
+        id: "{{ subnet.id | default(omit) }}"
+        vpc: "{{ vpc.id }}"
+        ipv4_cidr_block: "{{ ipv4_cidr_block }}"
+        zone: "{{ zone }}"
+      register: subnet_create_output
+
+    - name: Save VPC Subnet as fact
+      set_fact:
+        cacheable: True
+        subnet: "{{ subnet_create_output.resource }}"
+
+...

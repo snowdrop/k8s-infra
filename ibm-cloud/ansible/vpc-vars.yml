@@ -1,0 +1,6 @@
+---
+name_prefix: snowdrop
+zone: eu-de-1
+
+ipv4_cidr_block: 10.243.0.0/24
+...
