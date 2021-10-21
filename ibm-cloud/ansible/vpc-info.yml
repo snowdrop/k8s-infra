@@ -1,0 +1,20 @@
+---
+- name: "Display IBM Cloud VPC information"
+  hosts: localhost
+  collections:
+   - ibm.cloudcollection
+  tasks:
+    - name: "Fetch the variables from var file"
+      include_vars:
+        file: vpc-vars.yml
+  
+    - name: "Get the vpc details"
+      ibm_is_vpc_info:
+        name: "{{ name_prefix }}-vpc"
+      register: vpc_output
+
+    - name: "Print VPC facts"
+      debug:
+        msg: "{{ vpc_output.resource }}"
+
+...
