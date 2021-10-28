@@ -83,7 +83,11 @@ Create a new VPC.
 $ ansible-playbook vpc-create.yml
 ```
 
-This command will also create a VPC Subnet.
+This command will also create:
+* a VPC Subnet
+* a Public Gateway
+
+#### Get VPC information
 
 To get the VPC information use the `vpc-info` playbook.
 
@@ -198,13 +202,89 @@ Print VPC facts ----------------------------------------------- 0.05s
 Fetch the variables from var file ----------------------------- 0.02s
 
 ```
-
 #### Destroy an existing VPC
 
-Destroy an existing VPC and it's subnets.
+Destroy an existing VPC. This instruction also destroys:
+* VPC subnets
+* public gateway
 
 ```bash
 $ ansible-playbook vpc-destroy.yml
+```
+
+### Public Gateway
+
+The VPC Create and VPC Destroy playbooks also create the related public gateway and attach it to the VPC subnet.
+
+To get information on a Public Gateway use the `pg-info.yml` playbook.
+
+e.g.
+
+```bash
+$ ansible-playbook pg-info.yml
+
+PLAY [Display IBM Cloud Public Gateway information] *******************************************
+
+TASK [Gathering Facts] ************************************************************************
+Thursday 28 October 2021  10:45:10 +0200 (0:00:00.012)       0:00:00.012 ****** 
+ok: [localhost]
+
+TASK [Fetch the variables from var file] ******************************************************
+Thursday 28 October 2021  10:45:11 +0200 (0:00:00.897)       0:00:00.909 ****** 
+ok: [localhost]
+
+TASK [Set static facts] ***********************************************************************
+Thursday 28 October 2021  10:45:11 +0200 (0:00:00.020)       0:00:00.929 ****** 
+ok: [localhost]
+
+TASK [Get Public Gateway facts] ***************************************************************
+Thursday 28 October 2021  10:45:11 +0200 (0:00:00.036)       0:00:00.965 ****** 
+ok: [localhost]
+
+TASK [Print Public Gateway facts] *************************************************************
+Thursday 28 October 2021  10:45:17 +0200 (0:00:05.825)       0:00:06.791 ****** 
+
+ok: [localhost] => {
+    "msg": {
+        "changed": false,
+        "failed": false,
+        "rc": 0,
+        "resource": {
+            "crn": "crn:v1:bluemix:public:is:eu-de-1:a/xxxxxxxxxxxxxxxxxxxxxxxx::public-gateway:xxxx-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxx",
+            "floating_ip": {
+                "address": "158.177.4.17",
+                "id": "xxxx-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxx"
+            },
+            "id": "xxxx-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxx",
+            "name": "snowdrop-gateway",
+            "resource_controller_url": "https://cloud.ibm.com/vpc-ext/network/publicGateways",
+            "resource_crn": "crn:v1:bluemix:public:is:eu-de-1:a/xxxxxxxxxxxxxxxxxxxxxxxx::public-gateway:xxxx-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxx",
+            "resource_group": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+            "resource_group_name": "Default",
+            "resource_name": "snowdrop-gateway",
+            "resource_status": "available",
+            "status": "available",
+            "tags": [],
+            "vpc": "xxxx-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxx",
+            "zone": "eu-de-1"
+        },
+        "stderr": "",
+        "stderr_lines": [],
+        "stdout": "data.ibm_is_public_gateway.ansible_snowdropgateway: Refreshing state...\n\nWarning: Argument is deprecated\n\nThe generation field is deprecated and will be removed after couple of\nreleases\n\n\nApply complete! Resources: 0 added, 0 changed, 0 destroyed.\n",
+        "stdout_lines": [
+            "data.ibm_is_public_gateway.ansible_snowdropgateway: Refreshing state...",
+            "",
+            "Warning: Argument is deprecated",
+            "",
+            "The generation field is deprecated and will be removed after couple of",
+            "releases",
+            "",
+            "",
+            "Apply complete! Resources: 0 added, 0 changed, 0 destroyed."
+        ]
+    }
+}
+
 ```
 
 ### VSI - Virtual Server Instance
