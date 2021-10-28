@@ -10,27 +10,48 @@
       include_vars:
         file: vpc-vars.yml
 
-    - name: Get the vpc details
+    - name: "Set static facts"
+      set_fact:
+        vpc_name: "{{ name_prefix }}-vpc"
+        public_gateway_name: "{{ name_prefix }}-gateway"
+        vpc_subnet_name: "{{ name_prefix }}-subnet"
+
+    - name: "Get the vpc details"
       ibm_is_vpc_info:
-        name: "{{ name_prefix }}-vpc"
+        name: "{{ vpc_name }}"
       register: vpc_output
 
-    - name: set subnet in fact
+    - name: "Set subnet in fact"
       set_fact:
         cacheable: True
         vpc: "{{ vpc_output.resource }}"
 
-    - name: "Print VPC facts"
-      debug:
-        msg: "{{ vpc_output.resource }}"
-
-    - name: Remove VPC Subnet
+    - name: "Destroy VPC Subnet"
       ibm_is_subnet:
         state: absent
         id: "{{ item.id }}"
       loop: "{{ vpc.subnets }}"
 
-    - name: Remove VPC
+    - name: "Get Public Gateway information"
+      ibm_is_public_gateway_info:
+        name: "{{ public_gateway_name }}"
+      register: public_gateway_output
+
+    - name: "Set Public Gateway facts"
+      set_fact:
+        cacheable: True
+        public_gateway_facts: "{{ public_gateway_output.resource }}"
+
+    - name: "Destroy Public Gateway"
+      ibm_is_public_gateway:
+        name: "{{ public_gateway_name }}"
+        vpc: "{{ vpc_name }}"
+        zone: "{{ zone }}"
+        id: "{{ public_gateway_facts.id }}"
+        state: absent
+      register: pub_gateway_destroy_output
+
+    - name: "Destroy VPC"
       ibm_is_vpc:
         state: absent
         id: "{{ vpc.id }}"

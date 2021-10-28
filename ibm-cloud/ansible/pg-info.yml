@@ -1,0 +1,26 @@
+---
+- name: "Display IBM Cloud Public Gateway information"
+  hosts: localhost
+  collections:
+   - ibm.cloudcollection
+  tasks:
+    - name: "Fetch the variables from var file"
+      include_vars:
+        file: vpc-vars.yml
+  
+    - name: "Set static facts"
+      set_fact:
+        vpc_name: "{{ name_prefix }}-vpc"
+        public_gateway_name: "{{ name_prefix }}-gateway"
+        vpc_subnet_name: "{{ name_prefix }}-subnet"
+
+    - name: "Get Public Gateway facts"
+      ibm_is_public_gateway_info:
+        name: "{{ public_gateway_name }}"
+      register: public_gateway_facts
+
+    - name: "Print Public Gateway facts"
+      debug:
+        msg: "{{ public_gateway_facts }}"
+
+...
