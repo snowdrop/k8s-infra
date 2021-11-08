@@ -3,36 +3,70 @@
   hosts: localhost
   collections:
    - ibm.cloudcollection
+
   tasks:
     - name: Fetch the variables from var file
       include_vars:
         file: vpc-vars.yml
-  
-    - name: Configure VPC
+
+    - name: "Set static facts"
+      set_fact:
+        vpc_name: "{{ name_prefix }}-vpc"
+        public_gateway_name: "{{ name_prefix }}-gateway"
+        vpc_subnet_name: "{{ name_prefix }}-subnet"
+
+    - name: "Create VPC"
       ibm_is_vpc:
-        name: "{{ name_prefix }}-vpc"
+        name: "{{ vpc_name }}"
         state: available
         id: "{{ vpc.id | default(omit) }}"
       register: vpc_create_output
 
-    - name: Save VPC as fact
+    - name: "Save VPC facts"
       set_fact:
         cacheable: True
         vpc: "{{ vpc_create_output.resource }}"
 
-    - name: Configure VPC Subnet
+    - name: "Create Public Gateway"
+      ibm_is_public_gateway:
+        name: "{{ public_gateway_name }}"
+        state: available
+        vpc: "{{ vpc.id }}"
+        zone: "{{ zone }}"
+      register: pub_gateway_create_output
+      when: "create_public_gateway | bool"
+
+    - name: "Get Public Gateway facts"
+      ibm_is_public_gateway_info:
+        name: "{{ public_gateway_name }}"
+      register: public_gateway_output
+
+    - name: "Set Public Gateway facts"
+      set_fact:
+        cacheable: True
+        public_gateway_facts: "{{ public_gateway_output.resource }}"
+
+    - name: "Configure VPC Subnet - with Public Gateway"
       ibm_is_subnet:
-        name: "{{ name_prefix }}-subnet"
+        name: "{{ vpc_subnet_name }}"
+        state: available
+        id: "{{ subnet.id | default(omit) }}"
+        vpc: "{{ vpc.id }}"
+        ipv4_cidr_block: "{{ ipv4_cidr_block }}"
+        zone: "{{ zone }}"
+        public_gateway: "{{ public_gateway_facts.id }}"
+      register: subnet_create_output
+      when: "create_public_gateway | bool"
+
+    - name: "Configure VPC Subnet - without Public Gateway"
+      ibm_is_subnet:
+        name: "{{ vpc_subnet_name }}"
         state: available
         id: "{{ subnet.id | default(omit) }}"
         vpc: "{{ vpc.id }}"
         ipv4_cidr_block: "{{ ipv4_cidr_block }}"
         zone: "{{ zone }}"
       register: subnet_create_output
-
-    - name: Save VPC Subnet as fact
-      set_fact:
-        cacheable: True
-        subnet: "{{ subnet_create_output.resource }}"
+      when: "not (create_public_gateway | bool)"
 
 ...
