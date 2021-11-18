@@ -11,19 +11,10 @@
   when: "ip_address is defined"
   failed_when: false
 
-# tasks for hetzner/delete_server
 - name: Delete cloud server
   shell: "hcloud server delete {{ vm_name }}"
   register: hcloud_delete_res
   changed_when: "hcloud_delete_res.rc == 0"
-  failed_when: "hcloud_delete_res.rc != 0 and ('server not found' not in hcloud_delete_res.stderr)"
-#  when: "vm_delete is defined and vm_delete | bool"
-
-- name: Delete cloud server key
-  shell: "hcloud ssh-key delete snowdrop"
-  register: hcloud_delete_key_res
-  changed_when: "hcloud_delete_key_res.rc == 0"
-  failed_when: "hcloud_delete_key_res.rc != 0 and ('SSH key not found' not in hcloud_delete_key_res.stderr)"
-#  when: "vm_delete is defined and vm_delete | bool"
+  failed_when: "hcloud_delete_res.rc != 0 and ('Server not found' not in hcloud_delete_res.stderr)"
 
 ...

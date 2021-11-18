@@ -33,7 +33,7 @@ Example Playbook
     - include_role:
         name: hetzner/create_ssh_key
       vars:
-        context_name: "{{ hetzner_context_name }}"
+        vm_name: "{{ hetzner_context_name }}"
 ...
 ```
 
