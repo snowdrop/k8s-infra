@@ -1,5 +1,5 @@
 ---
-- name: Create IBM Cloud VPC VSI
+- name: "Create IBM Cloud VPC - Virtual Private Cloud"
   hosts: localhost
   collections:
    - ibm.cloudcollection
