@@ -1,0 +1,10 @@
+---
+# tasks for hetzner/delete_ssh_key
+
+- name: "Delete ssh key"
+  shell: "hcloud ssh-key delete {{ vm_name }}"
+  register: hcloud_ssh_key_res
+  changed_when: "hcloud_ssh_key_res.rc == 0"
+  failed_when: "hcloud_ssh_key_res.rc != 0 and ('SSH Key not found' not in hcloud_ssh_key_res.stderr)"
+
+...

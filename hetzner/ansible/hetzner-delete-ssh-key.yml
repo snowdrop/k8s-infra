@@ -1,7 +1,7 @@
 ---
 # file: hetzner-create-ssh-key.yml
 # Optional variables:
-- name: "Create hetzner ssh key"
+- name: "Delete an existing Hetzner ssh key"
   hosts: localhost
   gather_facts: yes
 
@@ -25,7 +25,7 @@
         context_name: "{{ hetzner_context_name }}"
 
     - include_role:
-        name: hetzner/create_ssh_key
+        name: hetzner/delete_ssh_key
       vars:
         vm_name: "{{ vm_name }}"
 

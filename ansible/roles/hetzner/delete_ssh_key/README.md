@@ -1,7 +1,27 @@
----
-# file: hetzner-create-ssh-key.yml
-# Optional variables:
-- name: "Create hetzner ssh key"
+Role Name
+=========
+
+Delete an existing Hetzner SSH key.
+
+Requirements
+------------
+
+1. `hcloud` Hetzner CLI installed and on the PATH.
+
+Role Variables
+--------------
+
+The following variables are required:
+* vm_name: Name of the SSH key to be removed.
+
+Dependencies
+------------
+
+Example Playbook
+----------------
+
+```yaml
+- name: "Delete ssh key"
   hosts: localhost
   gather_facts: yes
 
@@ -25,8 +45,13 @@
         context_name: "{{ hetzner_context_name }}"
 
     - include_role:
-        name: hetzner/create_ssh_key
+        name: hetzner/delete_ssh_key
       vars:
         vm_name: "{{ vm_name }}"
-
 ...
+```
+
+Author Information
+------------------
+
+This role has been created by the Snowdrop team.
