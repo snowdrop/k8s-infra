@@ -3,13 +3,15 @@
 - name: Delete hetzner server
   hosts: localhost
   gather_facts: yes
-  vars_prompt:
-    - name: vm_name
-      prompt: Name of the VM being removed [vm_name]
-      private: no
-      when: " vm_name is not defined "
 
   pre_tasks:
+
+    - name: "Validate required variables"
+      assert:
+        that:
+          - "vm_name is defined"
+        fail_msg: "'vm_name' must be defined"
+
     - name: Get vm host vars
       set_fact:
         my_hostvars: "{{ hostvars[vm_name] }}"
