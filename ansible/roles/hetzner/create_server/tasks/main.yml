@@ -34,7 +34,7 @@
     dest: /tmp/user-data
 
 - name: Create cloud instance
-  shell: "hcloud server create --name {{ vm_name }} --type {{ server_type | default ('cx31') }} --image {{ vm_image | default ('centos-7') }} --ssh-key {{ context_name }} --user-data-from-file /tmp/user-data"
+  shell: "hcloud server create --name {{ vm_name }} --type {{ server_type | default ('cx31') }} --image {{ vm_image | default ('centos-7') }} --ssh-key {{ vm_name }} --user-data-from-file /tmp/user-data"
   register: hcloud_server_create_res
   changed_when: "hcloud_server_create_res.rc == 0 or 'uniqueness_error' in hcloud_server_create_res.stderr"
   failed_when: "hcloud_server_create_res.rc == 1 and 'uniqueness_error' not in hcloud_server_create_res.stderr"
