@@ -1,5 +1,5 @@
 ---
-- name: Destroy IBM Cloud VPC VSI
+- name: "Destroy IBM Cloud VPC - Virtual Private Cloud"
   hosts: localhost
 
   collections:

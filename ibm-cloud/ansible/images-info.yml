@@ -1,0 +1,15 @@
+---
+- name: "Display IBM Cloud VPC information"
+  hosts: localhost
+  collections:
+   - ibm.cloudcollection
+  tasks:
+    - name: "Retrieve image list"
+      ibm_is_images_info:
+      register: image_list_output
+
+    - name: "Print image list output"
+      debug:
+        msg: "{{ image_list_output.resource }}"
+
+...

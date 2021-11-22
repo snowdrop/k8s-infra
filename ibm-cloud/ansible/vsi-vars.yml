@@ -1,0 +1,19 @@
+---
+ibmcloud_region: eu-de
+region: eu-de
+vsi_image: ibm-ubuntu-16-04-05-64-minimal-for-vsi
+vsi_profile: bx2-2x8
+ssh_public_key: '<ssh_public_key>'
+
+version: 470   # Values: 460, 470, ... for ocp 4.6, 4.7,... OR 118, 120, ... for k8s 1.18, 1.20, ...
+distro: ocp    # Values : ocp or k8s which corresponds to OpenShift or kubernetes
+suffix:
+  subnet: subnet1
+  cos: cos
+
+# Kubernetes cluster
+kubernetes:
+  version: 4.7.23_openshift # To get the versions available: ibmcloud oc versions
+  workers: 2
+  flavor: bx2.4x16          # Value: {b,c,m}x2.{2,4,8,16,32,48 Cores}x{8,16,32,64,128,256,... GB}. To get the flavors available : ibmcloud ks flavors --zone eu-de-1 --provider vpc-gen2
+  infra: vpc-gen2           # Values: vpc-gen1, vpc-gen2 (default), classic
