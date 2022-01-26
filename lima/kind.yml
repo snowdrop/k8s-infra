@@ -5,7 +5,9 @@ images:
     arch: "x86_64"
   - location: "https://cloud-images.ubuntu.com/impish/current/impish-server-cloudimg-arm64.img"
     arch: "aarch64"
+memory: 6GiB
 mounts:
+  - location: "~"
   - location: "~/temp/lima"
     writable: true
 # containerd is managed by Docker, not by Lima, so the values are set to false here.
