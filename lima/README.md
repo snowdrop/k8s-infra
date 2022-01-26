@@ -3,6 +3,7 @@
     - Home project: "Linux virtual machines (on macOS, in most cases)": https://github.com/lima-vm/lima
     - FAQ: https://github.com/lima-vm/lima#faqs--troubleshooting
     - Default YAML config: https://github.com/lima-vm/lima/blob/master/pkg/limayaml/default.yaml
+    - Kind config: https://github.com/afbjorklund/lima/blob/kind/examples/kind.yaml
 - Colima - "Container runtimes, kubernetes on macOS (and Linux) with minimal setup.": https://github.com/abiosoft/colima
 
 ## Instructions
