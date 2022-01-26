@@ -1,9 +1,11 @@
-## Instructions
-
-Useful links:
-- Lima - "Linux virtual machines (on macOS, in most cases)": https://github.com/lima-vm/lima
-- Lima FAQ: https://github.com/lima-vm/lima#faqs--troubleshooting
+## Useful links:
+- Lima
+    - Home project: "Linux virtual machines (on macOS, in most cases)": https://github.com/lima-vm/lima
+    - FAQ: https://github.com/lima-vm/lima#faqs--troubleshooting
+    - Default YAML config: https://github.com/lima-vm/lima/blob/master/pkg/limayaml/default.yaml
 - Colima - "Container runtimes, kubernetes on macOS (and Linux) with minimal setup.": https://github.com/abiosoft/colima
+
+## Instructions
 
 Install using brew lima on macos
 ```bash
