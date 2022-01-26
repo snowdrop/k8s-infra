@@ -86,3 +86,9 @@ probes:
         exit 1
       fi
     hint: See "/var/log/cloud-init-output.log". in the guest
+message: |
+  To run `kubectl` on the host (assumes kubectl is installed):
+  $ mkdir -p "{{.Dir}}/conf"
+  $ export KUBECONFIG="{{.Dir}}/conf/kubeconfig.yaml"
+  $ limactl shell {{.Name}} sudo cat /etc/kubernetes/admin.yaml >$KUBECONFIG
+  $ kubectl ...
