@@ -9,7 +9,7 @@ This document contains the commands to be used to:
 
 **WARNING**: Be sure that you are using the proper password store within your terminal before to execute the commands hereafter
 
-# Clean, create a new VM and install a k8s cluster
+## Clean, create a new VM and install a k8s cluster
 ```
 VM_NAME=h01-121
 ansible-playbook hetzner/ansible/hetzner-delete-server.yml -e vm_name=${VM_NAME} -e hetzner_context_name=snowdrop
