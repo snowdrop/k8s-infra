@@ -39,6 +39,7 @@ export KUBECONFIG=~/.kube/h01-121
 
 ## Copy your user's public key to the VM
 ```
+VM_NAME=h01-121
 IP=$(PASSWORD_STORE_DIR=~/.password-store-snowdrop pass show hetzner/${VM_NAME}/ansible_ssh_host | awk 'NR==1{print $1}')
 PORT=$(PASSWORD_STORE_DIR=~/.password-store-snowdrop pass show hetzner/${VM_NAME}/ansible_ssh_port | awk 'NR==1{print $1}')
 USER=$(PASSWORD_STORE_DIR=~/.password-store-snowdrop pass show hetzner/${VM_NAME}/os_user | awk 'NR==1{print $1}')
@@ -47,6 +48,7 @@ ssh-copy-id -p ${PORT} -i ~/.ssh/id_rsa.pub ${USER}@${IP}
 
 ## Remote SSH
 ```
+VM_NAME=h01-121
 SSH_KEY=~/.ssh/id_rsa_snowdrop_hetzner_${VM_NAME}
 echo "$(PASSWORD_STORE_DIR=~/.password-store-snowdrop pass show hetzner/${VM_NAME}/id_rsa)" > ~/.ssh/id_rsa_snowdrop_hetzner_${VM_NAME}
 chmod 600 ~/.ssh/id_rsa_snowdrop_hetzner_${VM_NAME}
