@@ -25,7 +25,7 @@ ansible-playbook kubernetes/ansible/k8s-misc.yml --limit ${VM_NAME} -e k8s_versi
 ## Delete k8s cluster and/or the VM
 ```
 VM_NAME=h01-121
-ansible-playbook kubernetes/ansible/k8s-remove.yml --limit ${VM_NAME}
+ansible-playbook kubernetes/ansible/k8s-misc.yml --limit ${VM_NAME} -e remove=true --tags "k8s_cluster,docker_registry" 
 ansible-playbook hetzner/ansible/hetzner-delete-server.yml -e vm_name=${VM_NAME} -e hetzner_context_name=snowdrop
 ansible-playbook hetzner/ansible/hetzner-delete-ssh-key.yml -e vm_name=${VM_NAME}
 ```
