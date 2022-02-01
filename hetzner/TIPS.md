@@ -9,6 +9,7 @@ This document contains the commands to be used to:
 
 **WARNING**: Be sure that you are using the proper password store within your terminal before to execute the commands hereafter
 
+# Clean, create a new VM and install a k8s cluster
 ```
 VM_NAME=h01-121
 ansible-playbook hetzner/ansible/hetzner-delete-server.yml -e vm_name=${VM_NAME} -e hetzner_context_name=snowdrop
@@ -21,7 +22,7 @@ ansible-playbook ansible/playbook/sec_host.yml -e vm_name=${VM_NAME} -e provider
 ansible-playbook kubernetes/ansible/k8s-misc.yml --limit ${VM_NAME} -e k8s_version=1.21.4 -e registry_nodePort=32500 -e remove=false --tags "k8s_cluster,k8s_config,docker_registry"
 ```
 
-## Delete k8s cluster
+## Delete k8s cluster and/or the VM
 ```
 VM_NAME=h01-121
 ansible-playbook kubernetes/ansible/k8s.yml --limit ${VM_NAME} -e k8s_version=1.21.4 -e remove=false 
