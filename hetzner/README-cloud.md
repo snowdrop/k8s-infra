@@ -1,18 +1,23 @@
 # Table of Contents
 
-   * [Introduction](#introduction)
-      * [Scope](#scope)
-   * [Requirements](#requirements)
-      * [Install hcloud CLI](#install-hcloud-cli)
-   * [Hetzner Cloud](#hetzner-cloud)
-      * [Init the hetzner context](#init-the-hetzner-context)
-      * [Create the hetzner SSH key](#create-the-hetzner-ssh-key)
-   * [The inventory](#the-inventory)
-   * [The VM](#the-vm)
-      * [Create the hetzner vm](#create-the-hetzner-vm)
-      * [Delete a hetzner server](#delete-a-hetzner-server)
+* [Table of Contents](#table-of-contents)
+* [Introduction](#introduction)
+   * [Scope](#scope)
+* [Requirements](#requirements)
+   * [Install hcloud CLI](#install-hcloud-cli)
+* [Hetzner Cloud](#hetzner-cloud)
+   * [Init the hetzner context](#init-the-hetzner-context)
+* [The inventory](#the-inventory)
+* [The VM](#the-vm)
+   * [All-in-one creation](#all-in-one-creation)
+   * [Create the hetzner SSH key](#create-the-hetzner-ssh-key)
+   * [Create the hetzner vm](#create-the-hetzner-vm)
+   * [Delete a hetzner server](#delete-a-hetzner-server)
    * [Next steps](#next-steps)
-      * [Steps to create a k8s / okd cluster](#steps-to-create-a-k8s--okd-cluster)
+* [Steps to create a k8s / okd cluster](#steps-to-create-a-k8s--okd-cluster)
+
+
+
 # Introduction
 
 This document describes the requirements and the process to execute the provisioning of a Cloud VM on hetzner.
@@ -91,6 +96,29 @@ It's used so Ansible can connect to the server without requiring password.
 
 # The VM
 
+## All-in-one creation
+
+2 new playbooks have been created to aggregate the different operations executed by the different playbooks
+, `hetzner-create-server-aggregate.yml` and `hetzner-delete-server-aggregate.yml`.
+
+To create and deploy a new VM simply execute the following command on the root of the `k8s-infra` project.
+
+```bash
+$ ansible-playbook hetzner/ansible/hetzner-create-server-aggregate.yml -e vm_name=my_vm -e k8s_type=masters -e k8s_version=119 -e salt_text=$(gpg --gen-random --armor 1 20)  --tags create
+```
+
+| Variable | Required | Default | Prompt | Meaning |
+| --- | :---: | :---: | :---: | --- |
+| k8s_type | | | | Type of k8s node (masters, nodes). Will be used to set the ansible inventory groups. |
+| k8s_version | | | | K8s version to be later installed. Will be used to set the ansible inventory groups. |
+| salt_text | x | | | Salt and pepper. |
+| vm_name | x |  | | Name of the VM to be craated. This will be both the name on Hetzner as well as on the inventory |
+
+Removing a VM also has an aggregate playbook, requiring only the `vm_name` parameter.
+
+```bash
+$ ansible-playbook hetzner/ansible/hetzner-delete-server-aggregate.yml -e vm_name=my_vm
+```
 
 ## Create the hetzner SSH key
 
@@ -161,11 +189,12 @@ As well as the inventory entries for the server.
 ```bash
 $ ansible-playbook ansible/playbook/passstore_controller_inventory_remove.yml -e vm_name=my-name -e pass_provider=hetzner
 ```
-# Next steps
+
+## Next steps
 
 Once the server is created it must be secured before installing other software. For that check [this README file](../ansible/playbook/README.md).
 
-## Steps to create a k8s / okd cluster
+# Steps to create a k8s / okd cluster
 
 Check [the corresponding README file](../kubernetes/README.md). 
 

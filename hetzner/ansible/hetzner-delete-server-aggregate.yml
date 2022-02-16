@@ -1,0 +1,22 @@
+---
+# file: hetzner-create-server-aggregate.yml
+# Required variables:
+#   - vm_name
+
+- name: "Delete Hetzner Server"
+  import_playbook: "hetzner-delete-server.yml"
+  vars:
+    hetzner_context_name: "snowdrop"
+  tags: [always]
+
+- name: "Delete Hetzner Server SSH key"
+  import_playbook: "hetzner-delete-ssh-key.yml"
+  tags: [always]
+
+- name: "Cleanup passwordstore inventory"
+  import_playbook: "../../ansible/playbook/passstore_controller_inventory_remove.yml"
+  vars:
+    pass_provider: "hetzner"
+  tags: [always]
+
+...

@@ -1,0 +1,33 @@
+---
+# file: hetzner-create-server-aggregate.yml
+# Required variables:
+#   - vm_name
+#   - k8s_type: Kubernetes group [masters]
+#   - k8s_version: Kubernetes Version [119]
+#   - salt_text: Salt to be used on database creation, e.g.=$(gpg --gen-random --armor 1 20)
+
+- name: "Initialize passwordstore inventory"
+  import_playbook: "../../ansible/playbook/passstore_controller_inventory.yml"
+  vars:
+    pass_provider: "hetzner"
+  tags: [create]
+
+- name: "Create SSH Key for server"
+  import_playbook: "hetzner-create-ssh-key.yml"
+  tags: [always]
+
+- name: "Create Server on Hetzner"
+  import_playbook: "hetzner-create-server.yml"
+  vars:
+    hetzner_context_name: "snowdrop"
+  tags: [always]
+
+- name: "Secure new server"
+  import_playbook: "../../ansible/playbook/sec_host.yml"
+  vars:
+    provider: "hetzner"
+    hosts: "{{ vm_name }}"
+    vm_name: "{{ vm_name }}"
+  tags: [always]
+
+...
