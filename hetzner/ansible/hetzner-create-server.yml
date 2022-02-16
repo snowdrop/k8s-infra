@@ -1,9 +1,9 @@
 ---
 # file: hetzner-create-server.yml
 # Optional variables:
-- name:  Create hetzner server
+- name:  "Create Hetzner server Playbook"
   hosts: localhost
-  gather_facts: yes
+  gather_facts: no
   # vars_prompt:
   #   - name: vm_name
   #     prompt: Name of the VM being created [vm_name]
@@ -14,6 +14,8 @@
   #     private: yes
 
   pre_tasks:
+    - name: Refresh the inventory
+      meta: refresh_inventory
 
     - name: "Validate required variables"
       assert:
@@ -79,6 +81,12 @@
       shell: "git push"
       args:
         chdir: "{{ lookup('env', 'PASSWORD_STORE_DIR') }}"
+
+    - name: "Add host to known hosts {{ hostvars[vm_name]['ansible_ssh_host'] }}"
+      known_hosts:
+        name: "{{ hostvars[vm_name]['ansible_ssh_host'] }}"
+        key: "{{ lookup('pipe', 'ssh-keyscan {{ hostvars[vm_name].ansible_ssh_host }}') }}"
+        hash_host: true
 
 - name:  Wait for the VM to boot and we can ssh
   hosts: "{{ vm_name }}"
