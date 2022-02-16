@@ -7,44 +7,12 @@
     - name: hetzner_context_name
       prompt: Hetzner context name
       private: no
-      when: " hetzner_context_name is not defined "
     - name: hetzner_token
       prompt: Hetzner Token
       private: yes
-      when: "hetzner_token is not defined"
 
   roles:
     - role: hetzner/create_context
       context_name: "{{ hetzner_context_name }}"
-
-#  tasks:
-#    - name: Get variables
-#      include_vars: "{{lookup('first_found', params)}}"
-#      vars:
-#        params:
-#          files:
-#            - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
-#            - "{{ ansible_distribution }}.yml"
-#            - "{{ ansible_os_family }}.yml"
-#          paths:
-#            - vars
-#            - playbook/vars
-#
-#    - name: Install required packages
-#      package:
-#        name: "{{ required_packages }}"
-#        state: present
-#      become: yes
-#      when: "install_prereq is defined and install_prereq"
-#
-#    - name: "Create hcloud context"
-#      expect:
-#        command: "hcloud context create {{ hetzner_context_name }}"
-#        responses:
-#          (?i)Token: "{{ hetzner_token }}"
-#      register: hcloud_context_create_res
-#      no_log: true
-#      changed_when: "(hcloud_context_create_res.rc == 0)"
-#      failed_when: "(hcloud_context_create_res.rc != 0) and ('name already used' not in hcloud_context_create_res.stdout)"
 
 ...
