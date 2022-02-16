@@ -1,9 +1,9 @@
 ---
 # file: hetzner-create-ssh-key.yml
 # Optional variables:
-- name: "Create hetzner ssh key"
+- name: "Create Hetzner SSH key Playbook"
   hosts: localhost
-  gather_facts: yes
+  gather_facts: no
 
   pre_tasks:
     - name: "Set default hetzner_context_name if it is not defined"
