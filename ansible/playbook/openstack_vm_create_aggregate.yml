@@ -1,0 +1,38 @@
+---
+# Variables:
+#  - "vm_name": "n311-test"
+#  - "openstack": {
+#      "os_username": "'$(pass show openstack/host/console_user)'"
+#      "os_password": "'$(pass show openstack/host/console_pw)'"
+#      "os_domain":  "'$(pass show openstack/host/console_domain)'"
+#      "os_auth_url": "https://rhos-d.infra.prod.upshift.rdu2.redhat.com:13000/v3/"
+#      "vm": {
+#        "network": "provider_net_shared"
+#        "security_group": "spring-boot"
+#        "flavor": "ci.m5.large"
+#        "volumes" : ["test-volume"]
+#      }
+#    }}
+#  . k8s_type: Kubernetes host type [masters,nodes], empty for no k8s installation
+#  . k8s_version: Kubernetes version [117 ... 121], empty for no k8s installation
+
+- name: "Initialize passwordstore inventory"
+  import_playbook: "passstore_controller_inventory.yml"
+  vars:
+    pass_provider: "openstack"
+  tags: [create]
+
+- name: "Create Server on Openstack"
+  import_playbook: "openstack_vm_create.yml"
+  vars:
+    hetzner_context_name: "snowdrop"
+  tags: [always]
+
+- name: "Secure new server"
+  import_playbook: "sec_host.yml"
+  vars:
+    provider: "hetzner"
+    hosts: "{{ vm_name }}"
+    vm_name: "{{ vm_name }}"
+  tags: [always]
+...

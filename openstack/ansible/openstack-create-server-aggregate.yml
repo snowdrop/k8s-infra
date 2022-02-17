@@ -1,0 +1,27 @@
+---
+# file: openstack-create-server-aggregate.yml
+# Required variables:
+#   - vm_name
+#   - k8s_type: Kubernetes group [masters]
+#   - k8s_version: Kubernetes Version [119]
+#   - salt_text: Salt to be used on database creation, e.g.=$(gpg --gen-random --armor 1 20)
+
+- name: "Initialize passwordstore inventory"
+  import_playbook: "../../ansible/playbook/passstore_controller_inventory.yml"
+  vars:
+    pass_provider: "openstack"
+  tags: [create]
+
+- name: "Create Server on Openstack"
+  import_playbook: "openstack-create-server.yml"
+  tags: [always]
+
+- name: "Secure new server"
+  import_playbook: "../../ansible/playbook/sec_host.yml"
+  vars:
+    provider: "openstack"
+    # hosts: "{{ vm_name }}"
+    vm_name: "{{ vm_name }}"
+  tags: [always]
+
+...

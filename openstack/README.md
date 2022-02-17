@@ -3,9 +3,15 @@
 You need to have both the `decorator` and `openstacksdk` pip packages installed.
 Depending on the existing state of your machine, you might need to do:
 
-```
+```bash
 [sudo] pip install [--upgrade] decorator
 [sudo] pip install [--upgrade] openstacksdk
+```
+
+Install openstack.cloud Ansible collection.
+
+```bash
+$ ansible-galaxy collection install openstack.cloud
 ```
 
 # Provision a VM on OpenStack
@@ -35,4 +41,8 @@ as well as the private key of the new VM as `inventory/id_openstack.rsa`
 
 ```
 ansible-playbook playbook/openstack.yml -e type=cloude -e '{"state": "present", "hostname": "n311-prod", "openstack": {"timeout": "300", "os_username": "psi-spring-boot-jenkins", "os_password": "xxxxxxxx", "os_domain":  "redhat.com", "os_auth_url": "https://rhos-d.infra.prod.upshift.rdu2.redhat.com:13000/v3/", "vm": {"network": "provider_net_shared", "security_group": "spring-boot",  "flavor": "ci.m5.large", "volumes" : ["ceph-volume"]}}}'
+```
+
+```
+ansible-playbook playbook/openstack.yml -e k8s_type=masters -e k8s_version=121 -e '{"openstack": {"vm": {"network": "provider_net_shared"}}}' -e vm_name=vm20210217-t01 --tags create
 ```

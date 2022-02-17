@@ -26,7 +26,7 @@
     msg:
       - project_name: "{{ openstack.os_project_name }}"
       - username: "{{ openstack.os_username }}"
-      - password: "{{ openstack.os_password }}"
+      # - password: "{{ openstack.os_password }}"
       - auth_url: "{{ openstack.os_auth_url }}"
 
 - name: Create SSH key to use with instance {{ openstack.vm.name }}

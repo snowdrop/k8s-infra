@@ -15,23 +15,47 @@
 #    }}
 - name: "Openstack VM create"
   hosts: localhost
-  gather_facts: False
+  gather_facts: no
 
   roles:
     - role: "openstack/create_vm"
       vars: 
         state: "present"
+        
 
   post_tasks:
     - name: Refresh the inventory so the newly added host is available
       meta: refresh_inventory
 
-- name: "Openstack VM init"
-  hosts: "{{ hostname }}"
-  gather_facts: yes
+# - name: "Openstack VM init"
+#   hosts: "{{ hostname }}"
+#   gather_facts: yes
 
-  roles:
-    - role: "openstack/init_vm"
+#   roles:
+#     - role: "openstack/init_vm"
+
+- name:  Wait for the VM to boot and we can ssh
+  hosts: "{{ vm_name }}"
+  gather_facts: no
+
+  tasks:
+    - name: ping hosts
+      wait_for_connection:
+        timeout: 60
+
+  post_tasks:
+    - name: "DON'T FORGET TO SECURE YOUR SERVER"
+      debug:
+        msg: "Trying to start start server securization automatically For manual execution: $ ansible-playbook ansible/playbook/sec_host.yml -e vm_name={{ vm_name }} -e provider=openstack"
+
+
+# - name: "Secure new server"
+#   import_playbook: "sec_host.yml"
+#   vars:
+#     provider: "hetzner"
+#     hosts: "{{ vm_name }}"
+#     vm_name: "{{ vm_name }}"
+#   tags: [always]
 
 
 ...

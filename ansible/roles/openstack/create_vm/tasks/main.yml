@@ -5,7 +5,8 @@
 
 - name: Set admin ssh key path
   set_fact: 
-    key_path: "{{ admin_home.stdout }}/.ssh/id_rsa_snowdrop_openstack_{{ openstack.vm.name }}"
+    key_path: "{{ admin_home.stdout }}/.ssh/id_rsa_snowdrop_openstack_{{ vm_name }}"
+    volume_name: "{{ vm_name }}-volume"
   no_log: True
 
 - stat:
@@ -17,10 +18,12 @@
     openstack_console_user:     "{{ query('passwordstore', '/openstack/host/console_user' )[0] }}"
     openstack_console_password: "{{ query('passwordstore', '/openstack/host/console_pw ')[0] }}"
     openstack_os_domain:        "{{ query('passwordstore', '/openstack/host/console_domain ')[0] }}"
+    openstack_os_auth_url: "{{ query('passwordstore', 'openstack/host/os_auth_url')[0] }}"
+    openstack_security_group: "{{ query('passwordstore', 'openstack/host/security_group')[0] }}"
     # openstack_console_user: "{{ openstack.os_username }}"
     # openstack_console_password: "{{ openstack.os_password }}"
 
-- name: "Gather information about a previously created image named {{ openstack.vm.name }}"
+- name: "Gather information about a previously created image named {{ vm_name }}"
   openstack.cloud.server_info:
     auth:
       project_name: "{{ openstack.os_project_name }}"
@@ -28,9 +31,10 @@
       password: "{{ openstack_console_password }}"
       user_domain_name: "{{ openstack_os_domain }}"
       project_domain_name: "{{ openstack_os_domain }}"
-      auth_url: "{{ openstack.os_auth_url }}"
+      # auth_url: "{{ openstack.os_auth_url }}"
+      auth_url: "{{ openstack_os_auth_url }}"
     filters:
-      name: "{{ openstack.vm.name }}"
+      name: "{{ vm_name }}"
   register: server_info_result
 
 - name: Print Openstack output
@@ -43,7 +47,22 @@
     include_tasks: keys.yml
     when: state == "present"
 
-  - name: "{{ 'Create' if state == \"present\" else 'Delete' }} {{ openstack.vm.name }} - {{ openstack.vm.title }}"
+  - name: "Create VM volume"
+    openstack.cloud.volume:
+      auth:
+        project_name: "{{ openstack.os_project_name }}"
+        username: "{{ openstack_console_user }}"
+        password: "{{ openstack_console_password }}"
+        user_domain_name: "{{ openstack_os_domain }}"
+        project_domain_name: "{{ openstack_os_domain }}"
+        auth_url: "{{ openstack_os_auth_url }}"
+      state: present
+      # cloud: "nova"
+      size: "{{ flavours[openstack.vm.flavor].disk_size }}"
+      display_name: "{{ volume_name }}"
+      volume_type: "ceph"
+
+  - name: "{{ 'Create' if state == \"present\" else 'Delete' }} {{ vm_name }} - {{ openstack.vm.title }}"
     os_server:
       state: "{{ state }}"
       auth:
@@ -56,15 +75,16 @@
         # project_domain_name: "{{ openstack.os_domain }}"
         user_domain_name: "{{ openstack_os_domain }}"
         project_domain_name: "{{ openstack_os_domain }}"
-        auth_url: "{{ openstack.os_auth_url }}"
-      name: "{{ openstack.vm.name }}"
+        # auth_url: "{{ openstack.os_auth_url }}"
+        auth_url: "{{ openstack_os_auth_url }}"
+      name: "{{ vm_name }}"
       image: "{{ openstack.vm.image }}"
       key_name: "{{ openstack.vm.key_name }}"
-      timeout: 200
+      timeout: "{{ openstack.timeout }}"
       flavor: "{{ openstack.vm.flavor }}"
       auto_floating_ip: yes
       network: "{{ openstack.vm.network }}"
-      security_groups: "{{ openstack.vm.security_group }}"
+      security_groups: "{{ openstack_security_group }}"
       volumes: "{{ openstack.vm.volumes }}"
       boot_from_volume: "{{ openstack.vm.boot_from_volume }}"
     register: openstack_output
@@ -89,40 +109,40 @@
     #     dest: ../inventory/id_openstack.rsa
     #     mode: 0600
 
-    - set_fact:
+    # - set_fact:
         # private_key_in_inventory: "{{ lookup('env', 'PWD') }}/ansible/inventory/id_openstack.rsa"
-        login_username: centos
+        # login_username: centos
 
-    - name: "Add host to passwordstore inventory"
-      include_role:
-        name: "passstore/ansible_inventory"
-        apply:
-          tags:
-            - always
-      vars:
-        pass_provider: openstack
-        pass_l1: ""
-        pass_l2: "openstack"
-        pass_l3: "{{ openstack.vm.name }}"
-        os_user: "centos"
-        os_password: "{{ openstack_output.server.adminPass }}"
-        ansible_ssh_host: "{{ openstack_vm_ipv4 }}"
-        ansible_ssh_port: "22"
-        # id_rsa: "{{ rsa_key }}"
-        # id_rsa_pub: "{{ rsa_key_pub }}"
-        skip_rsa: true
-        operation: "fill"
+    # - name: "Add host to passwordstore inventory"
+    #   include_role:
+    #     name: "passstore/ansible_inventory"
+    #     apply:
+    #       tags:
+    #         - always
+    #   vars:
+    #     pass_provider: openstack
+    #     pass_l1: ""
+    #     pass_l2: "openstack"
+    #     pass_l3: "{{ openstack.vm.name }}"
+    #     os_user: "centos"
+    #     os_password: "{{ openstack_output.server.adminPass }}"
+    #     ansible_ssh_host: "{{ openstack_vm_ipv4 }}"
+    #     ansible_ssh_port: "22"
+    #     # id_rsa: "{{ rsa_key }}"
+    #     # id_rsa_pub: "{{ rsa_key_pub }}"
+    #     skip_rsa: true
+    #     operation: "fill"
 
-    - include_role:
-        name: generate_inventory
-      vars:
-        ip_address: "{{ openstack_vm_ipv4  }}"
-        username: "{{ login_username }}"
-        # keyfile: "{{ private_key_in_inventory }}"
-        keyfile: "{{ key_path }}"
-        hostname: "{{ openstack.vm.name }}"
-        openshift_origin_version: "3.11"
-        openshift_docker_selinux_enabled: false
+    # - include_role:
+    #     name: generate_inventory
+    #   vars:
+    #     ip_address: "{{ openstack_vm_ipv4  }}"
+    #     username: "{{ login_username }}"
+    #     # keyfile: "{{ private_key_in_inventory }}"
+    #     keyfile: "{{ key_path }}"
+    #     hostname: "{{ openstack.vm.name }}"
+    #     openshift_origin_version: "3.11"
+    #     openshift_docker_selinux_enabled: false
 
     - name: "Wait for boot"
       wait_for:
@@ -149,6 +169,7 @@
         include_tasks: vm_remove.yml
 
       - name: Remove passwordstore entry
-        shell: "pass rm -r /openstack/{{ openstack.vm.name }}"
+        shell: "pass rm -r /openstack/{{ vm_name }}"
 
   when: "server_info_result.openstack_servers is undefined or (server_info_result.openstack_servers|length == 0)"
+...

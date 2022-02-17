@@ -2,9 +2,7 @@ hostname: openstackVM
 
 openstack:
   os_project_name: spring-boot-jenkins
-  
   sshkey_name: "{{ hostname }}"
-
   vm:
     title: CentOS 7 Generic Cloud Latest
     name: "{{ hostname }}"
