@@ -27,7 +27,7 @@ openstack:
     flavor: m1.small
     network: default_network
     security_group: default_security_group
-    volumes: []
+    # volumes: []
     boot_from_volume: false
 
 login_username: centos
