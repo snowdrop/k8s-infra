@@ -1,22 +1,7 @@
 ---
-- name:  Apply host security roles
+- name: "Apply security roles to host"
   hosts: "{{ vm_name }}"
   gather_facts: yes
-#  roles:
-#    - role: 'sec/firewalld'
-#      tags: [always]
-#    - role: 'sec/sysctl'
-#      tags: [always]
-#    - role: 'sec/motd'
-#      tags: [always]
-#    - role: 'sec/journalctl'
-#      tags: [always]
-#    - role: 'sec/audit'
-#      tags: [always]
-#    - role: 'sec/sshd_port'
-#      new_ssh_port_number:
-#      tags: [always]
-#      when: "new_ssh_port_number is defined and (new_ssh_port_number != ansible_ssh_host)"
 
   tasks:
     - name: "Install firewalld"
@@ -45,12 +30,7 @@
       vars:
         new_ssh_port_number: "{{ query('passwordstore', provider + '/' + vm_name + '/ssh_port' )[0] }}"
 
-#  post_tasks:
-#    - name: Add the ansible_ssh_port variable to the host_var files
-#      debug:
-#        msg: "To continue to step 2, add the ansible_ssh_port variable to the host_vars file by executing ansible-playbook ansible/playbook/sec_host_2.yml -e vm_name=<name of the ansible host>"
-
-- name:  Update the ssh port
+- name:  "Update the ssh port"
   hosts: localhost
   gather_facts: no
   tasks:
@@ -65,7 +45,7 @@
         tasks_from: "add_variable"
       vars:
         pass_l1: "snowdrop"
-        pass_l2: "hetzner"
+        pass_l2: "{{ provider }}"
         pass_l3: "{{ vm_name }}"
         var_name: "ansible_ssh_port"
         var_value: "{{ query('passwordstore', provider + '/' + vm_name + '/ssh_port' )[0] }}"
@@ -77,26 +57,12 @@
         tasks_from: "remove_variable"
       vars:
         pass_l1: "snowdrop"
-        pass_l2: "hetzner"
+        pass_l2: "{{ provider }}"
         pass_l3: "{{ vm_name }}"
         var_name: "ssh_port"
       tags: [always]
 
-#    - include_role:
-#        name: "generate_inventory"
-#        tasks_from: "update-custom-ssh-port"
-#      vars:
-#        new_ssh_port_number: "{{ query('passwordstore', provider + '/' + vm_name + '/ssh_port' )[0] }}"
-#        host_name: "{{ vm_name }}"
-#        inventory_relative_path: "../../ansible/inventory/"
-#      tags: [always]
-
-#  post_tasks:
-#    - name: Finish server securitation
-#      debug:
-#        msg: "Finish server securization executing step 3, $ ansible-playbook ansible/playbook/sec_host_3.yml -e vm_name={{ vm_name }}"
-
-- name:  Apply host security roles 2
+- name:  "Apply host security roles 2"
   hosts: "{{ vm_name }}"
   gather_facts: yes
   roles:

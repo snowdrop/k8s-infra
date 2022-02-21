@@ -12,7 +12,7 @@
   gather_facts: False
 
   roles:
-    - role: "openstack/delete_vm"
+    - role: "openstack/vm"
       vars: 
         state: "absent"
 ...

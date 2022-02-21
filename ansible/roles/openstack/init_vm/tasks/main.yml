@@ -27,10 +27,4 @@
   reboot:
   become: yes
 
-# - name: Show useful ssh login info
-#   debug:
-#     msg:
-#       - "You can ssh into the newly created VM using the following command:"
-#       - "ssh -i {{ private_key_in_inventory }} {{ login_username }}@{{ openstack_output.server.accessIPv4 }}"
-
 ...

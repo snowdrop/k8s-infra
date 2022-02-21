@@ -1,15 +1,33 @@
 hostname: openstackVM
+type: cloude
+
+flavours:
+  m1.small:
+    name: "m1.small"
+    disk_size: 20
+  m1.medium:
+    name: "m1.medium"
+    disk_size: 40
+  m1.large:
+    name: "m1.large"
+    disk_size: 60
+  m1.xlarge:
+    name: "m1.xlarge"
+    disk_size: 80
 
 openstack:
   os_project_name: spring-boot-jenkins
   sshkey_name: "{{ hostname }}"
+  timeout: 300
   vm:
     title: CentOS 7 Generic Cloud Latest
     name: "{{ hostname }}"
     image: CentOS-7-x86_64-GenericCloud-released-latest
     key_name: "{{ hostname }}"
-    flavor: m1.xlarge
+    flavor: m1.small
     network: default_network
     security_group: default_security_group
     volumes: []
     boot_from_volume: false
+
+login_username: centos
