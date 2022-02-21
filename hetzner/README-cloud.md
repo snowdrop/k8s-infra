@@ -99,7 +99,20 @@ It's used so Ansible can connect to the server without requiring password.
 ## All-in-one creation
 
 2 new playbooks have been created to aggregate the different operations executed by the different playbooks
-, `hetzner-create-server-aggregate.yml` and `hetzner-delete-server-aggregate.yml`.
+, `hetzner-create-server-aggregate.yml` and `hetzner-delete-server-aggregate.yml`. Each of the playbooks invokes deployment and cleanup operations on the passwordstore inventory database, VM deployment operations and VM securization.
+
+The `hetzner-create-server-aggregate.yml` playbooks calls the following playbooks:
+
+* `../../ansible/playbook/passstore_controller_inventory.yml` to set the VM passwordstore inventory information;
+* `hetzner-create-ssh-key.yml` to create the Hetzner VM SSH keys;
+* `hetzner-create-server.yml` to deploy a new server on hetzner;
+* `../../ansible/playbook/sec_host.yml` to apply the securization playbook;
+
+The `hetzner-deñete-server-aggregate.yml` playbooks calls the following playbooks:
+
+* `hetzner-delete-server.yml` to delete the server from hetzner;
+* `hetzner-delete-ssh-key.yml` to delete the Hetzner VM SSH keys;
+* `../../ansible/playbook/passstore_controller_inventory.yml` to clean th VM information from the passwordstore inventory;
 
 To create and deploy a new VM simply execute the following command on the root of the `k8s-infra` project.
 
