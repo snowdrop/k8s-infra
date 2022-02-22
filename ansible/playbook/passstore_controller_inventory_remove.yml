@@ -12,7 +12,9 @@
       assert:
         that:
           - "vm_name is defined"
+          - "vm_name | length > 0"
           - "pass_provider is defined"
+          - "pass_provider | length > 0"
         fail_msg: "'vm_name' and 'pass_provider' must be defined"
 
     - name: "Pull pass git database"

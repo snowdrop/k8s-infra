@@ -3,13 +3,12 @@
 #  - "vm_name": "n311-test"
 - name: "Delete Server on Openstack"
   import_playbook: "openstack_vm_delete.yml"
-  vars:
-    hetzner_context_name: "snowdrop"
   tags: [always]
 
 - name: "Cleanup passwordstore inventory"
   import_playbook: "passstore_controller_inventory_remove.yml"
   vars:
     pass_provider: "openstack"
+    vm_name: "{{ vm_name }}"
   tags: [always]
 ...
