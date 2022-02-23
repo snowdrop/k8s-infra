@@ -7,12 +7,20 @@
 #      "os_auth_url": "https://rhos-d.infra.prod.upshift.rdu2.redhat.com:13000/v3/"
 #    }
 
+- name: "Validate passwordstore"
+  import_playbook: "passstore_controller_check.yml"
+
 - name: "Openstack VM delete"
   hosts: localhost
   gather_facts: False
 
-  roles:
-    - role: "openstack/vm"
+  tasks:
+    - name: "Execute create inventory, if tagged as so"
+      include_role:
+        name: "openstack/vm"
+        apply:
+          tags:
+            - always
       vars: 
         state: "absent"
 ...

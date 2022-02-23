@@ -13,14 +13,27 @@
 #        "volumes" : ["test-volume"]
 #      }
 #    }}
+- name: "Validate passwordstore"
+  import_playbook: "passstore_controller_check.yml"
+
 - name: "Openstack VM create"
   hosts: localhost
   gather_facts: no
 
-  roles:
-    - role: "openstack/vm"
-      vars: 
-        state: "present"
+  # roles:
+  #   - role: "openstack/vm"
+  #     vars: 
+  #       state: "present"
+
+  tasks:
+    - name: "Execute create inventory, if tagged as so"
+      include_role:
+        name: "openstack/vm"
+        apply:
+          tags:
+            - always
+        vars: 
+          state: "present"
 
   post_tasks:
     - name: Refresh the inventory so the newly added host is available
@@ -41,19 +54,8 @@
       ansible.builtin.wait_for:
         host: "{{ query('passwordstore', '/openstack/' + vm_name + '/ansible_ssh_host')[0] }}"
         port: "{{ query('passwordstore', '/openstack/' + vm_name + '/ansible_ssh_port')[0] }}"
-        # delay: 15
         timeout: 120
-      # ansible.builtin.wait_for_connection:
-      #   timeout: 60
       register: wait_for_connection_reg
-      # failed_when: "'FAILED' in wait_for_connection_reg.stdout and not 'Too many authentication failures' in wait_for_connection_reg.stdout"
-      # ignore_errors: true
-      # ignore_unreachable: yes
-      # ignore_fatal: yes
-
-    # - name: "Show 'Wait for connection to host' output"
-    #   debug:
-    #     msg: "wait_for_connection_reg : {{ wait_for_connection_reg }}"
 
   post_tasks:
     - name: "DON'T FORGET TO SECURE YOUR SERVER"

@@ -9,6 +9,10 @@
 #  . k8s_type: Kubernetes host type [masters,nodes], empty for no k8s installation
 #  . k8s_version: Kubernetes version [117 ... 121], empty for no k8s installation
 
+- name: "Validate passwordstore"
+  import_playbook: "passstore_controller_check.yml"
+  tags: [always]
+
 - name: "Initialize passwordstore inventory"
   import_playbook: "passstore_controller_inventory.yml"
   vars:
