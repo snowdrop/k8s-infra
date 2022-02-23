@@ -3,17 +3,34 @@ Table of Contents
 
 * [Introduction](#introduction)
 * [ssh-vm](#ssh-vm)
+   * [Requirements](#requirements)
    * [Usage](#usage)
    * [The passwordstore database](#the-passwordstore-database)
 
 
 # Introduction
 
-Project tools.
+Auxiliary tools for the `k8s_infra` project.
 
 # ssh-vm
 
 Shell script that allows connecting to a host that's added to the passwordstore database.
+
+## Requirements
+
+1. pass installed on the computer (https://www.passwordstore.org/)
+    * Fedora: 
+    ```bash
+    $ dnf install pass
+    ```
+    * RHEL
+    ```bash
+    $ yum install pass
+    ```
+2. team's pass database updated on the computer
+    * check the project documentation
+
+## Usage
 
 Parameters:
 1. VM_PROVIDER: Provider where the VM is deployed [hetzner,openstack]
@@ -21,9 +38,7 @@ Parameters:
 3. PASSWORD_STORE_DIR: Folder location of the pass database
 4. SSH COMMAND (optional): command to be executed on remote host. If none, the ssh connection is returned to the user.
 
-## Usage
-
-Connecto to a remote host.
+Connect to a remote host.
 
 ```bash
 k8s_infra] $ ./tooling/passstore-vm-ssh.sh hetzner h01-116 ~/github/snowdrop/pass/
