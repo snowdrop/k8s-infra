@@ -32,8 +32,8 @@
         apply:
           tags:
             - always
-        vars: 
-          state: "present"
+      vars: 
+        state: "present"
 
   post_tasks:
     - name: Refresh the inventory so the newly added host is available
