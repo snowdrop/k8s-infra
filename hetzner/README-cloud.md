@@ -207,7 +207,7 @@ $ ansible-playbook ansible/playbook/passstore_controller_inventory_remove.yml -e
 
 Once the server is created it must be secured before installing other software. For that check [this README file](../ansible/playbook/README.md).
 
-# Steps to create a k8s / okd cluster
+# Steps to create a k8s cluster
 
 Check [the corresponding README file](../kubernetes/README.md). 
 
