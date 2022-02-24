@@ -7,6 +7,7 @@
   set_fact: 
     key_path: "{{ admin_home.stdout }}/.ssh/id_rsa_snowdrop_openstack_{{ vm_name }}"
     volume_name: "{{ vm_name }}-volume"
+    openstack_vm_ipv4: "{{ query('passwordstore', '/openstack/' + vm_name + '/ansible_ssh_host')[0] }}"
   no_log: True
 
 - stat:
@@ -80,7 +81,7 @@
 
 - name: "Remove the host from the known_hosts file"
   known_hosts:
-    name: "{{ ansible_ssh_host }}"
+    name: "{{ openstack_vm_ipv4 }}"
     state: absent
   ignore_errors: true
 
