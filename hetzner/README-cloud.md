@@ -14,7 +14,7 @@
    * [Create the hetzner vm](#create-the-hetzner-vm)
    * [Delete a hetzner server](#delete-a-hetzner-server)
    * [Next steps](#next-steps)
-* [Steps to create a k8s / okd cluster](#steps-to-create-a-k8s--okd-cluster)
+* [Steps to create a k8s cluster](#steps-to-create-a-k8s-cluster)
 
 
 
