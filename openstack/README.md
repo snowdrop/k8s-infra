@@ -3,7 +3,10 @@
 * [Introduction](#introduction)
 * [Prerequisites](#prerequisites)
 * [Provision a VM on OpenStack](#provision-a-vm-on-openstack)
-
+   * [Delete a VM](#delete-a-vm)
+   * [Connect to the new instance](#connect-to-the-new-instance)
+   * [Choose an image](#choose-an-image)
+   
 # Introduction
 
 This document describes the requirements and the process to execute the provisioning of a Cloud VM on Openstack.
@@ -25,6 +28,8 @@ $ ansible-galaxy collection install openstack.cloud
 ```
 
 # Provision a VM on OpenStack
+
+> **IMPORTANT** : The Ansible commands should be executed within the ansible folder !
 
 The first thing that needs to be done is to provision a fairly large CentOS virtual machine top of the Cloud operating system OpenStack.
 
@@ -80,6 +85,8 @@ ansible-playbook playbook/openstack.yml \
    -e '{"state": "present", "hostname": "somehostname", "openstack": {"timeout": "600","os_username": "username", "os_password": "password", "os_domain": "domain", "os_auth_url": "https://somehost:13000/v3", "os_project_id": "someprojectid", "vm": {"network": "some_network", "security_group": "some_security_group", "flavor": "m1.medium"}}}'`
 ```
 
+## Delete a VM
+
 To delete a VM, simply execute the `openstack_vm_remove_aggregate` playbook.
 
 ```bash
@@ -111,7 +118,7 @@ openstack/vm : Print Openstack output ------------------------------------------
 openstack/vm : include_tasks --------------------------------------------------------------- 0.07s
 ```
 
-**IMPORTANT** : The Ansible commands should be executed within the ansible folder !
+## Connect to the new instance
 
 Since all the information related to the host will be managed by our ansible passwordstore roles, which also stores the ssh public and secret keys locally on the `~/.ssh` folder, to login to the newly created VM is as simple as launching the following command.
 
@@ -130,4 +137,18 @@ Access is forbidden to all unauthorized person.
 All activity is being monitored.
 
 Welcome to vm20210221-t01..
+```
+
+## Choose an image
+
+Different OS images are available on Openstack.
+
+e.g.
+* CentOS 7 Generic Cloud Latest
+* CentOS-8-x86_64-GenericCloud-released-latest
+
+To select a specific image use the `openstack.vm.image` variable override.
+
+```bash
+$ ansible-playbook playbook/openstack_vm_create_aggregate.yml -e k8s_type=masters -e k8s_version=121 -e '{"openstack": {"vm": {"image": "CentOS-8-x86_64-GenericCloud-released-latest", "network": "provider_net_shared"}}}' -e vm_name=${VM_NAME} --tags create
 ```
