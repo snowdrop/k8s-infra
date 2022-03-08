@@ -98,7 +98,7 @@ It's used so Ansible can connect to the server without requiring password.
 
 ## All-in-one creation
 
-2 new playbooks have been created to aggregate the different operations executed by the different playbooks
+2 new playbooks have been created to aggregate the operations executed by the different playbooks
 , `hetzner-create-server-aggregate.yml` and `hetzner-delete-server-aggregate.yml`. Each of the playbooks invokes deployment and cleanup operations on the passwordstore inventory database, VM deployment operations and VM securization.
 
 The `hetzner-create-server-aggregate.yml` playbooks calls the following playbooks:
