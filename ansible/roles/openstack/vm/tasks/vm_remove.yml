@@ -1,0 +1,97 @@
+---
+- name: "Find admin user home folder"
+  local_action: shell echo "{{ lookup('env','HOME') }}"
+  register: admin_home
+
+- name: "Set required facts"
+  set_fact: 
+    key_path: "{{ admin_home.stdout }}/.ssh/id_rsa_snowdrop_openstack_{{ vm_name }}"
+    volume_name: "{{ vm_name }}-volume"
+    openstack_vm_ipv4: "{{ query('passwordstore', '/openstack/' + vm_name + '/ansible_ssh_host')[0] }}"
+  no_log: True
+
+- stat:
+    path: "{{ key_path }}"
+  register: st
+
+- name: "Set pass facts from passwordstore"
+  set_fact:
+    openstack_console_user:     "{{ query('passwordstore', '/openstack/host/console_user' )[0] }}"
+    openstack_console_password: "{{ query('passwordstore', '/openstack/host/console_pw ')[0] }}"
+    openstack_os_domain:        "{{ query('passwordstore', '/openstack/host/console_domain ')[0] }}"
+    openstack_os_auth_url: "{{ query('passwordstore', 'openstack/host/os_auth_url')[0] }}"
+    openstack_security_group: "{{ query('passwordstore', 'openstack/host/security_group')[0] }}"
+
+- name: "Gather information about a previously created VM"
+  openstack.cloud.server_info:
+    auth:
+      project_name: "{{ openstack.os_project_name }}"
+      username: "{{ openstack_console_user }}"
+      password: "{{ openstack_console_password }}"
+      user_domain_name: "{{ openstack_os_domain }}"
+      project_domain_name: "{{ openstack_os_domain }}"
+      auth_url: "{{ openstack_os_auth_url }}"
+    filters:
+      name: "{{ vm_name }}"
+  register: server_info_result
+
+- name: Print Openstack output
+  debug:
+    var: server_info_result
+
+- name: "Delete {{ vm_name }}"
+  os_server:
+    state: "absent"
+    auth:
+      project_name: "{{ openstack.os_project_name }}"
+      username: "{{ openstack_console_user }}"
+      password: "{{ openstack_console_password }}"
+      user_domain_name: "{{ openstack_os_domain }}"
+      project_domain_name: "{{ openstack_os_domain }}"
+      auth_url: "{{ openstack_os_auth_url }}"
+    name: "{{ vm_name }}"
+  register: openstack_output
+  ignore_errors: true
+
+- name: "Delete VM volume"
+  openstack.cloud.volume:
+    auth:
+      project_name: "{{ openstack.os_project_name }}"
+      username: "{{ openstack_console_user }}"
+      password: "{{ openstack_console_password }}"
+      user_domain_name: "{{ openstack_os_domain }}"
+      project_domain_name: "{{ openstack_os_domain }}"
+      auth_url: "{{ openstack_os_auth_url }}"
+    state: absent
+    display_name: "{{ volume_name }}"
+  ignore_errors: true
+
+- name: "Delete key {{ vm_name }} from server"
+  os_keypair:
+    state: absent
+    auth:
+      project_name: "{{ openstack.os_project_name }}"
+      username: "{{ openstack_console_user }}"
+      password: "{{ openstack_console_password }}"
+      user_domain_name: "{{ openstack_os_domain }}"
+      project_domain_name: "{{ openstack_os_domain }}"
+      auth_url: "{{ openstack_os_auth_url }}"
+    name: "{{ vm_name }}"
+  ignore_errors: true
+
+- name: "Remove the host from the known_hosts file"
+  known_hosts:
+    name: "{{ openstack_vm_ipv4 }}"
+    state: absent
+  ignore_errors: true
+
+- name: "Remove existing SSH key to use with instance"
+  file:
+    state: absent
+    path: "{{ item }}"
+  loop:
+    - "{{ key_path }}"
+    - "{{ key_path }}.pub"
+  ignore_errors: true
+
+...

@@ -1,0 +1,28 @@
+---
+- name: "Validate pass is installed"
+  ansible.builtin.shell: "pass version"
+
+- name: "Validate PASSWORD_STORE_DIR environment variable is set if password_store_dir is not set"
+  set_fact:
+    my_passwordstore_folder: "{{ lookup('env', 'PASSWORD_STORE_DIR') }}"
+  when: "password_store_dir is not defined or password_store_dir | length <= 0"
+
+- name: "Validate password_store_dir environment variable is set"
+  assert:
+    that: "password_store_dir is defined and password_store_dir | length > 0"
+  when: "password_store_dir is defined and password_store_dir | length > 0"
+
+- name: "Check Hetzner structure"
+  set_fact:
+    hetzner_1: "{{ query('passwordstore', 'hetzner/console')[0] }}"
+    # fail_msg: "Hetzner configuration not found."
+    # success_msg: "Hetzner minimal configuration checked."
+
+- name: "Check Openstack minimal configuration"
+  set_fact:
+    openstack_1: "{{ query('passwordstore', 'openstack/host/console_domain')[0] }}"
+    openstack_2: "{{ query('passwordstore', 'openstack/host/console_user')[0] }}"
+    openstack_3: "{{ query('passwordstore', 'openstack/host/console_pw')[0] }}"
+    # fail_msg: "Openstack configuration not found."
+    # success_msg: "Openstack minimal configuration checked."
+...

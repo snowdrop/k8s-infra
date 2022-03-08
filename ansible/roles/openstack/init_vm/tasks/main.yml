@@ -1,0 +1,30 @@
+---
+- name: Disable selinux
+  shell: "sed -i 's/^SELINUX=.*/SELINUX=permissive/g' /etc/selinux/config"
+  become: yes
+
+- name: Make commands under /usr/local/bin accessible to sudoers
+  shell: "sudo sed -i -e '/secure_path/ s[=.*[&:/usr/local/bin[' /etc/sudoers"
+  become: yes
+
+- name: Upgrade all packages
+  yum:
+    name: '*'
+    state: latest
+  become: yes
+
+- name: Install packages
+  package:
+    name: "{{ openstack_packages }}"
+    state: present
+  become: yes
+
+- name: Remove erroneous certs
+  shell: "rm -rf /etc/docker/certs.d/registry.access.redhat.com"
+  become: yes
+
+- name: Reboot instance
+  reboot:
+  become: yes
+
+...

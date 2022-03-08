@@ -1,0 +1,7 @@
+---
+- include_tasks: vm_create.yml
+  when: "state == 'present'"
+
+- include_tasks: vm_remove.yml
+  when: "state == 'absent'"
+...
