@@ -1,4 +1,5 @@
 openstack_packages:
   - NetworkManager
+  - centos-release-ansible-29
   - python-rhsm-certificates
   - atomic
