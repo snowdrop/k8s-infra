@@ -2,8 +2,6 @@
 - include_vars: "{{ item }}"
   with_first_found:
     - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
-    - "{{ ansible_distribution }}.yml"
-    - "{{ ansible_os_family }}.yml"
     - "main.yml"
 
 - name: "Apply CentOS 8 specific"
@@ -32,6 +30,7 @@
   package:
     name: "{{ openstack_packages }}"
     state: present
+  when: "openstack_packages is defined"
   become: yes
 
 - name: Remove erroneous certs
