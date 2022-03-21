@@ -1,0 +1,16 @@
+---
+- name: "Print host variables"
+  hosts: "all"
+  gather_facts: yes
+
+  tasks:
+    - name: "Print host variables"
+      debug:
+        msg: |
+          Host name: {{ ansible_hostname }}
+          Host variables: {{ hostvars[inventory_hostname] }}
+
+    # - name: "Ansible | List all known variables and facts"
+    #   debug:
+    #     var: hostvars[inventory_hostname]
+...
