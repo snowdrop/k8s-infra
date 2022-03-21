@@ -1,0 +1,10 @@
+---
+- name: "Find controller user home folder"
+  connection: local
+  local_action: "shell echo {{ lookup('env','HOME') }}"
+  register: local_user_home
+
+- name: "Remove controller kube config file"
+  connection: local
+  local_action: "shell rm -f {{ local_user_home.stdout }}/.kube/{{ pass_provider }}-{{ ansible_hostname }}-config"
+...

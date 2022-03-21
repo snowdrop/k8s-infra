@@ -1,0 +1,99 @@
+---
+- name: "Create k8s config folder on host OS user HOME"
+  file:
+    path: ".kube"
+    state: directory
+    mode: '0755'
+
+- name: "Copy k8s config file to host OS user folder"
+  copy:
+    src: "/etc/kubernetes/admin.conf"
+    dest: ".kube/config"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0644'
+    remote_src: yes
+    force: no
+  become: yes
+
+# - set_fact:
+#     k8s_server: "https://{{ ansible_ssh_host }}:6443"
+#     inventory_location: "{{ lookup('env', 'PWD') }}/inventory"
+#   when: apiserver_address is undefined
+
+# - set_fact:
+#     k8s_server: "https://{{ apiserver_address }}:6443"
+#     inventory_location: "{{ lookup('env', 'PWD') }}/inventory"
+#   when: (apiserver_address is defined) and (apiserver_address|length > 0)
+
+# - name: Get namespace
+#   shell: |
+#     kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config get secrets -o jsonpath="{.items[?(@.metadata.annotations['kubernetes\.io/service-account\.name']=='default')].data.namespace}" | base64 -d
+#   register: get_namespace_out
+#   until: get_namespace_out.stdout != ""
+#   retries: 10
+#   delay: 5
+
+# - set_fact:
+#     k8s_namespace: "{{ get_namespace_out.stdout }}"
+
+# - name: Get CA
+#   shell: |
+#     kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config get secrets -o jsonpath="{.items[?(@.metadata.annotations['kubernetes\.io/service-account\.name']=='default')].data.ca\.crt}"
+#   register: get_ca_out
+
+# - set_fact:
+#     k8s_ca: "{{ get_ca_out.stdout }}"
+
+# - name: Get token
+#   shell: |
+#     kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config get secrets -o jsonpath="{.items[?(@.metadata.annotations['kubernetes\.io/service-account\.name']=='default')].data.token}" | base64 -d
+#   register: get_token_out
+
+# - set_fact:
+#     k8s_token: "{{ get_token_out.stdout }}"
+
+# - name: Save locally (= your laptop) the kube config
+#   connection: local
+#   local_action: template src="k8s-config.yml.j2" dest={{ lookup('env', 'PWD') }}/{{ k8s_config_filename }}
+
+- name: "Find user home folder"
+  connection: local
+  local_action: "shell echo {{ lookup('env','HOME') }}"
+  register: local_user_home
+
+- name: "Copy k8s config file to controller .kube folder"
+  fetch:
+    src: "/etc/kubernetes/admin.conf"
+    dest: "{{ local_user_home.stdout }}/.kube/{{ pass_provider }}-{{ ansible_hostname }}-config"
+    mode: '0600'
+    flat: yes
+  become: yes
+
+# - name: Get K8S config
+#   connection: local
+#   local_action: command cat {{ lookup('env', 'PWD') }}/{{ k8s_config_filename }}
+#   register: get_config
+
+- name: "Fetch K8S config"
+  # set_fact:
+  #   k8s_config: "{{ lookup('file', '/etc/kubernetes/admin.conf') }}"
+  # lookup: "{{ lookup('file', local_user_home.stdout + '/.kube/' + pass_provider + '-' + ansible_hostname + '-config') }}"
+  connection: local
+  local_action: "shell cat {{ local_user_home.stdout }}/.kube/{{ pass_provider }}-{{ ansible_hostname }}-config"
+  register: k8s_config
+
+# Doesn't work as the contents is a multiline json. Fails with fatal: [vm20220316-t02]: FAILED! => {"msg": "Unexpected templating type error occurred on ({{ query('passwordstore', pass_provider + '/' + ansible_hostname + '/kube_cfg create=True userpass=' + get_config)[0] }}): can only concatenate str (not \"dict\") to str"}
+# - name: "Add k8s config to passwordstore"
+#   set_fact:
+#     kube_config: "{{ query('passwordstore', pass_provider + '/' + ansible_hostname + '/kube_cfg create=True userpass=''' + k8s_config.stdout + ''') }}"
+#   when: passwordstore_enabled | bool
+
+- name: Print kubernetes config file location
+  debug:
+    msg:
+      - "You can use the following Kubernetes config file to interact with remote cluster via kubectl"
+      - "{{ k8s_config_filename }}"
+      - "or copy/paste the following config included between the [...] in a file"
+      - "{{ k8s_config.stdout_lines }}"
+...
