@@ -1,3 +1,10 @@
+---
+- name: "Remove controller config file"
+  import_role:
+    name: k8s_config
+  vars:
+    state: "absent"
+
 - name: Reset kubeadm
   command: kubeadm reset -f
   become: yes
@@ -16,3 +23,4 @@
 
 - name: "Remove containerd"
   include_tasks: "remove_containerd.yml"
+...

@@ -121,21 +121,11 @@
   failed_when: "kubeadm_init_res.rc != 0  and 'already exists' not in kubeadm_init_res.stderr"
   become: yes
 
-- name: Create k8s config folder for os user
-  file:
-    path: ".kube"
-    state: directory
-    mode: '0755'
-
-- name: Copy k8s config file to the user home
-  copy:
-    src: "/etc/kubernetes/admin.conf"
-    dest: ".kube/config"
-    owner: "{{ ansible_user }}"
-    group: "{{ ansible_user }}"
-    mode: '0644'
-    remote_src: yes
-  become: yes
+- name: "Copy config file"
+  include_role:
+    name: k8s_config
+  vars:
+    state: "present"
 
 - name: "Install Flannel Virtual Network for pod communication"
   shell: |
