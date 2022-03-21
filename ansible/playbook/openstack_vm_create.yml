@@ -20,11 +20,6 @@
   hosts: localhost
   gather_facts: no
 
-  # roles:
-  #   - role: "openstack/vm"
-  #     vars: 
-  #       state: "present"
-
   tasks:
     - name: "Execute create inventory, if tagged as so"
       include_role:
