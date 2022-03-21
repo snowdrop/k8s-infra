@@ -1,4 +1,13 @@
 ---
+- include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
+    - "main.yml"
+
+- name: "Apply CentOS 8 specific"
+  import_tasks: "centos-8.yml"
+  when: "ansible_distribution == 'CentOS' and ansible_distribution_major_version == '8'"
+
 - name: Disable selinux
   shell: "sed -i 's/^SELINUX=.*/SELINUX=permissive/g' /etc/selinux/config"
   become: yes
@@ -13,10 +22,15 @@
     state: latest
   become: yes
 
+- name: "Apply CentOS 8 specific, again after update"
+  import_tasks: "centos-8.yml"
+  when: "ansible_distribution == 'CentOS' and ansible_distribution_major_version == '8'"
+
 - name: Install packages
   package:
     name: "{{ openstack_packages }}"
     state: present
+  when: "openstack_packages is defined"
   become: yes
 
 - name: Remove erroneous certs

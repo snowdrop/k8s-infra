@@ -84,7 +84,6 @@
   - name: "Print Openstack output"
     debug:
       var: openstack_output
-      verbosity: 2
 
   - name: "Store host IP on passwordstore"
     set_fact:

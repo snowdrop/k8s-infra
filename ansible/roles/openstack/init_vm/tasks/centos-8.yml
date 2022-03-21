@@ -1,0 +1,8 @@
+---
+- name: "Change CentOS Mirrors to vault.centos.org"
+  shell: "{{ item }}"
+  loop:
+    - "sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*.repo"
+    - "sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*.repo"
+  become: yes
+...
