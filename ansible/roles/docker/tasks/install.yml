@@ -2,20 +2,14 @@
 - name: "Call the old docker removal tasks"
   include_tasks: remove_old_version.yml
 
-- name: Install dependencies needed by docker
+- name: "Install dependencies needed by docker"
   yum:
     name: "{{ docker_dependencies }}"
     state: present
   become: yes
 
-- name: Add docker repository
-  yum_repository:
-    name: docker
-    description: Docker
-    baseurl: https://download.docker.com/linux/centos/7/$basearch/stable
-    enabled: 1
-    gpgcheck: 1
-    gpgkey: https://download.docker.com/linux/centos/gpg
+- name: "Add docker repository"
+  shell: "yum config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo"
   become: yes
 
 - name: Install docker
