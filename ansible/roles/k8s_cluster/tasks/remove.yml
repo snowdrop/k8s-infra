@@ -5,11 +5,13 @@
   vars:
     state: "absent"
 
-- name: Reset kubeadm
+- name: "Reset kubeadm"
   command: kubeadm reset -f
   become: yes
+  register: kubeadm_reset_res
+  failed_when: "kubeadm_reset_res != 0 and 'No such file or directory' not in kubeadm_reset_res.msg"
 
-- name: Remove Kubernetes packages - kubeadm, kubelet, kubectl
+- name: "Remove Kubernetes packages - kubeadm, kubelet, kubectl"
   yum:
     name: "{{ packages }}"
     state: absent
@@ -21,6 +23,10 @@
       - kubelet-{{k8s_version}}
   become: yes
 
-- name: "Remove containerd"
-  include_tasks: "remove_containerd.yml"
+- name: "Remove kubernetes repository"
+  yum_repository:
+    name: kubernetes
+    state: absent
+  become: yes
+
 ...
