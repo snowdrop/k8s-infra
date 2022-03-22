@@ -22,7 +22,7 @@ openstack:
   vm:
     title: CentOS 7 Generic Cloud Latest
     name: "{{ hostname }}"
-    image: CentOS-7-x86_64-GenericCloud-released-latest
+    image: CentOS-8-x86_64-GenericCloud-released-latest
     key_name: "{{ hostname }}"
     flavor: m1.small
     network: default_network
