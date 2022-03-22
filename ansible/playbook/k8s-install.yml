@@ -13,7 +13,7 @@
         name: 'containerd'
       vars:
         state: present
-      tags: [containerd]
+      tags: [containerd,docker]
 
     - name: "Execute docker installation role"
       import_role:
