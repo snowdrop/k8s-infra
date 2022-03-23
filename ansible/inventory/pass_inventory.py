@@ -118,7 +118,7 @@ for (dirpath, dirnames, filenames) in walk(password_store_dir):
 
 if len(sys.argv) == 2 and sys.argv[1] == '--list':
     print(json.dumps(result))
-# elif len(sys.argv) == 3 and sys.argv[1] == '--host':
-    # print(json.dumps({'ansible_connection': ansible_connection}))
+elif len(sys.argv) == 3 and sys.argv[1] == '--host':
+    print(json.dumps(result['_meta']['hostvars'][sys.argv[2]]))
 else:
     sys.stderr.write("Need an argument, either --list or --host <host>\n")
