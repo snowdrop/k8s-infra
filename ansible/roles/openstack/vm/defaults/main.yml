@@ -20,7 +20,7 @@ openstack:
   sshkey_name: "{{ hostname }}"
   timeout: 300
   vm:
-    title: CentOS 7 Generic Cloud Latest
+    title: CentOS 8 Generic Cloud Latest
     name: "{{ hostname }}"
     image: CentOS-8-x86_64-GenericCloud-released-latest
     key_name: "{{ hostname }}"
