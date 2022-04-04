@@ -19,15 +19,10 @@
     state: present
   become: yes
 
-- name: Add docker repository
-  yum_repository:
+- name: "Add docker repository"
+  include_role:
     name: docker
-    description: Docker
-    baseurl: https://download.docker.com/linux/centos/7/$basearch/stable
-    enabled: 1
-    gpgcheck: 1
-    gpgkey: https://download.docker.com/linux/centos/gpg
-  become: yes
+    tasks_from: add-docker-repo.yml
 
 - name: Install containerd
   package:
