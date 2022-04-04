@@ -1,4 +1,11 @@
 ---
+- include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ansible_distribution}}-{{ansible_distribution_major_version}}.yml"
+    - "{{ ansible_os_family }}-{{ansible_distribution_major_version}}.yml"
+    - "{{ ansible_distribution }}.yml"
+    - "{{ ansible_os_family }}.yml"
+
 - name: "Call the old docker removal tasks"
   include_tasks: remove_old_version.yml
 
@@ -9,10 +16,9 @@
   become: yes
 
 - name: "Add docker repository"
-  shell: "yum config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo"
-  become: yes
+  include_tasks: add-docker-repo.yml
 
-- name: Install docker
+- name: "Install docker"
   yum: 
     name: "{{ docker_packages }}"
     state: present

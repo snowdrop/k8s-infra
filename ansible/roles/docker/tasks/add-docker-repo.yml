@@ -1,0 +1,25 @@
+---
+- include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ansible_distribution}}-{{ansible_distribution_major_version}}.yml"
+    - "{{ ansible_os_family }}-{{ansible_distribution_major_version}}.yml"
+    - "{{ ansible_distribution }}.yml"
+    - "{{ ansible_os_family }}.yml"
+
+- name: "Add docker repository CentOS/RedHat 8"
+  shell: "yum config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo"
+  become: yes
+  when: "(ansible_distribution == 'CentOS' or ansible_os_family == 'RedHat') and ansible_distribution_major_version == '8'"
+
+- name: "Add docker repository CentOS/RedHat 7"
+  yum_repository:
+    name: docker-ce
+    description: Docker
+    baseurl: https://download.docker.com/linux/centos/7/$basearch/stable
+    enabled: 1
+    gpgcheck: 1
+    gpgkey: https://download.docker.com/linux/centos/gpg
+  become: yes
+  when: "(ansible_distribution == 'CentOS' or ansible_os_family == 'RedHat') and ansible_distribution_major_version == '7'"
+
+...
