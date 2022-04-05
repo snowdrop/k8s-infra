@@ -1,0 +1,31 @@
+---
+- name: "Install/Uninstall kubernetes dashboard"
+  hosts: "{{ override_host | default('masters') }}"
+  gather_facts: "{{ gathering_host_info | default('true') | bool == true }}"
+
+  vars:
+    client_tool: kubectl
+
+  pre_tasks:
+    - name: "Define variables"
+      set_fact:
+        remove: "{{ state == 'absent' }}"
+
+    - name: "Print input"
+      debug:
+        msg: "variable value: {{ item }}"
+      with_items:
+        - "{{ state }}"
+        - "{{ remove }}"
+        - "{{ state == 'absent' }}"
+        - "{{ state == 'absent' | bool }}"
+
+  tasks:
+    - name: "Execute k8s_dashboard installation role"
+      import_role:
+        name: 'k8s_dashboard'
+      vars:
+        - remove: "{{ remove }}"
+      tags: [k8s_dashboard]
+
+...
