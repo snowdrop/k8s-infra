@@ -2,114 +2,50 @@
 #- set_fact:
 #    password_store_dir: "{{ lookup('env','PASSWORD_STORE_DIR') | default('~/.password-store', True) }}"
 
-- set_fact:
-    k8s_dashboard_ingress_host: "{{ ansible_ssh_host }}.nip.io"
-  when: (apiserver_address is undefined) or (apiserver_address|length == 0) 
-
-- set_fact:
-    k8s_dashboard_ingress_host: "{{ apiserver_address }}.nip.io"
-  when: (apiserver_address is defined) and (apiserver_address|length > 0)
-
-- name: Generate k8s dasbboard tokens
-  set_fact:
-    k8s_dashboard_token_public: "{{ query('passwordstore', pass_provider + '/' + ansible_hostname + '/k8s_dashboard_token_public create=yes length=6 nosymbols=true')[0] | lower }}"
-    k8s_dashboard_token_secret: "{{ query('passwordstore', pass_provider + '/' + ansible_hostname + '/k8s_dashboard_token_secret create=yes length=16 nosymbols=true' )[0] | lower }}"
-  when: passwordstore_enabled | bool
-
-- name: Update k8s dasbboard tokens
-  set_fact:
-    k8s_dashboard_token_public: "{{ query('passwordstore', pass_provider + '/' + ansible_hostname + '/k8s_dashboard_token_public overwrite=yes length=6 nosymbols=true userpass=' + k8s_dashboard_token_public )[0] | lower }}"
-    k8s_dashboard_token_secret: "{{ query('passwordstore', pass_provider + '/' + ansible_hostname + '/k8s_dashboard_token_secret overwrite=yes length=16 nosymbols=true userpass=' + k8s_dashboard_token_secret )[0] | lower }}"
-  when: passwordstore_enabled | bool
-
-- name: Generate k8s dasbboard tokens
-  set_fact:
-    k8s_dashboard_token_public: "{{ lookup('password', '/dev/null length=6 chars=digits,ascii_lowercase' ) }}"
-    k8s_dashboard_token_secret: "{{ lookup('password', '/dev/null length=16 chars=digits,ascii_lowercase' ) }}"
-  when: not passwordstore_enabled | bool
-
-- name: Install cfssl tool
-  include_role:
-    name: cfssl_tool
-
-- name: Delete any previous CSR
-  shell: |
-    kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config \
-      delete csr {{ k8s_dashboard_name }}
-  ignore_errors: true
-
-- name: Install Dashboard Version - {{ k8s_dashboard_version }}
+- name: "Install Dashboard"
   shell: |
     kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config \
       apply -f \
       https://raw.githubusercontent.com/kubernetes/dashboard/{{ k8s_dashboard_version }}/aio/deploy/recommended.yaml
 
-- name: Copy cfssl json j2
-  template:
-    src: "../templates/cfssl.json.j2"
-    dest: /tmp/cfssl.json
+- name: "Copy RBAC and SA files"
+  copy:
+    src: "../files/{{ item }}"
+    dest: /tmp/{{ item }}
+  with_items:
+    - sa.yml
+    - rbac.yml
 
-- name: Generate the pem and csr files
+- name: "Create the Service Account, ClusterRoleBinding for the K8s Dashboard admin-user"
   shell: |
-    cat /tmp/cfssl.json | /usr/local/bin/cfssl genkey - | /usr/local/bin/cfssljson -bare server
-
-- name: Convert Self Signed Certificate to base64 string
-  shell: |
-    cat server.csr | base64 | tr -d '\n'
-  register: csr_base64
-
-- name: Copy CertificateSigningRequest yml j2
-  template:
-    src: "../templates/csr.yml.j2"
-    dest: /tmp/csr.yml
-
-- name: Create a CertificateSigningRequest on the k8s cluster
-  shell: |
-    kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config \
-      apply -f /tmp/csr.yml
-
-- name: Approve the CSR request
-  shell: |
-    kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config \
-      certificate approve {{ k8s_dashboard_name }}
-
-- name: Get the server certificate
-  shell: |
-    kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config \
-      get csr {{ k8s_dashboard_name }} -o jsonpath='{.status.certificate}' | base64 --decode > server.crt
-
-- name: Delete and re-create the Kubernetes Dashboard containing the Self Signed certificate
-  shell: |
-    kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config \
-      delete secret/{{ k8s_dashboard_secret_name }} -n {{ k8s_dashboard_namespace }}
-    kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config \
-      create secret tls {{ k8s_dashboard_secret_name }} -n {{ k8s_dashboard_namespace }} --cert=server.crt --key=server-key.pem
-
-- name: Copy Ingress yml j2
-  template:
-    src: "../templates/ingress-dashboard.yml.j2"
-    dest: /tmp/ingress-dashboard.yml
-
-- name: Copy RBAC yml j2
-  template:
-    src: "../templates/rbac.yml.j2"
-    dest: /tmp/rbac.yml
-
-- name: "Create the Service Account, ClusterRoleBinding for the K8s Dashboard admin-user like also the Ingress route"
-  shell: |
-    kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config apply -f /tmp/rbac.yml
-    kubectl --kubeconfig={{ ansible_user_dir }}/.kube/config apply -f /tmp/ingress-dashboard.yml
+    kubectl apply -f /tmp/sa.yml
+    kubectl apply -f /tmp/rbac.yml
   register: result
   retries: 10
   delay: 10
   until: result is not failed
 
+- name: "Collect the dashboard Token"
+  shell: |
+    kubectl -n kubernetes-dashboard get secret $(kubectl -n kubernetes-dashboard get sa/admin-user \
+      -o jsonpath='{.secrets[0].name}') {% raw %}-o go-template='{{.data.token | base64decode}}'{% endraw %}
+  register: k8s_dashboard_token_res
+
+- name: "Add the dashboard token to the passwordstore"
+  set_fact:
+    k8s_dashboard_token: "{{ query('passwordstore', pass_provider + '/' + ansible_hostname + '/k8s_dashboard_token overwrite=yes nosymbols=true create=True userpass=' + k8s_dashboard_token_res.stdout)[0] | lower }}"
+  when: passwordstore_enabled | bool
+
 - name: Print kubernetes dashboard URL & Token
   debug:
     msg:
-      - "You can also view the kubernetes dashboard at"
-      - "https://k8s-console.{{ k8s_dashboard_ingress_host }}/"
+      - "To enable access to the Dashboard using the kubectl command-line tool, run the following command:"
+      - "$ kubectl proxy"
       - ""
-      - "Using the Boot Token: "
-      - "{{ k8s_dashboard_token_public }}.{{ k8s_dashboard_token_secret }}"
+      - "Kubectl will make Dashboard available at: " 
+      - "http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/"
+      - ""
+      - "Use {{ k8s_dashboard_token_res.stdout }} as token"
+      - ""
+      - "More information on: https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/"
 ...
