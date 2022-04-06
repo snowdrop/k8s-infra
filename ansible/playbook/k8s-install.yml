@@ -13,7 +13,7 @@
         name: 'containerd'
       vars:
         state: present
-      tags: [containerd,docker]
+      tags: [containerd]
 
     - name: "Execute docker installation role"
       import_role:
@@ -29,19 +29,12 @@
         - remove: false
       tags: [always,k8s_cluster]
 
-    # - name: "Execute k8s_config installation role"
-    #   import_role:
-    #     name: 'k8s_config'
-    #   vars:
-    #     - remove: false
-    #   tags: [always,k8s_config]
-
     - name: "Execute ingress installation role"
       import_role:
         name: 'ingress'
       vars:
         - remove: false
-      tags: [always,ingress]
+      tags: [ingress]
       
     - name: "Execute k8s_dashboard installation role"
       import_role:

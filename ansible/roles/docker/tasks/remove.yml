@@ -28,4 +28,10 @@
     state: absent
   become: yes
 
+- name: "Remove docker repository"
+  yum_repository:
+    name: docker-ce
+    state: absent
+  become: yes
+
 ...

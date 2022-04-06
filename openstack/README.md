@@ -144,11 +144,26 @@ Welcome to vm20210221-t01..
 Different OS images are available on Openstack.
 
 e.g.
-* CentOS 7 Generic Cloud Latest
+* CentOS-7-x86_64-GenericCloud-released-latest
 * CentOS-8-x86_64-GenericCloud-released-latest
 
 To select a specific image use the `openstack.vm.image` variable override.
 
 ```bash
 $ ansible-playbook playbook/openstack_vm_create_aggregate.yml -e k8s_type=masters -e k8s_version=121 -e '{"openstack": {"vm": {"image": "CentOS-8-x86_64-GenericCloud-released-latest", "network": "provider_net_shared"}}}' -e vm_name=${VM_NAME} --tags create
+```
+
+## Choose a flavor
+
+| Flavor | VCPUS | RAM | Total Disks | Root Disk | Ephmeral Disk |
+| --- | --- | --- | --- | --- | --- |
+| m1.medium | 2 | 4 GB | 40 GB | 40 GB | 0 GB |
+| ci.m1.medium | 2 | 4 GB | 40 GB | 40 GB | 0 GB |
+| ci.m1.medium.large	| 4	| 4 GB | 16 GB | 16 GB | 0 GB |
+| ci.m5.large | ??? | ??? | ??? | ??? | ??? |
+
+To select a specific flavor use the `openstack.vm.flavor` variable override.
+
+```bash
+$ ansible-playbook playbook/openstack_vm_create_aggregate.yml -e k8s_type=masters -e k8s_version=121 -e '{"openstack": {"vm": {"flavor": "m1.medium", "network": "provider_net_shared"}}}' -e vm_name=${VM_NAME} --tags create
 ```

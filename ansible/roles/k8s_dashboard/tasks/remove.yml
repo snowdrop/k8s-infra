@@ -1,12 +1,24 @@
-- name: Remove the Dashboard k8s resources created from the templates
-  shell: |
-    kubectl --kubeconfig=$HOME/.kube/config delete ingress/k8s-dashboard -n {{ k8s_dashboard_namespace }}
-    kubectl --kubeconfig=$HOME/.kube/config delete clusterrolebinding/cluster-admin-for-bootstrappers
-    kubectl --kubeconfig=$HOME/.kube/config delete certificate/k8s-dashboard-certificate -n {{ k8s_dashboard_namespace }}
-  ignore_errors: true
+---
+- name: "Copy RBAC and SA files"
+  template:
+    src: "../files/{{ item }}"
+    dest: /tmp/{{ item }}
+  with_items:
+    - sa.yml
+    - rbac.yml
 
-- name: Remove Dashboard
+- name: "Create the Service Account, ClusterRoleBinding for the K8s Dashboard admin-user"
+  shell: |
+    kubectl delete -f /tmp/sa.yml
+    kubectl delete -f /tmp/rbac.yml
+  register: result
+  retries: 10
+  delay: 10
+  until: result is not failed
+
+- name: "Remove Dashboard"
   shell: |
     kubectl --kubeconfig=$HOME/.kube/config \
       delete -f \
       https://raw.githubusercontent.com/kubernetes/dashboard/{{ k8s_dashboard_version }}/aio/deploy/recommended.yaml
+...

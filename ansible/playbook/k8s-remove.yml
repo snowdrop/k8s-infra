@@ -20,7 +20,7 @@
         name: 'ingress'
       vars:
         - remove: true
-      tags: [always,ingress]
+      tags: [ingress]
 
     - name: "Execute k8s_cluster uninstall role"
       import_role:

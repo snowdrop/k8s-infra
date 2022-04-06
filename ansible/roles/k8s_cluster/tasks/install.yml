@@ -66,6 +66,22 @@
     exclude: kube*
     state: present
   become: yes
+  register: k8s_add_repo_res
+  failed_when: "k8s_add_repo_res.rc is defined and k8s_add_repo_res.rc > 0 and k8s_add_repo_res.stderr is defined and 'signature could not be verified for kubernetes' not in k8s_add_repo_res.stderr"
+
+- name: "Add kubernetes repository alternative to GPG key failure"
+  yum_repository:
+    name: kubernetes
+    description: Kubernetes
+    baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+    gpgcheck: false
+    repo_gpgcheck: false
+    gpgkey: https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+    exclude: kube*
+    state: present
+  become: yes
+  register: k8s_add_repo_alt_res
+  when: "k8s_add_repo_res is not defined or (k8s_add_repo_res.rc is defined and k8s_add_repo_res.rc > 0 and k8s_add_repo_res.stderr is defined and 'signature could not be verified for kubernetes' in k8s_add_repo_res.stderr)"
 
 - name: "Install Kubernetes packages - {{ k8s_version }}"
   package:
@@ -121,10 +137,8 @@
   vars:
     state: "present"
 
-- name: "Install Flannel Virtual Network for pod communication"
-  shell: |
-    kubectl -n kube-system get deployment coredns -o yaml | sed 's/allowPrivilegeEscalation: false/allowPrivilegeEscalation: true/g' | kubectl apply -f -
-    kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/{{ coreos_flannel_sha_commit }}/Documentation/kube-flannel.yml
+- name: "Install CNI"
+  include_tasks: install_cni.yml
 
 - name: Taint the node
   command: "kubectl taint nodes --all node-role.kubernetes.io/master-"

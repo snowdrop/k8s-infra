@@ -8,6 +8,9 @@ flavours:
   m1.medium:
     name: "m1.medium"
     disk_size: 40
+  ci.m1.medium:
+    name: "ci.m1.medium"
+    disk_size: 40
   m1.large:
     name: "m1.large"
     disk_size: 60
