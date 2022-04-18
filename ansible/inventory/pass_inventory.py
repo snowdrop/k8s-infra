@@ -1,4 +1,4 @@
-#! /usr/bin/python
+#! /usr/bin/python3
 
 # -*- coding:utf-8 -*-
 # This module reads information from a passwordstore database and turns it into an ansible dynamic inventory.

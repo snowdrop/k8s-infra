@@ -1,0 +1,41 @@
+= Ansible Container
+:author: Antonio Costa
+:email: antcosta@redhat.com
+:docdate: 2022-04-18
+:toc: left
+:icons: font
+:description: Container for running k8s-infra Ansible Playbooks
+
+== Building the image
+
+Place the current folder in the `container` subfolder.
+
+[source, shell]
+----
+$ cd container
+----
+
+Launch the `buildah` image build using the `Dockerfile` file.
+
+[source, shell]
+----
+$ buildah build-using-dockerfile --tag k8s-infra-ansible
+----
+
+== Running the container
+
+
+[source, shell]
+----
+$ podman run --rm -v ${HOME}/docs/redhat/forks-github/k8s-infra:/opt/volumes/k8s-infra:Z -v ${HOME}/docs/redhat/forks-github/pass/:/opt/volumes/pass:Z -v ${HOME}/.gnupg:/opt/volumes/gnupg:Z -e ANSIBLE_PLAYBOOK_FILE=playbook/ansible_test.yml localhost/k8s-infra-ansible
+----
+
+Create a VM.
+
+[source, shell]
+----
+$ VM_NAME=k121-centos8-container-test
+$ podman run --rm -v ${HOME}/docs/redhat/forks-github/k8s-infra:/opt/volumes/k8s-infra:Z -v ${HOME}/docs/redhat/forks-github/pass/:/opt/volumes/pass:Z -v ${HOME}/.gnupg:/opt/volumes/gnupg:Z -v ${HOME}/.ssh:/root/.ssh:Z -e ANSIBLE_PLAYBOOK_FILE=playbook/openstack_vm_create_aggregate.yml -e ANSIBLE_PLAYBOOK_PARAMETERS="-e vm_name=${VM_NAME} -e k8s_type=masters -e k8s_version=121 -e '{\"openstack\": {\"vm\": {\"network\": \"provider_net_shared\" , \"flavor\": \"ci.m5.large\", \"image\": \"CentOS-8-x86_64-GenericCloud-released-latest\" }}}' --tags create" localhost/k8s-infra-ansible
+
+VM_NAME=k121-centos8-01 ; ansible-playbook playbook/openstack_vm_create_aggregate.yml -e vm_name=${VM_NAME}  -e k8s_type=masters -e k8s_version=121 -e '{"openstack": {"vm": {"network": "provider_net_shared" , "flavor": "ci.m5.large", "image": "CentOS-8-x86_64-GenericCloud-released-latest" }}}' --tags create
+----

@@ -159,8 +159,8 @@ $ ansible-playbook playbook/openstack_vm_create_aggregate.yml -e k8s_type=master
 | --- | --- | --- | --- | --- | --- |
 | m1.medium | 2 | 4 GB | 40 GB | 40 GB | 0 GB |
 | ci.m1.medium | 2 | 4 GB | 40 GB | 40 GB | 0 GB |
-| ci.m1.medium.large	| 4	| 4 GB | 16 GB | 16 GB | 0 GB |
-| ci.m5.large | ??? | ??? | ??? | ??? | ??? |
+| ci.m1.medium.large	| 4| 4 GB | 16 GB | 16 GB | 0 GB |
+| ci.m5.large | 16 | 32GB | 40GB | 40GB | 0GB |
 
 To select a specific flavor use the `openstack.vm.flavor` variable override.
 
