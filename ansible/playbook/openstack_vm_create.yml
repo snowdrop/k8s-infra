@@ -42,13 +42,13 @@
     - name: "Show 'Wait for connection to host' output"
       debug:
         msg: 
-          - "ip : {{ query('passwordstore', '/openstack/' + vm_name + '/ansible_ssh_host')[0] }}"
-          - "port : {{ query('passwordstore', '/openstack/' + vm_name + '/ansible_ssh_port')[0] }}"
+          - "ip : {{ query('passwordstore', 'openstack/' + vm_name + '/ansible_ssh_host')[0] }}"
+          - "port : {{ query('passwordstore', 'openstack/' + vm_name + '/ansible_ssh_port')[0] }}"
 
     - name: "Wait for connection to host"
       ansible.builtin.wait_for:
-        host: "{{ query('passwordstore', '/openstack/' + vm_name + '/ansible_ssh_host')[0] }}"
-        port: "{{ query('passwordstore', '/openstack/' + vm_name + '/ansible_ssh_port')[0] }}"
+        host: "{{ query('passwordstore', 'openstack/' + vm_name + '/ansible_ssh_host')[0] }}"
+        port: "{{ query('passwordstore', 'openstack/' + vm_name + '/ansible_ssh_port')[0] }}"
         timeout: 120
       register: wait_for_connection_reg
 
