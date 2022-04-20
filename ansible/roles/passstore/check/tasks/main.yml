@@ -7,6 +7,11 @@
     my_passwordstore_folder: "{{ lookup('env', 'PASSWORD_STORE_DIR') }}"
   when: "password_store_dir is not defined or password_store_dir | length <= 0"
 
+- name: "Print password_store_dir"
+  debug:
+    msg: "my_passwordstore_folder: {{ my_passwordstore_folder }}"
+  when: "password_store_dir is not defined or password_store_dir | length <= 0"
+
 - name: "Validate password_store_dir environment variable is set"
   assert:
     that: "password_store_dir is defined and password_store_dir | length > 0"
@@ -14,7 +19,7 @@
 
 - name: "Check Hetzner structure"
   set_fact:
-    hetzner_1: "{{ query('passwordstore', 'hetzner/console')[0] }}"
+    hetzner_1: "{{ query('passwordstore', 'hetzner/console/K0224220518')[0] }}"
     # fail_msg: "Hetzner configuration not found."
     # success_msg: "Hetzner minimal configuration checked."
 
