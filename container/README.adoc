@@ -93,16 +93,9 @@ Connect to the container.
 
 [source, shell]
 ----
-$ podman run -it --rm -v /home/ajc102/docs/redhat/forks-github/k8s-infra:/opt/volumes/k8s-infra:Z -v /home/ajc102/docs/redhat/forks-github/pass/:/opt/volumes/pass:Z -v ${HOME}/.gnupg:/opt/volumes/gnupg:Z --env-file ${HOME}/.k8s-infra-container.properties -e PASS_GPG_KEY_PASSPHRASE=${PASS_GPG_KEY_PASSPHRASE} --entrypoint /bin/bash localhost/k8s-infra-ansible
+$ podman run --privileged -it --rm -v /home/ajc102/docs/redhat/forks-github/k8s-infra:/opt/volumes/k8s-infra:Z -v /home/ajc102/docs/redhat/forks-github/pass/:/opt/volumes/pass:Z -v ${HOME}/.gnupg:/opt/volumes/gnupg:Z -v $(dirname ${SSH_AUTH_SOCK}):/ssh-agent -e SSH_AUTH_SOCK="/ssh-agent" --env-file ${HOME}/.k8s-infra-container.properties -v ${HOME}/.ssh:/root/.ssh:Z  -e PASS_GPG_KEY_PASSPHRASE=${PASS_GPG_KEY_PASSPHRASE} --entrypoint /bin/bash localhost/k8s-infra-ansible
 ----
 
-Add the GitHub SSH key to the agent so the passphrase is not requested as part of the process execution.
-
-[source, shell]
-----
-[root@9999999 ] exec ssh-agent $SHELL
-[root@9999999 ] ssh-add ~/.ssh/id_ed25519_github
-----
 
 Execute the requested playbook.
 
@@ -115,29 +108,23 @@ Execute the requested playbook.
 
 == Using the container
 
-=== Requirements and preparation
+The container includes 
 
-[source, shell]
-----
-$ podman run --rm -v ${HOME}/docs/redhat/forks-github/k8s-infra:/opt/volumes/k8s-infra:Z -v ${PASSWORD_STORE_DIR}:/opt/volumes/pass:Z -v ${HOME}/.gnupg:/opt/volumes/gnupg:Z -e ANSIBLE_PLAYBOOK_FILE=playbook/ansible_test.yml localhost/k8s-infra-ansible
-----
 
 Create a VM.
 
 [source, shell]
 ----
-$ VM_NAME=k121-centos8-container-test
-$ podman run --rm -v ${HOME}/docs/redhat/forks-github/k8s-infra:/opt/volumes/k8s-infra:Z -v ${PASSWORD_STORE_DIR}:/opt/volumes/pass:Z -v ${HOME}/.gnupg:/opt/volumes/gnupg:Z -v ${HOME}/.ssh:/root/.ssh:Z -e ANSIBLE_PLAYBOOK_FILE=playbook/openstack_vm_create_aggregate.yml -e ANSIBLE_PLAYBOOK_PARAMETERS="-e vm_name=${VM_NAME} -e k8s_type=masters -e k8s_version=121 -e '{\"openstack\": {\"vm\": {\"network\": \"provider_net_shared\" , \"flavor\": \"ci.m5.large\", \"image\": \"CentOS-8-x86_64-GenericCloud-released-latest\" }}}' --tags create" localhost/k8s-infra-ansible
-
-VM_NAME=testcontainer-k121-centos8-test ; ansible-playbook playbook/openstack_vm_create_aggregate.yml -e vm_name=${VM_NAME}  -e k8s_type=masters -e k8s_version=121 -e '{"openstack": {"vm": {"network": "provider_net_shared" , "flavor": "ci.m5.large", "image": "CentOS-8-x86_64-GenericCloud-released-latest" }}}' --tags create
+$ VM_NAME=testcontainer-k121-centos8-test-04
+$ podman run --privileged -it --rm -v /home/ajc102/docs/redhat/forks-github/k8s-infra:/opt/volumes/k8s-infra:Z -v /home/ajc102/docs/redhat/forks-github/pass/:/opt/volumes/pass:Z -v ${HOME}/.gnupg:/opt/volumes/gnupg:Z -v $(dirname ${SSH_AUTH_SOCK}):/ssh-agent -e SSH_AUTH_SOCK="/ssh-agent" --env-file ${HOME}/.k8s-infra-container.properties -v ${HOME}/.ssh:/root/.ssh:Z  -e PASS_GPG_KEY_PASSPHRASE=${PASS_GPG_KEY_PASSPHRASE} -e CLOUD_PROVIDER=openstack -e ANSIBLE_ACTION=vm_create -e VM_NAME=${VM_NAME} -e VM_FLAVOR="ci.m5.large" -e VM_IMAGE="CentOS-8-x86_64-GenericCloud-released-latest" -e K8S_VERSION="121" localhost/k8s-infra-ansible
 ----
 
 Remove VM.
 
 [source, shell]
 ----
-$ VM_NAME=k121-centos8-container-test
-$ podman run --rm -v ${HOME}/docs/redhat/forks-github/k8s-infra:/opt/volumes/k8s-infra:Z -v ${PASSWORD_STORE_DIR}:/opt/volumes/pass:Z -v ${HOME}/.gnupg:/opt/volumes/gnupg:Z -v ${HOME}/.ssh:/root/.ssh:Z -e ANSIBLE_PLAYBOOK_FILE=playbook/openstack_vm_remove_aggregate.yml -e ANSIBLE_PLAYBOOK_PARAMETERS="-e vm_name=${VM_NAME}" localhost/k8s-infra-ansible
+$ VM_NAME=testcontainer-k121-centos8-test-04
+$ podman run --privileged -it --rm -v /home/ajc102/docs/redhat/forks-github/k8s-infra:/opt/volumes/k8s-infra:Z -v /home/ajc102/docs/redhat/forks-github/pass/:/opt/volumes/pass:Z -v ${HOME}/.gnupg:/opt/volumes/gnupg:Z -v $(dirname ${SSH_AUTH_SOCK}):/ssh-agent -e SSH_AUTH_SOCK="/ssh-agent" --env-file ${HOME}/.k8s-infra-container.properties -v ${HOME}/.ssh:/root/.ssh:Z  -e PASS_GPG_KEY_PASSPHRASE=${PASS_GPG_KEY_PASSPHRASE} -e CLOUD_PROVIDER=openstack -e ANSIBLE_ACTION=vm_remove -e VM_NAME=${VM_NAME} localhost/k8s-infra-ansible
 ----
 
 
@@ -202,3 +189,25 @@ removed '/opt/volumes/pass/x.gpg'
 [root@e0e2d962be41 pass]#
 ----
 
+References: 
+
+* https://unix.stackexchange.com/questions/656738/how-to-forward-gpg-agent-from-host-to-docker-container-and-reuse-cached-passphra
+
+=== SSH Key
+
+The container needs access to the `ssh-agent` on the host. To confirm if this access is available execute the following command.
+
+[source, shell]
+----
+ssh-add -l
+----
+
+Without permission a `Error connecting to agent: Permission denied` is returned. With access to the ssh-agent a list of ssh-keys is shown.
+
+To add an SSH key to the agent, so the passphrase is not requested as part of the process execution, execute the following command.
+
+[source, shell]
+----
+[root@9999999 ] exec ssh-agent $SHELL
+[root@9999999 ] ssh-add ~/.ssh/id_ed25519_github
+----

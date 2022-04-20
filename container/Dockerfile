@@ -10,7 +10,7 @@ RUN sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|
 RUN dnf check-update ; \
     dnf install -y gcc libffi-devel python3 epel-release ; \
     dnf install -y python3-pip ; \
-    dnf install -y wget openvpn git pass pinentry-curses ; \
+    dnf install -y jq wget openvpn git pass pinentry-curses ; \
     dnf clean all
 
 RUN pip3 install --upgrade pip; \

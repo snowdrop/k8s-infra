@@ -8,3 +8,4 @@ echo "${PASS_GPG_KEY_PASSPHRASE}" | /usr/libexec/gpg-preset-passphrase --verbose
 echo "Configuring GIT..."
 git config --global user.email "${GIT_EMAIL}"
 git config --global user.name "${GIT_USERNAME}"
+git config --global pull.rebase true
