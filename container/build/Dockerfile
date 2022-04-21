@@ -24,6 +24,6 @@ ENV GNUPGHOME=/opt/volumes/gnupg
 
 WORKDIR /opt
 
-COPY --chmod=755 contents/ansibleRun.sh contents/setEnv.sh /opt/
+COPY --chmod=755 entrypoint.sh /opt/
 
-ENTRYPOINT ["/opt/ansibleRun.sh"]
+ENTRYPOINT ["/opt/entrypoint.sh"]
