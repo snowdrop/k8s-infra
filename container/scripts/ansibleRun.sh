@@ -13,10 +13,8 @@ case $ANSIBLE_ACTION in
                   --arg vm_flavor "${VM_FLAVOR}" \
                   --arg vm_image "${VM_IMAGE}" \
                   --arg k8s_version "${K8S_VERSION}" \
-                  '{vm_name: $vm_name, k8s_type=masters, k8s_version: $k8s_version, openstack: {vm: {network: "provider_net_shared" , flavor: $vm_flavor, image: $vm_image }}}' );
-    ANSIBLE_PLAYBOOK_PARAMETERS="-e '";
-    ANSIBLE_PLAYBOOK_PARAMETERS+="'";
-    ANSIBLE_PLAYBOOK_TAGS+=" --tags create";;
+                  '{vm_name: $vm_name, k8s_type: "masters", k8s_version: $k8s_version, openstack: {vm: {network: "provider_net_shared" , flavor: $vm_flavor, image: $vm_image }}}' );
+    ANSIBLE_PLAYBOOK_PARAMETERS="-e '${ANSIBLE_PLAYBOOK_JSON_PARAMETERS}' --tags create";;
   vm_remove)
     ANSIBLE_PLAYBOOK_FILE=playbook/${CLOUD_PROVIDER}_${ANSIBLE_ACTION}_aggregate.yml;
     ANSIBLE_PLAYBOOK_JSON_PARAMETERS=$( jq -cn \
