@@ -4,10 +4,6 @@
 - name: "Validate passwordstore"
   import_playbook: "passstore_controller_check.yml"
   tags: [always]
-  
-- name: "Validate passwordstore"
-  import_playbook: "passstore_controller_check.yml"
-  tags: [always]
 
 - name: "Delete Server on Openstack"
   import_playbook: "openstack_vm_delete.yml"
