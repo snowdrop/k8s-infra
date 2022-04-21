@@ -6,9 +6,16 @@
 :icons: font
 :description: Container for running k8s-infra Ansible Playbooks
 
+== Description
+
+This container provides the functionality of the k8s-infra project with the simplicity of distributing all the tools inside the container itself.
+
+
 == Building the image
 
-Place the current folder in the `container` subfolder.
+The build of the container image is done using the https://buildah.io[buildah] project.
+
+First of all open the `container` subfolder.
 
 [source, shell]
 ----
@@ -22,6 +29,7 @@ Launch the `buildah` image build using the `Dockerfile` file.
 $ buildah build-using-dockerfile --tag k8s-infra-ansible
 ----
 
+The image is now build on the system.
 
 == Before using the container
 
@@ -34,7 +42,17 @@ Using the container requires some information to be provided. The following info
 
 In this section the information is included as environment variables but a properties file can be created and provided as the source.
 
-=== Getting the GPG Keygrip ID
+=== SSH Integration
+
+WARNING: It's TODO work integrating the container with the host's `ssh-agent`. It has been tried but doesn't always work. In the meantime the workaround is as describe din this section.
+
+The container integrates with the host's SSH configuration by mapping the `${HOME}/.ssh` folder. With this integration both the ssh keys and the SSH `config` file are shared. When both the `${HOME}/.ssh` folder and the `SSH_ID_KEY` variable are provided the container will add this key to it's own `ssh-agent`.
+
+WARNING: As a drawback of the current SSH integration, the container will have it's own SSH agent which means that the GihHub SSH key used to access the git repositories must be added at container start. Moreover, if the SSH key has a passphrase this passphrase must be inserted on container prompt.
+
+=== GNUPG Integration
+
+The container integrates with the GNUPG of the host. This is done by sharing the `${HOME}/.gnupg` folder with the containe using a volume. For this integration to work it uses the _GPG Keygrip ID_ instead of the _GPG Key ID_.
 
 First step before running the container is to identify the *Keygrip* ID of our own GPG key.
 
@@ -65,68 +83,124 @@ $ PASS_GPG_KEY_PASSPHRASE=mysupersecretandstrongpassphrase
 
 Set the following variables for GIT.
 
-* `GIT_EMAIL`
-* `GIT_USERNAME`
+* `GIT_EMAIL`: Email address that the commits will be associated with;
+* `GIT_USERNAME`: git user name;
+* `SSH_ID_KEY`: SSH key file name to be added to the ssh agent;
 
-=== Creating a properties file
+=== Wrapping the information on a properties file
 
 The required information can be provided by using a properties file instead of independent environment variables.
 
-Create the properties file, in this document the file will be `${HOME}/.k8s-infra-container.properties`.
+Create the properties file, in this document the file will be `${HOME}/.k8s-infra-container.env`.
 
 [source, shell]
 ----
-$ cat << EOF > ${HOME}/.k8s-infra-container.properties
+$ cat << EOF > ${HOME}/.k8s-infra-container.env
 GIT_EMAIL=johndoe@redhat.com
 GIT_USERNAME=johndoe
 PASS_GPG_KEYGRIP_NAME=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+SSH_ID_KEY=my_id_github
 EOF
 ----
 
 CAUTION: Adding the gpg passphrase to the file might not be such a good idea.
 
-CAUTION: Don't forget to change the file permissions to `U:R` only `chmod 600 ${HOME}/.k8s-infra-container.properties`.
+CAUTION: Don't forget to change the file permissions to `U:R` only `chmod 600 ${HOME}/.k8s-infra-container.env`.
 
-== Running tasks inside the container
+== Generic considerations using container
 
-Connect to the container.
+Using the container requires the following volumes/information to be provided:
 
-[source, shell]
-----
-$ podman run --privileged -it --rm -v /home/ajc102/docs/redhat/forks-github/k8s-infra:/opt/volumes/k8s-infra:Z -v /home/ajc102/docs/redhat/forks-github/pass/:/opt/volumes/pass:Z -v ${HOME}/.gnupg:/opt/volumes/gnupg:Z -v $(dirname ${SSH_AUTH_SOCK}):/ssh-agent -e SSH_AUTH_SOCK="/ssh-agent" --env-file ${HOME}/.k8s-infra-container.properties -v ${HOME}/.ssh:/root/.ssh:Z  -e PASS_GPG_KEY_PASSPHRASE=${PASS_GPG_KEY_PASSPHRASE} --entrypoint /bin/bash localhost/k8s-infra-ansible
-----
+* Access to the host `.gnupg` folder:
+** e.g.: `-v ${HOME}/.gnupg:/opt/volumes/gnupg:Z`
+* Variables
+** `PASS_GPG_KEYGRIP_NAME`
+** `PASS_GPG_KEY_PASSPHRASE`
+** `GIT_EMAIL`: Email address that the commits will be associated with;
+** `GIT_USERNAME`: git user name;
 
+The following are optional volumes:
 
-Execute the requested playbook.
+* k8s-infra repository using a host folder:
+** using: `-v /path-to-k8s-infra-folder//k8s-infra:/opt/volumes/k8s-infra:Z`
+** otherwise the repository will be pulled from 
+* pass repository using a host folder:
+** e.g.: `-v /path-to-k8s-infra-folder//pass/:/opt/volumes/pass:Z`
+* Variables
+** `SSH_ID_KEY`: otherwise no ssh key will be defined;
 
-[source, shell]
-----
-[root@9999999 ansible] VM_NAME=testcontainer-k121-centos8-test-04
-[root@9999999 ansible] ansible-playbook playbook/openstack_vm_create_aggregate.yml -e vm_name=${VM_NAME}  -e k8s_type=masters -e k8s_version=121 -e '{"openstack": {"vm": {"network": "provider_net_shared" , "flavor": "ci.m5.large", "image": "CentOS-8-x86_64-GenericCloud-released-latest" }}}' --tags create
-----
+== Using the Ansible Actions
 
+The container includes the following actions:
 
-== Using the container
+* `create_vm`: to create a new VM;
+* `remove_vm`: to remove an existing VM;
+* `k8s_install`: to deploy a k8s instance on a host;
 
-The container includes 
+Sample environment files are included in the `samples` subfolder. They can be used when calling the `podman run` command with the `--env-file` option and have values overriden with the `-e` option.
 
+=== Create a VM
 
-Create a VM.
+Required parameters:
+
+.Required parameters for creating a VM
+[cols="1,1m,3",options="header"]
+|===
+|Variable name
+|Value(s)
+|Description
+
+|CLOUD_PROVIDER
+|[hetzner,openstack]
+|Cloud provider to be used
+
+|ANSIBLE_ACTION
+|vm_create
+|
+
+|VM_NAME
+|vm_create
+|
+
+|VM_FLAVOR
+|vm_create
+|
+
+|VM_IMAGE
+|vm_create
+|
+
+|K8S_VERSION
+|[121]
+|k8s version to be installed
+
+|===
 
 [source, shell]
 ----
 $ VM_NAME=testcontainer-k121-centos8-test-04
-$ podman run --privileged -it --rm -v /home/ajc102/docs/redhat/forks-github/k8s-infra:/opt/volumes/k8s-infra:Z -v /home/ajc102/docs/redhat/forks-github/pass/:/opt/volumes/pass:Z -v ${HOME}/.gnupg:/opt/volumes/gnupg:Z -v $(dirname ${SSH_AUTH_SOCK}):/ssh-agent -e SSH_AUTH_SOCK="/ssh-agent" --env-file ${HOME}/.k8s-infra-container.properties -v ${HOME}/.ssh:/root/.ssh:Z  -e PASS_GPG_KEY_PASSPHRASE=${PASS_GPG_KEY_PASSPHRASE} -e CLOUD_PROVIDER=openstack -e ANSIBLE_ACTION=vm_create -e VM_NAME=${VM_NAME} -e VM_FLAVOR="ci.m5.large" -e VM_IMAGE="CentOS-8-x86_64-GenericCloud-released-latest" -e K8S_VERSION="121" localhost/k8s-infra-ansible
+$ podman run --privileged -it --rm -v /path-to-k8s-infra-folder//k8s-infra:/opt/volumes/k8s-infra:Z -v /path-to-k8s-infra-folder//pass/:/opt/volumes/pass:Z -v ${HOME}/.gnupg:/opt/volumes/gnupg:Z -v $(dirname ${SSH_AUTH_SOCK}):/ssh-agent -e SSH_AUTH_SOCK="/ssh-agent" --env-file ${HOME}/.k8s-infra-container.env -v ${HOME}/.ssh:/root/.ssh:Z  -e PASS_GPG_KEY_PASSPHRASE=${PASS_GPG_KEY_PASSPHRASE} --env-file ./container/samples/vm_create.env -e CLOUD_PROVIDER=openstack -e ANSIBLE_ACTION=vm_create -e VM_NAME=${VM_NAME} -e VM_FLAVOR="ci.m5.large" -e VM_IMAGE="CentOS-8-x86_64-GenericCloud-released-latest" -e K8S_VERSION="121" localhost/k8s-infra-ansible
 ----
 
-Remove VM.
+=== Remove a VM
 
 [source, shell]
 ----
 $ VM_NAME=testcontainer-k121-centos8-test-04
-$ podman run --privileged -it --rm -v /home/ajc102/docs/redhat/forks-github/k8s-infra:/opt/volumes/k8s-infra:Z -v /home/ajc102/docs/redhat/forks-github/pass/:/opt/volumes/pass:Z -v ${HOME}/.gnupg:/opt/volumes/gnupg:Z -v $(dirname ${SSH_AUTH_SOCK}):/ssh-agent -e SSH_AUTH_SOCK="/ssh-agent" --env-file ${HOME}/.k8s-infra-container.properties -v ${HOME}/.ssh:/root/.ssh:Z  -e PASS_GPG_KEY_PASSPHRASE=${PASS_GPG_KEY_PASSPHRASE} -e CLOUD_PROVIDER=openstack -e ANSIBLE_ACTION=vm_remove -e VM_NAME=${VM_NAME} localhost/k8s-infra-ansible
+$ podman run --privileged -it --rm -v /path-to-k8s-infra-folder/k8s-infra:/opt/volumes/k8s-infra:Z -v /path-to-pass-folder/pass/:/opt/volumes/pass:Z -v ${HOME}/.gnupg:/opt/volumes/gnupg:Z -v $(dirname ${SSH_AUTH_SOCK}):/ssh-agent:Z -e SSH_AUTH_SOCK="/ssh-agent" --env-file ${HOME}/.k8s-infra-container.env -v ${HOME}/.ssh:/root/.ssh:Z  -e PASS_GPG_KEY_PASSPHRASE=${PASS_GPG_KEY_PASSPHRASE} --env-file ./container/samples/vm_create.env -e VM_NAME=${VM_NAME} localhost/k8s-infra-ansible
 ----
 
+== Using the container manyally
+
+The container can also be used manually. For this pass the `--entrypoint /bin/bash` variable to the `podman run` command so the `entrypoint.sh` script is not automatically called. If the required varialbes are used the `entrypoint.sh` can be executed manually without changing the container and the result should be similar to running the pod directly from podman.
+
+.Example of running the container manually
+[source, shell]
+----
+$ podman run --privileged -it --rm -v ${HOME}/.ssh:/root/.ssh:Z -v ${HOME}/.gnupg:/opt/volumes/gnupg:Z --env-file ${HOME}/.k8s-infra-container.env -e PASS_GPG_KEY_PASSPHRASE=${PASS_GPG_KEY_PASSPHRASE} --entrypoint /bin/bash localhost/k8s-infra-ansible
+----
+
+Once inside the k8s-infra project can be used as desired.
 
 == Troubleshooting
 
@@ -195,7 +269,15 @@ References:
 
 === SSH Key
 
-The container needs access to the `ssh-agent` on the host. To confirm if this access is available execute the following command.
+==== Notes for future integration with the ssh-agent
+
+* SSH agent socket link:
+** e.g.: ` -v $(dirname ${SSH_AUTH_SOCK}):/ssh-agent -e SSH_AUTH_SOCK="/ssh-agent"`
+
+
+The container needs access to the `ssh-agent` on the host. 
+
+To confirm if this access is available execute the following command inside the container.
 
 [source, shell]
 ----
@@ -204,7 +286,14 @@ ssh-add -l
 
 Without permission a `Error connecting to agent: Permission denied` is returned. With access to the ssh-agent a list of ssh-keys is shown.
 
-To add an SSH key to the agent, so the passphrase is not requested as part of the process execution, execute the following command.
+To start a fresh `ssh-agent` instance perform the following steps.
+
+[source, shell]
+----
+eval "$(ssh-agent -s)"
+----
+
+To start a new `ssh-agent`, so the passphrase is not requested as part of the process execution, execute the following command.
 
 [source, shell]
 ----
