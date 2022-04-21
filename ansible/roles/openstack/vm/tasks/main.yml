@@ -1,4 +1,9 @@
 ---
+- name: "Print required information"
+  debug: 
+    msg:
+      - "vm_name: {{ vm_name }}"
+
 - include_tasks: vm_create.yml
   when: "state == 'present'"
 
