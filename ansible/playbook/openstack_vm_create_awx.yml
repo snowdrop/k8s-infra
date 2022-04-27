@@ -1,0 +1,21 @@
+---
+# Variables:
+#  - "vm_name": "n311-test"
+#  - "openstack": {
+#      "vm": {
+#        "network": "provider_net_shared"
+#      }
+#    }}
+#  . k8s_type: Kubernetes host type [masters,nodes], empty for no k8s installation
+#  . k8s_version: Kubernetes version [117 ... 121], empty for no k8s installation
+
+- name: "Create Server on Openstack"
+  import_playbook: "openstack_vm_create.yml"
+
+- name: "Secure new server"
+  import_playbook: "sec_host.yml"
+  vars:
+    provider: "openstack"
+    hosts: "{{ vm_name }}"
+    vm_name: "{{ vm_name }}"
+...

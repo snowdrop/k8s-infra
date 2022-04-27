@@ -1,0 +1,84 @@
+= AWX
+
+References: https://github.com/ansible/awx-operator
+
+== Installation
+
+From the root directory of the `k8s-infra` project move into the `awx` folder. 
+
+[source,bash]
+----
+[k8s-infra] $ cd awx
+[awx] $
+----
+
+
+Run the following command to create the resources.
+
+[source,bash]
+----
+$ kustomize build . | kubectl apply -f -
+----
+
+The result should be something like.
+
+[source]
+----
+namespace/awx created
+customresourcedefinition.apiextensions.k8s.io/awxbackups.awx.ansible.com created
+customresourcedefinition.apiextensions.k8s.io/awxrestores.awx.ansible.com created
+customresourcedefinition.apiextensions.k8s.io/awxs.awx.ansible.com created
+serviceaccount/awx-operator-controller-manager created
+role.rbac.authorization.k8s.io/awx-operator-awx-manager-role created
+role.rbac.authorization.k8s.io/awx-operator-leader-election-role created
+clusterrole.rbac.authorization.k8s.io/awx-operator-metrics-reader created
+clusterrole.rbac.authorization.k8s.io/awx-operator-proxy-role created
+rolebinding.rbac.authorization.k8s.io/awx-operator-awx-manager-rolebinding created
+rolebinding.rbac.authorization.k8s.io/awx-operator-leader-election-rolebinding created
+clusterrolebinding.rbac.authorization.k8s.io/awx-operator-proxy-rolebinding created
+configmap/awx-operator-awx-manager-config created
+service/awx-operator-controller-manager-metrics-service created
+deployment.apps/awx-operator-controller-manager created
+----
+
+Get information on the created resources.
+
+[source,bash]
+----
+$ kubectl -n awx get pods 
+
+NAME                                               READY   STATUS    RESTARTS   AGE
+awx-operator-controller-manager-7758c4f45c-zc262   2/2     Running   0          13s
+----
+
+Set the current namespace to `awx`.
+
+[source,bash]
+----
+$ kubectl config set-context --current --namespace=awx
+----
+
+
+== Uninstall
+
+[source,bash]
+----
+$ kustomize build . | kubectl delete -f -
+
+namespace "awx" deleted
+customresourcedefinition.apiextensions.k8s.io "awxbackups.awx.ansible.com" deleted
+customresourcedefinition.apiextensions.k8s.io "awxrestores.awx.ansible.com" deleted
+customresourcedefinition.apiextensions.k8s.io "awxs.awx.ansible.com" deleted
+serviceaccount "awx-operator-controller-manager" deleted
+role.rbac.authorization.k8s.io "awx-operator-awx-manager-role" deleted
+role.rbac.authorization.k8s.io "awx-operator-leader-election-role" deleted
+clusterrole.rbac.authorization.k8s.io "awx-operator-metrics-reader" deleted
+clusterrole.rbac.authorization.k8s.io "awx-operator-proxy-role" deleted
+rolebinding.rbac.authorization.k8s.io "awx-operator-awx-manager-rolebinding" deleted
+rolebinding.rbac.authorization.k8s.io "awx-operator-leader-election-rolebinding" deleted
+clusterrolebinding.rbac.authorization.k8s.io "awx-operator-proxy-rolebinding" deleted
+configmap "awx-operator-awx-manager-config" deleted
+service "awx-operator-controller-manager-metrics-service" deleted
+deployment.apps "awx-operator-controller-manager" deleted
+----
+

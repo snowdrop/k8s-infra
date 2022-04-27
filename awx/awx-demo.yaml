@@ -1,0 +1,15 @@
+---
+apiVersion: awx.ansible.com/v1beta1
+kind: AWX
+metadata:
+  name: awx-demo
+spec:
+  # image_version: latest
+  # image_version: "20.1.0"
+  # image_pull_policy: IfNotPresent
+  service_type: nodeport
+  nodeport_port: 30080
+  # service_type: LoadBalancer
+  # loadbalancer_protocol: https
+  # loadbalancer_port: 443
+  # postgres_image_version: "12.6"
