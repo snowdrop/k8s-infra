@@ -19,7 +19,7 @@
 
 - name: "Openstack VM create"
   hosts: localhost
-  gather_facts: no
+  gather_facts: True
 
   pre_tasks:
     - name: "Print variables"
