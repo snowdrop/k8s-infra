@@ -18,7 +18,6 @@ This enables consistent and repeatable cluster deployments across a wide variety
 
 ## Instructions
 
-
 Execute next the following instructions which have been created from the [Quick Start](https://cluster-api.sigs.k8s.io/user/quick-start.html#install-clusterctl)
 ```bash
 kind delete cluster
