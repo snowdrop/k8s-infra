@@ -24,7 +24,9 @@
   pre_tasks:
     - name: "Print variables"
       debug:
-        msg: "hostvars[inventory_hostname]: {{ hostvars[inventory_hostname] }}"
+        msg: "{{ item }}"
+          - "hostvars[inventory_hostname]: {{ hostvars[inventory_hostname] }}"
+          - "ansible_env: {{ ansible_env }}"
 
   tasks:
     # - name: "Set facts"
