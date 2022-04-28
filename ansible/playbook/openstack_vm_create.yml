@@ -13,9 +13,9 @@
 #        "volumes" : ["test-volume"]
 #      }
 #    }}
-- name: "Validate passwordstore"
-  import_playbook: "passstore_controller_check.yml"
-  when: "passwordstore_enabled is not defined or (passwordstore_enabled | bool == true)"
+# - name: "Validate passwordstore"
+#   import_playbook: "passstore_controller_check.yml"
+#   when: "passwordstore_enabled is not defined or (passwordstore_enabled | bool == true)"
 
 - name: "Openstack VM create"
   hosts: localhost
