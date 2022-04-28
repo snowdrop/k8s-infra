@@ -39,7 +39,6 @@
         - "hostvars[inventory_hostname]: {{ hostvars[inventory_hostname] }}"
         - "ansible_env: {{ ansible_env }}"
         - "config_file: {{ config_file }}"
-        - "include_vars: {{ include_vars }}"
 
   tasks:
     # - name: "Set facts"
