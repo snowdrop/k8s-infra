@@ -28,12 +28,12 @@
 - name: "Remove existing SSH key to use with instance {{ vm_name }}"
   os_keypair:
     auth:
-      project_name: "{{ openstack.os_project_name }}"
-      username: "{{ openstack_console_user }}"
-      password: "{{ openstack_console_password }}"
-      user_domain_name: "{{ openstack_os_domain }}"
-      project_domain_name: "{{ openstack_os_domain }}"
-      auth_url: "{{ openstack_os_auth_url }}"
+      project_name: "{{ openstack_auth.openstack_project_name }}"
+      username: "{{ openstack_auth.openstack_console_user }}"
+      password: "{{ openstack_auth.openstack_console_password }}"
+      user_domain_name: "{{ openstack_auth.openstack_user_domain }}"
+      project_domain_name: "{{ openstack_auth.openstack_project_domain }}"
+      auth_url: "{{ openstack_auth.openstack_os_auth_url }}"
     name: "{{ vm_name }}"
     state: absent
   ignore_errors: true
@@ -41,12 +41,12 @@
 - name: "Create SSH key to use with instance {{ vm_name }}"
   os_keypair:
     auth:
-      project_name: "{{ openstack.os_project_name }}"
-      username: "{{ openstack_console_user }}"
-      password: "{{ openstack_console_password }}"
-      user_domain_name: "{{ openstack_os_domain }}"
-      project_domain_name: "{{ openstack_os_domain }}"
-      auth_url: "{{ openstack_os_auth_url }}"
+      project_name: "{{ openstack_auth.openstack_project_name }}"
+      username: "{{ openstack_auth.openstack_console_user }}"
+      password: "{{ openstack_auth.openstack_console_password }}"
+      user_domain_name: "{{ openstack_auth.openstack_user_domain }}"
+      project_domain_name: "{{ openstack_auth.openstack_project_domain }}"
+      auth_url: "{{ openstack_auth.openstack_os_auth_url }}"
     name: "{{ vm_name }}"
     public_key_file: "{{ key_path }}.pub"
     state: present
