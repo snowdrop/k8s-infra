@@ -25,9 +25,9 @@
     - name: "Print variables"
       debug:
         msg: "{{ item }}"
-        with_items: 
-          - "hostvars[inventory_hostname]: {{ hostvars[inventory_hostname] }}"
-          - "ansible_env: {{ ansible_env }}"
+      with_items: 
+        - "hostvars[inventory_hostname]: {{ hostvars[inventory_hostname] }}"
+        - "ansible_env: {{ ansible_env }}"
 
   tasks:
     # - name: "Set facts"
