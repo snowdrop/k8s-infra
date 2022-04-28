@@ -16,14 +16,14 @@
     rsa_key: "{{lookup('file', key_path) }}"
     rsa_key_pub: "{{lookup('file', key_path + '.pub') }}"
 
-- name: OpenStack params
-  debug:
-    verbosity: 2
-    msg:
-      - project_name: "{{ openstack.os_project_name }}"
-      - username: "{{ openstack_console_user }}"
-      - password: "{{ openstack_console_password }}"
-      - auth_url: "{{ openstack_os_auth_url }}"
+# - name: OpenStack params
+#   debug:
+#     verbosity: 2
+#     msg:
+#       - project_name: "{{ openstack.os_project_name }}"
+#       - username: "{{ openstack_console_user }}"
+#       - password: "{{ openstack_console_password }}"
+#       - auth_url: "{{ openstack_os_auth_url }}"
 
 - name: "Remove existing SSH key to use with instance {{ vm_name }}"
   os_keypair:
