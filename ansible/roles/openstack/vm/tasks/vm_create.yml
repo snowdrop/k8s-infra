@@ -85,9 +85,13 @@
     debug:
       var: openstack_output
 
+  - name: "Store host IP on passwordstore"
+    set_fact:
+      openstack_vm_ipv4: "{{ openstack_output.server.accessIPv4 }}"
+
   - name: "Show IP addresses"
     debug:
-      msg: "VM IP : {{ openstack_vm_ipv4 }}"
+      msg: "VM IP : {{ openstack_output['accessIPv4'] }}"
 
   # - name: "Store host IP on passwordstore"
   #   set_fact:

@@ -32,22 +32,22 @@
       include_vars: "{{ config_file }}"
       when: st.stat.exists and st.stat.isreg
 
-    - name: "Load config file contents"
-      shell: "cat {{ config_file }}"
-      register: cat_res
-      when: st.stat.exists and st.stat.isreg
+    # - name: "Print config file contents"
+    #   shell: "cat {{ config_file }}"
+    #   register: cat_res
+    #   when: st.stat.exists and st.stat.isreg
 
-    - name: "Print variables"
-      debug:
-        msg: "{{ item }}"
-      with_items: 
-        - "hostvars[inventory_hostname]: {{ hostvars[inventory_hostname] }}"
-        - "ansible_env: {{ ansible_env }}"
-        - "config_file: {{ config_file }}"
-        - "cat_res: {{ cat_res }}"
+    # - name: "Print variables"
+    #   debug:
+    #     msg: "{{ item }}"
+    #   with_items: 
+    #     - "hostvars[inventory_hostname]: {{ hostvars[inventory_hostname] }}"
+    #     - "ansible_env: {{ ansible_env }}"
+    #     - "config_file: {{ config_file }}"
+    #     - "cat_res: {{ cat_res }}"
 
   tasks:
-    - name: "Set facts"
+    - name: "Set openstack_auth facts"
       set_fact:
         openstack_auth: 
           openstack_project_name: "{{ clouds.devstack.auth.project_name }}"

@@ -17,13 +17,13 @@
     path: "{{ key_path }}"
   register: st
 
-- name: "Set pass facts from passwordstore"
-  set_fact:
-    openstack_console_user:     "{{ query('passwordstore', 'openstack/host/console_user' )[0] }}"
-    openstack_console_password: "{{ query('passwordstore', 'openstack/host/console_pw ')[0] }}"
-    openstack_os_domain:        "{{ query('passwordstore', 'openstack/host/console_domain ')[0] }}"
-    openstack_os_auth_url: "{{ query('passwordstore', 'openstack/host/os_auth_url')[0] }}"
-    openstack_security_group: "{{ query('passwordstore', 'openstack/host/security_group')[0] }}"
+# - name: "Set pass facts from passwordstore"
+#   set_fact:
+#     openstack_console_user:     "{{ query('passwordstore', 'openstack/host/console_user' )[0] }}"
+#     openstack_console_password: "{{ query('passwordstore', 'openstack/host/console_pw ')[0] }}"
+#     openstack_os_domain:        "{{ query('passwordstore', 'openstack/host/console_domain ')[0] }}"
+#     openstack_os_auth_url: "{{ query('passwordstore', 'openstack/host/os_auth_url')[0] }}"
+#     openstack_security_group: "{{ query('passwordstore', 'openstack/host/security_group')[0] }}"
 
 - name: "Gather information about a previously created VM"
   openstack.cloud.server_info:
@@ -82,20 +82,20 @@
     name: "{{ vm_name }}"
   ignore_errors: true
 
-- name: "Remove the host from the known_hosts file"
-  known_hosts:
-    name: "{{ openstack_vm_ipv4 }}"
-    state: absent
-  when: openstack_vm_ipv4 is defined
-  ignore_errors: true
+# - name: "Remove the host from the known_hosts file"
+#   known_hosts:
+#     name: "{{ openstack_vm_ipv4 }}"
+#     state: absent
+#   when: openstack_vm_ipv4 is defined
+#   ignore_errors: true
 
-- name: "Remove existing SSH key to use with instance"
-  file:
-    state: absent
-    path: "{{ item }}"
-  loop:
-    - "{{ key_path }}"
-    - "{{ key_path }}.pub"
-  ignore_errors: true
+# - name: "Remove existing SSH key to use with instance"
+#   file:
+#     state: absent
+#     path: "{{ item }}"
+#   loop:
+#     - "{{ key_path }}"
+#     - "{{ key_path }}.pub"
+#   ignore_errors: true
 
 ...
