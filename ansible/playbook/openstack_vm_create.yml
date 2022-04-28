@@ -64,6 +64,12 @@
             - always
       vars: 
         state: "present"
+        openstack_auth.openstack_project_name:  clouds.devstack.auth.project_name
+        openstack_auth.openstack_console_user:  clouds.devstack.auth.username
+        openstack_auth.openstack_console_password:  clouds.devstack.auth.password
+        openstack_auth.openstack_user_domain:  clouds.devstack.auth.domain_name
+        openstack_auth.openstack_project_domain:  clouds.devstack.auth.project_domain_name
+        openstack_auth.openstack_os_auth_url:  clouds.devstack.auth.auth_url
 
   post_tasks:
     - name: Refresh the inventory so the newly added host is available
