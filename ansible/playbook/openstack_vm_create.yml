@@ -24,6 +24,14 @@
     config_file: "{{ lookup('env', 'OS_CLIENT_CONFIG_FILE') }}"
 
   pre_tasks:
+    - name: "Confirm the Config File exists"
+      stat: path="{{ config_file }}"
+      register: st
+
+    - name: "Load config file contents"
+      include_vars: "{{ config_file }}"
+      when: st.stat.exists and st.stat.isreg
+
     - name: "Print variables"
       debug:
         msg: "{{ item }}"
@@ -31,6 +39,7 @@
         - "hostvars[inventory_hostname]: {{ hostvars[inventory_hostname] }}"
         - "ansible_env: {{ ansible_env }}"
         - "config_file: {{ config_file }}"
+        - "include_vars: {{ include_vars }}"
 
   tasks:
     # - name: "Set facts"
