@@ -51,7 +51,7 @@
       set_fact:
         openstack_auth: "{{ openstack_auth | default({}) | combine ({ item.key : item.value }) }}"
       with_items:
-        - {'key': 'openstack_project_name', 'value': clouds.devstack.auth.project_name }
+        - {'key': 'openstack_project_name', 'value': {{ clouds.devstack.auth.project_name}} }
         - {'key': 'openstack_console_user', 'value': clouds.devstack.auth.username}
         - {'key': 'openstack_console_password', 'value': clouds.devstack.auth.password}
         - {'key': 'openstack_user_domain', 'value': clouds.devstack.auth.domain_name}
