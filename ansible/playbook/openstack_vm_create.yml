@@ -47,7 +47,7 @@
         - "cat_res: {{ cat_res }}"
 
   tasks:
-    - name: "Set facts"
+    - name: "Collect openstack_auth information"
       set_fact:
         openstack_auth: "{{ openstack_auth | default({}) | combine ({ item.key : item.value }) }}"
       with_items:
