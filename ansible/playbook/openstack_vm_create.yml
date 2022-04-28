@@ -49,7 +49,7 @@
   tasks:
     - name: "Set facts"
       set_fact:
-        openstack_auth: "{{ clouds_data | default({}) | combine ({ item.key : item.value }) }}"
+        openstack_auth: "{{ openstack_auth | default({}) | combine ({ item.key : item.value }) }}"
       with_items:
         - {'key': 'openstack_project_name', 'value': clouds.devstack.auth.project_name }
         - {'key': 'openstack_console_user', 'value': clouds.devstack.auth.username}
