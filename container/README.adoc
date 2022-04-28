@@ -15,11 +15,11 @@ This container provides the functionality of the k8s-infra project with the simp
 
 The build of the container image is done using the https://buildah.io[buildah] project.
 
-First of all open the `container` subfolder.
+First of all open the `container/build` subfolder.
 
 [source, shell]
 ----
-$ cd container
+$ cd container/build
 ----
 
 Launch the `buildah` image build using the `Dockerfile` file.

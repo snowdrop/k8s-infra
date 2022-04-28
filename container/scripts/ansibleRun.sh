@@ -22,7 +22,9 @@ case $ANSIBLE_ACTION in
                   '{vm_name: $vm_name}' );
     ANSIBLE_PLAYBOOK_PARAMETERS="-e '${ANSIBLE_PLAYBOOK_JSON_PARAMETERS}'";;
   k8s_install)
-    echo "K8S_INSTALL!!!";;
+    echo "K8S_INSTALL!!!";
+    ANSIBLE_PLAYBOOK_FILE=playbook/k8s-install.yml;
+    ANSIBLE_PLAYBOOK_PARAMETERS=" --limit ${VM_NAME} --tags docker";;
   *) 
     echo "The select ${ANSIBLE_ACTION} action is not available.";
     echo "Allowed actions are:";

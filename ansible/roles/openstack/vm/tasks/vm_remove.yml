@@ -28,12 +28,12 @@
 - name: "Gather information about a previously created VM"
   openstack.cloud.server_info:
     auth:
-      project_name: "{{ openstack.os_project_name }}"
-      username: "{{ openstack_console_user }}"
-      password: "{{ openstack_console_password }}"
-      user_domain_name: "{{ openstack_os_domain }}"
-      project_domain_name: "{{ openstack_os_domain }}"
-      auth_url: "{{ openstack_os_auth_url }}"
+      project_name: "{{ openstack_auth.openstack_project_name }}"
+      username: "{{ openstack_auth.openstack_console_user }}"
+      password: "{{ openstack_auth.openstack_console_password }}"
+      user_domain_name: "{{ openstack_auth.openstack_user_domain }}"
+      project_domain_name: "{{ openstack_auth.openstack_project_domain }}"
+      auth_url: "{{ openstack_auth.openstack_os_auth_url }}"
     filters:
       name: "{{ vm_name }}"
   register: server_info_result
@@ -44,41 +44,41 @@
 
 - name: "Delete {{ vm_name }}"
   os_server:
-    state: "absent"
     auth:
-      project_name: "{{ openstack.os_project_name }}"
-      username: "{{ openstack_console_user }}"
-      password: "{{ openstack_console_password }}"
-      user_domain_name: "{{ openstack_os_domain }}"
-      project_domain_name: "{{ openstack_os_domain }}"
-      auth_url: "{{ openstack_os_auth_url }}"
+      project_name: "{{ openstack_auth.openstack_project_name }}"
+      username: "{{ openstack_auth.openstack_console_user }}"
+      password: "{{ openstack_auth.openstack_console_password }}"
+      user_domain_name: "{{ openstack_auth.openstack_user_domain }}"
+      project_domain_name: "{{ openstack_auth.openstack_project_domain }}"
+      auth_url: "{{ openstack_auth.openstack_os_auth_url }}"
     name: "{{ vm_name }}"
+    state: "absent"
   register: openstack_output
   ignore_errors: true
 
 - name: "Delete VM volume"
   openstack.cloud.volume:
     auth:
-      project_name: "{{ openstack.os_project_name }}"
-      username: "{{ openstack_console_user }}"
-      password: "{{ openstack_console_password }}"
-      user_domain_name: "{{ openstack_os_domain }}"
-      project_domain_name: "{{ openstack_os_domain }}"
-      auth_url: "{{ openstack_os_auth_url }}"
-    state: absent
+      project_name: "{{ openstack_auth.openstack_project_name }}"
+      username: "{{ openstack_auth.openstack_console_user }}"
+      password: "{{ openstack_auth.openstack_console_password }}"
+      user_domain_name: "{{ openstack_auth.openstack_user_domain }}"
+      project_domain_name: "{{ openstack_auth.openstack_project_domain }}"
+      auth_url: "{{ openstack_auth.openstack_os_auth_url }}"
     display_name: "{{ volume_name }}"
+    state: absent
   ignore_errors: true
 
 - name: "Delete key {{ vm_name }} from server"
   os_keypair:
     state: absent
     auth:
-      project_name: "{{ openstack.os_project_name }}"
-      username: "{{ openstack_console_user }}"
-      password: "{{ openstack_console_password }}"
-      user_domain_name: "{{ openstack_os_domain }}"
-      project_domain_name: "{{ openstack_os_domain }}"
-      auth_url: "{{ openstack_os_auth_url }}"
+      project_name: "{{ openstack_auth.openstack_project_name }}"
+      username: "{{ openstack_auth.openstack_console_user }}"
+      password: "{{ openstack_auth.openstack_console_password }}"
+      user_domain_name: "{{ openstack_auth.openstack_user_domain }}"
+      project_domain_name: "{{ openstack_auth.openstack_project_domain }}"
+      auth_url: "{{ openstack_auth.openstack_os_auth_url }}"
     name: "{{ vm_name }}"
   ignore_errors: true
 

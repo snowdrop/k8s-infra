@@ -28,6 +28,12 @@
   file: path=/etc/docker state=directory
   become: yes
 
+- name: "Add the connection user to the docker group"
+  ansible.builtin.user:
+    name: "{{ ansible_user_id }}"
+    groups: docker
+  become: yes
+
 - name: "Start docker"
   systemd:
     state: restarted

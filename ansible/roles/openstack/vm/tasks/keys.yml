@@ -27,7 +27,6 @@
 
 - name: "Remove existing SSH key to use with instance {{ vm_name }}"
   os_keypair:
-    state: absent
     auth:
       project_name: "{{ openstack.os_project_name }}"
       username: "{{ openstack_console_user }}"
@@ -36,11 +35,11 @@
       project_domain_name: "{{ openstack_os_domain }}"
       auth_url: "{{ openstack_os_auth_url }}"
     name: "{{ vm_name }}"
+    state: absent
   ignore_errors: true
 
 - name: "Create SSH key to use with instance {{ vm_name }}"
   os_keypair:
-    state: present
     auth:
       project_name: "{{ openstack.os_project_name }}"
       username: "{{ openstack_console_user }}"
@@ -50,6 +49,7 @@
       auth_url: "{{ openstack_os_auth_url }}"
     name: "{{ vm_name }}"
     public_key_file: "{{ key_path }}.pub"
+    state: present
   ignore_errors: true
 
 ...
