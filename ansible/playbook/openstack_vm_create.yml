@@ -32,6 +32,11 @@
       include_vars: "{{ config_file }}"
       when: st.stat.exists and st.stat.isreg
 
+    - name: "Load config file contents"
+      shell: "cat {{ config_file }}"
+      register: cat_res
+      when: st.stat.exists and st.stat.isreg
+
     - name: "Print variables"
       debug:
         msg: "{{ item }}"
@@ -39,6 +44,7 @@
         - "hostvars[inventory_hostname]: {{ hostvars[inventory_hostname] }}"
         - "ansible_env: {{ ansible_env }}"
         - "config_file: {{ config_file }}"
+        - "cat_res: {{ cat_res }}"
 
   tasks:
     # - name: "Set facts"
