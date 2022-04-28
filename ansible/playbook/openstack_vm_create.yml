@@ -28,6 +28,7 @@
       with_items: 
         - "hostvars[inventory_hostname]: {{ hostvars[inventory_hostname] }}"
         - "ansible_env: {{ ansible_env }}"
+        - "env: {{ env }}"
 
   tasks:
     # - name: "Set facts"
