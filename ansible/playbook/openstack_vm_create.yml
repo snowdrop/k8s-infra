@@ -49,12 +49,14 @@
   tasks:
     - name: "Set facts"
       set_fact:
-        openstack_auth.openstack_project_name:  clouds.devstack.auth.project_name
-        openstack_auth.openstack_console_user:  clouds.devstack.auth.username
-        openstack_auth.openstack_console_password:  clouds.devstack.auth.password
-        openstack_auth.openstack_user_domain:  clouds.devstack.auth.domain_name
-        openstack_auth.openstack_project_domain:  clouds.devstack.auth.project_domain_name
-        openstack_auth.openstack_os_auth_url:  clouds.devstack.auth.auth_url
+        openstack_auth: "{{ clouds_data | default({}) | combine ({ item.key : item.value }) }}"
+      with_items:
+        - {'openstack_project_name': clouds.devstack.auth.project_name }
+        - {'openstack_auth.openstack_console_user': clouds.devstack.auth.username}
+        - {'openstack_auth.openstack_console_password': clouds.devstack.auth.password}
+        - {'openstack_auth.openstack_user_domain': clouds.devstack.auth.domain_name}
+        - {'openstack_auth.openstack_project_domain': clouds.devstack.auth.project_domain_name}
+        - {'openstack_auth.openstack_os_auth_url': clouds.devstack.auth.auth_url}
         # openstack_auth.openstack_project_name: 
         # openstack_auth.openstack_console_user:     "{{ query('passwordstore', 'openstack/host/console_user' )[0] }}"
         # openstack_auth.openstack_console_password: "{{ query('passwordstore', 'openstack/host/console_pw ')[0] }}"
