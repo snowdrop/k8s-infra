@@ -34,9 +34,8 @@ nodes:
   extraMounts:
     - hostPath: /var/run/docker.sock
       containerPath: /var/run/docker.sock
-      EOF
-      kind create cluster --config extramounts.yml
-
+EOF
+kind create cluster --config extramounts.yml
 clusterctl init --infrastructure docker
 clusterctl generate cluster toto --kubernetes-version v1.21.10 --flavor development > my-cluster.yml
 kubectl apply -f my-cluster.yml
