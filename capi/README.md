@@ -8,7 +8,7 @@ The supporting infrastructure, like virtual machines, networks, load balancers, 
 
 This enables consistent and repeatable cluster deployments across a wide variety of infrastructure environments.
 
-NOTe: As the Cluster API supports to create a K8s clusters against different [providers](https://cluster-api.sigs.k8s.io/reference/providers.html), this project could help us to simplify how we provision k8s on Hetzner, IBMCloud and OpenStack.
+**NOTE**: As the Cluster API supports to create a K8s clusters against different [providers](https://cluster-api.sigs.k8s.io/reference/providers.html), this project could help us to simplify how we provision k8s on Hetzner, IBMCloud and OpenStack.
 
 ## Prerequisites
 
