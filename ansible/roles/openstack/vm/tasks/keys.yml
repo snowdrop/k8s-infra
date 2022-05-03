@@ -24,6 +24,8 @@
     credential_type: "Machine"
     state: present
     # controller_config_file: "~/tower_cli.cfg"
+    controller_oauthtoken: "{{ controller_oauthtoken }}"
+    controller_host: "{{ controller_host }}"
     inputs:
       username: joe
       password: secret
