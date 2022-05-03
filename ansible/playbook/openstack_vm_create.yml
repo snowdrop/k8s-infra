@@ -43,7 +43,7 @@
     #   shell: "ls -la {{ ansible_private_data_dir }}"
     #   register: ls_res
 
-    - controller_meta:
+    - awx.awx.controller_meta:
       register: result
 
     - name: Show details about the collection
