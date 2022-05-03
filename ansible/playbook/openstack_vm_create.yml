@@ -43,12 +43,6 @@
     #   shell: "ls -la {{ ansible_private_data_dir }}"
     #   register: ls_res
 
-    - awx.awx.controller_meta:
-      register: result
-
-    - name: Show details about the collection
-      debug: var=result
-
     - name: "Print variables"
       debug:
         msg: "{{ item }}"
@@ -57,7 +51,7 @@
         - "ansible_env: {{ ansible_env }}"
         - "config_file: {{ config_file }}"
         - "cat_res: {{ cat_res }}"
-        - "ls_res: {{ ls_res }}"
+        # - "ls_res: {{ ls_res }}"
 
   tasks:
     - name: "Set openstack_auth facts"
