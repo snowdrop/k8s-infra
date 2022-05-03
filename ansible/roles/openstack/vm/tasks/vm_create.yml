@@ -135,4 +135,6 @@
   #       shell: "pass rm -r /openstack/{{ vm_name }}"
 
   # when: "server_info_result.openstack_servers is undefined or (server_info_result.openstack_servers|length == 0)"
+
+
 ...
