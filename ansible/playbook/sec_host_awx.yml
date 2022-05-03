@@ -1,0 +1,39 @@
+---
+- name: "Run sec_host Playbook"
+  import_playbook: "sec_host.yml"
+  vars: 
+    new_ssh_port_number: "{{ vm_custom_ssh_port }}"
+
+- name:  "Update the ssh port"
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Get vm host vars
+      set_fact:
+        my_hostvars: "{{ hostvars[vm_name] }}"
+      tags: [always]
+
+    - name: Update inventory
+      include_role:
+        name: "passstore/ansible_inventory"
+        tasks_from: "add_variable"
+      vars:
+        pass_l1: "snowdrop"
+        pass_l2: "{{ provider }}"
+        pass_l3: "{{ vm_name }}"
+        var_name: "ansible_ssh_port"
+        var_value: "{{ query('passwordstore', provider + '/' + vm_name + '/ssh_port' )[0] }}"
+      tags: [always]
+
+    - name: Update inventory
+      include_role:
+        name: "passstore/ansible_inventory"
+        tasks_from: "remove_variable"
+      vars:
+        pass_l1: "snowdrop"
+        pass_l2: "{{ provider }}"
+        pass_l3: "{{ vm_name }}"
+        var_name: "ssh_port"
+      tags: [always]
+
+...

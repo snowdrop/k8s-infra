@@ -33,7 +33,6 @@
       vm:
         image: "{{ openstack_vm_image }}"
         flavor: "{{ openstack_vm_flavor }}"
-    # openstack_auth: "{{ openstack_auth }}"
 
 - name: "Openstack VM create"
   hosts: localhost
