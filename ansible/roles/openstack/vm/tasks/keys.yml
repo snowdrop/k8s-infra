@@ -26,6 +26,7 @@
     # controller_config_file: "~/tower_cli.cfg"
     controller_oauthtoken: "{{ controller_oauthtoken }}"
     controller_username: "admin"
+    controller_host: "{{ controller_host }}"
     inputs:
       username: joe
       password: secret
