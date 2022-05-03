@@ -39,19 +39,19 @@
     #   register: cat_res
     #   when: st.stat.exists and st.stat.isreg
 
-    - name: "Print config file contents"
-      shell: "ls -la /tmp"
-      register: ls_tmp
+    # - name: "Print config file contents"
+    #   shell: "ls -la /tmp"
+    #   register: ls_tmp
 
     - name: "Print config file contents"
-      shell: "ls -la ~/.ansible/tmp"
+      shell: "ls -la ~/.ssh"
       register: ls_ansible
 
     - name: "Print variables"
       debug:
         msg: "{{ item }}"
       with_items: 
-        - "hostvars[inventory_hostname]: {{ hostvars[inventory_hostname] }}"
+        # - "hostvars[inventory_hostname]: {{ hostvars[inventory_hostname] }}"
         - "ansible_env: {{ ansible_env }}"
         # - "config_file: {{ config_file }}"
         # - "cat_res: {{ cat_res }}"
