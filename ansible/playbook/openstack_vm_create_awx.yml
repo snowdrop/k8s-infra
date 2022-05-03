@@ -36,7 +36,7 @@
         state: present
         controller_oauthtoken: "{{ controller_oauthtoken }}"
         controller_username: "{{ awx_user_name }}"
-        controller_host: "http://{{ hostvars['AWX_DEMO_SERVICE_PORT_80_TCP_ADDR'] }}:{{ hostvars['AWX_DEMO_SERVICE_PORT_80_TCP_PORT'] }}"
+        controller_host: "http://{{ hostvars[inventory_hostname]['AWX_DEMO_SERVICE_PORT_80_TCP_ADDR'] }}:{{ hostvars[inventory_hostname]['AWX_DEMO_SERVICE_PORT_80_TCP_PORT'] }}"
         inputs:
           username: "centos"
           ssh_key_data: "{{ lookup('file', key_path) }}"
