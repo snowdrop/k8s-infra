@@ -59,6 +59,7 @@ $ kubectl config set-context --current --namespace=awx
 ----
 
 
+
 == Uninstall
 
 [source,bash]

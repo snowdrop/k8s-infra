@@ -39,7 +39,6 @@ TODO
 |===
 | Name | Type | Value | Comments
 | openstack_project_name | string | | Tenant domain
-| openstack_console_password | string | | Console login user
 | openstack_console_user | string | | Console login user
 | openstack_console_password | string | | Console login user
 | openstack_user_domain | string | | User domain
