@@ -3,4 +3,23 @@
 #  - "vm_name": "n311-test"
 - name: "Delete Server on Openstack"
   import_playbook: "openstack_vm_delete.yml"
+
+- name: "Openstack VM create"
+  hosts: localhost
+  gather_facts: True
+  vars:
+    config_file: "{{ lookup('env', 'OS_CLIENT_CONFIG_FILE') }}"
+    ansible_private_data_dir: "{{ lookup('env', 'AWX_PRIVATE_DATA_DIR') }}" #No such file or directory :(
+    ansible_cp_dir: "{{ lookup('env', 'ANSIBLE_SSH_CONTROL_PATH_DIR') }}"
+    
+  tasks:
+    - name: "Remove user credentials from AWX"
+      awx.awx.credential:
+        name: "openstack-{{ vm_name }}"
+        organization: "Default"
+        credential_type: "Machine"
+        state: absent
+        controller_oauthtoken: "{{ controller_oauthtoken }}"
+        controller_username: "{{ awx_user_name }}"
+        controller_host: "http://{{ hostvars['AWX_DEMO_SERVICE_PORT_80_TCP_ADDR'] }}:{{ hostvars['AWX_DEMO_SERVICE_PORT_80_TCP_PORT'] }}"
 ...
