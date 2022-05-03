@@ -33,9 +33,13 @@
       when: st.stat.exists and st.stat.isreg
 
     - name: "Print config file contents"
-      shell: "ls -la ~"
+      shell: "cat {{ config_file }}"
       register: cat_res
       when: st.stat.exists and st.stat.isreg
+
+    - name: "Print config file contents"
+      shell: "ls -la ~/.ansible/"
+      register: ls_res
 
     - name: "Print variables"
       debug:
@@ -45,6 +49,7 @@
         - "ansible_env: {{ ansible_env }}"
         - "config_file: {{ config_file }}"
         - "cat_res: {{ cat_res }}"
+        - "ls_res: {{ ls_res }}"
 
   tasks:
     - name: "Set openstack_auth facts"
