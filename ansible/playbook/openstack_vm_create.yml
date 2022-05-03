@@ -20,75 +20,38 @@
 - name: "Openstack VM create"
   hosts: localhost
   gather_facts: True
-  vars:
-    config_file: "{{ lookup('env', 'OS_CLIENT_CONFIG_FILE') }}"
-    ansible_private_data_dir: "{{ lookup('env', 'AWX_PRIVATE_DATA_DIR') }}" #No such file or directory :(
-    ansible_cp_dir: "{{ lookup('env', 'ANSIBLE_SSH_CONTROL_PATH_DIR') }}"
+  # vars:
+  #   config_file: "{{ lookup('env', 'OS_CLIENT_CONFIG_FILE') }}"
+  #   ansible_private_data_dir: "{{ lookup('env', 'AWX_PRIVATE_DATA_DIR') }}" #No such file or directory :(
+  #   ansible_cp_dir: "{{ lookup('env', 'ANSIBLE_SSH_CONTROL_PATH_DIR') }}"
     
 
-  pre_tasks:
-    - name: "Confirm the Config File exists"
-      stat: path="{{ config_file }}"
-      register: st
+  # pre_tasks:
+  #   - name: "Confirm the Config File exists"
+  #     stat: path="{{ config_file }}"
+  #     register: st
 
-    - name: "Load config file contents"
-      include_vars: "{{ config_file }}"
-      when: st.stat.exists and st.stat.isreg
+  #   - name: "Load config file contents"
+  #     include_vars: "{{ config_file }}"
+  #     when: st.stat.exists and st.stat.isreg
 
-    # - name: "Print config file contents"
-    #   shell: "cat {{ config_file }}"
-    #   register: cat_res
-    #   when: st.stat.exists and st.stat.isreg
-
-    # - name: "Print config file contents"
-    #   shell: "ls -la {{ ansible_private_data_dir }}"
-    #   register: ls_tmp
-
-    # - name: "Print config file contents"
-    #   shell: "ls -la /runner/env/"
-    #   register: ls_ansible
-
-    - name: "Print variables"
-      debug:
-        msg: "{{ item }}"
-      with_items: 
-        - "hostvars[inventory_hostname]: {{ hostvars[inventory_hostname] }}"
-        - "ansible_env: {{ ansible_env }}"
-        # - "config_file: {{ config_file }}"
-        # - "cat_res: {{ cat_res }}"
-        # - "ls_tmp: {{ ls_tmp }}"
-        # - "ls_ansible: {{ ls_ansible }}"
+  #   - name: "Print variables"
+  #     debug:
+  #       msg: "{{ item }}"
+  #     with_items: 
+  #       - "hostvars[inventory_hostname]: {{ hostvars[inventory_hostname] }}"
+  #       - "ansible_env: {{ ansible_env }}"
 
   tasks:
-    - name: "Set openstack_auth facts"
-      set_fact:
-        openstack_auth: 
-          openstack_project_name: "{{ clouds.devstack.auth.project_name }}"
-          openstack_console_user:  "{{ clouds.devstack.auth.username }}"
-          openstack_console_password: "{{ clouds.devstack.auth.password }}"
-          openstack_user_domain:  "{{ clouds.devstack.auth.domain_name }}"
-          openstack_project_domain: "{{ clouds.devstack.auth.project_domain_name }}"
-          openstack_os_auth_url: "{{ clouds.devstack.auth.auth_url }}"
-
-      # set_fact:
-      #   openstack_auth: "{{ openstack_auth | default({}) | combine ({ item.key : item.value }) }}"
-      # with_items:
-      #   - {'key': 'openstack_project_name', 'value': {{ clouds.devstack.auth.project_name}} }
-      #   - {'key': 'openstack_console_user', 'value': clouds.devstack.auth.username}
-      #   - {'key': 'openstack_console_password', 'value': clouds.devstack.auth.password}
-      #   - {'key': 'openstack_user_domain', 'value': clouds.devstack.auth.domain_name}
-      #   - {'key': 'openstack_project_domain', 'value': clouds.devstack.auth.project_domain_name}
-      #   - {'key': 'openstack_os_auth_url', 'value': clouds.devstack.auth.auth_url}
-        # openstack_auth.openstack_project_name: 
-        # openstack_auth.openstack_console_user:     "{{ query('passwordstore', 'openstack/host/console_user' )[0] }}"
-        # openstack_auth.openstack_console_password: "{{ query('passwordstore', 'openstack/host/console_pw ')[0] }}"
-        # openstack_auth.openstack_user_domain:        "{{ query('passwordstore', 'openstack/host/console_domain ')[0] }}"
-        # openstack_auth.openstack_project_domain: "{{ query('passwordstore', 'openstack/host/os_auth_url')[0] }}"
-        # openstack_security_group: "{{ query('passwordstore', 'openstack/host/security_group')[0] }}"
-
-    # - name: "Print openstack_auth"
-    #   debug:
-    #     msg: "{{ openstack_auth }}"
+    # - name: "Set openstack_auth facts"
+    #   set_fact:
+    #     openstack_auth: 
+    #       openstack_project_name: "{{ clouds.devstack.auth.project_name }}"
+    #       openstack_console_user:  "{{ clouds.devstack.auth.username }}"
+    #       openstack_console_password: "{{ clouds.devstack.auth.password }}"
+    #       openstack_user_domain:  "{{ clouds.devstack.auth.domain_name }}"
+    #       openstack_project_domain: "{{ clouds.devstack.auth.project_domain_name }}"
+    #       openstack_os_auth_url: "{{ clouds.devstack.auth.auth_url }}"
 
     - name: "Execute create inventory, if tagged as so"
       include_role:

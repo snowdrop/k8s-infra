@@ -1,13 +1,30 @@
 ---
-# Variables:
-#  - "vm_name": "n311-test"
-#  - "openstack": {
-#      "vm": {
-#        "network": "provider_net_shared"
-#      }
-#    }}
-#  . k8s_type: Kubernetes host type [masters,nodes], empty for no k8s installation
-#  . k8s_version: Kubernetes version [117 ... 121], empty for no k8s installation
+
+- name: "Gather OpenStack credentials"
+  hosts: localhost
+  gather_facts: True
+  vars:
+    config_file: "{{ lookup('env', 'OS_CLIENT_CONFIG_FILE') }}"
+
+  pre_tasks:
+    - name: "Confirm the Config File exists"
+      stat: path="{{ config_file }}"
+      register: st
+
+    - name: "Load config file contents"
+      include_vars: "{{ config_file }}"
+      when: st.stat.exists and st.stat.isreg
+
+  tasks:
+    - name: "Set openstack_auth facts"
+      set_fact:
+        openstack_auth: 
+          openstack_project_name: "{{ clouds.devstack.auth.project_name }}"
+          openstack_console_user:  "{{ clouds.devstack.auth.username }}"
+          openstack_console_password: "{{ clouds.devstack.auth.password }}"
+          openstack_user_domain:  "{{ clouds.devstack.auth.domain_name }}"
+          openstack_project_domain: "{{ clouds.devstack.auth.project_domain_name }}"
+          openstack_os_auth_url: "{{ clouds.devstack.auth.auth_url }}"  
 
 - name: "Create Server on Openstack"
   import_playbook: "openstack_vm_create.yml"
@@ -16,7 +33,7 @@
       vm:
         image: "{{ openstack_vm_image }}"
         flavor: "{{ openstack_vm_flavor }}"
-        controller_host: ""
+    # openstack_auth: "{{ openstack_auth }}"
 
 - name: "Openstack VM create"
   hosts: localhost
