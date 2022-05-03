@@ -22,7 +22,7 @@
   gather_facts: True
   vars:
     config_file: "{{ lookup('env', 'OS_CLIENT_CONFIG_FILE') }}"
-    ansible_private_data_dir: "{{ lookup('env', 'AWX_PRIVATE_DATA_DIR') }}"
+    ansible_private_data_dir: "{{ lookup('env', 'AWX_PRIVATE_DATA_DIR') }}" #No such file or directory :(
     ansible_cp_dir: "{{ lookup('env', 'ANSIBLE_SSH_CONTROL_PATH_DIR') }}"
     
 
@@ -40,9 +40,9 @@
     #   register: cat_res
     #   when: st.stat.exists and st.stat.isreg
 
-    - name: "Print config file contents"
-      shell: "ls -la {{ ansible_private_data_dir }}"
-      register: ls_tmp
+    # - name: "Print config file contents"
+    #   shell: "ls -la {{ ansible_private_data_dir }}"
+    #   register: ls_tmp
 
     # - name: "Print config file contents"
     #   shell: "ls -la /runner/env/"
@@ -56,7 +56,7 @@
         - "ansible_env: {{ ansible_env }}"
         # - "config_file: {{ config_file }}"
         # - "cat_res: {{ cat_res }}"
-        - "ls_tmp: {{ ls_tmp }}"
+        # - "ls_tmp: {{ ls_tmp }}"
         # - "ls_ansible: {{ ls_ansible }}"
 
   tasks:
