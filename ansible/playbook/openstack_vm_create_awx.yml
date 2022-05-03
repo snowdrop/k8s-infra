@@ -11,6 +11,12 @@
 
 - name: "Create Server on Openstack"
   import_playbook: "openstack_vm_create.yml"
+  vars: 
+    openstack:
+      vm:
+        image: "{{ openstack_vm_image }}"
+        flavor: "{{ openstack_vm_flavor }}"
+
 
 - name: "Secure new server"
   import_playbook: "sec_host.yml"
@@ -18,6 +24,4 @@
     provider: "openstack"
     hosts: "{{ vm_name }}"
     vm_name: "{{ vm_name }}"
-    openstack.vm.image: "{{ openstack_vm_image }}"
-    openstack.vm.flavor: "{{ openstack_vm_flavor }}"
 ...
