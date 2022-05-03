@@ -18,4 +18,6 @@
     provider: "openstack"
     hosts: "{{ vm_name }}"
     vm_name: "{{ vm_name }}"
+    openstack.vm.image: "{{ openstack_vm_image }}"
+    openstack.vm.flavor: "{{ openstack_vm_flavor }}"
 ...
