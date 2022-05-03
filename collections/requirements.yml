@@ -2,6 +2,6 @@
 collections:
   - name: openstack.cloud
   - name: awx.awx
-  - name: ansible.controller
+  # - name: ansible.controller
 
 ...
