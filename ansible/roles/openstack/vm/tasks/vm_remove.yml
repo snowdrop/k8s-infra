@@ -82,6 +82,17 @@
     name: "{{ vm_name }}"
   ignore_errors: true
 
+
+- name: "Remove user credentials from AWX"
+  awx.awx.credential:
+    name: "openstack-{{ vm_name }}"
+    organization: "Default"
+    credential_type: "Machine"
+    state: absent
+    controller_oauthtoken: "{{ controller_oauthtoken }}"
+    controller_username: "{{ awx_user_name }}"
+    controller_host: "{{ controller_host }}"
+
 # - name: "Remove the host from the known_hosts file"
 #   known_hosts:
 #     name: "{{ openstack_vm_ipv4 }}"
