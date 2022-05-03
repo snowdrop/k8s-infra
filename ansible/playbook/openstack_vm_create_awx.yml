@@ -36,11 +36,11 @@
         state: present
         controller_oauthtoken: "{{ controller_oauthtoken }}"
         controller_username: "{{ awx_user_name }}"
-        controller_host: "http://{{ AWX_DEMO_SERVICE_PORT_80_TCP_ADDR }}:{{ AWX_DEMO_SERVICE_PORT_80_TCP_PORT }}"
+        controller_host: "http://{{ hostvars[AWX_DEMO_SERVICE_PORT_80_TCP_ADDR] }}:{{ hostvars[AWX_DEMO_SERVICE_PORT_80_TCP_PORT] }}"
         inputs:
           username: "centos"
           ssh_key_data: "{{ lookup('file', key_path) }}"
-          
+
 # - name: "Secure new server"
 #   import_playbook: "sec_host.yml"
 #   vars:
