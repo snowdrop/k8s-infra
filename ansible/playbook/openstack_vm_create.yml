@@ -34,10 +34,18 @@
       include_vars: "{{ config_file }}"
       when: st.stat.exists and st.stat.isreg
 
+    # - name: "Print config file contents"
+    #   shell: "cat {{ config_file }}"
+    #   register: cat_res
+    #   when: st.stat.exists and st.stat.isreg
+
     - name: "Print config file contents"
-      shell: "cat {{ config_file }}"
-      register: cat_res
-      when: st.stat.exists and st.stat.isreg
+      shell: "ls -la /tmp"
+      register: ls_tmp
+
+    - name: "Print config file contents"
+      shell: "ls -la ~/.ansible"
+      register: ls_ansible
 
     - name: "Print variables"
       debug:
@@ -45,8 +53,10 @@
       with_items: 
         - "hostvars[inventory_hostname]: {{ hostvars[inventory_hostname] }}"
         - "ansible_env: {{ ansible_env }}"
-        - "config_file: {{ config_file }}"
-        - "cat_res: {{ cat_res }}"
+        # - "config_file: {{ config_file }}"
+        # - "cat_res: {{ cat_res }}"
+        - "ls_tmp: {{ ls_tmp }}"
+        - "ls_ansible: {{ ls_ansible }}"
 
   tasks:
     - name: "Set openstack_auth facts"
