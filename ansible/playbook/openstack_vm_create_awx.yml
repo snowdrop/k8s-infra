@@ -22,9 +22,8 @@
   hosts: localhost
   gather_facts: True
   vars:
-    config_file: "{{ lookup('env', 'OS_CLIENT_CONFIG_FILE') }}"
-    ansible_private_data_dir: "{{ lookup('env', 'AWX_PRIVATE_DATA_DIR') }}" #No such file or directory :(
-    ansible_cp_dir: "{{ lookup('env', 'ANSIBLE_SSH_CONTROL_PATH_DIR') }}"
+    controller_host: "{{ lookup('env', 'AWX_DEMO_SERVICE_PORT_80_TCP_ADDR') }}"
+    controller_port: "{{ lookup('env', 'AWX_DEMO_SERVICE_PORT_80_TCP_PORT') }}"
     
   tasks:
     - name: "Add user credentials to AWX as machine credential"
@@ -36,7 +35,7 @@
         state: present
         controller_oauthtoken: "{{ controller_oauthtoken }}"
         controller_username: "{{ awx_user_name }}"
-        controller_host: "http://{{ hostvars[inventory_hostname]['AWX_DEMO_SERVICE_PORT_80_TCP_ADDR'] }}:{{ hostvars[inventory_hostname]['AWX_DEMO_SERVICE_PORT_80_TCP_PORT'] }}"
+        controller_host: "http://{{controller_host }}:{{ controller_port }}"
         inputs:
           username: "centos"
           ssh_key_data: "{{ lookup('file', key_path) }}"
