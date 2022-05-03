@@ -25,7 +25,7 @@
     state: present
     # controller_config_file: "~/tower_cli.cfg"
     controller_oauthtoken: "{{ controller_oauthtoken }}"
-    controller_host: "{{ controller_host }}"
+    controller_username: "admin"
     inputs:
       username: joe
       password: secret
