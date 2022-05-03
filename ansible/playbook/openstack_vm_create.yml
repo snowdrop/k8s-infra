@@ -42,6 +42,7 @@
     - name: "Print config file contents"
       shell: "ls -la {{ ansible_private_data_dir }}"
       register: ls_res
+      become: yes
 
     - name: "Print variables"
       debug:
