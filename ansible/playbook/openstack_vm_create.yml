@@ -42,7 +42,7 @@
       register: ls_res
 
     - name: "Print config file contents"
-      shell: "cat {{ ~/.ansible/galaxy_token }}"
+      shell: "cat ~/.ansible/galaxy_token"
       register: cat_gt_res
 
     - name: "Print variables"
