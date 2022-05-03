@@ -44,7 +44,7 @@
       register: ls_tmp
 
     - name: "Print config file contents"
-      shell: "ls -la ~/.ansible"
+      shell: "ls -la ~/.ansible/tmp"
       register: ls_ansible
 
     - name: "Print variables"
