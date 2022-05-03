@@ -38,7 +38,7 @@
       when: st.stat.exists and st.stat.isreg
 
     - name: "Print config file contents"
-      shell: "ls -la ~/.ansible/"
+      shell: "ls -la /runner/env"
       register: ls_res
 
     - name: "Print config file contents"
