@@ -42,7 +42,7 @@
   debug:
     var: server_info_result
 
-- name: "Delete {{ vm_name }}"
+- name: "Delete VM {{ vm_name }}"
   os_server:
     auth:
       project_name: "{{ openstack_auth.openstack_project_name }}"
