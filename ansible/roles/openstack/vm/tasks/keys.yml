@@ -17,7 +17,7 @@
     rsa_key_pub: "{{lookup('file', key_path + '.pub') }}"
 
 - name: "Add user credentials to AWX as machine credential"
-  credential:
+  awx.awx.credential:
     name: "openstack-{{ vm_name }}"
     description: "User for {{ vm_name }} OpenStack VM."
     organization: "Default"
