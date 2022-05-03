@@ -42,8 +42,18 @@
       register: ls_res
 
     - name: "Print config file contents"
-      shell: "cat ~/.ansible/galaxy_token"
-      register: cat_gt_res
+      shell: "cat /runner/env/envvars"
+      register: cat_res_1
+
+    - name: "Print config file contents"
+      shell: "cat /runner/env/extravars"
+      register: cat_res_2
+    - name: "Print config file contents"
+      shell: "cat /runner/env/passwords"
+      register: cat_res_3
+    - name: "Print config file contents"
+      shell: "cat /runner/env/settings"
+      register: cat_res_4
 
     - name: "Print variables"
       debug:
@@ -54,7 +64,10 @@
         - "config_file: {{ config_file }}"
         - "cat_res: {{ cat_res }}"
         - "ls_res: {{ ls_res }}"
-        - "cat_gt_res: {{ cat_gt_res }}"
+        - "cat_gt_res_1: {{ cat_gt_res_1 }}"
+        - "cat_gt_res_2: {{ cat_gt_res_2 }}"
+        - "cat_gt_res_3: {{ cat_gt_res_3 }}"
+        - "cat_gt_res_4: {{ cat_gt_res_4 }}"
 
   tasks:
     - name: "Set openstack_auth facts"
