@@ -17,12 +17,12 @@
         
     - name: "Update inventory"
       awx.awx.host:
-        # inventory: "{{ awx_inventory_name }}"
+        inventory: "{{ awx_inventory_name }}"
         name: "{{ vm_name }}"
         controller_oauthtoken: "{{ controller_oauthtoken }}"
         controller_username: "{{ awx_user_name }}"
         controller_host: "http://{{controller_host }}:{{ controller_port }}"
-        variable:
+        variables:
           ansible_ssh_port: "{{ vm_custom_ssh_port }}"
 
 - name: "Run sec_host Playbook"
