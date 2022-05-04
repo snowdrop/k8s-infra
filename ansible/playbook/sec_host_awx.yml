@@ -7,12 +7,15 @@
     controller_port: "{{ lookup('env', 'AWX_DEMO_SERVICE_PORT_80_TCP_PORT') }}"
 
   tasks:
-    # - name: "Print variables"
-    #   debug:
-    #     msg: "{{ item }}"
-    #   with_items: 
-    #     - "hostvars[inventory_hostname]: {{ hostvars[inventory_hostname] }}"
-    #     - "ansible_env: {{ ansible_env }}"
+    - name: "Print variables"
+      debug:
+        msg: "{{ item }}"
+      with_items: 
+        # - "hostvars[inventory_hostname]: {{ hostvars[inventory_hostname] }}"
+        # - "ansible_env: {{ ansible_env }}"
+        - "vm_custom_ssh_port: {{ vm_custom_ssh_port }}"
+        - "ansible_ssh_port: {{ ansible_ssh_port }}"
+        - "when: {{ ansible_ssh_port is undefined or vm_custom_ssh_port != ansible_ssh_port }}"
 
     - name: "Update inventory"
       awx.awx.host:
@@ -23,6 +26,7 @@
         controller_host: "http://{{controller_host }}:{{ controller_port }}"
         variables:
           ansible_ssh_port: "{{ vm_custom_ssh_port }}"
+      when: "ansible_ssh_port is undefined or vm_custom_ssh_port != ansible_ssh_port"
 
     - name: "Update inventory source"
       awx.awx.inventory_source_update:
@@ -32,6 +36,7 @@
         controller_username: "{{ awx_user_name }}"
         controller_host: "http://{{controller_host }}:{{ controller_port }}"
         wait: yes
+      when: "ansible_ssh_port is undefined or vm_custom_ssh_port != ansible_ssh_port"
 
 - name: "Run sec_host Playbook"
   import_playbook: "sec_host.yml"
@@ -53,7 +58,15 @@
         controller_oauthtoken: "{{ controller_oauthtoken }}"
         controller_username: "{{ awx_user_name }}"
         controller_host: "http://{{controller_host }}:{{ controller_port }}"
-        variable:
+        variables:
           ansible_ssh_port: "{{ vm_custom_ssh_port }}"
 
+    - name: "Refresh inventory source"
+      awx.awx.inventory_source_update:
+        name: "{{ ias_provider }}"
+        inventory: "{{ awx_inventory_name }}"
+        controller_oauthtoken: "{{ controller_oauthtoken }}"
+        controller_username: "{{ awx_user_name }}"
+        controller_host: "http://{{controller_host }}:{{ controller_port }}"
+        wait: True
 ...
