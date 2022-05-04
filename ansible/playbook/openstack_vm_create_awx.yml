@@ -5,8 +5,16 @@
   gather_facts: True
   vars:
     config_file: "{{ lookup('env', 'OS_CLIENT_CONFIG_FILE') }}"
+    os_user_name:  "{{ openstack_vm_image | regex_search('^[a-zA-Z]*') | lower }}"
 
   pre_tasks:
+
+  - name: "Print variables"
+      debug: 
+        msg: "{{ item }}"
+      with_items:
+        - "os_user_name: {{ os_user_name }}"
+
     - name: "Confirm the Config File exists"
       stat: path="{{ config_file }}"
       register: st
@@ -42,12 +50,14 @@
     controller_port: "{{ lookup('env', 'AWX_DEMO_SERVICE_PORT_80_TCP_PORT') }}"
     ssh_key_data: "{{ lookup('file', key_path) }}"
     ssh_key_data_pub: "{{ lookup('file', key_path + '.pub') }}"
+    os_user_name:  "{{ openstack_vm_image | regex_search('^[a-zA-Z]*') | lower }}"
 
   pre_tasks:
     - name: "Print variables"
       debug: 
         msg: "{{ item }}"
       with_items:
+        - "os_user_name: {{ os_user_name }}"
         - "key_path: {{ key_path }}"
         - "ssh_key_data: {{ ssh_key_data }}"
         - "ssh_key_data_pub: {{ ssh_key_data_pub }}"
@@ -57,6 +67,7 @@
       when: st.stat.exists and st.stat.isreg
 
   tasks:
+
     - name: "Add user credentials to AWX as machine credential"
       awx.awx.credential:
         name: "openstack-{{ vm_name }}"
@@ -68,7 +79,7 @@
         controller_username: "{{ awx_user_name }}"
         controller_host: "http://{{controller_host }}:{{ controller_port }}"
         inputs:
-          username: "centos"
+          username: "{{ os_user_name }}"
           ssh_key_data: "{{ lookup('file', key_path) }}"
 
 # - name: "Secure new server"

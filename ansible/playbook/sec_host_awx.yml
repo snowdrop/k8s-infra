@@ -4,7 +4,7 @@
   vars: 
     new_ssh_port_number: "{{ vm_custom_ssh_port }}"
 
-- name:  "Update the ssh port"
+- name:  "Update the ssh port on AWX"
   hosts: localhost
   gather_facts: no
   tasks:
