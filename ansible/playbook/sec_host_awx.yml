@@ -17,6 +17,7 @@
         
     - name: "Update inventory"
       awx.awx.host:
+        inventory: "{{ awx_inventory_name }}"
         name: "{{ vm_name }}"
         controller_oauthtoken: "{{ controller_oauthtoken }}"
         controller_username: "{{ awx_user_name }}"
