@@ -13,8 +13,8 @@
         msg: "{{ item }}"
       with_items: 
         - "hostvars[inventory_hostname]: {{ hostvars[inventory_hostname] }}"
-        - "ansible_env: {{ ansible_env }}"
-        
+        # - "ansible_env: {{ ansible_env }}"
+
     - name: "Update inventory"
       awx.awx.host:
         name: "{{ vm_name }}"
