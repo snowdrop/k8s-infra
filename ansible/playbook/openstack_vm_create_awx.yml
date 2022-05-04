@@ -9,7 +9,7 @@
 
   pre_tasks:
 
-  - name: "Print variables"
+    - name: "Print variables"
       debug: 
         msg: "{{ item }}"
       with_items:
