@@ -41,6 +41,7 @@
     controller_host: "{{ lookup('env', 'AWX_DEMO_SERVICE_PORT_80_TCP_ADDR') }}"
     controller_port: "{{ lookup('env', 'AWX_DEMO_SERVICE_PORT_80_TCP_PORT') }}"
     ssh_key_data: "{{ lookup('file', key_path) }}"
+    ssh_key_data_pub: "{{ lookup('file', key_path + '.pub') }}"
 
   pre_tasks:
     - name: "Print variables"
@@ -49,6 +50,7 @@
       with_items:
         - "key_path: {{ key_path }}"
         - "ssh_key_data: {{ ssh_key_data }}"
+        - "ssh_key_data_pub: {{ ssh_key_data_pub }}"
 
     - name: "Load config file contents"
       include_vars: "{{ config_file }}"
