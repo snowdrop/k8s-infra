@@ -1,7 +1,7 @@
 ---
 - name:  "TO BE REMOVED - COPY OF PRIOR TO DO THE CHANGE FOR TESTING Update the ssh port on AWX"
   hosts: localhost
-  gather_facts: no
+  gather_facts: True
   vars:
     controller_host: "{{ lookup('env', 'AWX_DEMO_SERVICE_PORT_80_TCP_ADDR') }}"
     controller_port: "{{ lookup('env', 'AWX_DEMO_SERVICE_PORT_80_TCP_PORT') }}"
@@ -13,8 +13,8 @@
         msg: "{{ item }}"
       with_items: 
         - "hostvars[inventory_hostname]: {{ hostvars[inventory_hostname] }}"
-        # - "ansible_env: {{ ansible_env }}"
-
+        - "ansible_env: {{ ansible_env }}"
+        
     - name: "Update inventory"
       awx.awx.host:
         name: "{{ vm_name }}"
