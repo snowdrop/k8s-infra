@@ -24,9 +24,9 @@
       include_role:
         name: "sec/audit"
 
-    - name: "Update all"
+    - name: "Install SELinux"
       include_role:
-        name: "sec/audit"
+        name: "sec/selinux"
 
     - name: "Change sshd port"
       include_role:
