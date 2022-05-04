@@ -5,4 +5,9 @@ collections:
   - name: awx.awx
     version: 20.1.0
 
+  - name: hetzner.hcloud
+    version: 1.6.0
+
+  - name: community.hrobot
+    version: 1.3.0
 ...
