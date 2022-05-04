@@ -6,7 +6,15 @@
     controller_host: "{{ lookup('env', 'AWX_DEMO_SERVICE_PORT_80_TCP_ADDR') }}"
     controller_port: "{{ lookup('env', 'AWX_DEMO_SERVICE_PORT_80_TCP_PORT') }}"
 
+
   tasks:
+    - name: "Print variables"
+      debug:
+        msg: "{{ item }}"
+      with_items: 
+        - "hostvars[inventory_hostname]: {{ hostvars[inventory_hostname] }}"
+        - "ansible_env: {{ ansible_env }}"
+        
     - name: "Update inventory"
       awx.awx.host:
         name: "{{ vm_name }}"
