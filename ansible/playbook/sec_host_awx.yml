@@ -6,28 +6,13 @@
     controller_host: "{{ lookup('env', 'AWX_DEMO_SERVICE_PORT_80_TCP_ADDR') }}"
     controller_port: "{{ lookup('env', 'AWX_DEMO_SERVICE_PORT_80_TCP_PORT') }}"
 
-
   tasks:
-    - name: "Print variables"
-      debug:
-        msg: "{{ item }}"
-      with_items: 
-        - "hostvars[inventory_hostname]: {{ hostvars[inventory_hostname] }}"
-        - "ansible_env: {{ ansible_env }}"
-
-    - name: "Get inventory information"
-      awx.awx.host:
-        inventory: "{{ awx_inventory_name }}"
-        name: "{{ vm_name }}"
-        controller_oauthtoken: "{{ controller_oauthtoken }}"
-        controller_username: "{{ awx_user_name }}"
-        controller_host: "http://{{controller_host }}:{{ controller_port }}"
-      register: vm_inventory_information
-
-    - name: "Debug info"
-      debug:
-        msg: 
-          - "vm_inventory_information : {{ vm_inventory_information }}"
+    # - name: "Print variables"
+    #   debug:
+    #     msg: "{{ item }}"
+    #   with_items: 
+    #     - "hostvars[inventory_hostname]: {{ hostvars[inventory_hostname] }}"
+    #     - "ansible_env: {{ ansible_env }}"
 
     - name: "Update inventory"
       awx.awx.host:
@@ -38,6 +23,13 @@
         controller_host: "http://{{controller_host }}:{{ controller_port }}"
         variables:
           ansible_ssh_port: "{{ vm_custom_ssh_port }}"
+
+    - name: "Update inventory source"
+      awx.awx.inventory_source_update:
+        name: "{{ ias_provider }}"
+        inventory: "{{ awx_inventory_name }}"
+        # organization: Default
+        wait: yes
 
 - name: "Run sec_host Playbook"
   import_playbook: "sec_host.yml"
