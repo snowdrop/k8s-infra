@@ -5,16 +5,8 @@
   gather_facts: True
   vars:
     config_file: "{{ lookup('env', 'OS_CLIENT_CONFIG_FILE') }}"
-    os_user_name:  "{{ openstack_vm_image | regex_search('^[a-zA-Z]*') | lower }}"
 
   pre_tasks:
-
-    - name: "Print variables"
-      debug: 
-        msg: "{{ item }}"
-      with_items:
-        - "os_user_name: {{ os_user_name }}"
-
     - name: "Confirm the Config File exists"
       stat: path="{{ config_file }}"
       register: st
