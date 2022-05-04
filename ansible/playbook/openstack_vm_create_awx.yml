@@ -40,7 +40,20 @@
   vars:
     controller_host: "{{ lookup('env', 'AWX_DEMO_SERVICE_PORT_80_TCP_ADDR') }}"
     controller_port: "{{ lookup('env', 'AWX_DEMO_SERVICE_PORT_80_TCP_PORT') }}"
-    
+    ssh_key_data: "{{ lookup('file', key_path) }}"
+
+  pre_tasks:
+    - name: "Print variables"
+      debug: 
+        msg: "{{ item }}"
+      with_items:
+        - "key_path: {{ key_path }}"
+        - "ssh_key_data: {{ ssh_key_data }}"
+
+    - name: "Load config file contents"
+      include_vars: "{{ config_file }}"
+      when: st.stat.exists and st.stat.isreg
+
   tasks:
     - name: "Add user credentials to AWX as machine credential"
       awx.awx.credential:
