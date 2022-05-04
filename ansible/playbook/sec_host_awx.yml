@@ -14,7 +14,21 @@
       with_items: 
         - "hostvars[inventory_hostname]: {{ hostvars[inventory_hostname] }}"
         - "ansible_env: {{ ansible_env }}"
-        
+
+    - name: "Get inventory information"
+      awx.awx.host:
+        inventory: "{{ awx_inventory_name }}"
+        name: "{{ vm_name }}"
+        controller_oauthtoken: "{{ controller_oauthtoken }}"
+        controller_username: "{{ awx_user_name }}"
+        controller_host: "http://{{controller_host }}:{{ controller_port }}"
+      register: vm_inventory_information
+
+    - name: "Debug info"
+      debug:
+        msg: 
+          - "vm_inventory_information : {{ vm_inventory_information }}"
+
     - name: "Update inventory"
       awx.awx.host:
         inventory: "{{ awx_inventory_name }}"
