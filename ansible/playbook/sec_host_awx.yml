@@ -9,7 +9,7 @@
   tasks:
     - name: "Update inventory"
       awx.awx.host:
-        name: "{{ ias_provider }}-{{ vm_name }}"
+        name: "{{ vm_name }}"
         controller_oauthtoken: "{{ controller_oauthtoken }}"
         controller_username: "{{ awx_user_name }}"
         controller_host: "http://{{controller_host }}:{{ controller_port }}"
@@ -31,7 +31,7 @@
   tasks:
     - name: "Update inventory"
       awx.awx.host:
-        name: "{{ ias_provider }}-{{ vm_name }}"
+        name: "{{ vm_name }}"
         controller_oauthtoken: "{{ controller_oauthtoken }}"
         controller_username: "{{ awx_user_name }}"
         controller_host: "http://{{controller_host }}:{{ controller_port }}"
