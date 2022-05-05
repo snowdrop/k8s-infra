@@ -8,7 +8,7 @@
 
   pre_tasks:
     - name: "Fetch SSH public key"
-      shell: "ssh-add -L | head -n 1 | awk '{print $2;}'"
+      shell: "ssh-add -L | head -n 1"
       register: ssh_pub
     
     - name: "Write SSH Public Key to file"
