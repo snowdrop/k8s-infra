@@ -1,0 +1,10 @@
+---
+- name: "Create SSH Key for server"
+  import_playbook: "hetzner_ssh_key_create.yml"
+
+- name: "Create Server on Hetzner"
+  import_playbook: "hetzner_vm_create.yml"
+  vars:
+    hetzner_context_name: "snowdrop"
+
+...
