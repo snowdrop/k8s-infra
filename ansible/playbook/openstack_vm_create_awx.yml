@@ -7,11 +7,16 @@
 
   pre_tasks:
     - name: "Print variables"
+      shell: "ssh-add -L"
+     register: ssh_1
+      
+    - name: "Print variables"
       debug: 
         msg: "{{ item }}"
       with_items:
         - "ansible_env: {{ ansible_env }}"
         - "localhost: {{ hostvars['localhost'] | to_yaml }}"
+        - "ssh_1: {{ ssh_1 }}"
         
     - name: "Confirm the Config File exists"
       stat: path="{{ config_file }}"
