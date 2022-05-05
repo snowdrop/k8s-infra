@@ -13,9 +13,9 @@
     key_path: "{{ admin_home.stdout }}/.ssh/id_rsa_snowdrop_openstack_{{ vm_name }}"
   when: "key_path is not defined"
 
-- stat:
-    path: "{{ key_path }}"
-  register: st
+# - stat:
+#     path: "{{ key_path }}"
+#   register: st
 
 # - name: "Set pass facts from passwordstore"
 #   set_fact:

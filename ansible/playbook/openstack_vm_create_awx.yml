@@ -4,9 +4,13 @@
   gather_facts: True
   vars:
     config_file: "{{ lookup('env', 'OS_CLIENT_CONFIG_FILE') }}"
-    key_path: "/tmp/admin_key.pub"
+    # key_path: "/tmp/admin_key.pub"
 
   pre_tasks:
+    - name: "Set openstack_auth facts"
+      set_fact:
+        key_path: "/tmp/admin_key.pub"
+
     - name: "Fetch SSH public key"
       shell: "ssh-add -L | head -n 1"
       register: ssh_pub
@@ -71,9 +75,9 @@
         - "ssh_key_data: {{ ssh_key_data }}"
         - "ssh_key_data_pub: {{ ssh_key_data_pub }}"
 
-    - name: "Load config file contents"
-      include_vars: "{{ config_file }}"
-      when: st.stat.exists and st.stat.isreg
+    # - name: "Load config file contents"
+    #   include_vars: "{{ config_file }}"
+    #   when: st.stat.exists and st.stat.isreg
 
   tasks:
 
