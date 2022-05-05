@@ -1,0 +1,8 @@
+---
+apiVersion: awx.ansible.com/v1beta1
+kind: AWXBackup
+metadata:
+  name: awxbackup-2022-05-05
+  namespace: awx
+spec:
+  deployment_name: awx-demo
