@@ -43,6 +43,12 @@
     var: server_info_result
     verbosity: 2
 
+- name: "DEBUG"
+  debug:
+    msg: "{{ item }}"
+  with_items:
+  - "if: state == 'present' and key_name is not defined"
+
 - name: "Only proceed if vm exists and state is present"
   block:
   
