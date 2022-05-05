@@ -45,9 +45,10 @@
 
 - name: "Only proceed if vm exists and state is present"
   block:
+  
   - name: "Generate keys locally and import the pub key into Openstack"
     include_tasks: keys.yml
-    when: state == "present"
+    when: "state == 'present' and key_name is not defined"
 
   # - name: "Add user credentials to AWX as machine credential"
   #   awx.awx.credential:
@@ -110,7 +111,7 @@
         auth_url: "{{ openstack_auth.openstack_os_auth_url }}"
       name: "{{ vm_name }}"
       image: "{{ openstack.vm.image }}"
-      key_name: "{{ vm_name }}"
+      key_name: "{{ key_name }}"
       state: "{{ state }}"
       timeout: "{{ openstack.timeout }}"
       flavor: "{{ openstack.vm.flavor }}"
