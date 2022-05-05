@@ -3,18 +3,18 @@
   shell: ssh-keygen -b 2048 -t rsa -f {{ key_path }} -q -N ""
   when: st.stat.exists == false
 
-- name: "Change RSA public key permission"
-  file:
-    path: "{{ item }}"
-    mode: "0600"
-  loop:
-    - "{{ key_path }}"
-    - "{{ key_path }}.pub"
+# - name: "Change RSA public key permission"
+#   file:
+#     path: "{{ item }}"
+#     mode: "0600"
+#   loop:
+#     - "{{ key_path }}"
+#     - "{{ key_path }}.pub"
 
-- name: "Load key information"
-  set_fact:
-    rsa_key: "{{lookup('file', key_path) }}"
-    rsa_key_pub: "{{lookup('file', key_path + '.pub') }}"
+# - name: "Load key information"
+#   set_fact:
+#     rsa_key: "{{lookup('file', key_path) }}"
+#     rsa_key_pub: "{{lookup('file', key_path + '.pub') }}"
 
 - name: "Remove existing SSH key to use with instance {{ vm_name }}"
   os_keypair:
