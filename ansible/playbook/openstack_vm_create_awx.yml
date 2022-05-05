@@ -1,5 +1,4 @@
 ---
-
 - name: "Gather OpenStack credentials"
   hosts: localhost
   gather_facts: True
@@ -7,6 +6,15 @@
     config_file: "{{ lookup('env', 'OS_CLIENT_CONFIG_FILE') }}"
 
   pre_tasks:
+    - name: "Print variables"
+      debug: 
+        msg: "{{ item }}"
+      with_items:
+        - "os_user_name: {{ os_user_name }}"
+        - "ansible_env: {{ ansible_env }}"
+        - "ansible_env: {{ ansible_env }}"
+        - "localhost: {{ hostvars['localhost'] | to_yaml }}""
+        
     - name: "Confirm the Config File exists"
       stat: path="{{ config_file }}"
       register: st
@@ -24,7 +32,7 @@
           openstack_console_password: "{{ clouds.devstack.auth.password }}"
           openstack_user_domain:  "{{ clouds.devstack.auth.domain_name }}"
           openstack_project_domain: "{{ clouds.devstack.auth.project_domain_name }}"
-          openstack_os_auth_url: "{{ clouds.devstack.auth.auth_url }}"  
+          openstack_os_auth_url: "{{ clouds.devstack.auth.auth_url }}"
 
 - name: "Create Server on Openstack"
   import_playbook: "openstack_vm_create.yml"
