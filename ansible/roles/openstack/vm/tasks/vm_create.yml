@@ -73,8 +73,30 @@
       display_name: "{{ volume_name }}"
       volume_type: "ceph"
 
+  # - name: "Create VM instance"
+  #   os_server:
+  #     auth:
+  #       project_name: "{{ openstack_auth.openstack_project_name }}"
+  #       username: "{{ openstack_auth.openstack_console_user }}"
+  #       password: "{{ openstack_auth.openstack_console_password }}"
+  #       user_domain_name: "{{ openstack_auth.openstack_user_domain }}"
+  #       project_domain_name: "{{ openstack_auth.openstack_project_domain }}"
+  #       auth_url: "{{ openstack_auth.openstack_os_auth_url }}"
+  #     name: "{{ vm_name }}"
+  #     image: "{{ openstack.vm.image }}"
+  #     key_name: "{{ vm_name }}"
+  #     state: "{{ state }}"
+  #     timeout: "{{ openstack.timeout }}"
+  #     flavor: "{{ openstack.vm.flavor }}"
+  #     auto_floating_ip: yes
+  #     network: "{{ openstack.vm.network }}"
+  #     security_groups: "{{ openstack_security_group }}"
+  #     volumes: "{{ volume_name }}"
+  #     boot_from_volume: "{{ openstack.vm.boot_from_volume }}"
+  #   register: openstack_output
+
   - name: "Create VM instance"
-    os_server:
+    openstack.cloud.server:
       auth:
         project_name: "{{ openstack_auth.openstack_project_name }}"
         username: "{{ openstack_auth.openstack_console_user }}"
@@ -93,6 +115,12 @@
       security_groups: "{{ openstack_security_group }}"
       volumes: "{{ volume_name }}"
       boot_from_volume: "{{ openstack.vm.boot_from_volume }}"
+      userdata: |
+        users:
+        - name: snowdrop
+          groups: sudo
+          shell: /bin/bash
+          sudo: ['ALL=(ALL) NOPASSWD:ALL']
     register: openstack_output
 
   - name: "Print Openstack output"
