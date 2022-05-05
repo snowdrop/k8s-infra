@@ -8,7 +8,7 @@
   pre_tasks:
     - name: "Print variables"
       shell: "ssh-add -L"
-     register: ssh_1
+      register: ssh_1
       
     - name: "Print variables"
       debug: 
