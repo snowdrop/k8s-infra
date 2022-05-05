@@ -13,7 +13,7 @@
         - "os_user_name: {{ os_user_name }}"
         - "ansible_env: {{ ansible_env }}"
         - "ansible_env: {{ ansible_env }}"
-        - "localhost: {{ hostvars['localhost'] | to_yaml }}""
+        - "localhost: {{ hostvars['localhost'] | to_yaml }}"
         
     - name: "Confirm the Config File exists"
       stat: path="{{ config_file }}"
