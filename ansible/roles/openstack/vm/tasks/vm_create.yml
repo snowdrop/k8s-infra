@@ -5,9 +5,13 @@
 
 - name: "Set required facts"
   set_fact: 
-    key_path: "{{ admin_home.stdout }}/.ssh/id_rsa_snowdrop_openstack_{{ vm_name }}"
     volume_name: "{{ vm_name }}-volume"
   no_log: True
+
+- name: "Set key path if not set"
+  set_fact: 
+    key_path: "{{ admin_home.stdout }}/.ssh/id_rsa_snowdrop_openstack_{{ vm_name }}"
+  when: "key_path is not defined"
 
 - stat:
     path: "{{ key_path }}"
