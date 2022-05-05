@@ -14,7 +14,7 @@
     - name: "Write SSH Public Key to file"
       copy: 
         content: "{{ ssh_pub }}"
-        dest: "{{ config_file }}"
+        dest: "{{ key_path }}"
 
     - name: "Print variables"
       debug: 
