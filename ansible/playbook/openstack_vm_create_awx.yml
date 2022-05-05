@@ -10,8 +10,6 @@
       debug: 
         msg: "{{ item }}"
       with_items:
-        - "os_user_name: {{ os_user_name }}"
-        - "ansible_env: {{ ansible_env }}"
         - "ansible_env: {{ ansible_env }}"
         - "localhost: {{ hostvars['localhost'] | to_yaml }}"
         
