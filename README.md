@@ -1,61 +1,53 @@
 Table of Contents
 =================
 
-* [Instructions to install a k8s cluster](#instructions-to-install-a-k8s-cluster)
-    * [Become a Docker Machine](#become-a-docker-machine)
+* [Introduction](#introduction)
     * [Provision the Cluster](#provision-the-cluster)
-        * [Local](#local)
+        * [Locally](#locally)
             * [Kind](#kind)
-            * [Microk8s](#microk8s)
             * [Minikube](#minikube)
-        * [Local - Vagrant](#local---vagrant)
-        * [Local - Customized VM](#local---customized-vm)
-            * [Create vdi file from Cloud ISO](#create-vdi-file-from-cloud-iso)
-            * [Create VM on VirtualBox](#create-vm-on-virtualbox)
         * [Public Cloud provider](#public-cloud-provider)
             * [Hetzner - bare metal](#hetzner---bare-metal)
             * [Hetzner Cloud - virtualized](#hetzner-cloud---virtualized)
-        * [Private Cloud provider](#private-cloud-provider)
-            * [OpenStack - vpn](#openstack---vpn)
+        * [IBM Cloud](#ibm-cloud)
+        * [Red Hat OpenStack - RHOS](#red-hat-openstack---rhos)
     * [Cluster Deployment](#cluster-deployment)
-        * [OpenShift](#openshift)
         * [Kubernetes](#kubernetes)
-    * [Turn on your machine into a Cloud Native Dev environment](#turn-on-your-machine-into-a-cloud-native-dev-environment)
+        * [OpenShift](#openshift)
+    * [Sandbox](#sandbox)
+        * [Become a Docker Machine](#become-a-docker-machine)
+        * [Turn on your machine into a Cloud Native Dev environment](#turn-on-your-machine-into-a-cloud-native-dev-environment)
+        * [Microk8s](#microk8s)
+        * [Vagrant](#vagrant)
+        * [Virtualbox](#virtualbox)
+            * [Create vdi file from Cloud ISO](#create-vdi-file-from-cloud-iso)
+            * [Create VM on VirtualBox](#create-vm-on-virtualbox)
 
-# Instructions to install a k8s cluster
+# Introduction
 
-This project details the `prerequisites` and `steps` necessary to convert a machine / environment into a Cloud Development Platform 
-where we can deploy a Kubernetes (aka k8s) cluster.
-
-The documentation has been designed around the following topics :
-
-- Become a Docker machine
-- Next, to provision Kubernetes/OpenShift
-- Post installation
-
-## Become a Docker Machine
-
-[docker section](doc/docker.md)
+This project details the `prerequisites` and `steps` necessary to run a Kubernetes (aka k8s) cluster, Openshift locally, on a public or private cloud provider.
 
 ## Provision the Cluster
 
 As different tools / bootstrapping methods are available and serve different purposes to install a cluster, the following table 
 summarizes and presents the possibilities offered:
 
-| Cloud Provider             | Purpose                                              | Tool        | ISO                     |  Hypervisor       |
-| ---------------------------| ---------------------------------------------------- | ----------- | ------------------------| :---------------: |
-| Local Machine              | Local dvlpt                                          | Kind, Microk8s   | -   | Hyperkit, native |
-| Local Machine              | Local dvlpt                                          | Minishift/Minikube   | CentOS or boot2docker   | Xhyve, Hyperkit, Virtualbox |
-| Local Machine              | Local dvlpt, test new oc release, validate playbooks | Ansible     | CentOS                  | Virtualbox        |
-| Remote Public  - Hetzner   | Demo, Hands On Lab machine                           | Ansible     | CentOS, Fedora, RHEL    | -                 |
-| Remote Private - OpenStack | Testing, Productization                              | Ansible     | CentOS, Fedora, RHEL    | -                 |
+| Cloud Provider             | Purpose                                              | Tool               | ISO                   |         Hypervisor          |
+|----------------------------|------------------------------------------------------|--------------------|-----------------------|:---------------------------:|
+| Local Machine              | Local dvlpt                                          | Kind, Microk8s     | -                     |      Hyperkit, native       |
+| Local Machine              | Local dvlpt                                          | Minishift/Minikube | CentOS or boot2docker | Xhyve, Hyperkit, Virtualbox |
+| Local Machine              | Local dvlpt, test new oc release, validate playbooks | Ansible            | CentOS                |         Virtualbox          |
+| Remote Public  - Hetzner   | Demo, Hands On Lab machine                           | Ansible            | CentOS, Fedora, RHEL  |              -              |
+| Remote Public - IBM Cloud  | Testing                                              | Ansible            | CentOS, Fedora, RHEL  |              -              |
+| Remote Private - OpenStack | Testing, Productization                              | Ansible            | CentOS, Fedora, RHEL  |              -              |
+
 
 **NOTE**: 
-- `Kind, microk8s` tools needs a local `Docker server` running on your laptop
+- `Kind, microk8s` tools needs a local `Docker daemon` running on your laptop
 - `Minishift/Minikube` tools manages the whole process to create the vm, next to install Docker
 - For `Ansible` tool, the Linux VM must be accessible using `ssh`
 
-### Local
+### Locally
 
 For local development on your machine, you can install a `K8s` cluster using `kind`, `minikube` or `microk8s`.
 
@@ -63,21 +55,82 @@ For local development on your machine, you can install a `K8s` cluster using `ki
 
 #### Kind
 
-See instructions - https://kind.sigs.k8s.io/docs/user/quick-start/
-
-#### Microk8s
-
-See instructions - https://github.com/ubuntu/microk8s
+See the official documentation - https://kind.sigs.k8s.io/docs/user/quick-start/ and [the bash scripts](kind/README.md) we created to simplify the creation of the cluster
+like also to setup ingress or a private container registry
 
 #### Minikube
 
 See the [official documentation](https://kubernetes.io/docs/tasks/tools/install-minikube/) to install `minikube` on Macos, Linux or Windows
 
-### Local - Vagrant
+### Public Cloud provider
+
+#### Hetzner - bare metal
+
+- See [hetzner](hetzner/README.md) page explaining how to create a vm.
+
+#### Hetzner Cloud - virtualized
+
+- See [hetzner-cloud](hetzner/README-cloud.md) page explaining how to create a cloud vm.
+
+### IBM Cloud
+
+- See [ibm-cloud](ibm-cloud/README.md)
+
+### Red Hat OpenStack - RHOS
+
+- See [OpenStack](openstack/README.md) page explaining how to create an OpenStack cloud vm.
+
+## Cluster Deployment
+
+As the vm is now running and the docker daemon is up, you can install your `k8s` distribution using either one of the following approaches :
+
+### Kubernetes
+
+You can then use the following instructions to install a Kubernetes cluster with the help of Ansible and the [roles we created](doc/k8s.md)
+
+### OpenShift
+
+- Simple using the `oc` binary tool and the command [oc cluster up](https://github.com/openshift/origin/blob/master/docs/cluster_up_down.md) within the vm
+- More elaborated using `Ansible` tool and one of the following playbook/role:
+  - `oc cluster up` [role](doc/oc.md)
+  - `openshift-ansible` all-in-one playbook as described [here](doc/cloud.md)
+
+## Sandbox
+
+Material not actively maintained to create a VM, run on your desktop a k8s cluster or provision it with Istio, Jaeger, Fabric8 launcher, Ansible Broker catalog, etc
+
+### Become a Docker Machine
+
+[docker section](doc/docker.md)
+
+### Turn on your machine into a Cloud Native Dev environment
+
+Independent of the approach you choose before, you'll be now able to configure your cluster
+using one of the following features and with the help of the [Ansible roles](ansible/roles) we have created:
+
+- Create list of users/passwords and their corresponding project
+- Grant Cluster admin role to an OpenShift user
+- Set the Master-configuration of OpenShift to use `htpasswd` as its identity provider
+- Enable Persistence using `hotPath` as `persistenceVolume`
+- Install Nexus Repository Server
+- Install Jenkins and configure it to handle `s2i` builds started within an OpenShift project
+- Install Distributed Tracing - Jaeger
+- Install ServiceMesh - Istio
+- Deploy the [Ansible Service Broker](http://automationbroker.io/)
+- Install and enable the Fabric8 [Launcher](http://fabric8-launcher)
+  ...
+
+See [Ansible post installation](doc/post-installation.md)
+
+### Microk8s
+
+See instructions - https://github.com/ubuntu/microk8s
+
+### Vagrant
 
 See the [vagrant](vagrant/README.md)
 
-### Local - Customized VM
+### Virtualbox
 
 Why do we need a customized vm locally - [see](doc/why-custom-vm.md)
 
@@ -85,20 +138,20 @@ The following section explains how you can create a customized Generic Cloud ima
 
 #### Create vdi file from Cloud ISO
 
-In order to customize the Linux VM for the cloud, we are using the [cloud-init](http://cloudinit.readthedocs.io/en/latest) tool which is a set of python scripts and utilities 
-able to perform tasks as defined hereafter : 
+In order to customize the Linux VM for the cloud, we are using the [cloud-init](http://cloudinit.readthedocs.io/en/latest) tool which is a set of python scripts and utilities
+able to perform tasks as defined hereafter :
 
 - Configure the Network adapters (NAT, vboxnet),
 - Add a `root` user and configure its password
 - Additionally add non root user
-- Import your public ssh key and authorize it, 
+- Import your public ssh key and authorize it,
 - Install `docker, ansible, networkManager` packages using yum
 
-**Note** : Centos 7 ISO includes the `cloud-init` tool by default (version `0.7.9`). 
+**Note** : Centos 7 ISO includes the `cloud-init` tool by default (version `0.7.9`).
 
 To create from the Centos ISO file a VirtualDisk that Virtualbox can use, you will have to execute the following bash script `./new-iso.sh`, which will perform the following tasks :
 
-- Add your SSH public key within the `user-data` file using as input the `user-data.tpl` file 
+- Add your SSH public key within the `user-data` file using as input the `user-data.tpl` file
 - Package the files `user-data` and `meta-data` within an ISO file created using `genisoimage` application
 - Download the CentOS Generic Cloud image and save it under `/PATH/TO/IMAGES/DIR`
 - Convert the `raw` Centos ISO image to `vdi` file format
@@ -158,7 +211,7 @@ This script will perform the following tasks:
 - Customize vm; ram, cpu, ...
 - Create IDE Controller, attach iso dvd and vdi disk
 - Start vm and configure SSH Port forward
-- Create an ansible inventory file (of type `simple`) that can be used to execute the project's playbooks against the newly created vm (this is only done if Ansible is installed) 
+- Create an ansible inventory file (of type `simple`) that can be used to execute the project's playbooks against the newly created vm (this is only done if Ansible is installed)
 
 ```bash
 cd virtualbox
@@ -235,53 +288,4 @@ Warning: Permanently added '192.168.99.50' (ECDSA) to the list of known hosts.
 [root@cloud ~]# 
 ```
 
-### Public Cloud provider
-
-#### Hetzner - bare metal
-
-- See [hetzner](hetzner/README.md) page explaining how to create a vm.
-
-#### Hetzner Cloud - virtualized
-
-- See [hetzner-cloud](hetzner/README-cloud.md) page explaining how to create a cloud vm.
-
-### Private Cloud provider
-
-#### OpenStack - vpn
-
-- See [OpenStack](openstack/README.md) page explaining how to create an OpenStack cloud vm.
-
-## Cluster Deployment
-
-As the vm is now running and the docker daemon is up, you can install your `k8s` distribution using either one of the following approaches :
-
-### OpenShift
-
-- Simple using the `oc` binary tool and the command [oc cluster up](https://github.com/openshift/origin/blob/master/docs/cluster_up_down.md) within the vm
-- More elaborated using `Ansible` tool and one of the following playbook/role:
-  - `oc cluster up` [role](doc/oc.md)
-  - `openshift-ansible` all-in-one playbook as described [here](doc/cloud.md)
-  
-### Kubernetes
-
-You can then use the following instructions to install a Kubernetes cluster with the help of Ansible and the [roles we created](doc/k8s.md)
-
-## Turn on your machine into a Cloud Native Dev environment 
-
-Independent of the approach you choose before, you'll be now able to configure your cluster
-using one of the following features and with the help of the [Ansible roles](ansible/roles) we have created: 
-
-- Create list of users/passwords and their corresponding project
-- Grant Cluster admin role to an OpenShift user 
-- Set the Master-configuration of OpenShift to use `htpasswd` as its identity provider
-- Enable Persistence using `hotPath` as `persistenceVolume`
-- Install Nexus Repository Server
-- Install Jenkins and configure it to handle `s2i` builds started within an OpenShift project
-- Install Distributed Tracing - Jaeger
-- Install ServiceMesh - Istio
-- Deploy the [Ansible Service Broker](http://automationbroker.io/)
-- Install and enable the Fabric8 [Launcher](http://fabric8-launcher)
-...
-
-See [Ansible post installation](doc/post-installation.md)
  

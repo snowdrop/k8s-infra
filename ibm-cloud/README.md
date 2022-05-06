@@ -11,7 +11,6 @@
          * [Destroy an existing VPC](#destroy-an-existing-vpc)
       * [VSI - Virtual Server Instance](#vsi---virtual-server-instance)
 
-
 ## Introduction
 
 The goal of this project is to manage IBM Cloud VPC (Virtual Private cloud)
@@ -21,7 +20,6 @@ The goal of this project is to manage IBM Cloud VPC (Virtual Private cloud)
 * https://www.ibm.com/cloud/blog/announcements/ibm-cloud-collection-for-ansible
 * https://github.com/IBM-Cloud/ansible-collection-ibm
 * https://registry.terraform.io/providers/IBM-Cloud/ibm/latest/docs/resources/is_subnet
-
 
 ## Install 
 
