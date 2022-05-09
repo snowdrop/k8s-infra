@@ -8,15 +8,6 @@
     volume_name: "{{ vm_name }}-volume"
   no_log: True
 
-- name: "Set key path if not set"
-  set_fact: 
-    key_path: "{{ admin_home.stdout }}/.ssh/id_rsa_snowdrop_openstack_{{ vm_name }}"
-  when: "key_path is not defined"
-
-# - stat:
-#     path: "{{ key_path }}"
-#   register: st
-
 # - name: "Set pass facts from passwordstore"
 #   set_fact:
 #     openstack_console_user:     "{{ query('passwordstore', 'openstack/host/console_user' )[0] }}"
@@ -47,14 +38,14 @@
   debug:
     msg: "{{ item }}"
   with_items:
-  - "if: state == 'present' and key_name is not defined"
+  - "if: {{ state == 'present' and key_name is not defined }}"
 
 - name: "Only proceed if vm exists and state is present"
   block:
   
   - name: "Generate keys locally and import the pub key into Openstack"
     include_tasks: keys.yml
-    when: "state == 'present' and key_name is not defined"
+    when: "state == 'present' and (key_name is not defined or key_name | length == 0)"
 
   # - name: "Add user credentials to AWX as machine credential"
   #   awx.awx.credential:
@@ -127,9 +118,10 @@
       volumes: "{{ volume_name }}"
       boot_from_volume: "{{ openstack.vm.boot_from_volume }}"
       userdata: |
+        #cloud-config
         users:
         - name: snowdrop
-          groups: sudo
+          groups: [wheel, adm, systemd-journal]
           shell: /bin/bash
           sudo: ['ALL=(ALL) NOPASSWD:ALL']
     register: openstack_output
