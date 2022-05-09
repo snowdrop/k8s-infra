@@ -120,6 +120,7 @@
       userdata: |
         #cloud-config
         users:
+        - default
         - name: snowdrop
           groups: [wheel, adm, systemd-journal]
           shell: /bin/bash
