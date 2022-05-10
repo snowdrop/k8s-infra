@@ -9,9 +9,10 @@
     # key_path: "/tmp/admin_key.pub"
 
   tasks:
+    # , query_params={ 'name': 'Openstack' }, return_ids=True
     - name: "Get inventory for IaaS Provider"
       set_fact:
-        iaas_inventory: "{{ query('awx.awx.controller_api', 'inventories', query_params={ 'name': 'Openstack' }, return_ids=True, host='http://' + controller_host + ':' + controller_port, username=awx_user_name, oauth_token=controller_oauthtoken ) }}"
+        iaas_inventory: "{{ query('awx.awx.controller_api', 'inventories', host='http://' + controller_host + ':' + controller_port, username=awx_user_name, oauth_token=controller_oauthtoken ) }}"
       environment:
         CONTROLLER_OAUTH_TOKEN: "{{ controller_oauthtoken }}"
         CONTROLLER_USERNAME: "{{ awx_user_name }}"
