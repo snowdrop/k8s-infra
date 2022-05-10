@@ -9,24 +9,6 @@
     # key_path: "/tmp/admin_key.pub"
 
   tasks:
-    - name: "Confirm the Config File exists"
-      stat: path="{{ config_file }}"
-      register: st
-
-    - name: "Load config file contents"
-      include_vars: "{{ config_file }}"
-      when: st.stat.exists and st.stat.isreg
-      
-    - name: "Set openstack_auth facts"
-      set_fact:
-        openstack_auth: 
-          openstack_project_name: "{{ clouds.devstack.auth.project_name }}"
-          openstack_console_user:  "{{ clouds.devstack.auth.username }}"
-          openstack_console_password: "{{ clouds.devstack.auth.password }}"
-          openstack_user_domain:  "{{ clouds.devstack.auth.domain_name }}"
-          openstack_project_domain: "{{ clouds.devstack.auth.project_domain_name }}"
-          openstack_os_auth_url: "{{ clouds.devstack.auth.auth_url }}"
-
     - name: "Get inventory for IaaS Provider"
       set_fact:
         iaas_inventory: "{{ query('awx.awx.controller_api', 'inventory_sources', query_params={ 'inventory': 30 }, return_ids=True ) }}"
