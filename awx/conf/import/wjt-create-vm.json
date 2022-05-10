@@ -1,0 +1,409 @@
+{
+     "workflow_job_templates": [
+          {
+               "name": "CreateVM",
+               "description": "Create VM",
+               "extra_vars": "---",
+               "organization": null,
+               "survey_enabled": false,
+               "allow_simultaneous": false,
+               "ask_variables_on_launch": false,
+               "inventory": null,
+               "limit": null,
+               "scm_branch": "",
+               "ask_inventory_on_launch": false,
+               "ask_scm_branch_on_launch": false,
+               "ask_limit_on_launch": false,
+               "webhook_service": "",
+               "webhook_credential": null,
+               "related": {
+                    "schedules": [],
+                    "workflow_nodes": [
+                         {
+                              "extra_data": {},
+                              "inventory": null,
+                              "scm_branch": null,
+                              "job_type": null,
+                              "job_tags": null,
+                              "skip_tags": null,
+                              "limit": null,
+                              "diff_mode": null,
+                              "verbosity": null,
+                              "all_parents_must_converge": false,
+                              "identifier": "f510a069-4c02-4107-a051-80b9e5d831b0",
+                              "workflow_job_template": {
+                                   "organization": null,
+                                   "name": "CreateVM",
+                                   "type": "workflow_job_template"
+                              },
+                              "unified_job_template": {
+                                   "organization": {
+                                        "name": "snowdrop",
+                                        "type": "organization"
+                                   },
+                                   "name": "CreateVMOpenstack",
+                                   "type": "job_template"
+                              },
+                              "related": {
+                                   "credentials": [],
+                                   "success_nodes": [
+                                        {
+                                             "workflow_job_template": {
+                                                  "organization": null,
+                                                  "name": "CreateVM",
+                                                  "type": "workflow_job_template"
+                                             },
+                                             "identifier": "dbbb01f7-6456-47e1-abe5-c55d27dd389c",
+                                             "type": "workflow_job_template_node"
+                                        }
+                                   ],
+                                   "failure_nodes": [],
+                                   "always_nodes": []
+                              },
+                              "natural_key": {
+                                   "workflow_job_template": {
+                                        "organization": null,
+                                        "name": "CreateVM",
+                                        "type": "workflow_job_template"
+                                   },
+                                   "identifier": "f510a069-4c02-4107-a051-80b9e5d831b0",
+                                   "type": "workflow_job_template_node"
+                              }
+                         },
+                         {
+                              "extra_data": {},
+                              "scm_branch": null,
+                              "job_type": null,
+                              "job_tags": null,
+                              "skip_tags": null,
+                              "limit": null,
+                              "diff_mode": null,
+                              "verbosity": null,
+                              "all_parents_must_converge": false,
+                              "identifier": "e9039f13-4ad0-4e4f-871d-4ec9806d9e7b",
+                              "inventory": {
+                                   "organization": {
+                                        "name": "snowdrop",
+                                        "type": "organization"
+                                   },
+                                   "name": "OpenStack",
+                                   "type": "inventory"
+                              },
+                              "workflow_job_template": {
+                                   "organization": null,
+                                   "name": "CreateVM",
+                                   "type": "workflow_job_template"
+                              },
+                              "unified_job_template": {
+                                   "organization": {
+                                        "name": "snowdrop",
+                                        "type": "organization"
+                                   },
+                                   "name": "SecureHost",
+                                   "type": "job_template"
+                              },
+                              "related": {
+                                   "credentials": [
+                                        {
+                                             "organization": {
+                                                  "name": "snowdrop",
+                                                  "type": "organization"
+                                             },
+                                             "name": "OpenStackHosts",
+                                             "credential_type": {
+                                                  "name": "Machine",
+                                                  "kind": "ssh",
+                                                  "type": "credential_type"
+                                             },
+                                             "type": "credential"
+                                        }
+                                   ],
+                                   "success_nodes": [],
+                                   "failure_nodes": [],
+                                   "always_nodes": []
+                              },
+                              "natural_key": {
+                                   "workflow_job_template": {
+                                        "organization": null,
+                                        "name": "CreateVM",
+                                        "type": "workflow_job_template"
+                                   },
+                                   "identifier": "e9039f13-4ad0-4e4f-871d-4ec9806d9e7b",
+                                   "type": "workflow_job_template_node"
+                              }
+                         },
+                         {
+                              "extra_data": {},
+                              "inventory": null,
+                              "scm_branch": null,
+                              "job_type": null,
+                              "job_tags": null,
+                              "skip_tags": null,
+                              "limit": null,
+                              "diff_mode": null,
+                              "verbosity": null,
+                              "all_parents_must_converge": false,
+                              "identifier": "dbbb01f7-6456-47e1-abe5-c55d27dd389c",
+                              "workflow_job_template": {
+                                   "organization": null,
+                                   "name": "CreateVM",
+                                   "type": "workflow_job_template"
+                              },
+                              "unified_job_template": {
+                                   "name": "OpenStack",
+                                   "inventory": {
+                                        "organization": {
+                                             "name": "snowdrop",
+                                             "type": "organization"
+                                        },
+                                        "name": "OpenStack",
+                                        "type": "inventory"
+                                   },
+                                   "type": "inventory_source"
+                              },
+                              "related": {
+                                   "credentials": [],
+                                   "success_nodes": [
+                                        {
+                                             "workflow_job_template": {
+                                                  "organization": null,
+                                                  "name": "CreateVM",
+                                                  "type": "workflow_job_template"
+                                             },
+                                             "identifier": "e9039f13-4ad0-4e4f-871d-4ec9806d9e7b",
+                                             "type": "workflow_job_template_node"
+                                        }
+                                   ],
+                                   "failure_nodes": [],
+                                   "always_nodes": []
+                              },
+                              "natural_key": {
+                                   "workflow_job_template": {
+                                        "organization": null,
+                                        "name": "CreateVM",
+                                        "type": "workflow_job_template"
+                                   },
+                                   "identifier": "dbbb01f7-6456-47e1-abe5-c55d27dd389c",
+                                   "type": "workflow_job_template_node"
+                              }
+                         },
+                         {
+                              "extra_data": {},
+                              "scm_branch": null,
+                              "job_type": null,
+                              "job_tags": null,
+                              "skip_tags": null,
+                              "limit": null,
+                              "diff_mode": null,
+                              "verbosity": null,
+                              "all_parents_must_converge": false,
+                              "identifier": "21d6ea37-2bbb-4bd4-a9e6-52bb411f3722",
+                              "inventory": {
+                                   "organization": {
+                                        "name": "snowdrop",
+                                        "type": "organization"
+                                   },
+                                   "name": "Hetzner",
+                                   "type": "inventory"
+                              },
+                              "workflow_job_template": {
+                                   "organization": null,
+                                   "name": "CreateVM",
+                                   "type": "workflow_job_template"
+                              },
+                              "unified_job_template": {
+                                   "organization": {
+                                        "name": "snowdrop",
+                                        "type": "organization"
+                                   },
+                                   "name": "SecureHost",
+                                   "type": "job_template"
+                              },
+                              "related": {
+                                   "credentials": [
+                                        {
+                                             "organization": {
+                                                  "name": "snowdrop",
+                                                  "type": "organization"
+                                             },
+                                             "name": "OpenStackHosts",
+                                             "credential_type": {
+                                                  "name": "Machine",
+                                                  "kind": "ssh",
+                                                  "type": "credential_type"
+                                             },
+                                             "type": "credential"
+                                        }
+                                   ],
+                                   "success_nodes": [],
+                                   "failure_nodes": [],
+                                   "always_nodes": []
+                              },
+                              "natural_key": {
+                                   "workflow_job_template": {
+                                        "organization": null,
+                                        "name": "CreateVM",
+                                        "type": "workflow_job_template"
+                                   },
+                                   "identifier": "21d6ea37-2bbb-4bd4-a9e6-52bb411f3722",
+                                   "type": "workflow_job_template_node"
+                              }
+                         },
+                         {
+                              "extra_data": {},
+                              "inventory": null,
+                              "scm_branch": null,
+                              "job_type": null,
+                              "job_tags": null,
+                              "skip_tags": null,
+                              "limit": null,
+                              "diff_mode": null,
+                              "verbosity": null,
+                              "all_parents_must_converge": false,
+                              "identifier": "85eb2ec3-3fe9-4b7f-a504-f4ec98119e94",
+                              "workflow_job_template": {
+                                   "organization": null,
+                                   "name": "CreateVM",
+                                   "type": "workflow_job_template"
+                              },
+                              "unified_job_template": {
+                                   "name": "Hetzner",
+                                   "inventory": {
+                                        "organization": {
+                                             "name": "snowdrop",
+                                             "type": "organization"
+                                        },
+                                        "name": "Hetzner",
+                                        "type": "inventory"
+                                   },
+                                   "type": "inventory_source"
+                              },
+                              "related": {
+                                   "credentials": [],
+                                   "success_nodes": [
+                                        {
+                                             "workflow_job_template": {
+                                                  "organization": null,
+                                                  "name": "CreateVM",
+                                                  "type": "workflow_job_template"
+                                             },
+                                             "identifier": "21d6ea37-2bbb-4bd4-a9e6-52bb411f3722",
+                                             "type": "workflow_job_template_node"
+                                        }
+                                   ],
+                                   "failure_nodes": [],
+                                   "always_nodes": []
+                              },
+                              "natural_key": {
+                                   "workflow_job_template": {
+                                        "organization": null,
+                                        "name": "CreateVM",
+                                        "type": "workflow_job_template"
+                                   },
+                                   "identifier": "85eb2ec3-3fe9-4b7f-a504-f4ec98119e94",
+                                   "type": "workflow_job_template_node"
+                              }
+                         },
+                         {
+                              "extra_data": {},
+                              "inventory": null,
+                              "scm_branch": null,
+                              "job_type": null,
+                              "job_tags": null,
+                              "skip_tags": null,
+                              "limit": null,
+                              "diff_mode": null,
+                              "verbosity": null,
+                              "all_parents_must_converge": false,
+                              "identifier": "e9695415-8301-4043-a3e8-f222a522b500",
+                              "workflow_job_template": {
+                                   "organization": null,
+                                   "name": "CreateVM",
+                                   "type": "workflow_job_template"
+                              },
+                              "unified_job_template": {
+                                   "organization": {
+                                        "name": "snowdrop",
+                                        "type": "organization"
+                                   },
+                                   "name": "CreateVMHetzner",
+                                   "type": "job_template"
+                              },
+                              "related": {
+                                   "credentials": [],
+                                   "success_nodes": [
+                                        {
+                                             "workflow_job_template": {
+                                                  "organization": null,
+                                                  "name": "CreateVM",
+                                                  "type": "workflow_job_template"
+                                             },
+                                             "identifier": "85eb2ec3-3fe9-4b7f-a504-f4ec98119e94",
+                                             "type": "workflow_job_template_node"
+                                        }
+                                   ],
+                                   "failure_nodes": [],
+                                   "always_nodes": []
+                              },
+                              "natural_key": {
+                                   "workflow_job_template": {
+                                        "organization": null,
+                                        "name": "CreateVM",
+                                        "type": "workflow_job_template"
+                                   },
+                                   "identifier": "e9695415-8301-4043-a3e8-f222a522b500",
+                                   "type": "workflow_job_template_node"
+                              }
+                         }
+                    ],
+                    "labels": [],
+                    "notification_templates_started": [
+                         {
+                              "organization": {
+                                   "name": "snowdrop",
+                                   "type": "organization"
+                              },
+                              "name": "Snowdrop",
+                              "type": "notification_template"
+                         }
+                    ],
+                    "notification_templates_success": [
+                         {
+                              "organization": {
+                                   "name": "snowdrop",
+                                   "type": "organization"
+                              },
+                              "name": "Snowdrop",
+                              "type": "notification_template"
+                         }
+                    ],
+                    "notification_templates_error": [
+                         {
+                              "organization": {
+                                   "name": "snowdrop",
+                                   "type": "organization"
+                              },
+                              "name": "Snowdrop",
+                              "type": "notification_template"
+                         }
+                    ],
+                    "notification_templates_approvals": [
+                         {
+                              "organization": {
+                                   "name": "snowdrop",
+                                   "type": "organization"
+                              },
+                              "name": "Snowdrop",
+                              "type": "notification_template"
+                         }
+                    ],
+                    "survey_spec": {}
+               },
+               "natural_key": {
+                    "organization": null,
+                    "name": "CreateVM",
+                    "type": "workflow_job_template"
+               }
+          }
+     ]
+}

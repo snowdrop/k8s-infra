@@ -1,4 +1,19 @@
 ---
+- name: "Gather OpenStack credentials"
+  hosts: localhost
+  gather_facts: True
+  vars:
+    config_file: "{{ lookup('env', 'OS_CLIENT_CONFIG_FILE') }}"
+    # key_path: "/tmp/admin_key.pub"
+
+  pre_tasks:
+    - name: "Validate IaaS Provider"
+      assert:
+        that:
+          - "iaas_provider is defined"
+          - "iaas_provider == 'hetzner'"
+        fail_msg: "IaaS Provider is either undefied or not hetzner"
+
 - name: "Create SSH Key for server"
   import_playbook: "hetzner_ssh_key_create.yml"
 
@@ -6,5 +21,4 @@
   import_playbook: "hetzner_vm_create.yml"
   vars:
     hetzner_context_name: "snowdrop"
-
 ...

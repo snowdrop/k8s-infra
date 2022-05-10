@@ -169,7 +169,7 @@ $ awx credentials create --name a-github-user --credential_type "GitHub Personal
 
 [source,bash]
 ----
-$ awx notification_templates create --name Snowdrop --description "Snowdrop Team" --organization snowdrop --notification_type email  --inputs '{"host": "smtp.corp.redhat.com", "port": "25", "username": "snowdrop-releasing-team@redhat.com", "password": "", "use_tls": False, "use_ssl": False, "sender": "snowdrop-releasing-team@redhat.com", "recipients": "antcosta@redhat.com"}'
+$ awx notification_templates create --name Snowdrop --description "Snowdrop Team" --organization snowdrop --notification_type email  --inputs '{"host": "smtp.host", "port": "25", "username": "user", "password": "", "use_tls": False, "use_ssl": False, "sender": "sender", "recipients": "recipients_csv"}'
 
 ----
 

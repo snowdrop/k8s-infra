@@ -7,6 +7,13 @@
     # key_path: "/tmp/admin_key.pub"
 
   pre_tasks:
+    - name: "Validate IaaS Provider"
+      assert:
+        that:
+          - "iaas_provider is defined"
+          - "iaas_provider == 'openstack'"
+        fail_msg: "IaaS Provider is either undefied or not openstack"
+
     # - name: "Set openstack_auth facts"
     #   set_fact:
     #     key_path: "/tmp/admin_key.pub"

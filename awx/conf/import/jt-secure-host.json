@@ -1,0 +1,110 @@
+{
+     "job_templates": [
+          {
+               "name": "SecureHost",
+               "description": "Secure Host",
+               "job_type": "run",
+               "inventory": null,
+               "playbook": "ansible/playbook/sec_host_awx.yml",
+               "scm_branch": "",
+               "forks": 0,
+               "limit": "",
+               "verbosity": 0,
+               "extra_vars": "---",
+               "job_tags": "",
+               "force_handlers": false,
+               "skip_tags": "",
+               "start_at_task": "",
+               "timeout": 0,
+               "use_fact_cache": true,
+               "execution_environment": null,
+               "host_config_key": "",
+               "ask_scm_branch_on_launch": false,
+               "ask_diff_mode_on_launch": false,
+               "ask_variables_on_launch": false,
+               "ask_limit_on_launch": false,
+               "ask_tags_on_launch": false,
+               "ask_skip_tags_on_launch": false,
+               "ask_job_type_on_launch": false,
+               "ask_verbosity_on_launch": false,
+               "ask_inventory_on_launch": true,
+               "ask_credential_on_launch": true,
+               "survey_enabled": false,
+               "become_enabled": false,
+               "diff_mode": false,
+               "allow_simultaneous": false,
+               "job_slice_count": 1,
+               "webhook_service": "",
+               "webhook_credential": null,
+               "project": {
+                    "organization": {
+                         "name": "snowdrop",
+                         "type": "organization"
+                    },
+                    "name": "dev-K8sInfraProject-antcosta",
+                    "type": "project"
+               },
+               "related": {
+                    "labels": [],
+                    "credentials": [],
+                    "schedules": [],
+                    "notification_templates_started": [
+                         {
+                              "organization": {
+                                   "name": "snowdrop",
+                                   "type": "organization"
+                              },
+                              "name": "Snowdrop",
+                              "type": "notification_template"
+                         }
+                    ],
+                    "notification_templates_success": [
+                         {
+                              "organization": {
+                                   "name": "snowdrop",
+                                   "type": "organization"
+                              },
+                              "name": "Snowdrop",
+                              "type": "notification_template"
+                         }
+                    ],
+                    "notification_templates_error": [
+                         {
+                              "organization": {
+                                   "name": "snowdrop",
+                                   "type": "organization"
+                              },
+                              "name": "Snowdrop",
+                              "type": "notification_template"
+                         }
+                    ],
+                    "survey_spec": {
+                         "name": "",
+                         "description": "",
+                         "spec": [
+                              {
+                                   "question_name": "VM Name",
+                                   "question_description": "VM Name",
+                                   "required": false,
+                                   "type": "text",
+                                   "variable": "vn_name",
+                                   "min": 0,
+                                   "max": 1024,
+                                   "default": "",
+                                   "choices": "",
+                                   "new_question": true
+                              }
+                         ]
+                    }
+               },
+               "natural_key": {
+                    "organization": {
+                         "name": "snowdrop",
+                         "type": "organization"
+                    },
+                    "name": "SecureHost",
+                    "type": "job_template"
+               }
+          }
+     ]
+}
