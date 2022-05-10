@@ -7,7 +7,10 @@
     controller_port: "{{ lookup('env', 'AWX_DEMO_SERVICE_PORT_80_TCP_PORT') }}"
     config_file: "{{ lookup('env', 'OS_CLIENT_CONFIG_FILE') }}"
     # key_path: "/tmp/admin_key.pub"
-
+  environment:
+    CONTROLLER_OAUTH_TOKEN: "{{ controller_oauthtoken }}"
+    CONTROLLER_USERNAME: "{{ awx_user_name }}"
+    CONTROLLER_HOST: "http://{{ lookup('env', 'AWX_DEMO_SERVICE_PORT_80_TCP_ADDR')  }}:{{ lookup('env', 'AWX_DEMO_SERVICE_PORT_80_TCP_PORT') }}"
   tasks:
     - name: "Confirm the Config File exists"
       stat: path="{{ config_file }}"
