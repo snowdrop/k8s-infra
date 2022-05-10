@@ -8,6 +8,25 @@
     config_file: "{{ lookup('env', 'OS_CLIENT_CONFIG_FILE') }}"
     # key_path: "/tmp/admin_key.pub"
 
+  pre_tasks:
+    - name: "Confirm the Config File exists"
+      stat: path="{{ config_file }}"
+      register: st
+
+    - name: "Load config file contents"
+      include_vars: "{{ config_file }}"
+      when: st.stat.exists and st.stat.isreg
+
+    - name: "Set openstack_auth facts"
+      set_fact:
+        openstack_auth: 
+          openstack_project_name: "{{ clouds.devstack.auth.project_name }}"
+          openstack_console_user:  "{{ clouds.devstack.auth.username }}"
+          openstack_console_password: "{{ clouds.devstack.auth.password }}"
+          openstack_user_domain:  "{{ clouds.devstack.auth.domain_name }}"
+          openstack_project_domain: "{{ clouds.devstack.auth.project_domain_name }}"
+          openstack_os_auth_url: "{{ clouds.devstack.auth.auth_url }}"  
+
   tasks:
     # , query_params={ 'name': 'Openstack' }, return_ids=True
     - name: "Get inventory for IaaS Provider"
@@ -71,14 +90,6 @@
         - "localhost: {{ hostvars['localhost'] | to_yaml }}"
         # - "ssh_pub: {{ ssh_pub }}"
         
-    - name: "Confirm the Config File exists"
-      stat: path="{{ config_file }}"
-      register: st
-
-    - name: "Load config file contents"
-      include_vars: "{{ config_file }}"
-      when: st.stat.exists and st.stat.isreg
-
 - name: "Create Server on Openstack"
   import_playbook: "openstack_vm_create.yml"
   vars: 
