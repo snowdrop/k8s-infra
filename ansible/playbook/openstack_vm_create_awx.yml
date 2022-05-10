@@ -14,6 +14,13 @@
           - "iaas_provider == 'openstack'"
         fail_msg: "IaaS Provider is either undefied or not openstack"
 
+    - name: "Validate IaaS Provider"
+      assert:
+        that:
+          - "openstack_network is defined"
+          - "openstack_security_group is defined"
+        fail_msg: "Missing mandatory variables: openstack_network, openstack_security_group"
+
     # - name: "Set openstack_auth facts"
     #   set_fact:
     #     key_path: "/tmp/admin_key.pub"
