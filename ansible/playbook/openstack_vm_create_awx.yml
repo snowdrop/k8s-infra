@@ -9,7 +9,7 @@
     # key_path: "/tmp/admin_key.pub"
 
   tasks:
-    - controller_meta:
+    - awx.awx.controller_meta:
       register: result
 
     - name: Show details about the collection
