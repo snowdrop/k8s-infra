@@ -69,13 +69,13 @@
         var_name: "ansible_ssh_host"
         var_value: "{{ ip_address }}"
 
-  post_tasks:
-    - name: Refresh the inventory
-      meta: refresh_inventory
+  # post_tasks:
+  #   - name: Refresh the inventory
+  #     meta: refresh_inventory
 
-    - name: Get vm host vars
-      set_fact:
-        my_hostvars: "{{ hostvars[vm_name] }}"
+  #   - name: Get vm host vars
+  #     set_fact:
+  #       my_hostvars: "{{ hostvars[vm_name] }}"
 
     - name: "Push changes to the pass git database"
       shell: "git push"
