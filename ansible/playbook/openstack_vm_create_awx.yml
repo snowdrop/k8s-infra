@@ -51,9 +51,8 @@
 
     - name: "Set OpenStack variables"
       set_fact:
-        openstack_network: "{{ iaas_inventory_vars['openstack_network'] }}"
+        openstack: "{{ iaas_inventory_vars['openstack'] }}"
         openstack_security_group: "{{ iaas_inventory_vars['openstack_security_group'] }}"
-
 
     - name: "Validate IaaS Provider"
       assert:
@@ -97,7 +96,6 @@
       vm:
         image: "{{ openstack_vm_image }}"
         flavor: "{{ openstack_vm_flavor }}"
-        network: "{{ openstack_network }}"
 
 - name: "Openstack VM create"
   hosts: localhost
