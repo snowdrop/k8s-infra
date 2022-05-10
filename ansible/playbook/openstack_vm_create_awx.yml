@@ -9,6 +9,14 @@
     # key_path: "/tmp/admin_key.pub"
 
   tasks:
+    - name: "Confirm the Config File exists"
+      stat: path="{{ config_file }}"
+      register: st
+
+    - name: "Load config file contents"
+      include_vars: "{{ config_file }}"
+      when: st.stat.exists and st.stat.isreg
+
     - name: "Set openstack_auth facts"
       set_fact:
         openstack_auth: 
@@ -25,7 +33,7 @@
       environment:
         CONTROLLER_OAUTH_TOKEN: "{{ controller_oauthtoken }}"
         CONTROLLER_USERNAME: "{{ awx_user_name }}"
-        CONTROLLER_HOST: "http://{{controller_host }}:{{ controller_port }}"
+        CONTROLLER_HOST: "http://{{ controller_host  }}:{{ controller_port }}"
 
     - name: "Print inventory"
       debug: 
