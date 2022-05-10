@@ -9,12 +9,14 @@
     # key_path: "/tmp/admin_key.pub"
 
   tasks:
-    - awx.awx.controller_meta:
-      register: result
+    - name: "Confirm the Config File exists"
+      stat: path="{{ config_file }}"
+      register: st
 
-    - name: Show details about the collection
-      debug: var=result
-
+    - name: "Load config file contents"
+      include_vars: "{{ config_file }}"
+      when: st.stat.exists and st.stat.isreg
+      
     - name: "Set openstack_auth facts"
       set_fact:
         openstack_auth: 
