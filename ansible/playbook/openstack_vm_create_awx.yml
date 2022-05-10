@@ -23,7 +23,7 @@
         msg: "{{ item }}"
       with_items:
         - "iaas_inventory: {{ iaas_inventory }}"
-        - "iaas_inventory variable_data: {{ iaas_inventory['related']['variable_data'] }}"
+        - "iaas_inventory variable_data: {{ iaas_inventory[0]['related']['variable_data'] }}"
 
     - name: "Validate IaaS Provider"
       assert:
