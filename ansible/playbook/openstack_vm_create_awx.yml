@@ -30,6 +30,12 @@
       set_fact:
         iaas_inventory_vars: "{{ iaas_inventory[0]['variables'] | from_yaml }}"
 
+    - name: "Set OpenStack variables"
+      set_fact:
+        openstack_network: "{{ iaas_inventory_vars['openstack_network'] }}"
+        openstack_security_group: "{{ iaas_inventory_vars['openstack_security_group'] }}"
+
+
     - name: "Validate IaaS Provider"
       assert:
         that:
