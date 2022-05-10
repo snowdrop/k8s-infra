@@ -1,6 +1,10 @@
 = AWX
+:toc:left
+:toc-title: Table of Contents
+:icons: font
+:description: AWX documentation
+:source-highlighter: highlight.js
 
-References: https://github.com/ansible/awx-operator
 
 == Installation
 

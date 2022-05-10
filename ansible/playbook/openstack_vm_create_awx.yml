@@ -7,18 +7,18 @@
     # key_path: "/tmp/admin_key.pub"
 
   pre_tasks:
-    - name: "Set openstack_auth facts"
-      set_fact:
-        key_path: "/tmp/admin_key.pub"
+    # - name: "Set openstack_auth facts"
+    #   set_fact:
+    #     key_path: "/tmp/admin_key.pub"
 
-    - name: "Fetch SSH public key"
-      shell: "ssh-add -L | head -n 1"
-      register: ssh_pub
+    # - name: "Fetch SSH public key"
+    #   shell: "ssh-add -L | head -n 1"
+    #   register: ssh_pub
     
-    - name: "Write SSH Public Key to file"
-      copy: 
-        content: "{{ ssh_pub }}"
-        dest: "{{ key_path }}"
+    # - name: "Write SSH Public Key to file"
+    #   copy: 
+    #     content: "{{ ssh_pub }}"
+    #     dest: "{{ key_path }}"
 
     - name: "Print variables"
       debug: 
@@ -26,6 +26,7 @@
       with_items:
         - "ansible_env: {{ ansible_env }}"
         - "localhost: {{ hostvars['localhost'] | to_yaml }}"
+        - "VM: {{ hostvars[vm_name] | to_yaml }}"
         - "ssh_pub: {{ ssh_pub }}"
         
     - name: "Confirm the Config File exists"

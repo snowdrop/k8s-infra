@@ -1,0 +1,5 @@
+{
+    "env": {
+        "HCLOUD_TOKEN": "{{ hetzner_api_token }}"
+    }
+}

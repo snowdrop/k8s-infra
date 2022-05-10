@@ -1,7 +1,15 @@
 ---
+- name: "Set key path if not set"
+  set_fact: 
+    key_path: "{{ admin_home.stdout }}/.ssh/id_rsa_snowdrop_openstack_{{ vm_name }}"
+
+- stat:
+    path: "{{ key_path }}"
+  register: st
+
 - name: "Generate SSH keys"
   shell: ssh-keygen -b 2048 -t rsa -f {{ key_path }} -q -N ""
-  when: st.stat.exists == false
+  when: "st.stat.exists == false"
 
 - name: "Set key name"
   set_fact:
