@@ -3,13 +3,29 @@
   hosts: localhost
   gather_facts: True
   vars:
+    controller_host: "{{ lookup('env', 'AWX_DEMO_SERVICE_PORT_80_TCP_ADDR') }}"
+    controller_port: "{{ lookup('env', 'AWX_DEMO_SERVICE_PORT_80_TCP_PORT') }}"
     config_file: "{{ lookup('env', 'OS_CLIENT_CONFIG_FILE') }}"
     # key_path: "/tmp/admin_key.pub"
 
-  pre_tasks:
+  tasks:
+    - name: "Set openstack_auth facts"
+      set_fact:
+        openstack_auth: 
+          openstack_project_name: "{{ clouds.devstack.auth.project_name }}"
+          openstack_console_user:  "{{ clouds.devstack.auth.username }}"
+          openstack_console_password: "{{ clouds.devstack.auth.password }}"
+          openstack_user_domain:  "{{ clouds.devstack.auth.domain_name }}"
+          openstack_project_domain: "{{ clouds.devstack.auth.project_domain_name }}"
+          openstack_os_auth_url: "{{ clouds.devstack.auth.auth_url }}"
+
     - name: "Get inventory for IaaS Provider"
       set_fact:
         iaas_inventory: "{{ query('awx.awx.controller_api', 'inventory_sources', query_params={ 'inventory': 30 }, return_ids=True ) }}"
+      environment:
+        CONTROLLER_OAUTH_TOKEN: "{{ controller_oauthtoken }}"
+        CONTROLLER_USERNAME: "{{ awx_user_name }}"
+        CONTROLLER_HOST: "http://{{controller_host }}:{{ controller_port }}"
 
     - name: "Print inventory"
       debug: 
@@ -57,17 +73,6 @@
     - name: "Load config file contents"
       include_vars: "{{ config_file }}"
       when: st.stat.exists and st.stat.isreg
-
-  tasks:
-    - name: "Set openstack_auth facts"
-      set_fact:
-        openstack_auth: 
-          openstack_project_name: "{{ clouds.devstack.auth.project_name }}"
-          openstack_console_user:  "{{ clouds.devstack.auth.username }}"
-          openstack_console_password: "{{ clouds.devstack.auth.password }}"
-          openstack_user_domain:  "{{ clouds.devstack.auth.domain_name }}"
-          openstack_project_domain: "{{ clouds.devstack.auth.project_domain_name }}"
-          openstack_os_auth_url: "{{ clouds.devstack.auth.auth_url }}"
 
 - name: "Create Server on Openstack"
   import_playbook: "openstack_vm_create.yml"
