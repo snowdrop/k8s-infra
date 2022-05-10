@@ -97,6 +97,7 @@
       vm:
         image: "{{ openstack_vm_image }}"
         flavor: "{{ openstack_vm_flavor }}"
+        network: "{{ openstack_network }}"
 
 - name: "Openstack VM create"
   hosts: localhost
