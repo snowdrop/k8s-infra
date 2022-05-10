@@ -7,12 +7,20 @@
     # key_path: "/tmp/admin_key.pub"
 
   pre_tasks:
+    - name: "Get inventory for IaaS Provider"
+      set_fact:
+        iaas_inventory: "{{ query('awx.awx.controller_api', 'inventory_sources', query_params={ 'inventory': 30 }, return_ids=True ) }}"
+
+    - name: "Print inventory"
+      debug: 
+        msg: "iaas_inventory: {{ iaas_inventory }}"
+
     - name: "Validate IaaS Provider"
       assert:
         that:
           - "iaas_provider is defined"
           - "iaas_provider == 'openstack'"
-        fail_msg: "IaaS Provider is either undefied or not openstack"
+        fail_msg: "IaaS Provider is either undefined or not openstack"
 
     - name: "Validate IaaS Provider"
       assert:
