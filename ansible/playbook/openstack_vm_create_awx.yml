@@ -11,7 +11,7 @@
   tasks:
     - name: "Get inventory for IaaS Provider"
       set_fact:
-        iaas_inventory: "{{ query('awx.awx.controller_api', 'inventory_sources', query_params={ 'inventory': 30 }, return_ids=True, host='http://' + controller_host + ':' + controller_port, username=awx_user_name, oauth_token=controller_oauthtoken ) }}"
+        iaas_inventory: "{{ query('awx.awx.controller_api', 'inventory', query_params={ 'name': 'openstack' }, return_ids=True, host='http://' + controller_host + ':' + controller_port, username=awx_user_name, oauth_token=controller_oauthtoken ) }}"
       environment:
         CONTROLLER_OAUTH_TOKEN: "{{ controller_oauthtoken }}"
         CONTROLLER_USERNAME: "{{ awx_user_name }}"
