@@ -12,11 +12,11 @@
     # , query_params={ 'name': 'Openstack' }, return_ids=True
     - name: "Get inventory for IaaS Provider"
       set_fact:
-        iaas_inventory: "{{ query('awx.awx.controller_api', 'inventories', query_params={ 'name': 'OpenStack' }, host='http://' + controller_host + ':' + controller_port, username=awx_user_name, oauth_token=controller_oauthtoken ) }}"
-      environment:
-        CONTROLLER_OAUTH_TOKEN: "{{ controller_oauthtoken }}"
-        CONTROLLER_USERNAME: "{{ awx_user_name }}"
-        CONTROLLER_HOST: "http://{{ controller_host }}:{{ controller_port }}"
+        iaas_inventory: "{{ query('awx.awx.controller_api', 'inventories', query_params={ 'name': iaas_provider }, host='http://' + controller_host + ':' + controller_port, username=awx_user_name, oauth_token=controller_oauthtoken ) }}"
+      # environment:
+      #   CONTROLLER_OAUTH_TOKEN: "{{ controller_oauthtoken }}"
+      #   CONTROLLER_USERNAME: "{{ awx_user_name }}"
+      #   CONTROLLER_HOST: "http://{{ controller_host }}:{{ controller_port }}"
 
     - name: "Print inventory"
       debug: 
@@ -25,6 +25,10 @@
         - "iaas_inventory: {{ iaas_inventory }}"
         - "iaas_inventory variable_data: {{ iaas_inventory[0]['related']['variable_data'] }}"
         - "iaas_inventory variables: {{ iaas_inventory[0]['variables'] }}"
+
+    - name: "Get varaibles from IaaS Provider inventory"
+      set_fact:
+        iaas_inventory_vars: "{{ iaas_inventory[0]['variables'] | from_yaml }}"
 
     - name: "Validate IaaS Provider"
       assert:
