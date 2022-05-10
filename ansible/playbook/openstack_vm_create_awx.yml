@@ -33,7 +33,7 @@
       with_items:
         - "ansible_env: {{ ansible_env }}"
         - "localhost: {{ hostvars['localhost'] | to_yaml }}"
-        - "ssh_pub: {{ ssh_pub }}"
+        # - "ssh_pub: {{ ssh_pub }}"
         
     - name: "Confirm the Config File exists"
       stat: path="{{ config_file }}"
