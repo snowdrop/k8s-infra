@@ -876,7 +876,9 @@
                                              "type": "credential"
                                         }
                                    ],
-                                   "success_nodes": [
+                                   "success_nodes": [],
+                                   "failure_nodes": [],
+                                   "always_nodes": [
                                         {
                                              "workflow_job_template": {
                                                   "organization": {
@@ -889,9 +891,7 @@
                                              "identifier": "550d5c66-f429-4391-8933-4a1006e909cb",
                                              "type": "workflow_job_template_node"
                                         }
-                                   ],
-                                   "failure_nodes": [],
-                                   "always_nodes": []
+                                   ]
                               },
                               "natural_key": {
                                    "workflow_job_template": {
@@ -1155,9 +1155,7 @@
                               },
                               "related": {
                                    "credentials": [],
-                                   "success_nodes": [],
-                                   "failure_nodes": [],
-                                   "always_nodes": [
+                                   "success_nodes": [
                                         {
                                              "workflow_job_template": {
                                                   "organization": {
@@ -1170,7 +1168,9 @@
                                              "identifier": "dbbb01f7-6456-47e1-abe5-c55d27dd389c",
                                              "type": "workflow_job_template_node"
                                         }
-                                   ]
+                                   ],
+                                   "failure_nodes": [],
+                                   "always_nodes": []
                               },
                               "natural_key": {
                                    "workflow_job_template": {
@@ -1317,9 +1317,7 @@
                               },
                               "related": {
                                    "credentials": [],
-                                   "success_nodes": [],
-                                   "failure_nodes": [],
-                                   "always_nodes": [
+                                   "success_nodes": [
                                         {
                                              "workflow_job_template": {
                                                   "organization": {
@@ -1332,7 +1330,9 @@
                                              "identifier": "85eb2ec3-3fe9-4b7f-a504-f4ec98119e94",
                                              "type": "workflow_job_template_node"
                                         }
-                                   ]
+                                   ],
+                                   "failure_nodes": [],
+                                   "always_nodes": []
                               },
                               "natural_key": {
                                    "workflow_job_template": {

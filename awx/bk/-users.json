@@ -89,6 +89,18 @@
                                         "name": "snowdrop",
                                         "type": "organization"
                                    },
+                                   "name": "k8sInstall",
+                                   "type": "job_template"
+                              }
+                         },
+                         {
+                              "name": "Admin",
+                              "type": "role",
+                              "content_object": {
+                                   "organization": {
+                                        "name": "snowdrop",
+                                        "type": "organization"
+                                   },
                                    "name": "dev-K8sInfraProject-antcosta",
                                    "type": "project"
                               }
