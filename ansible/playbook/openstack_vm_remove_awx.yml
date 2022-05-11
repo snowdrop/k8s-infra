@@ -63,6 +63,5 @@
         controller_oauthtoken: "{{ controller_oauthtoken }}"
         controller_username: "{{ awx_user_name }}"
         controller_host: "http://{{controller_host }}:{{ controller_port }}"
-
-  when: "iaas_provider is not defined or iaas_provider == 'openstack'"
+      when: "iaas_provider is not defined or iaas_provider == 'openstack'"
 ...
