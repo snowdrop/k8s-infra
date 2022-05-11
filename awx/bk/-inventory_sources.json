@@ -1,0 +1,235 @@
+{
+     "inventory_sources": [
+          {
+               "name": "Hetzner",
+               "description": "Hetzner",
+               "source": "scm",
+               "source_path": "",
+               "source_vars": "",
+               "enabled_var": "",
+               "enabled_value": "",
+               "host_filter": "",
+               "overwrite": true,
+               "overwrite_vars": false,
+               "timeout": 0,
+               "verbosity": 1,
+               "execution_environment": null,
+               "update_on_launch": true,
+               "update_cache_timeout": 0,
+               "update_on_project_update": false,
+               "credential": {
+                    "organization": {
+                         "name": "snowdrop",
+                         "type": "organization"
+                    },
+                    "name": "hetzner-hcloud",
+                    "credential_type": {
+                         "name": "HetznerHCloudToken",
+                         "kind": "cloud",
+                         "type": "credential_type"
+                    },
+                    "type": "credential"
+               },
+               "inventory": {
+                    "organization": {
+                         "name": "snowdrop",
+                         "type": "organization"
+                    },
+                    "name": "Hetzner",
+                    "type": "inventory"
+               },
+               "source_project": {
+                    "organization": {
+                         "name": "snowdrop",
+                         "type": "organization"
+                    },
+                    "name": "HetznerDynamicInventory",
+                    "type": "project"
+               },
+               "related": {
+                    "schedules": [
+                         {
+                              "rrule": "DTSTART;TZID=Europe/Madrid:20220510T114500 RRULE:INTERVAL=1;FREQ=HOURLY",
+                              "name": "HourlyUpdate",
+                              "description": "Hourly update",
+                              "extra_data": {},
+                              "scm_branch": null,
+                              "job_type": null,
+                              "job_tags": null,
+                              "skip_tags": null,
+                              "limit": null,
+                              "diff_mode": null,
+                              "verbosity": null,
+                              "enabled": true,
+                              "inventory": {
+                                   "organization": {
+                                        "name": "snowdrop",
+                                        "type": "organization"
+                                   },
+                                   "name": "Hetzner",
+                                   "type": "inventory"
+                              },
+                              "unified_job_template": {
+                                   "name": "Hetzner",
+                                   "inventory": {
+                                        "organization": {
+                                             "name": "snowdrop",
+                                             "type": "organization"
+                                        },
+                                        "name": "Hetzner",
+                                        "type": "inventory"
+                                   },
+                                   "type": "inventory_source"
+                              },
+                              "related": {
+                                   "credentials": []
+                              },
+                              "natural_key": {
+                                   "unified_job_template": {
+                                        "name": "Hetzner",
+                                        "inventory": {
+                                             "organization": {
+                                                  "name": "snowdrop",
+                                                  "type": "organization"
+                                             },
+                                             "name": "Hetzner",
+                                             "type": "inventory"
+                                        },
+                                        "type": "inventory_source"
+                                   },
+                                   "name": "HourlyUpdate",
+                                   "type": "schedule"
+                              }
+                         }
+                    ],
+                    "notification_templates_started": [],
+                    "notification_templates_success": [],
+                    "notification_templates_error": []
+               },
+               "natural_key": {
+                    "name": "Hetzner",
+                    "inventory": {
+                         "organization": {
+                              "name": "snowdrop",
+                              "type": "organization"
+                         },
+                         "name": "Hetzner",
+                         "type": "inventory"
+                    },
+                    "type": "inventory_source"
+               }
+          },
+          {
+               "name": "OpenStack",
+               "description": "OpenStack",
+               "source": "openstack",
+               "source_path": "",
+               "source_vars": "---",
+               "enabled_var": "",
+               "enabled_value": "",
+               "host_filter": "",
+               "overwrite": true,
+               "overwrite_vars": false,
+               "timeout": 0,
+               "verbosity": 1,
+               "execution_environment": null,
+               "update_on_launch": true,
+               "update_cache_timeout": 0,
+               "source_project": null,
+               "update_on_project_update": false,
+               "credential": {
+                    "organization": {
+                         "name": "snowdrop",
+                         "type": "organization"
+                    },
+                    "name": "openstack-jenkins",
+                    "credential_type": {
+                         "name": "OpenStack",
+                         "kind": "cloud",
+                         "type": "credential_type"
+                    },
+                    "type": "credential"
+               },
+               "inventory": {
+                    "organization": {
+                         "name": "snowdrop",
+                         "type": "organization"
+                    },
+                    "name": "openstack",
+                    "type": "inventory"
+               },
+               "related": {
+                    "schedules": [
+                         {
+                              "rrule": "DTSTART;TZID=Europe/Madrid:20220510T114500 RRULE:INTERVAL=1;FREQ=HOURLY",
+                              "name": "HourlyUpdate",
+                              "description": "Hourly Update",
+                              "extra_data": {},
+                              "scm_branch": null,
+                              "job_type": null,
+                              "job_tags": null,
+                              "skip_tags": null,
+                              "limit": null,
+                              "diff_mode": null,
+                              "verbosity": null,
+                              "enabled": true,
+                              "inventory": {
+                                   "organization": {
+                                        "name": "snowdrop",
+                                        "type": "organization"
+                                   },
+                                   "name": "openstack",
+                                   "type": "inventory"
+                              },
+                              "unified_job_template": {
+                                   "name": "OpenStack",
+                                   "inventory": {
+                                        "organization": {
+                                             "name": "snowdrop",
+                                             "type": "organization"
+                                        },
+                                        "name": "openstack",
+                                        "type": "inventory"
+                                   },
+                                   "type": "inventory_source"
+                              },
+                              "related": {
+                                   "credentials": []
+                              },
+                              "natural_key": {
+                                   "unified_job_template": {
+                                        "name": "OpenStack",
+                                        "inventory": {
+                                             "organization": {
+                                                  "name": "snowdrop",
+                                                  "type": "organization"
+                                             },
+                                             "name": "openstack",
+                                             "type": "inventory"
+                                        },
+                                        "type": "inventory_source"
+                                   },
+                                   "name": "HourlyUpdate",
+                                   "type": "schedule"
+                              }
+                         }
+                    ],
+                    "notification_templates_started": [],
+                    "notification_templates_success": [],
+                    "notification_templates_error": []
+               },
+               "natural_key": {
+                    "name": "OpenStack",
+                    "inventory": {
+                         "organization": {
+                              "name": "snowdrop",
+                              "type": "organization"
+                         },
+                         "name": "openstack",
+                         "type": "inventory"
+                    },
+                    "type": "inventory_source"
+               }
+          }
+     ]
+}

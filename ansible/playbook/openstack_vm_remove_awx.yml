@@ -1,10 +1,49 @@
 ---
 # Variables:
 #  - "vm_name": "n311-test"
+- name: "Gather OpenStack credentials"
+  hosts: localhost
+  gather_facts: True
+  vars:
+    controller_host: "{{ lookup('env', 'AWX_DEMO_SERVICE_PORT_80_TCP_ADDR') }}"
+    controller_port: "{{ lookup('env', 'AWX_DEMO_SERVICE_PORT_80_TCP_PORT') }}"
+    config_file: "{{ lookup('env', 'OS_CLIENT_CONFIG_FILE') }}"
+
+  pre_tasks:
+    - name: "Confirm the Config File exists"
+      stat: path="{{ config_file }}"
+      register: st
+
+    - name: "Load config file contents"
+      include_vars: "{{ config_file }}"
+      when: st.stat.exists and st.stat.isreg
+
+    - name: "Set openstack_auth facts"
+      set_fact:
+        openstack_auth: 
+          openstack_project_name: "{{ clouds.devstack.auth.project_name }}"
+          openstack_console_user:  "{{ clouds.devstack.auth.username }}"
+          openstack_console_password: "{{ clouds.devstack.auth.password }}"
+          openstack_user_domain:  "{{ clouds.devstack.auth.domain_name }}"
+          openstack_project_domain: "{{ clouds.devstack.auth.project_domain_name }}"
+          openstack_os_auth_url: "{{ clouds.devstack.auth.auth_url }}"  
+
+    - name: "Get inventory for IaaS Provider"
+      set_fact:
+        iaas_inventory: "{{ query('awx.awx.controller_api', 'inventories', query_params={ 'name': iaas_provider }, host='http://' + controller_host + ':' + controller_port, username=awx_user_name, oauth_token=controller_oauthtoken ) }}"
+ 
+     - name: "Validate IaaS Provider"
+      assert:
+        that:
+          - "iaas_provider is defined"
+          - "iaas_provider == 'openstack'"
+        fail_msg: "IaaS Provider is either undefined or not openstack"
+
 - name: "Delete Server on Openstack"
   import_playbook: "openstack_vm_delete.yml"
+  when: "iaas_provider is not defined or iaas_provider == 'openstack'"
 
-- name: "Openstack VM create"
+- name: "Remove credentials from AWX"
   hosts: localhost
   gather_facts: True
   vars:
@@ -24,4 +63,6 @@
         controller_oauthtoken: "{{ controller_oauthtoken }}"
         controller_username: "{{ awx_user_name }}"
         controller_host: "http://{{controller_host }}:{{ controller_port }}"
+
+  when: "iaas_provider is not defined or iaas_provider == 'openstack'"
 ...

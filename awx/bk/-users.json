@@ -1,0 +1,86 @@
+{
+     "users": [
+          {
+               "username": "admin",
+               "first_name": "",
+               "last_name": "",
+               "email": "test@example.com",
+               "is_superuser": true,
+               "is_system_auditor": false,
+               "related": {
+                    "roles": [
+                         {
+                              "name": "Admin",
+                              "type": "role",
+                              "content_object": {
+                                   "organization": {
+                                        "name": "snowdrop",
+                                        "type": "organization"
+                                   },
+                                   "name": "CreateVMOpenstack",
+                                   "type": "job_template"
+                              }
+                         },
+                         {
+                              "name": "Admin",
+                              "type": "role",
+                              "content_object": {
+                                   "organization": {
+                                        "name": "snowdrop",
+                                        "type": "organization"
+                                   },
+                                   "name": "CreateVMHetzner",
+                                   "type": "job_template"
+                              }
+                         },
+                         {
+                              "name": "Admin",
+                              "type": "role",
+                              "content_object": {
+                                   "organization": {
+                                        "name": "snowdrop",
+                                        "type": "organization"
+                                   },
+                                   "name": "SecureHost",
+                                   "type": "job_template"
+                              }
+                         },
+                         {
+                              "name": "Admin",
+                              "type": "role",
+                              "content_object": {
+                                   "organization": {
+                                        "name": "snowdrop",
+                                        "type": "organization"
+                                   },
+                                   "name": "dev-K8sInfraProject-antcosta",
+                                   "type": "project"
+                              }
+                         },
+                         {
+                              "name": "Admin",
+                              "type": "role",
+                              "content_object": {
+                                   "organization": null,
+                                   "name": "Demo Credential",
+                                   "credential_type": {
+                                        "name": "Machine",
+                                        "kind": "ssh",
+                                        "type": "credential_type"
+                                   },
+                                   "type": "credential"
+                              }
+                         },
+                         {
+                              "name": "System Administrator",
+                              "type": "role"
+                         }
+                    ]
+               },
+               "natural_key": {
+                    "username": "admin",
+                    "type": "user"
+               }
+          }
+     ]
+}

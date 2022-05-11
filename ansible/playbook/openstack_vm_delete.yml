@@ -26,15 +26,15 @@
       when: st.stat.exists and st.stat.isreg
 
   tasks:
-    - name: "Set openstack_auth facts"
-      set_fact:
-        openstack_auth: 
-          openstack_project_name: "{{ clouds.devstack.auth.project_name }}"
-          openstack_console_user:  "{{ clouds.devstack.auth.username }}"
-          openstack_console_password: "{{ clouds.devstack.auth.password }}"
-          openstack_user_domain:  "{{ clouds.devstack.auth.domain_name }}"
-          openstack_project_domain: "{{ clouds.devstack.auth.project_domain_name }}"
-          openstack_os_auth_url: "{{ clouds.devstack.auth.auth_url }}"
+    # - name: "Set openstack_auth facts"
+    #   set_fact:
+    #     openstack_auth: 
+    #       openstack_project_name: "{{ clouds.devstack.auth.project_name }}"
+    #       openstack_console_user:  "{{ clouds.devstack.auth.username }}"
+    #       openstack_console_password: "{{ clouds.devstack.auth.password }}"
+    #       openstack_user_domain:  "{{ clouds.devstack.auth.domain_name }}"
+    #       openstack_project_domain: "{{ clouds.devstack.auth.project_domain_name }}"
+    #       openstack_os_auth_url: "{{ clouds.devstack.auth.auth_url }}"
 
     - name: "Execute create inventory, if tagged as so"
       include_role:
