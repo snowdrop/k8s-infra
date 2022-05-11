@@ -1,0 +1,17 @@
+---
+# file: hetzner-create-server-aggregate.yml
+# Required variables:
+#   - vm_name
+
+- name: "Delete Hetzner Server"
+  import_playbook: "hetzner-delete-server.yml"
+  vars:
+    hetzner_context_name: "snowdrop"
+  when: "iaas_provider is not defined or iaas_provider == 'hetzner'"
+
+- name: "Delete Hetzner Server SSH key"
+  import_playbook: "hetzner-delete-ssh-key.yml"
+  tags: [always]
+  when: "iaas_provider is not defined or iaas_provider == 'hetzner'"
+
+...
