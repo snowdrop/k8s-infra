@@ -1,6 +1,6 @@
 ---
 - name: "Install kubernetes"
-  hosts: "{{ override_host | default('masters') }}"
+  hosts: "{{ vm_name | default('masters') }}"
   gather_facts: "{{ gathering_host_info | default('true') | bool == true }}"
 
   # Define default values for variables that are common between roles
