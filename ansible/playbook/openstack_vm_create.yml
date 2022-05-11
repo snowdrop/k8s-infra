@@ -26,7 +26,13 @@
   #   ansible_cp_dir: "{{ lookup('env', 'ANSIBLE_SSH_CONTROL_PATH_DIR') }}"
     
 
-  # pre_tasks:
+  pre_tasks:
+    - name: "Validate OpenStack required variables"
+      assert:
+        that:
+          - "openstack_security_group is defined"
+        fail_msg: "Missing mandatory variables: openstack_security_group"
+
   #   - name: "Confirm the Config File exists"
   #     stat: path="{{ config_file }}"
   #     register: st

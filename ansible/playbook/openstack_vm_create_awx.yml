@@ -6,7 +6,7 @@
     controller_host: "{{ lookup('env', 'AWX_DEMO_SERVICE_PORT_80_TCP_ADDR') }}"
     controller_port: "{{ lookup('env', 'AWX_DEMO_SERVICE_PORT_80_TCP_PORT') }}"
     config_file: "{{ lookup('env', 'OS_CLIENT_CONFIG_FILE') }}"
-    # key_path: "/tmp/admin_key.pub"
+    my_iaas_provider: "openstack"
 
   pre_tasks:
     - name: "Confirm the Config File exists"
@@ -27,15 +27,9 @@
           openstack_project_domain: "{{ clouds.devstack.auth.project_domain_name }}"
           openstack_os_auth_url: "{{ clouds.devstack.auth.auth_url }}"  
 
-  tasks:
-    # , query_params={ 'name': 'Openstack' }, return_ids=True
     - name: "Get inventory for IaaS Provider"
       set_fact:
         iaas_inventory: "{{ query('awx.awx.controller_api', 'inventories', query_params={ 'name': iaas_provider }, host='http://' + controller_host + ':' + controller_port, username=awx_user_name, oauth_token=controller_oauthtoken ) }}"
-      # environment:
-      #   CONTROLLER_OAUTH_TOKEN: "{{ controller_oauthtoken }}"
-      #   CONTROLLER_USERNAME: "{{ awx_user_name }}"
-      #   CONTROLLER_HOST: "http://{{ controller_host }}:{{ controller_port }}"
 
     - name: "Print inventory"
       debug: 
@@ -54,39 +48,26 @@
         openstack: "{{ iaas_inventory_vars['openstack'] }}"
         openstack_security_group: "{{ iaas_inventory_vars['openstack_security_group'] }}"
 
-    - name: "Validate IaaS Provider"
-      assert:
-        that:
-          - "iaas_provider is defined"
-          - "iaas_provider == 'openstack'"
-        fail_msg: "IaaS Provider is either undefined or not openstack"
+  tasks:
+    # - name: "Validate IaaS Provider"
+    #   assert:
+    #     that:
+    #       - "iaas_provider is defined"
+    #       - "iaas_provider == my_iaas_provider"
+    #     fail_msg: "IaaS Provider is either undefined or not {{ my_iaas_provider }}"
 
-    - name: "Validate IaaS Provider"
-      assert:
-        that:
-          - "openstack_security_group is defined"
-        fail_msg: "Missing mandatory variables: openstack_security_group"
+    # - name: "Validate OpenStack required variables"
+    #   assert:
+    #     that:
+    #       - "openstack_security_group is defined"
+    #     fail_msg: "Missing mandatory variables: openstack_security_group"
 
-    # - name: "Set openstack_auth facts"
-    #   set_fact:
-    #     key_path: "/tmp/admin_key.pub"
-
-    # - name: "Fetch SSH public key"
-    #   shell: "ssh-add -L | head -n 1"
-    #   register: ssh_pub
-    
-    # - name: "Write SSH Public Key to file"
-    #   copy: 
-    #     content: "{{ ssh_pub }}"
-    #     dest: "{{ key_path }}"
-
-    - name: "Print variables"
-      debug: 
-        msg: "{{ item }}"
-      with_items:
-        - "ansible_env: {{ ansible_env }}"
-        - "localhost: {{ hostvars['localhost'] | to_yaml }}"
-        # - "ssh_pub: {{ ssh_pub }}"
+    # - name: "Print variables"
+    #   debug: 
+    #     msg: "{{ item }}"
+    #   with_items:
+    #     - "ansible_env: {{ ansible_env }}"
+    #     - "localhost: {{ hostvars['localhost'] | to_yaml }}"
         
 - name: "Create Server on Openstack"
   import_playbook: "openstack_vm_create.yml"
@@ -95,6 +76,7 @@
       vm:
         image: "{{ openstack_vm_image }}"
         flavor: "{{ openstack_vm_flavor }}"
+  when: "iaas_provider is not defined or iaas_provider == my_iaas_provider"
 
 - name: "Openstack VM create"
   hosts: localhost
@@ -116,10 +98,6 @@
         - "ssh_key_data: {{ ssh_key_data }}"
         - "ssh_key_data_pub: {{ ssh_key_data_pub }}"
 
-    # - name: "Load config file contents"
-    #   include_vars: "{{ config_file }}"
-    #   when: st.stat.exists and st.stat.isreg
-
   tasks:
 
     - name: "Add user credentials to AWX as machine credential"
@@ -135,11 +113,6 @@
         inputs:
           username: "{{ os_user_name }}"
           ssh_key_data: "{{ lookup('file', key_path) }}"
+      when: "iaas_provider is not defined or iaas_provider == my_iaas_provider"
 
-# - name: "Secure new server"
-#   import_playbook: "sec_host.yml"
-#   vars:
-#     provider: "openstack"
-#     hosts: "{{ vm_name }}"
-#     vm_name: "{{ vm_name }}"
 ...

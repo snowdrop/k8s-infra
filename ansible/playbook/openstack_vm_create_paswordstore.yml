@@ -26,6 +26,44 @@
     hetzner_context_name: "snowdrop"
   tags: [always]
 
+- name: "Refresh inventory"
+  hosts: localhost
+  gather_facts: True
+
+  tasks:
+    - name: Refresh the inventory so the newly added host is available
+      meta: refresh_inventory
+
+- name:  "Wait for the VM to boot and we can ssh"
+  hosts: "{{ vm_name }}"
+  gather_facts: no
+
+  tasks:
+    - name: "Show 'Wait for connection to host' output"
+      debug:
+        msg: 
+          - "ip : {{ query('passwordstore', 'openstack/' + vm_name + '/ansible_ssh_host')[0] }}"
+          - "port : {{ query('passwordstore', 'openstack/' + vm_name + '/ansible_ssh_port')[0] }}"
+
+    - name: "Wait for connection to host"
+      ansible.builtin.wait_for:
+        host: "{{ query('passwordstore', 'openstack/' + vm_name + '/ansible_ssh_host')[0] }}"
+        port: "{{ query('passwordstore', 'openstack/' + vm_name + '/ansible_ssh_port')[0] }}"
+        timeout: 120
+      register: wait_for_connection_reg
+
+  post_tasks:
+    - name: "DON'T FORGET TO SECURE YOUR SERVER"
+      debug:
+        msg: "Trying to start start server securization automatically For manual execution: $ ansible-playbook ansible/playbook/sec_host.yml -e vm_name={{ vm_name }} -e provider=openstack"
+
+- name: "Openstack VM init"
+  hosts: "{{ vm_name }}"
+  gather_facts: yes
+
+  roles:
+    - role: "openstack/init_vm"
+
 - name: "Secure new server"
   import_playbook: "sec_host.yml"
   vars:

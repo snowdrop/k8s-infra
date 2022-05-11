@@ -3,7 +3,10 @@
   hosts: localhost
   gather_facts: True
   vars:
+    controller_host: "{{ lookup('env', 'AWX_DEMO_SERVICE_PORT_80_TCP_ADDR') }}"
+    controller_port: "{{ lookup('env', 'AWX_DEMO_SERVICE_PORT_80_TCP_PORT') }}"
     config_file: "{{ lookup('env', 'OS_CLIENT_CONFIG_FILE') }}"
+    my_iaas_provider: "hetzner"
     # key_path: "/tmp/admin_key.pub"
 
   pre_tasks:
@@ -11,14 +14,20 @@
       assert:
         that:
           - "iaas_provider is defined"
-          - "iaas_provider == 'hetzner'"
+          - "iaas_provider == my_iaas_provider"
         fail_msg: "IaaS Provider is either undefied or not hetzner"
+
+    - name: "Get inventory for IaaS Provider"
+      set_fact:
+        iaas_inventory: "{{ query('awx.awx.controller_api', 'inventories', query_params={ 'name': iaas_provider }, host='http://' + controller_host + ':' + controller_port, username=awx_user_name, oauth_token=controller_oauthtoken ) }}"
 
 - name: "Create SSH Key for server"
   import_playbook: "hetzner_ssh_key_create.yml"
+  when: "iaas_provider is not defined or iaas_provider == my_iaas_provider"
 
 - name: "Create Server on Hetzner"
   import_playbook: "hetzner_vm_create.yml"
   vars:
     hetzner_context_name: "snowdrop"
+  when: "iaas_provider is not defined or iaas_provider == my_iaas_provider"
 ...
