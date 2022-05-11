@@ -4,7 +4,7 @@
 #   - vm_name
 
 - name: "Delete Hetzner Server"
-  import_playbook: "hetzner-vm-delete"
+  import_playbook: "hetzner-vm-delete.yml"
   vars:
     hetzner_context_name: "snowdrop"
   when: "iaas_provider is not defined or iaas_provider == 'hetzner'"
