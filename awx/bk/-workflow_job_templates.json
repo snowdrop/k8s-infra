@@ -230,7 +230,7 @@
                                         "name": "snowdrop",
                                         "type": "organization"
                                    },
-                                   "name": "Hetzner",
+                                   "name": "hetzner",
                                    "type": "inventory"
                               },
                               "workflow_job_template": {
@@ -309,7 +309,7 @@
                                              "name": "snowdrop",
                                              "type": "organization"
                                         },
-                                        "name": "Hetzner",
+                                        "name": "hetzner",
                                         "type": "inventory"
                                    },
                                    "type": "inventory_source"
@@ -984,7 +984,7 @@
                                    "variable": "vm_name",
                                    "min": 0,
                                    "max": 1024,
-                                   "default": "fedora-35-tria-carola",
+                                   "default": "",
                                    "choices": "",
                                    "formattedChoices": [
                                         {
@@ -1263,7 +1263,7 @@
                                              "name": "snowdrop",
                                              "type": "organization"
                                         },
-                                        "name": "Hetzner",
+                                        "name": "hetzner",
                                         "type": "inventory"
                                    },
                                    "type": "inventory_source"
@@ -1389,7 +1389,7 @@
                                    "variable": "vm_name",
                                    "min": 0,
                                    "max": 1024,
-                                   "default": "fedora-35-tria-carola",
+                                   "default": "",
                                    "choices": "",
                                    "formattedChoices": [
                                         {

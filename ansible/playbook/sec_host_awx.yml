@@ -25,7 +25,7 @@
 
     - name: "Refresh inventory source"
       awx.awx.inventory_source_update:
-        name: "{{ ias_provider }}"
+        name: "{{ iaas_provider }}"
         inventory: "{{ awx_inventory_name }}"
         controller_oauthtoken: "{{ controller_oauthtoken }}"
         controller_username: "{{ awx_user_name }}"

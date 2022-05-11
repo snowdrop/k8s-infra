@@ -170,7 +170,7 @@
                "name": "HetznerDeleteVM",
                "description": "Create Delete VM",
                "job_type": "run",
-               "playbook": "hetzner/ansible/hetzner-delete-server-aggregate.yml",
+               "playbook": "ansible/playbook/hetzner-vm-delete-awx.yml",
                "scm_branch": "",
                "forks": 0,
                "limit": "",
