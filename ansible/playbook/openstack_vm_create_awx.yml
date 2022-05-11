@@ -6,7 +6,6 @@
     controller_host: "{{ lookup('env', 'AWX_DEMO_SERVICE_PORT_80_TCP_ADDR') }}"
     controller_port: "{{ lookup('env', 'AWX_DEMO_SERVICE_PORT_80_TCP_PORT') }}"
     config_file: "{{ lookup('env', 'OS_CLIENT_CONFIG_FILE') }}"
-    my_iaas_provider: "openstack"
 
   pre_tasks:
     - name: "Confirm the Config File exists"
@@ -49,18 +48,12 @@
         openstack_security_group: "{{ iaas_inventory_vars['openstack_security_group'] }}"
 
   tasks:
-    # - name: "Validate IaaS Provider"
-    #   assert:
-    #     that:
-    #       - "iaas_provider is defined"
-    #       - "iaas_provider == my_iaas_provider"
-    #     fail_msg: "IaaS Provider is either undefined or not {{ my_iaas_provider }}"
 
-    # - name: "Validate OpenStack required variables"
-    #   assert:
-    #     that:
-    #       - "openstack_security_group is defined"
-    #     fail_msg: "Missing mandatory variables: openstack_security_group"
+    - name: "Validate OpenStack required variables"
+      assert:
+        that:
+          - "openstack_security_group is defined"
+        fail_msg: "Missing mandatory variables: openstack_security_group"
 
     # - name: "Print variables"
     #   debug: 
@@ -76,7 +69,7 @@
       vm:
         image: "{{ openstack_vm_image }}"
         flavor: "{{ openstack_vm_flavor }}"
-  when: "iaas_provider is not defined or iaas_provider == my_iaas_provider"
+  when: "iaas_provider is not defined or iaas_provider == 'openstack'"
 
 - name: "Openstack VM create"
   hosts: localhost
@@ -113,6 +106,6 @@
         inputs:
           username: "{{ os_user_name }}"
           ssh_key_data: "{{ lookup('file', key_path) }}"
-      when: "iaas_provider is not defined or iaas_provider == my_iaas_provider"
+      when: "iaas_provider is not defined or iaas_provider == 'openstack'"
 
 ...
