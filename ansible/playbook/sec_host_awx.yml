@@ -2,7 +2,7 @@
 - name: "Run sec_host Playbook"
   import_playbook: "sec_host.yml"
   vars: 
-    new_ssh_port_number: "{{ vm_custom_ssh_port }}"
+    new_ssh_port_number: "{{ vm_custom_ssh_port | default(22) }}"
 
 - name:  "Update the ssh port on AWX"
   hosts: localhost
@@ -21,6 +21,7 @@
         controller_host: "http://{{controller_host }}:{{ controller_port }}"
         variables:
           ansible_ssh_port: "{{ vm_custom_ssh_port }}"
+      when: "vm_custom_ssh_port is defined"
 
     - name: "Refresh inventory source"
       awx.awx.inventory_source_update:
