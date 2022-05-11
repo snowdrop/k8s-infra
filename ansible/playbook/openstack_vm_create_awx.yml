@@ -77,19 +77,14 @@
   vars:
     controller_host: "{{ lookup('env', 'AWX_DEMO_SERVICE_PORT_80_TCP_ADDR') }}"
     controller_port: "{{ lookup('env', 'AWX_DEMO_SERVICE_PORT_80_TCP_PORT') }}"
-    ssh_key_data: "{{ lookup('file', key_path) }}"
-    ssh_key_data_pub: "{{ lookup('file', key_path + '.pub') }}"
     os_user_name:  "{{ openstack_vm_image | regex_search('^[a-zA-Z]*') | lower }}"
 
   pre_tasks:
-    - name: "Print variables"
-      debug: 
-        msg: "{{ item }}"
-      with_items:
-        - "os_user_name: {{ os_user_name }}"
-        - "key_path: {{ key_path }}"
-        - "ssh_key_data: {{ ssh_key_data }}"
-        - "ssh_key_data_pub: {{ ssh_key_data_pub }}"
+    - name: "Define ssh variables"
+      set_fact:
+        ssh_key_data: "{{ lookup('file', key_path) }}"
+        ssh_key_data_pub: "{{ lookup('file', key_path + '.pub') }}"
+      when: "key_path is defined and (iaas_provider is not defined or iaas_provider == 'openstack')"
 
   tasks:
 
@@ -106,6 +101,6 @@
         inputs:
           username: "{{ os_user_name }}"
           ssh_key_data: "{{ lookup('file', key_path) }}"
-      when: "iaas_provider is not defined or iaas_provider == 'openstack'"
+      when: "key_path is defined and (iaas_provider is not defined or iaas_provider == 'openstack')"
 
 ...
