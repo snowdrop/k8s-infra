@@ -32,7 +32,7 @@
       set_fact:
         iaas_inventory: "{{ query('awx.awx.controller_api', 'inventories', query_params={ 'name': iaas_provider }, host='http://' + controller_host + ':' + controller_port, username=awx_user_name, oauth_token=controller_oauthtoken ) }}"
  
-     - name: "Validate IaaS Provider"
+    - name: "Validate IaaS Provider"
       assert:
         that:
           - "iaas_provider is defined"
@@ -64,5 +64,5 @@
         controller_username: "{{ awx_user_name }}"
         controller_host: "http://{{controller_host }}:{{ controller_port }}"
 
-      when: "iaas_provider is not defined or iaas_provider == 'openstack'"
+  when: "iaas_provider is not defined or iaas_provider == 'openstack'"
 ...
