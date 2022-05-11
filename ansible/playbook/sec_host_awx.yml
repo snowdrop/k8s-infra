@@ -4,24 +4,24 @@
   vars: 
     new_ssh_port_number: "{{ vm_custom_ssh_port | default(22) }}"
 
-# - name:  "Update the ssh port on AWX"
-#   hosts: localhost
-#   gather_facts: True
-#   vars:
-#     controller_host: "{{ lookup('env', 'AWX_DEMO_SERVICE_PORT_80_TCP_ADDR') }}"
-#     controller_port: "{{ lookup('env', 'AWX_DEMO_SERVICE_PORT_80_TCP_PORT') }}"
+- name:  "Update the ssh port on AWX"
+  hosts: localhost
+  gather_facts: True
+  vars:
+    controller_host: "{{ lookup('env', 'AWX_DEMO_SERVICE_PORT_80_TCP_ADDR') }}"
+    controller_port: "{{ lookup('env', 'AWX_DEMO_SERVICE_PORT_80_TCP_PORT') }}"
 
-#   tasks:
-#     - name: "Update inventory"
-#       awx.awx.host:
-#         inventory: "{{ awx_inventory_name }}"
-#         name: "{{ vm_name }}"
-#         controller_oauthtoken: "{{ controller_oauthtoken }}"
-#         controller_username: "{{ awx_user_name }}"
-#         controller_host: "http://{{controller_host }}:{{ controller_port }}"
-#         variables:
-#           ansible_ssh_port: "{{ vm_custom_ssh_port }}"
-#       when: "vm_custom_ssh_port is defined"
+  tasks:
+    - name: "Update inventory"
+      awx.awx.host:
+        inventory: "{{ awx_inventory_name }}"
+        name: "{{ vm_name }}"
+        controller_oauthtoken: "{{ controller_oauthtoken }}"
+        controller_username: "{{ awx_user_name }}"
+        controller_host: "http://{{controller_host }}:{{ controller_port }}"
+        variables:
+          ansible_ssh_port: "{{ vm_custom_ssh_port }}"
+      when: "vm_custom_ssh_port is defined"
 
 #     - name: "Refresh inventory source"
 #       awx.awx.inventory_source_update:
