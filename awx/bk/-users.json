@@ -17,7 +17,7 @@
                                         "name": "snowdrop",
                                         "type": "organization"
                                    },
-                                   "name": "CreateVMOpenstack",
+                                   "name": "OpenstackCreateVM",
                                    "type": "job_template"
                               }
                          },
@@ -29,7 +29,7 @@
                                         "name": "snowdrop",
                                         "type": "organization"
                                    },
-                                   "name": "CreateVMHetzner",
+                                   "name": "HetznerCreateVM",
                                    "type": "job_template"
                               }
                          },
@@ -53,6 +53,42 @@
                                         "name": "snowdrop",
                                         "type": "organization"
                                    },
+                                   "name": "OpenstackDeleteVM",
+                                   "type": "job_template"
+                              }
+                         },
+                         {
+                              "name": "Admin",
+                              "type": "role",
+                              "content_object": {
+                                   "organization": {
+                                        "name": "snowdrop",
+                                        "type": "organization"
+                                   },
+                                   "name": "HetznerDeleteVM",
+                                   "type": "job_template"
+                              }
+                         },
+                         {
+                              "name": "Admin",
+                              "type": "role",
+                              "content_object": {
+                                   "organization": {
+                                        "name": "snowdrop",
+                                        "type": "organization"
+                                   },
+                                   "name": "OpenstackInitVM",
+                                   "type": "job_template"
+                              }
+                         },
+                         {
+                              "name": "Admin",
+                              "type": "role",
+                              "content_object": {
+                                   "organization": {
+                                        "name": "snowdrop",
+                                        "type": "organization"
+                                   },
                                    "name": "dev-K8sInfraProject-antcosta",
                                    "type": "project"
                               }
@@ -61,8 +97,49 @@
                               "name": "Admin",
                               "type": "role",
                               "content_object": {
+                                   "organization": {
+                                        "name": "snowdrop",
+                                        "type": "organization"
+                                   },
+                                   "name": "VMDelete",
+                                   "type": "workflow_job_template"
+                              }
+                         },
+                         {
+                              "name": "Admin",
+                              "type": "role",
+                              "content_object": {
+                                   "organization": {
+                                        "name": "snowdrop",
+                                        "type": "organization"
+                                   },
+                                   "name": "VMCreate-Hetzner",
+                                   "type": "workflow_job_template"
+                              }
+                         },
+                         {
+                              "name": "Admin",
+                              "type": "role",
+                              "content_object": {
                                    "organization": null,
                                    "name": "Demo Credential",
+                                   "credential_type": {
+                                        "name": "Machine",
+                                        "kind": "ssh",
+                                        "type": "credential_type"
+                                   },
+                                   "type": "credential"
+                              }
+                         },
+                         {
+                              "name": "Admin",
+                              "type": "role",
+                              "content_object": {
+                                   "organization": {
+                                        "name": "snowdrop",
+                                        "type": "organization"
+                                   },
+                                   "name": "OpenStackHosts-fedora",
                                    "credential_type": {
                                         "name": "Machine",
                                         "kind": "ssh",
