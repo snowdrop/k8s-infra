@@ -24,6 +24,7 @@
   with_items:
     - "snowdrop"
     - "fedora"
+  become: True
 
 - name: "Disable SWAP"
   import_role:
