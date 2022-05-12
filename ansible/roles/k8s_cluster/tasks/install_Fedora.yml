@@ -1,0 +1,33 @@
+---
+- name: "Custom installation pre-requisites"
+  include_vars: "{{ item }}"
+  with_first_found:
+    files:
+      - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
+      - "{{ ansible_distribution }}.yml"
+      - "{{ ansible_os_family }}.yml"
+      - "main.yml"
+    skip: True
+
+- name: "Install required dependencies"
+  package:
+    name: "{{ required_dependencies }}"
+    state: present
+  become: true
+
+- name: "Start libvirtd"
+  systemd:
+    state: restarted
+    name: libvirtd
+    enabled: yes
+  become: yes
+
+- name: "Add users to libvirt group"
+  user: 
+    name: "{{ item }}"
+    groups: "libvirt"
+    append: True
+  with_items:
+    - "snowdrop"
+    - "fedora"
+...
