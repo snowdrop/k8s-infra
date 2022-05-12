@@ -135,7 +135,7 @@
           shell: /bin/bash
           sudo: ['ALL=(ALL) NOPASSWD:ALL']
           ssh_authorized_keys:
-            - {{ keypair_info['openstack_keypairs'][0][public_key] }}
+            - {{ keypair_info['openstack_keypairs'][0]['public_key'] }}
     register: openstack_output
 
   - name: "Print Openstack output"
