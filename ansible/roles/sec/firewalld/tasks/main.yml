@@ -1,5 +1,13 @@
 ---
 # tasks file for firewalld
+- name: "Debug host"
+  debug:
+    msg: "{{ item }}"
+  with_items:
+    - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
+    - "{{ ansible_distribution }}.yml"
+    - "{{ ansible_os_family }}.yml"
+
 - name: "Fetch firewalld information for host"
   include_vars: "{{ item }}"
   with_first_found:
