@@ -13,6 +13,7 @@ firewalld_public_ports:
   - 10255/tcp
   - 8472/udp
   - 30000-32767/tcp
+  - 8080/tcp
 
 firewalld_public_services:
   - http
