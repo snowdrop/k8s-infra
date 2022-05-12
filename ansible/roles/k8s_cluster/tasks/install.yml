@@ -135,12 +135,19 @@
   command: "kubeadm config images pull --kubernetes-version {{ k8s_version }}"
   become: yes
 
-- name: Initialize cluster for k8s - {{ k8s_version }}
+- name: "Checks k8s bootstrap status"
+  stat: 
+    path: "/etc/kubernetes/admin.conf"
+  register: k8s_config_file
+
+
+- name: "Initialize cluster for k8s - {{ k8s_version }}"
   command: "kubeadm init --pod-network-cidr={{ pod_subnet }} --apiserver-advertise-address={{ api_server }} --kubernetes-version {{ k8s_version }}"
   register: kubeadm_init_res
   changed_when: "kubeadm_init_res.rc == 0"
   failed_when: "kubeadm_init_res.rc != 0  and 'already exists' not in kubeadm_init_res.stderr"
   become: yes
+  when: "not k8s_config_file.stat.exists"
 
 - name: "Copy config file"
   include_role:
@@ -154,13 +161,13 @@
 - name: Taint the node
   command: "kubectl taint nodes --all node-role.kubernetes.io/master-"
 
-- name: Generate ClusterRole file for the sa default and namespace kube-system
+- name: "Generate ClusterRole file for the sa default and namespace kube-system"
   template:
     src: "clusterrole-admin.j2"
     dest: /tmp/clusterrole-admin.yml
   become: yes
 
-- name: Grant Cluster Admin role to the serviceaccount default of kube-system
+- name: "Grant Cluster Admin role to the serviceaccount default of kube-system"
   shell: |
     kubectl apply -f /tmp/clusterrole-admin.yml
 

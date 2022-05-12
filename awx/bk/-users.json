@@ -89,7 +89,7 @@
                                         "name": "snowdrop",
                                         "type": "organization"
                                    },
-                                   "name": "k8sInstall",
+                                   "name": "KubernetesInstall",
                                    "type": "job_template"
                               }
                          },
@@ -126,6 +126,18 @@
                                         "type": "organization"
                                    },
                                    "name": "VMCreate-Hetzner",
+                                   "type": "workflow_job_template"
+                              }
+                         },
+                         {
+                              "name": "Admin",
+                              "type": "role",
+                              "content_object": {
+                                   "organization": {
+                                        "name": "snowdrop",
+                                        "type": "organization"
+                                   },
+                                   "name": "k8s Deploy OpenStack",
                                    "type": "workflow_job_template"
                               }
                          },

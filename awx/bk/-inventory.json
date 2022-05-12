@@ -601,109 +601,6 @@
                               }
                          },
                          {
-                              "name": "fedora-35-jesus-laocoon",
-                              "description": "imported",
-                              "enabled": true,
-                              "instance_id": "e23abca2-a830-43f2-974e-85ad0657e752",
-                              "variables": "{\"ansible_host\": \"10.0.76.191\", \"ansible_ssh_host\": \"10.0.76.191\", \"openstack\": {\"OS-DCF:diskConfig\": \"MANUAL\", \"OS-EXT-AZ:availability_zone\": \"nova\", \"OS-EXT-SRV-ATTR:host\": null, \"OS-EXT-SRV-ATTR:hostname\": null, \"OS-EXT-SRV-ATTR:hypervisor_hostname\": null, \"OS-EXT-SRV-ATTR:instance_name\": null, \"OS-EXT-SRV-ATTR:kernel_id\": null, \"OS-EXT-SRV-ATTR:launch_index\": null, \"OS-EXT-SRV-ATTR:ramdisk_id\": null, \"OS-EXT-SRV-ATTR:reservation_id\": null, \"OS-EXT-SRV-ATTR:root_device_name\": null, \"OS-EXT-SRV-ATTR:user_data\": null, \"OS-EXT-STS:power_state\": 1, \"OS-EXT-STS:task_state\": null, \"OS-EXT-STS:vm_state\": \"active\", \"OS-SCH-HNT:scheduler_hints\": null, \"OS-SRV-USG:launched_at\": \"2022-05-12T08:26:47.000000\", \"OS-SRV-USG:terminated_at\": null, \"accessIPv4\": \"10.0.76.191\", \"accessIPv6\": \"\", \"addresses\": {\"provider_net_shared\": [{\"OS-EXT-IPS-MAC:mac_addr\": \"fa:16:3e:b9:d7:b8\", \"OS-EXT-IPS:type\": \"fixed\", \"addr\": \"10.0.76.191\", \"version\": 4}]}, \"adminPass\": null, \"az\": \"nova\", \"block_device_mapping\": null, \"cloud\": \"devstack\", \"config_drive\": \"\", \"created\": \"2022-05-12T08:26:15Z\", \"created_at\": \"2022-05-12T08:26:15Z\", \"description\": \"fedora-35-jesus-laocoon\", \"disk_config\": \"MANUAL\", \"flavor\": {\"disk\": 40, \"ephemeral\": 0, \"extra_specs\": {\"aggregate_instance_extra_specs:server_type:aggregate\": \"general\"}, \"original_name\": \"m1.medium\", \"ram\": 4096, \"swap\": 0, \"vcpus\": 2}, \"has_config_drive\": false, \"host\": null, \"hostId\": \"5a1d3b293b6f6f1b1ac6cb39ec411912122585c95f454c4df45b0b37\", \"host_id\": \"5a1d3b293b6f6f1b1ac6cb39ec411912122585c95f454c4df45b0b37\", \"host_status\": null, \"hostname\": null, \"hypervisor_hostname\": null, \"id\": \"e23abca2-a830-43f2-974e-85ad0657e752\", \"image\": {\"id\": \"8b8ab2a1-e349-4313-9a38-a800f42ffe99\"}, \"instance_name\": null, \"interface_ip\": \"10.0.76.191\", \"kernel_id\": null, \"key_name\": \"test-adm-key\", \"launch_index\": null, \"launched_at\": \"2022-05-12T08:26:47.000000\", \"location\": {\"cloud\": \"devstack\", \"project\": {\"domain_id\": null, \"domain_name\": \"redhat.com\", \"id\": \"2d488500f47a4e3d8a65c832295dfc5c\", \"name\": \"spring-boot-jenkins\"}, \"region_name\": \"\", \"zone\": \"nova\"}, \"locked\": false, \"max_count\": null, \"metadata\": {}, \"min_count\": null, \"name\": \"fedora-35-jesus-laocoon\", \"networks\": {}, \"os-extended-volumes:volumes_attached\": [{\"delete_on_termination\": false, \"id\": \"556c934e-b25c-456f-8e5c-a91cea50bc20\"}], \"personality\": null, \"power_state\": 1, \"private_v4\": \"\", \"progress\": 0, \"project_id\": \"2d488500f47a4e3d8a65c832295dfc5c\", \"properties\": {\"OS-DCF:diskConfig\": \"MANUAL\", \"OS-EXT-AZ:availability_zone\": \"nova\", \"OS-EXT-SRV-ATTR:host\": null, \"OS-EXT-SRV-ATTR:hostname\": null, \"OS-EXT-SRV-ATTR:hypervisor_hostname\": null, \"OS-EXT-SRV-ATTR:instance_name\": null, \"OS-EXT-SRV-ATTR:kernel_id\": null, \"OS-EXT-SRV-ATTR:launch_index\": null, \"OS-EXT-SRV-ATTR:ramdisk_id\": null, \"OS-EXT-SRV-ATTR:reservation_id\": null, \"OS-EXT-SRV-ATTR:root_device_name\": null, \"OS-EXT-SRV-ATTR:user_data\": null, \"OS-EXT-STS:power_state\": 1, \"OS-EXT-STS:task_state\": null, \"OS-EXT-STS:vm_state\": \"active\", \"OS-SCH-HNT:scheduler_hints\": null, \"OS-SRV-USG:launched_at\": \"2022-05-12T08:26:47.000000\", \"OS-SRV-USG:terminated_at\": null, \"host_status\": null, \"locked\": false, \"max_count\": null, \"min_count\": null, \"os-extended-volumes:volumes_attached\": [{\"delete_on_termination\": false, \"id\": \"556c934e-b25c-456f-8e5c-a91cea50bc20\"}], \"trusted_image_certificates\": null}, \"public_v4\": \"10.0.76.191\", \"public_v6\": \"\", \"ramdisk_id\": null, \"region\": \"\", \"reservation_id\": null, \"root_device_name\": null, \"scheduler_hints\": null, \"security_groups\": [{\"name\": \"spring-boot\"}], \"server_groups\": null, \"status\": \"ACTIVE\", \"tags\": [], \"task_state\": null, \"tenant_id\": \"2d488500f47a4e3d8a65c832295dfc5c\", \"terminated_at\": null, \"trusted_image_certificates\": null, \"updated\": \"2022-05-12T08:26:48Z\", \"user_data\": null, \"user_id\": \"ce2811bacc10df435e1953901e5c7dff29113f8ddcc2556e7fff83f1a37b806f\", \"vm_state\": \"active\", \"volumes\": [{\"delete_on_termination\": false, \"id\": \"556c934e-b25c-456f-8e5c-a91cea50bc20\"}]}}",
-                              "inventory": {
-                                   "organization": {
-                                        "name": "snowdrop",
-                                        "type": "organization"
-                                   },
-                                   "name": "openstack",
-                                   "type": "inventory"
-                              },
-                              "related": {
-                                   "groups": [
-                                        {
-                                             "name": "devstack",
-                                             "inventory": {
-                                                  "organization": {
-                                                       "name": "snowdrop",
-                                                       "type": "organization"
-                                                  },
-                                                  "name": "openstack",
-                                                  "type": "inventory"
-                                             },
-                                             "type": "group"
-                                        },
-                                        {
-                                             "name": "devstack_",
-                                             "inventory": {
-                                                  "organization": {
-                                                       "name": "snowdrop",
-                                                       "type": "organization"
-                                                  },
-                                                  "name": "openstack",
-                                                  "type": "inventory"
-                                             },
-                                             "type": "group"
-                                        },
-                                        {
-                                             "name": "devstack__nova",
-                                             "inventory": {
-                                                  "organization": {
-                                                       "name": "snowdrop",
-                                                       "type": "organization"
-                                                  },
-                                                  "name": "openstack",
-                                                  "type": "inventory"
-                                             },
-                                             "type": "group"
-                                        },
-                                        {
-                                             "name": "instance-e23abca2-a830-43f2-974e-85ad0657e752",
-                                             "inventory": {
-                                                  "organization": {
-                                                       "name": "snowdrop",
-                                                       "type": "organization"
-                                                  },
-                                                  "name": "openstack",
-                                                  "type": "inventory"
-                                             },
-                                             "type": "group"
-                                        },
-                                        {
-                                             "name": "_nova",
-                                             "inventory": {
-                                                  "organization": {
-                                                       "name": "snowdrop",
-                                                       "type": "organization"
-                                                  },
-                                                  "name": "openstack",
-                                                  "type": "inventory"
-                                             },
-                                             "type": "group"
-                                        },
-                                        {
-                                             "name": "nova",
-                                             "inventory": {
-                                                  "organization": {
-                                                       "name": "snowdrop",
-                                                       "type": "organization"
-                                                  },
-                                                  "name": "openstack",
-                                                  "type": "inventory"
-                                             },
-                                             "type": "group"
-                                        }
-                                   ]
-                              },
-                              "natural_key": {
-                                   "name": "fedora-35-jesus-laocoon",
-                                   "inventory": {
-                                        "organization": {
-                                             "name": "snowdrop",
-                                             "type": "organization"
-                                        },
-                                        "name": "openstack",
-                                        "type": "inventory"
-                                   },
-                                   "type": "host"
-                              }
-                         },
-                         {
                               "name": "k121-centos8-01",
                               "description": "imported",
                               "enabled": true,
@@ -938,18 +835,6 @@
                                              "type": "host"
                                         },
                                         {
-                                             "name": "fedora-35-jesus-laocoon",
-                                             "inventory": {
-                                                  "organization": {
-                                                       "name": "snowdrop",
-                                                       "type": "organization"
-                                                  },
-                                                  "name": "openstack",
-                                                  "type": "inventory"
-                                             },
-                                             "type": "host"
-                                        },
-                                        {
                                              "name": "k121-centos8-01",
                                              "inventory": {
                                                   "organization": {
@@ -1016,7 +901,7 @@
                                              "type": "host"
                                         },
                                         {
-                                             "name": "fedora-35-jesus-laocoon",
+                                             "name": "fedora-35-mariam-lyonors",
                                              "inventory": {
                                                   "organization": {
                                                        "name": "snowdrop",
@@ -1094,7 +979,7 @@
                                              "type": "host"
                                         },
                                         {
-                                             "name": "fedora-35-jesus-laocoon",
+                                             "name": "fedora-35-mariam-lyonors",
                                              "inventory": {
                                                   "organization": {
                                                        "name": "snowdrop",
@@ -1272,48 +1157,6 @@
                               }
                          },
                          {
-                              "name": "instance-e23abca2-a830-43f2-974e-85ad0657e752",
-                              "description": "imported",
-                              "variables": "{}",
-                              "inventory": {
-                                   "organization": {
-                                        "name": "snowdrop",
-                                        "type": "organization"
-                                   },
-                                   "name": "openstack",
-                                   "type": "inventory"
-                              },
-                              "related": {
-                                   "hosts": [
-                                        {
-                                             "name": "fedora-35-jesus-laocoon",
-                                             "inventory": {
-                                                  "organization": {
-                                                       "name": "snowdrop",
-                                                       "type": "organization"
-                                                  },
-                                                  "name": "openstack",
-                                                  "type": "inventory"
-                                             },
-                                             "type": "host"
-                                        }
-                                   ],
-                                   "children": []
-                              },
-                              "natural_key": {
-                                   "name": "instance-e23abca2-a830-43f2-974e-85ad0657e752",
-                                   "inventory": {
-                                        "organization": {
-                                             "name": "snowdrop",
-                                             "type": "organization"
-                                        },
-                                        "name": "openstack",
-                                        "type": "inventory"
-                                   },
-                                   "type": "group"
-                              }
-                         },
-                         {
                               "name": "_nova",
                               "description": "imported",
                               "variables": "{}",
@@ -1340,7 +1183,7 @@
                                              "type": "host"
                                         },
                                         {
-                                             "name": "fedora-35-jesus-laocoon",
+                                             "name": "fedora-35-mariam-lyonors",
                                              "inventory": {
                                                   "organization": {
                                                        "name": "snowdrop",
@@ -1418,7 +1261,7 @@
                                              "type": "host"
                                         },
                                         {
-                                             "name": "fedora-35-jesus-laocoon",
+                                             "name": "fedora-35-mariam-lyonors",
                                              "inventory": {
                                                   "organization": {
                                                        "name": "snowdrop",
