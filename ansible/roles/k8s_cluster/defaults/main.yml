@@ -1,5 +1,5 @@
 # default values required
-k8s_version: 1.14.9
+k8s_version: 1.21.4
 remove: false
 remote: true
 
