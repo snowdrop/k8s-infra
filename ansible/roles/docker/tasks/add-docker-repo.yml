@@ -13,7 +13,7 @@
 - name: "Add docker repository CentOS/RedHat 8"
   shell: "{{ add_docker_repo_command }}"
   become: yes
-  when: "newer_os"
+  when: "newer_os | bool"
 
 - name: "Add docker repository CentOS/RedHat 7"
   yum_repository:
@@ -24,6 +24,6 @@
     gpgcheck: 1
     gpgkey: https://download.docker.com/linux/centos/gpg
   become: yes
-  when: "! newer_os"
+  when: "not newer_os"
 
 ...
