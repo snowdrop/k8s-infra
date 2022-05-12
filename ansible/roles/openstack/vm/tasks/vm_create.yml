@@ -97,6 +97,15 @@
   #     boot_from_volume: "{{ openstack.vm.boot_from_volume }}"
   #   register: openstack_output
 
+  - name: "Get information about keypairs using optional parameters"
+    openstack.cloud.keypair_info:
+      name: "{{ key_name }}"
+    register: keypair_info
+
+  - name: "Print key information"
+    debug:
+      mst: "{{ keypair_info }}"
+
   - name: "Create VM instance"
     openstack.cloud.server:
       auth:
@@ -125,6 +134,8 @@
           groups: [wheel, adm, systemd-journal]
           shell: /bin/bash
           sudo: ['ALL=(ALL) NOPASSWD:ALL']
+          ssh_authorized_keys:
+            - {{ keypair_info['openstack_keypairs'][0][public_key] }}
     register: openstack_output
 
   - name: "Print Openstack output"
