@@ -62,7 +62,7 @@
     getenforce
   become: true
 
-- name: "Custom installation pre-requisites"
+- name: "Custom installation for Fedora"
   include_tasks: "install_Fedora.yml"
   when: "ansible_distribution == 'Fedora'"
 
