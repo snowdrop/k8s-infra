@@ -1,6 +1,7 @@
 ---
-- name: "Custom installation pre-requisites"
-  include_vars: "Fedora.yml"
+- name: "Get Fedora configuration"
+  include_vars: 
+    file: "Fedora.yml"
 
 - name: "Install required dependencies"
   package:
