@@ -3,9 +3,10 @@
 - name: "Fetch firewalld information for host"
   include_vars: "{{ item }}"
   with_first_found:
-    - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
-    - "{{ ansible_distribution }}.yml"
-    - "{{ ansible_os_family }}.yml"
+    files:
+      - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
+      - "{{ ansible_distribution }}.yml"
+      - "{{ ansible_os_family }}.yml"
 
 - name: "Install firewalld"
   package:
@@ -19,6 +20,7 @@
     state: started
     enabled: yes
   become: True
+
 - name: firewalld - Manage firewall services
   firewalld:
     service: "{{ item }}"
@@ -28,6 +30,7 @@
   become: True
   notify: Restart firewalld
   when: firewall_services is defined and (firewalld_enabled is undefined or firewalld_enabled == True)
+
 - name: firewalld - Manage firewall ports
   firewalld:
     port: "{{item}}"
@@ -37,6 +40,7 @@
   become: True
   notify: Restart firewalld
   when: firewall_ports is defined and (firewalld_enabled is undefined or firewalld_enabled == True)
+
 - name: Block black list ports
   firewalld:
     rich_rule: "rule family=\"ipv4\" source address=\"{{ item }}\" drop"
