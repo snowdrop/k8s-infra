@@ -1,28 +1,30 @@
 ---
-# tasks file for common
+# tasks file for firewalld
 - include_vars: "{{ item }}"
   with_first_found:
-    - "{{ansible_distribution}}-{{ansible_distribution_major_version}}.yml"
+    - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
     - "{{ ansible_distribution }}.yml"
     - "{{ ansible_os_family }}.yml"
-- name: Install firewalld
+
+- name: "Install firewalld"
   package:
     name: "{{ required_packages }}"
     state: present
-  become: yes
+  become: True
+
 - name: Enable and start firewalld
   service:
     name: firewalld
     state: started
     enabled: yes
-  become: yes
+  become: True
 - name: firewalld - Manage firewall services
   firewalld:
     service: "{{ item }}"
     permanent: yes
     state: enabled
   loop: "{{ firewall_services }}"
-  become: yes
+  become: True
   notify: Restart firewalld
   when: firewall_services is defined and (firewalld_enabled is undefined or firewalld_enabled == True)
 - name: firewalld - Manage firewall ports
@@ -31,7 +33,7 @@
     permanent: yes
     state: enabled
   loop: "{{ firewall_ports }}"
-  become: yes
+  become: True
   notify: Restart firewalld
   when: firewall_ports is defined and (firewalld_enabled is undefined or firewalld_enabled == True)
 - name: Block black list ports
@@ -42,5 +44,5 @@
     immediate: yes
     state: enabled
   loop: "{{ ipv4_blacklist }}"
-  become: yes
+  become: True
 ...
