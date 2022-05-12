@@ -21,7 +21,7 @@
     enabled: yes
   become: True
 
-- name: firewalld - Manage firewall services
+- name: "firewalld - Manage firewall services"
   firewalld:
     service: "{{ item }}"
     permanent: yes
@@ -31,7 +31,7 @@
   notify: Restart firewalld
   when: firewall_services is defined and (firewalld_enabled is undefined or firewalld_enabled == True)
 
-- name: firewalld - Manage firewall ports
+- name: "firewalld - Manage firewall ports"
   firewalld:
     port: "{{item}}"
     permanent: yes
@@ -41,7 +41,7 @@
   notify: Restart firewalld
   when: firewall_ports is defined and (firewalld_enabled is undefined or firewalld_enabled == True)
 
-- name: Block black list ports
+- name: "Block black list ports"
   firewalld:
     rich_rule: "rule family=\"ipv4\" source address=\"{{ item }}\" drop"
     zone: public
