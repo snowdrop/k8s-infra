@@ -8,7 +8,7 @@
   when: (apiserver_address is defined) and (apiserver_address|length > 0)
 
 - name: "Include firewalld handlers"
-  import_role:
+  include_role:
     name: "sec/firewalld"
 
 - name: "Add masquerade to trusted zone"
