@@ -154,6 +154,7 @@
     name: k8s_config
   vars:
     state: "present"
+  when: "not k8s_config_file.stat.exists"
 
 - name: "Install CNI"
   include_tasks: install_cni.yml

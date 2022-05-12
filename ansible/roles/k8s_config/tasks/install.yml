@@ -28,11 +28,13 @@
     mode: '0600'
     flat: yes
   become: yes
+  when: "iaas_provider is defined"
 
 - name: "Fetch K8S config"
   connection: local
   local_action: "shell cat {{ local_user_home.stdout }}/.kube/{{ iaas_provider }}-{{ ansible_hostname }}-config"
   register: k8s_config
+  when: "iaas_provider is defined"
 
 - name: Print kubernetes config file location
   debug:
