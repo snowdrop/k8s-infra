@@ -62,19 +62,11 @@
     getenforce
   become: true
 
-- name: "Disable SWAP"
-  import_role:
-    name: "core/disable-swap"
-    tasks_from: "Fedora.yml"
-  vars:
-    state: "absent"
-  when: "ansible_distribution == 'Fedora' "
-
 - name: "Custom installation pre-requisites"
   include_tasks: "{{ item }}"
   with_first_found:
     files:
-      - "install_{{ ansible_distribution }}"
+      - "install_{{ ansible_distribution }}.yml"
     skip: True
 
 - name: "Add kubernetes repository"

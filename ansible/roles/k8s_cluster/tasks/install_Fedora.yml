@@ -30,4 +30,12 @@
   with_items:
     - "snowdrop"
     - "fedora"
+
+- name: "Disable SWAP"
+  import_role:
+    name: "core/disable-swap"
+    tasks_from: "Fedora.yml"
+  vars:
+    state: "absent"
+  
 ...
