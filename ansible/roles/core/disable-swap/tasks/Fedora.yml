@@ -1,0 +1,44 @@
+---
+- name: "Stop and disable zram0 device SWAP service"
+  systemd:
+    enabled: false
+    name: "dev-zram0.swap"
+    state: stopped
+  register: disable_dev_zram
+  become: true
+  failed_when: "disable_dev_zram.failed and 'Could not find the requested service' not in disable_dev_zram.msg"
+
+- name: "Stop and disable systemd-zram-setup SWAP service"
+  systemd:
+    enabled: false
+    name: "systemd-zram-setup@zram0.service"
+    state: stopped
+  become: true
+  register: disable_systemd_zram_setup
+
+- name: "swapoff"
+  shell: "swapoff /dev/zram0; zramctl --reset /dev/zram0"
+  become: true
+  register: swapoff_zram
+  failed_when: "swapoff_zram.rc != 0 and 'No such file or directory' not in swapoff_zram.stderr "
+  changed_when: "swapoff_zram.changed and 'No such file or directory' not in swapoff_zram.stderr "
+
+- name: "Remove zram-generator-defaults package"
+  package:
+    name: "zram-generator-defaults"
+    state: absent
+  become: true
+  register: remove_zram_generator_defaults
+
+- name: "Touch /etc/systemd/zram-generator.conf"
+  file:
+    path: "/etc/systemd/zram-generator.conf"
+    state: touch
+  become: true
+  register: touch_zram_generator_conf
+
+- name: "Reboot the server if changes were made"
+  reboot:
+  when: "disable_dev_zram.changed or remove_zram_generator_defaults.changed or swapoff_zram.changed"
+  become: true
+...

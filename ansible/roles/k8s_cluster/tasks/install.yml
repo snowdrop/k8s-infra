@@ -55,6 +55,21 @@
 - name: "Flush handlers"
   meta: flush_handlers
 
+- name: "Disable selinux"
+  shell: |
+    setenforce 0
+    sed -i 's/^SELINUX=.*/SELINUX=disabled/g' /etc/selinux/config
+    getenforce
+  become: true
+
+- name: "Disable SWAP"
+  import_role:
+    name: "core/disable-swap"
+    tasks_from: "Fedora.yml"
+  vars:
+    state: "absent"
+  when: "ansible_distribution == 'Fedora' "
+
 - name: "Add kubernetes repository"
   yum_repository:
     name: kubernetes
