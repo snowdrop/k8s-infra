@@ -1,13 +1,6 @@
 ---
 - name: "Custom installation pre-requisites"
-  include_vars: "{{ item }}"
-  with_first_found:
-    files:
-      - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
-      - "{{ ansible_distribution }}.yml"
-      - "{{ ansible_os_family }}.yml"
-      - "main.yml"
-    skip: True
+  include_vars: "Fedora.yml"
 
 - name: "Install required dependencies"
   package:
