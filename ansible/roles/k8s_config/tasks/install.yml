@@ -24,21 +24,15 @@
 - name: "Copy k8s config file to controller .kube folder"
   fetch:
     src: "/etc/kubernetes/admin.conf"
-    dest: "{{ local_user_home.stdout }}/.kube/{{ pass_provider }}-{{ ansible_hostname }}-config"
+    dest: "{{ local_user_home.stdout }}/.kube/{{ iaas_provider }}-{{ ansible_hostname }}-config"
     mode: '0600'
     flat: yes
   become: yes
 
 - name: "Fetch K8S config"
   connection: local
-  local_action: "shell cat {{ local_user_home.stdout }}/.kube/{{ pass_provider }}-{{ ansible_hostname }}-config"
+  local_action: "shell cat {{ local_user_home.stdout }}/.kube/{{ iaas_provider }}-{{ ansible_hostname }}-config"
   register: k8s_config
-
-# TODO later as it doesn't work on the current release. Fails with fatal: [vm20220316-t02]: FAILED! => {"msg": "Unexpected templating type error occurred on ({{ query('passwordstore', pass_provider + '/' + ansible_hostname + '/kube_cfg create=True userpass=' + get_config)[0] }}): can only concatenate str (not \"dict\") to str"}
-# - name: "Add k8s config to passwordstore"
-#   set_fact:
-#     kube_config: "{{ query('passwordstore', pass_provider + '/' + ansible_hostname + '/kube_cfg create=True userpass=''' + k8s_config.stdout + ''') }}"
-#   when: passwordstore_enabled | bool
 
 - name: Print kubernetes config file location
   debug:
