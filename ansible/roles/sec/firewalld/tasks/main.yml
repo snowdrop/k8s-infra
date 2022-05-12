@@ -5,23 +5,24 @@
     msg: "{{ item }}"
   with_items:
     # - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
-    - "{{ ansible_distribution }}.yml"
-    - "{{ ansible_os_family }}.yml"
+    - "ansible_distribution: {{ ansible_distribution }}.yml"
+    - "ansible_os_family: {{ ansible_os_family }}.yml"
+
 
 - name: "Fetch firewalld information for host 1"
   include_vars: "{{ item }}"
   with_first_found:
-    files:
-      # - "../vars/{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
-      - "../vars/{{ ansible_distribution }}.yml"
-      - "../vars/{{ ansible_os_family }}.yml"
-    skip: yes
+    - "{{ ansible_distribution }}.yml"
+    - "{{ ansible_os_family }}.yml"
 
 - name: "Fetch firewalld information for host 2"
   include_vars: "{{ item }}"
   with_first_found:
-    - "{{ ansible_distribution }}.yml"
-    - "{{ ansible_os_family }}.yml"
+    files:
+      # - "../vars/{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
+      # - "../vars/{{ ansible_distribution }}.yuml"
+      - "../vars/{{ ansible_os_family }}.yml"
+    skip: yes
 
 - name: "Install firewalld"
   package:
