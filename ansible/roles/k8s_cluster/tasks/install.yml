@@ -63,11 +63,8 @@
   become: true
 
 - name: "Custom installation pre-requisites"
-  include_tasks: "{{ item }}"
-  with_first_found:
-    files:
-      - "install_{{ ansible_distribution }}.yml"
-    skip: True
+  include_tasks: "install_Fedora.yml"
+  when: "ansible_distribution == 'Fedora'"
 
 - name: "Add kubernetes repository"
   yum_repository:
