@@ -1,4 +1,12 @@
 ---
+- name: "Collect facts about system services"
+  service_facts:
+  register: services_state
+
+- name: "Debug services_state"
+  debug:
+    var: services_state
+
 - name: "Stop and disable zram0 device SWAP service"
   systemd:
     enabled: false
