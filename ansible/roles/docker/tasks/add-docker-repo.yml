@@ -18,7 +18,7 @@
     - "ansible_distribution: {{ ansible_os_family }}"
     - "ansible_distribution: {{ ansible_distribution_major_version }}"
     - "newer_os: {{ newer_os | bool }}"
-    - "not newer_os: {{ not newer_os }}"
+    - "not newer_os: {{ not (newer_os | bool) }}"
     - "expression: {{ (ansible_distribution == 'CentOS' or ansible_os_family == 'RedHat') and (ansible_distribution_major_version == '8' or ansible_distribution == 'Fedora')  }}"
 
 - name: "Add docker repository CentOS/RedHat 8"
