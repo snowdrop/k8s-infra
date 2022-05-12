@@ -104,7 +104,7 @@
 
   - name: "Print key information"
     debug:
-      mst: "{{ keypair_info }}"
+      msg: "{{ keypair_info }}"
 
   - name: "Create VM instance"
     openstack.cloud.server:

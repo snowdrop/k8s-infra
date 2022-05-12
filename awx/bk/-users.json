@@ -161,6 +161,23 @@
                               }
                          },
                          {
+                              "name": "Admin",
+                              "type": "role",
+                              "content_object": {
+                                   "organization": {
+                                        "name": "snowdrop",
+                                        "type": "organization"
+                                   },
+                                   "name": "OpenStackHosts-centos",
+                                   "credential_type": {
+                                        "name": "Machine",
+                                        "kind": "ssh",
+                                        "type": "credential_type"
+                                   },
+                                   "type": "credential"
+                              }
+                         },
+                         {
                               "name": "System Administrator",
                               "type": "role"
                          }
