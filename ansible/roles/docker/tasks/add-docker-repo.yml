@@ -14,7 +14,7 @@
   debug:
     msg: "{{ item }}"
   with_items:
-    - "newer_os: {{  | bool }}"
+    - "newer_os: {{ newer_os | bool }}"
     - "not newer_os: {{ not newer_os }}"
 
 - name: "Add docker repository CentOS/RedHat 8"

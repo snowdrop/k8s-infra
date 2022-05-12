@@ -671,7 +671,7 @@
                "name": "OpenstackInitVM",
                "description": "Init OpenStack VM",
                "job_type": "run",
-               "playbook": "ansible/playbook/openstack_vm_init.yml",
+               "playbook": "ansible/playbook/openstack/openstack_vm_init.yml",
                "scm_branch": "",
                "forks": 0,
                "limit": "",
