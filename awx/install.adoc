@@ -1,0 +1,221 @@
+= AWX Installation Guide
+:toc: left
+:toc-title: Table of Contents
+:icons: font
+:description: AWX installation documentation.
+:source-highlighter: highlight.js
+
+== Requisites
+
+[start=1]
+. Install helm
+. Install kustomize
+
+== Installation
+
+Make sure the `awx` namespace exists.
+
+[source,bash]
+----
+kubectl create namespace awx
+----
+
+=== PostgreSQL
+
+[IMPORTANT]
+====
+The AWX installation of PostgreSQL seems to be faulty as whenever the postgresql pod is restarted it fails with `initdb: error: directory "/var/lib/postgresql/data/pgdata" exists but is not empty`. This is why the PostgreSQL database will be deployed independently.
+
+[source]
+----
+$ kubectl -n awx logs -f pod/awx-demo-postgres-0
+The files belonging to this database system will be owned by user "postgres".
+This user must also own the server process.
+
+The database cluster will be initialized with locale "en_US.utf8".
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are disabled.
+
+initdb: error: directory "/var/lib/postgresql/data/pgdata" exists but is not empty
+If you want to create a new database system, either remove or empty
+the directory "/var/lib/postgresql/data/pgdata" or run initdb
+with an argument other than "/var/lib/postgresql/data/pgdata".
+----
+====
+
+Check if a password already exists on the passwordstore for the AWX PostgreSQL instance and if it doesn't generate a new one.
+
+[source,bash]
+----
+$ pass show apps/awx/postgresql-pw
+Error: apps/awx/postgresql-pw is not in the password store.
+----
+
+[source,bash]
+----
+AWX_PGSQL_PW=$(pass generate --no-symbols apps/awx/postgresql-pw)
+----
+
+If the password already exists.
+
+[source,bash]
+----
+AWX_PGSQL_PW=$(pass show apps/awx/postgresql-pw)
+----
+
+Create the PostgreSQL required PV and PVC.
+
+[source,bash]
+----
+kubectl apply -f awx/postgresql/pv-awx-demo.yaml
+kubectl -n awx apply -f awx/postgresql/pvc-awx-demo.yaml
+----
+
+Change the permissions of the PV folder so the Helm Chart can update them accordingly.
+
+[source,bash]
+----
+sudo chmod 777 -R /tmp/pv-awx-demo/
+sudo chown 1001:1001 -R /tmp/pv-awx-demo/
+----
+
+.Install PostgreSQL
+[source,bash]
+----
+helm install --namespace awx postgresql \
+    -f awx/postgresql/values.yaml \
+    --set auth.postgresPassword=${AWX_PGSQL_PW} \
+    bitnami/postgresql
+----
+
+=== AWX
+
+Create secret for the PostgreSQL connection.
+
+[source,bash]
+----
+kubectl -n awx create secret generic awx-demo-postgres-configuration --from-literal=host="postgresql.awx.svc.cluster.local" --from-literal=port=5432 --from-literal=database=postgres --from-literal=username=postgres --from-literal=password=${AWX_PGSQL_PW} --from-literal=sslmode=prefer --from-literal=type=unmanaged
+----
+
+Run the following command to create the resources.
+
+[source,bash]
+----
+$ kustomize build awx/kustomize | kubectl apply -f -
+----
+
+The result should be something like.
+
+[source]
+----
+namespace/awx created
+customresourcedefinition.apiextensions.k8s.io/awxbackups.awx.ansible.com created
+customresourcedefinition.apiextensions.k8s.io/awxrestores.awx.ansible.com created
+customresourcedefinition.apiextensions.k8s.io/awxs.awx.ansible.com created
+serviceaccount/awx-operator-controller-manager created
+role.rbac.authorization.k8s.io/awx-operator-awx-manager-role created
+role.rbac.authorization.k8s.io/awx-operator-leader-election-role created
+clusterrole.rbac.authorization.k8s.io/awx-operator-metrics-reader created
+clusterrole.rbac.authorization.k8s.io/awx-operator-proxy-role created
+rolebinding.rbac.authorization.k8s.io/awx-operator-awx-manager-rolebinding created
+rolebinding.rbac.authorization.k8s.io/awx-operator-leader-election-rolebinding created
+clusterrolebinding.rbac.authorization.k8s.io/awx-operator-proxy-rolebinding created
+configmap/awx-operator-awx-manager-config created
+service/awx-operator-controller-manager-metrics-service created
+deployment.apps/awx-operator-controller-manager created
+----
+
+Get information on the created resources.
+
+[source,bash]
+----
+$ kubectl -n awx get pods 
+
+NAME                                               READY   STATUS    RESTARTS   AGE
+awx-operator-controller-manager-7758c4f45c-zc262   2/2     Running   0          13s
+----
+
+==== Wait for the installation to finish
+
+Wait for the AWX Operator pod to be up and running.
+
+[source,bash]
+----
+kubectl -n awx get all
+
+NAME                                                   READY   STATUS    RESTARTS   AGE
+pod/awx-demo-5bf8bc5c4d-hrl46                          4/4     Running   0          5s
+pod/awx-operator-controller-manager-557589c5f4-89796   2/2     Running   0          7m53s
+pod/postgresql-0                                       1/1     Running   0          9m31s
+
+NAME                                                      TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)        AGE
+service/awx-demo-service                                  NodePort    10.98.17.33      <none>        80:30080/TCP   9s
+service/awx-operator-controller-manager-metrics-service   ClusterIP   10.102.223.177   <none>        8443/TCP       7m54s
+service/postgresql                                        ClusterIP   10.101.244.185   <none>        5432/TCP       9m32s
+service/postgresql-hl                                     ClusterIP   None             <none>        5432/TCP       9m32s
+----
+
+Wait for the installation to finish...
+
+[source,bash]
+----
+kubectl -n awx logs -f pod/awx-demo-5bf8bc5c4d-hrl46 awx-demo-web
+
+...
+[wait-for-migrations] Waiting for database migrations...
+[wait-for-migrations] Attempt 1 of 30
+[wait-for-migrations] Waiting 0.5 seconds before next attempt
+[wait-for-migrations] Attempt 2 of 30
+[wait-for-migrations] Waiting 1 seconds before next attempt
+[wait-for-migrations] Attempt 3 of 30
+...
+----
+
+... AWX will be available when the log shows a message similar to the following one.
+
+[source]
+----
+2022-05-23 10:56:36,731 INFO spawned: 'awx-rsyslogd' with pid 161
+----
+
+
+
+== Uninstall
+
+=== AWX
+
+[source,bash]
+----
+$ kustomize build awx/kustomize | kubectl delete -f -
+
+namespace "awx" deleted
+customresourcedefinition.apiextensions.k8s.io "awxbackups.awx.ansible.com" deleted
+customresourcedefinition.apiextensions.k8s.io "awxrestores.awx.ansible.com" deleted
+customresourcedefinition.apiextensions.k8s.io "awxs.awx.ansible.com" deleted
+serviceaccount "awx-operator-controller-manager" deleted
+role.rbac.authorization.k8s.io "awx-operator-awx-manager-role" deleted
+role.rbac.authorization.k8s.io "awx-operator-leader-election-role" deleted
+clusterrole.rbac.authorization.k8s.io "awx-operator-metrics-reader" deleted
+clusterrole.rbac.authorization.k8s.io "awx-operator-proxy-role" deleted
+rolebinding.rbac.authorization.k8s.io "awx-operator-awx-manager-rolebinding" deleted
+rolebinding.rbac.authorization.k8s.io "awx-operator-leader-election-rolebinding" deleted
+clusterrolebinding.rbac.authorization.k8s.io "awx-operator-proxy-rolebinding" deleted
+configmap "awx-operator-awx-manager-config" deleted
+service "awx-operator-controller-manager-metrics-service" deleted
+deployment.apps "awx-operator-controller-manager" deleted
+----
+
+=== PostgreSQL
+
+[source,bash]
+----
+helm uninstall --namespace awx postgresql
+----
+
+[source,bash]
+----
+kubectl -n awx delete -f awx/postgresql/pvc-awx-demo.yaml
+kubectl delete -f awx/postgresql/pv-awx-demo.yaml
+----

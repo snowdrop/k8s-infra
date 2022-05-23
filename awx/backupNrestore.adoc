@@ -46,8 +46,16 @@ $ for AWX_OBJECT in {'users','organizations','teams','credential_types','credent
 do
   awx export --${AWX_OBJECT} > awx/bk/${BK_FILE_PREFIX}-${AWX_OBJECT}.json
 done
-
 ----
 
 
 == Restore
+
+[source,bash]
+----
+$ BK_FILE_PREFIX=$(date '+%Y%m%d%H%M%S')
+$ for AWX_OBJECT in {'users','organizations','teams','credential_types','credentials','notification_templates','projects','inventory','inventory_sources','job_templates','workflow_job_templates'}
+do
+  awx import --${AWX_OBJECT} < awx/bk/${BK_FILE_PREFIX}-${AWX_OBJECT}.json
+done
+----

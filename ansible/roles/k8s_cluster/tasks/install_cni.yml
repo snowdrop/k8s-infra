@@ -1,19 +1,23 @@
 ---
+- name: "Define CNI installation method"
+  set_fact:
+    cni_new: "{{ ansible_distribution == 'Fedora' or ((ansible_distribution == 'CentOS' or ansible_os_family == 'RedHat') and ansible_distribution_major_version != '7') }}"
+
 - name: "Install Flannel Virtual Network for pod communication"
   shell: |
     kubectl -n kube-system get deployment coredns -o yaml | sed 's/allowPrivilegeEscalation: false/allowPrivilegeEscalation: true/g' | kubectl apply -f -
     kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/{{ coreos_flannel_sha_commit }}/Documentation/kube-flannel.yml
-  when: "(ansible_distribution == 'CentOS' or ansible_os_family == 'RedHat') and ansible_distribution_major_version == '7'"
+  when: "not cni_new | bool"
 
 - name: "Generate Calico manifest file"
   template:
     src: "calico/calico.yaml.j2"
     dest: "/tmp/calico.yaml"
   become: yes
-  when: "(ansible_distribution == 'CentOS' or ansible_os_family == 'RedHat') and ansible_distribution_major_version == '8'"
+  when: "cni_new | bool"
 
 - name: "Apply Calico manifest"
   shell: |
     kubectl apply -f /tmp/calico.yaml
-  when: "(ansible_distribution == 'CentOS' or ansible_os_family == 'RedHat') and ansible_distribution_major_version == '8'"
+  when: "cni_new | bool"
 ...

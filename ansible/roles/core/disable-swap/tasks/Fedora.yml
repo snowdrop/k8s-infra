@@ -15,7 +15,7 @@
   register: disable_dev_zram
   become: true
   failed_when: "disable_dev_zram.failed and 'Could not find the requested service' not in disable_dev_zram.msg"
-  when: "services_state['ansible_facts']['services']['systemd-zram-setup@service'] is not defined or services_state['ansible_facts']['services']['systemd-zram-setup@service']['state'] == 'running'"
+  when: "services_state['ansible_facts']['services']['systemd-zram-setup@service'] is defined and services_state['ansible_facts']['services']['systemd-zram-setup@service']['state'] == 'running'"
 
 - name: "Stop and disable systemd-zram-setup SWAP service"
   systemd:
@@ -24,6 +24,7 @@
     state: stopped
   become: true
   register: disable_systemd_zram_setup
+  when: "services_state['ansible_facts']['services']['systemd-zram-setup@service'] is defined and services_state['ansible_facts']['services']['systemd-zram-setup@service']['state'] == 'running'"
 
 - name: "swapoff"
   shell: "swapoff /dev/zram0; zramctl --reset /dev/zram0"

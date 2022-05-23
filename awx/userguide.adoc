@@ -1,0 +1,50 @@
+= AWX User Guide
+:toc: left
+:toc-title: Table of Contents
+:icons: font
+:description: AWX user documentation.
+:source-highlighter: highlight.js
+
+== Access the AWX Console
+
+Get the IP Address of the AWX application.
+
+[source,bash]
+----
+$ kubectl get service/awx-demo-service -o jsonpath='{.spec.clusterIP}'
+<ip_address>
+----
+
+Althought the port has been specified in the `kustomize` configuration scripts it can also be obtained using the following command.
+
+[source,bash]
+----
+kubectl get service/awx-demo-service -o jsonpath='{.spec.ports[0].nodePort}'
+10080
+----
+
+At this moment the application should be available at http://<ip_address>:10080/.
+
+Get the Admin password
+
+[source,bash]
+----
+kubectl get secret awx-demo-admin-password -o jsonpath="{.data.password}" | base64 --decode
+----
+
+== Login
+
+[source,bash]
+----
+awx login --conf.host http://$( kubectl get nodes -o jsonpath="{.items[0].status.addresses[?(@.type=='InternalIP')].address}"):$(kubectl get service/awx-demo-service -o jsonpath='{.spec.ports[0].nodePort}') --conf.username admin --conf.password $(kubectl get secret awx-demo-admin-password -o jsonpath="{.data.password}" | base64 --decode)
+----
+
+The result is the connection token.
+
+[source,json]
+----
+{
+     "token": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+}
+----
+

@@ -1,0 +1,8 @@
+= AWX Troubleshooting Guide
+:toc: left
+:toc-title: Table of Contents
+:icons: font
+:description: AWX troubleshooting guide.
+:source-highlighter: highlight.js
+
+

@@ -13,3 +13,4 @@ spec:
   # loadbalancer_protocol: https
   # loadbalancer_port: 443
   # postgres_image_version: "12.6"
+  postgres_configuration_secret: "awx-demo-postgres-configuration"

@@ -7,7 +7,10 @@ spec:
     - ReadWriteOnce
   capacity:
     storage: 8Gi
+  claimRef:
+    namespace: awx
+    name: postgres-awx-demo-postgres
   hostPath:
     path: /tmp/pv-awx-demo
     type: ""
-  persistentVolumeReclaimPolicy: Recycle
+  persistentVolumeReclaimPolicy: Retain
