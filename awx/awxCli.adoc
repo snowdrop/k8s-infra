@@ -1,0 +1,334 @@
+= AWX CLI
+:toc: left
+:toclevels: 3
+:toc-title: Table of Contents
+:icons: font
+:description: AWX CLI
+:source-highlighter: highlight.js
+
+== Install CLI
+
+Install the CLI using pip3.
+
+[source,bash]
+----
+$ pip3 install --user https://releases.ansible.com/ansible-tower/cli/ansible-tower-cli-latest.tar.gz
+----
+
+References: https://docs.ansible.com/ansible-tower/latest/html/towercli/usage.html#installation
+
+== Login
+
+The procedure to login using `awx` is the following. These docs are using the default awx user which is `admin`.
+
+[source,bash]
+----
+$ export TOWER_HOST=http://<AWX_HOST>:<AWX_PORT>
+$ export TOWER_USERNAME=admin
+$ export TOWER_PASSWORD=$(kubectl get secret awx-demo-admin-password -o jsonpath="{.data.password}" | base64 --decode)
+$ awx login  -f human
+export TOWER_OAUTH_TOKEN=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+----
+
+To identify `AWX_HOST` and `AWX_PORT`.
+
+[source,bash]
+----
+$ AWX_HOST=$(kubectl get nodes -o jsonpath="{.items[0].status.addresses[0].address}")
+$ AWX_PORT=$(kubectl get --namespace awx -o jsonpath="{.spec.ports[0].nodePort}" services awx-demo-service)
+----
+
+== Manage AWX resources
+
+=== Organization
+
+Create `snowdrop` organization.
+
+[source,bash]
+----
+$ awx organizations create --name snowdrop --description "Snowdrop Team organization"
+----
+
+=== Execution Environments
+
+[source,bash]
+----
+awx execution_environments create --name "AWX EE (0.5.0)" --description "AWX EE (0.5.0)" --image "quay.io/ansible/awx-ee:0.5.0" --pull missing
+
+awx execution_environments create --name "AWX EE (0.6.0)" --description "AWX EE (0.6.0)" --image "quay.io/ansible/awx-ee:0.6.0" --pull missing
+----
+
+=== Inventory
+
+
+==== Credential Types
+
+Create a credential type to hold the Hetzner API key.
+
+To create a new credential type, an `input configuration` and `inject configuration` are requried.
+
+The *Input Configuration* specifies the input schema of the credentials. In this case only the Hetzner API Key is required.
+
+[source,json]
+----
+include::conf/cred-type-hetzner-inputs.json[]
+----
+
+The *Injector Configuration* specifies how the credentials are injected in the execution jobs. In this case we'll create an `HETZNER_API_TOKEN` with the token.
+
+[source,json]
+----
+include::conf/cred-type-hetzner-injectors.json[]
+----
+
+
+[source,bash]
+----
+$ awx credential_types create --kind cloud --name HetznerHCloudToken --description "Hetzner HCloud API Token" 
+----
+
+WARNING: The json options for `inputs` and `injectors`, `--inputs awx/conf/cred-type-hetzner-input.json` and `--injectors awx/conf/cred-type-hetzner-injectors.json`, are failing when executing from the command line with `argument --injectors: ./awx/conf/cred-type-hetzner-injectors.json is not valid JSON or YAML` error. Because of this these `json` contents must be added by hand in the UI, for now.
+
+References:
+
+* https://docs.ansible.com/ansible-tower/latest/html/userguide/credential_types.html
+
+==== Credentials
+
+Create credentials to access inventories.
+
+TIP: Gather the returning `id` for the created credentials for future use.
+
+[source,bash]
+----
+$ awx credentials create --organization snowdrop --name openstack-jenkins --credential_type "OpenStack"  --inputs '{"username": "yyyyyyyyyyyyyy", "password": "xxxxxxxxxxxxxxxxxxxx", "project": "spring-boot-jenkins", "project_domain_name": "redhat.com", "domain": "redhat.com", "host": "https://rhos-d.infra.prod.upshift.rdu2.redhat.com:13000"}' 
+----
+
+Gather the returning `id` for the created credentials for future use.
+
+[source,json]
+----
+{
+     "id": 4,
+     "type": "credential",
+     "kind": "openstack"
+}
+----
+
+[source,bash]
+----
+$ awx credentials create --organization snowdrop --name hetzner-hcloud --credential_type "HetznerHCloudToken"  --inputs '{"hetzner_api_token": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"}'
+----
+
+[source,json]
+----
+{
+     "id": 5,
+     "type": "credential"
+}
+----
+
+==== Projects
+
+https://github.com/hg8496/ansible-hcloud-inventory.git
+
+[source,bash]
+----
+$ awx projects create --name HetznerDynamicInventory --description "Hetzner Dynamic Inventory" --scm_type git --scm_url "https://github.com/hg8496/ansible-hcloud-inventory.git" --organization snowdrop
+----
+
+==== Inventories
+
+Create the Openstack and Hetzner inventories.
+
+[source,bash]
+----
+$ awx inventory create --name OpenStack --description "OpenStack Jenkins" --organization snowdrop
+$ awx inventory create --name Hetzner --description "Hetzner Snowdrop" --organization snowdrop
+----
+
+Create inventory sources.
+
+WARNING: The `credential ID` is the one for the *Openstack* credentials identified previously.
+
+[source,bash]
+----
+$ awx inventory_sources create --name OpenStack --description "OpenStack" --source openstack --inventory OpenStack --update_on_launch true --overwrite true --overwrite_vars false --credential 4
+----
+
+Create inventory source for the Hetzner dynamic inventory.
+
+WARNING: The `credential ID` is the one for the *Hetzner HCloud API Token* credentials identified previously.
+
+[source,bash]
+----
+$ awx inventory_sources create --name Hetzner --description "Hetzner" --source scm --inventory Hetzner --update_on_launch true --overwrite true --update_on_project_update false --overwrite_vars false --credential 5 --source_project HetznerDynamicInventory
+----
+
+=== Credentials
+
+Create credentials to access github repositories
+
+[source,bash]
+----
+$ awx credentials create --name a-github-user --credential_type "GitHub Personal Access Token"  --inputs '{"token": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"}' --organization snowdrop
+----
+
+=== Notifications
+
+[source,bash]
+----
+$ awx notification_templates create --name Snowdrop --description "Snowdrop Team" --organization snowdrop --notification_type email  --inputs '{"host": "smtp.host", "port": "25", "username": "user", "password": "", "use_tls": False, "use_ssl": False, "sender": "sender", "recipients": "recipients_csv"}'
+
+----
+
+=== Job Templates / Playbooks
+
+[source,bash]
+----
+$ awx projects create --organization snowdrop --name K8sInfraProject --description "Snowdrop K8S Infra project" --scm_type git --scm_url "https://github.com/snowdrop/k8s-infra.git" --scm_update_on_launch true
+----
+
+
+Get the k8s infra project ID to be used later in the process.
+
+[source,bash]
+----
+AWX_K8S_INFRA_PROJ_ID=awx project get -f json --name K8sInfraProject | jq '.id'
+----
+
+==== OpenStack VMs
+
+Create OpenStack VM.
+
+[source,bash]
+----
+awx job_templates create --name OpenStackCreateVM --description "Create OpenStack VM" --job_type run --inventory Localhost --project K8sInfraProject --playbook "ansible/playbook/openstack/openstack_vm_create_awx.yml" --survey_enabled true --use_fact_cache true --survey_spec "{
+'description': 'Create OpenStack VM Survey','name': 'OpenStackCreateVMSurvey''spec': [{'index': 0,'question_name': 'VM Name','description': 'Name of the VM to be created''required': False,'variable': 'vm_name','type': 'text','max': 1024},{'index': 1,'question_name': 'OpenStack VM Image','description': 'OpenStack  VM Image to use''required': False,'choices': ['Fedora-Cloud-Base-35', 'CentOS-8-x86_64-GenericCloud-released-latest', 'CentOS-7-x86_64-GenericCloud-released-latest'],'variable': 'openstack_vm_image','type': 'multiplechoice','max': 1024},{'index': 2,'question_name': 'OpenStack VM Flavor','description': 'OpenStack VM Flavor''required': False,'choices': ['m1.medium', 'ci.m1.medium', 'ci.m1.medium.large', 'ci.m5.large'],'variable': 'openstack_vm_flavor','type': 'multiplechoice','max': 1024}]}"
+----
+
+Associate credentials and notifications.
+
+[source,bash]
+----
+awx job_templates associate --credential $(awx credentials get -f json --name openstack-jenkins | jq '.id') $(awx job_templates get -f json --name OpenStackCreateVM | jq '.id')
+
+awx job_templates associate --credential OpenStackHosts-snowdrop $(awx job_templates get -f json --name OpenStackCreateVM | jq '.id')
+
+awx job_templates associate --start_notification Snowdrop $(awx job_templates get -f json --name OpenStackCreateVM | jq '.id')
+
+awx job_templates associate --success_notification Snowdrop $(awx job_templates get -f json --name OpenStackCreateVM | jq '.id')
+
+awx job_templates associate --failure_notification Snowdrop $(awx job_templates get -f json --name OpenStackCreateVM | jq '.id')
+----
+
+Init OpenStack VM
+
+[source,bash]
+----
+awx job_templates create --name OpenStackInitVM --description "Init OpenStack VM" --job_type run --inventory Localhost --project K8sInfraProject --playbook "ansible/playbook/openstack/openstack_vm_create_awx.yml" --survey_enabled true --use_fact_cache true --survey_spec "{
+'description': 'Init OpenStack VM Survey','name': 'OpenStackInitVMSurvey''spec': [{'index': 0,'question_name': 'VM Name','description': 'Name of the VM to be created''required': False,'variable': 'vm_name','type': 'text','max': 1024}]}"
+----
+
+[source,bash]
+----
+awx job_templates associate --credential OpenStackHosts-snowdrop $(awx job_templates get -f json --name OpenStackInitVM | jq '.id')
+
+awx job_templates associate --failure_notification Snowdrop $(awx job_templates get -f json --name OpenStackInitVM | jq '.id')
+----
+
+Delete OpenStack VM
+
+[source,bash]
+----
+awx job_templates create --name OpenStackDeleteVM --description "Delete OpenStack VM" --job_type run --inventory Localhost --project K8sInfraProject --playbook "ansible/playbook/openstack/openstack_vm_remove_awx.yml" --survey_enabled true --use_fact_cache true --survey_spec "{
+'description': 'Init OpenStack VM Survey','name': 'OpenStackInitVMSurvey''spec': [{'index': 0,'question_name': 'VM Name','description': 'Name of the VM to be created''required': False,'variable': 'vm_name','type': 'text','max': 1024}]}"
+----
+
+
+[source,bash]
+----
+awx job_templates associate --credential OpenStackHosts-snowdrop $(awx job_templates get -f json --name OpenStackDeleteVM | jq '.id')
+
+awx job_templates associate --start_notification Snowdrop $(awx job_templates get -f json --name OpenStackDeleteVM | jq '.id')
+
+awx job_templates associate --success_notification Snowdrop $(awx job_templates get -f json --name OpenStackDeleteVM | jq '.id')
+
+awx job_templates associate --failure_notification Snowdrop $(awx job_templates get -f json --name OpenStackDeleteVM | jq '.id')
+----
+
+
+==== Hetzner VMs
+
+=== Workflow Job Templates
+
+Create OpenStack VM.
+
+[script,bash]
+-----
+awx workflow_job_templates create --name VMCreate-OpenStack --description "Create OpenStack VM" --organization "snowdrop" --survey_enabled true --allow_simultaneous false --ask_variables_on_launch true --inventory $(awx inventories get -f json --name openstack | jq '.id')
+-----
+
+Add nodes.
+
+[script,bash]
+----
+awx workflow_job_template_nodes create
+
+ [--extra_data JSON/YAML] [--inventory ID] [--scm_branch TEXT] [--job_type {None,,run,check}] [--job_tags TEXT] [--skip_tags TEXT] [--limit TEXT] [--diff_mode BOOLEAN]
+                                              [--verbosity {None,0,1,2,3,4,5}] --workflow_job_template ID [--unified_job_template ID] [--all_parents_must_converge BOOLEAN] [--identifier TEXT]
+
+required arguments:
+  --workflow_job_template ID
+                        the ID of the associated workflow_job_template
+
+options:
+  -h, --help            show this help message and exit
+  --extra_data JSON/YAML
+                        a JSON or YAML string. You can optionally specify a file path e.g., @path/to/file.yml
+  --inventory ID        Inventory applied as a prompt, assuming job template prompts for inventory
+  --scm_branch TEXT
+  --job_type {None,,run,check}
+  --job_tags TEXT
+  --skip_tags TEXT
+  --limit TEXT
+  --diff_mode BOOLEAN
+  --verbosity {None,0,1,2,3,4,5}
+  --unified_job_template ID
+                        the ID of the associated unified_job_template
+  --all_parents_must_converge BOOLEAN
+                        If enabled then the node will only run if all of the parent nodes have met the criteria to reach this node
+  --identifier TEXT     An identifier for this node that is unique within its workflow. It is copied to workflow job nodes corresponding to this node.
+
+----
+
+Import the backup from the infra-prod project.
+
+[script,bash]
+----
+AWX_OBJECT=workflow_job_templates
+INFRA_PROD_PROJ_FOLDER=~/infra-prod
+awx import --${AWX_OBJECT} < ${INFRA_PROD_PROJ_FOLDER}/infra/awx/bk/-${AWX_OBJECT}.json
+----
+
+
+
+=== List Job Templates (Playbooks)
+
+[source,bash]
+----
+awx job_templates list --all --name OpenstackCreateVM -f json > awx/conf/jt-OpenStackCreateVm.json
+----
+
+Export a Job Template to file.
+
+[source,bash]
+----
+awx job_templates list --all --name OpenstackCreateVM -f json > awx/conf/jt-OpenStackCreateVm.json
+----
+
+
+
+== References
+
+* https://docs.ansible.com/ansible-tower/latest/html/towercli/index.html

@@ -14,6 +14,8 @@ include::userguide.adoc[]
 
 include::backupNrestore.adoc[]
 
+include::awxCli.adoc[]
+
 include::troubleshooting.adoc[]
 
 :leveloffset: -1

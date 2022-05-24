@@ -1,9 +1,9 @@
-= AWX Backup and Restore
+= AWX Configuration with CLI
 :toc: left
 :toclevels: 3
 :toc-title: Table of Contents
 :icons: font
-:description: Backup and Restore procedures for AWX.
+:description: Configuration using CLI.
 :source-highlighter: highlight.js
 
 == Backup
@@ -37,7 +37,7 @@ ATTOW the objects available for export are the following.
  
 | workflow_job_templates
 
-===
+|===
 
 [source,bash]
 ----
