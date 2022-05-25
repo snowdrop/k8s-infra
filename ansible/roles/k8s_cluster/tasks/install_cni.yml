@@ -10,14 +10,13 @@
   when: "not cni_new | bool"
 
 - name: "Check if Calico is already deployed"
-  shell: "kubectl -n kube-system get daemonset.apps calico-node"
-  register: kc_get_ds_calico
-  failed_when: "kc_get_ds_calico.rc != 0 and 'was refused' not in kc_get_ds_calico.stderr"
+  shell: "kubectl -n kube-system get daemonset.apps calico-node -o jsonpath='{.metadata.name}'"
+  register: kc_calico_ds
   when: "cni_new | bool"
 
 - name: "Print calico output"
   debug: 
-    msg: "kc_get_ds_calico: {{ kc_get_ds_calico }}"
+    msg: "kc_calico_ds: {{ kc_calico_ds }}"
   when: "cni_new | bool"
 
 - name: "Generate Calico manifest file"
@@ -25,10 +24,9 @@
     src: "calico/calico.yaml.j2"
     dest: "/tmp/calico.yaml"
   become: yes
-  when: "cni_new | bool"
+  when: "(cni_new | bool) and kc_calico_ds.rc != 0"
 
 - name: "Apply Calico manifest"
-  shell: |
-    kubectl apply -f /tmp/calico.yaml
-  when: "cni_new | bool"
+  shell: "kubectl apply -f /tmp/calico.yaml"
+  when: "(cni_new | bool) and kc_calico_ds.rc != 0"
 ...
