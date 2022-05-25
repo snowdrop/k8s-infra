@@ -149,12 +149,17 @@
   become: yes
   when: "not k8s_config_file.stat.exists"
 
+- name: "Checks k8s bootstrap status"
+  stat: 
+    path: ".kube/config"
+  register: home_k8s_config_file
+
 - name: "Copy config file"
   include_role:
     name: k8s_config
   vars:
     state: "present"
-  when: "not k8s_config_file.stat.exists"
+  when: "not home_k8s_config_file.stat.exists"
 
 - name: "Install CNI"
   include_tasks: install_cni.yml
