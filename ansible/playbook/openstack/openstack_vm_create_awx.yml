@@ -12,6 +12,10 @@
       stat: path="{{ config_file }}"
       register: st
 
+    - name: "Cat config file contents"
+      shell: "cat {{ config_file }}"
+      when: st.stat.exists and st.stat.isreg
+
     - name: "Load config file contents"
       include_vars: "{{ config_file }}"
       when: st.stat.exists and st.stat.isreg
