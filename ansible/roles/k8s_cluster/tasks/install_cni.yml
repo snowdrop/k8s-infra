@@ -9,6 +9,16 @@
     kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/{{ coreos_flannel_sha_commit }}/Documentation/kube-flannel.yml
   when: "not cni_new | bool"
 
+- name: "Check if Calico is already deployed"
+  shell: "kubectl -n kube-system get daemonset.apps calico-node"
+  register: kc_get_ds_calico
+  when: "cni_new | bool"
+
+- name: "Print calico output"
+  debug: 
+    mes: "kc_get_ds_calico: {{ kc_get_ds_calico }}"
+  when: "cni_new | bool"
+
 - name: "Generate Calico manifest file"
   template:
     src: "calico/calico.yaml.j2"
