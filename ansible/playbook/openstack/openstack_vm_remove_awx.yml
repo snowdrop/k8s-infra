@@ -36,6 +36,7 @@
         - "controller_host: {{ controller_host }}"
         - "controller_port: {{ controller_port }}"
         - "controller_oauthtoken: {{ controller_oauthtoken }}"
+        - "openstack_auth: {{ openstack_auth }}"
         
     - name: "Get inventory for IaaS Provider"
       set_fact:
