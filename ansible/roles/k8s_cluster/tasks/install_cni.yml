@@ -12,11 +12,12 @@
 - name: "Check if Calico is already deployed"
   shell: "kubectl -n kube-system get daemonset.apps calico-node"
   register: kc_get_ds_calico
+  failed_when: "kc_get_ds_calico.rc != 0 and 'was refused' not in kc_get_ds_calico.stderr"
   when: "cni_new | bool"
 
 - name: "Print calico output"
   debug: 
-    mes: "kc_get_ds_calico: {{ kc_get_ds_calico }}"
+    msg: "kc_get_ds_calico: {{ kc_get_ds_calico }}"
   when: "cni_new | bool"
 
 - name: "Generate Calico manifest file"
