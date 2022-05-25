@@ -17,23 +17,6 @@
     path: "{{ key_path }}"
   register: st
 
-- name: "Gather information about a previously created VM"
-  openstack.cloud.server_info:
-    auth:
-      project_name: "{{ openstack_auth.openstack_project_name }}"
-      username: "{{ openstack_auth.openstack_console_user }}"
-      password: "{{ openstack_auth.openstack_console_password }}"
-      user_domain_name: "{{ openstack_auth.openstack_user_domain }}"
-      project_domain_name: "{{ openstack_auth.openstack_project_domain }}"
-      auth_url: "{{ openstack_auth.openstack_os_auth_url }}"
-    filters:
-      name: "{{ vm_name }}"
-  register: server_info_result
-
-- name: Print Openstack output
-  debug:
-    var: server_info_result
-
 - name: "Delete VM {{ vm_name }}"
   os_server:
     auth:
