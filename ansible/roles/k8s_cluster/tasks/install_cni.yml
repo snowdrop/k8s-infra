@@ -10,6 +10,16 @@
   when: "not cni_new | bool"
 
 - name: "Check if Calico is already deployed"
+  shell: "whoami"
+  register: xxx
+  when: "cni_new | bool"
+
+- name: "Print xxx output"
+  debug: 
+    msg: "xxx: {{ xxx }}"
+  when: "cni_new | bool"
+
+- name: "Check if Calico is already deployed"
   shell: "kubectl -n kube-system get daemonset.apps calico-node -o jsonpath='{.metadata.name}'"
   register: kc_calico_ds
   when: "cni_new | bool"
