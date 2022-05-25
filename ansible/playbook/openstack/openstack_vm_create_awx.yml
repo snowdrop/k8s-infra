@@ -15,6 +15,12 @@
     - name: "Cat config file contents"
       shell: "cat {{ config_file }}"
       when: st.stat.exists and st.stat.isreg
+      register: cat_output
+
+    - name: "Print config file contents"
+      debug: 
+        msg: "cat_output: {{ cat_output }}"
+      when: "cat_output is defined"
 
     - name: "Load config file contents"
       include_vars: "{{ config_file }}"
