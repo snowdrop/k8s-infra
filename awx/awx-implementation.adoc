@@ -250,6 +250,8 @@ awx job_templates create --name OpenStackDeleteVM --description "Delete OpenStac
 ----
 awx job_templates associate --credential OpenStackHosts-snowdrop $(awx job_templates get -f json --name OpenStackDeleteVM | jq '.id')
 
+awx job_templates associate --credential $(awx credentials get -f json --name openstack-jenkins | jq '.id') $(awx job_templates get -f json --name OpenStackCreateVM | jq '.id')
+
 awx job_templates associate --start_notification Snowdrop $(awx job_templates get -f json --name OpenStackDeleteVM | jq '.id')
 
 awx job_templates associate --success_notification Snowdrop $(awx job_templates get -f json --name OpenStackDeleteVM | jq '.id')
