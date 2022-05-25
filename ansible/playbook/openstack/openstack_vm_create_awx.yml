@@ -16,6 +16,17 @@
       include_vars: "{{ config_file }}"
       when: st.stat.exists and st.stat.isreg
 
+    - name: "Print credentials"
+      debug: 
+        msg: "{{ item }}"
+      with_items:
+        - "project_name: {{ clouds.devstack.auth.project_name }}"
+        - "username: {{ clouds.devstack.auth.username }}"
+        - "password: {{ clouds.devstack.auth.password }}"
+        - "domain_name: {{ clouds.devstack.auth.domain_name }}"
+        - "project_domain_name: {{ clouds.devstack.auth.project_domain_name }}"
+        - "auth_url: {{ clouds.devstack.auth.auth_url }}"
+
     - name: "Set openstack_auth facts"
       set_fact:
         openstack_auth: 
