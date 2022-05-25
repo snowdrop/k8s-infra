@@ -1,7 +1,10 @@
 ---
 - name: "Read config file contents"
-  set_fact:
-    k8s_config: "{{ lookup('file', default_k8s_config_file) }} "
+  shell: "cat {{ default_k8s_config_file }}"
+  become: yes
+  register: k8s_config
+  # set_fact:
+  #   k8s_config: "{{ lookup('file', default_k8s_config_file) }} "
     
 
 - name: "Create k8s config folder on host OS user HOME"
@@ -53,5 +56,5 @@
   debug:
     msg:
       - "Kubernetes config file contents"
-      - "{{ k8s_config }}"
+      - "{{ k8s_config.stdout_lines }}"
 ...
