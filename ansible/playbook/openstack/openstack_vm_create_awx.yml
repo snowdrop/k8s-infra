@@ -26,6 +26,15 @@
           openstack_project_domain: "{{ clouds.devstack.auth.project_domain_name }}"
           openstack_os_auth_url: "{{ clouds.devstack.auth.auth_url }}"  
 
+    - name: "Print parameters"
+      debug: 
+        msg: "{{ item }}"
+      with_items:
+        - "awx_user_name: {{ awx_user_name }}"
+        - "controller_host: {{ controller_host }}"
+        - "controller_port: {{ controller_port }}"
+        - "controller_oauthtoken: {{ controller_oauthtoken }}"
+
     - name: "Get inventory for IaaS Provider"
       set_fact:
         iaas_inventory: "{{ query('awx.awx.controller_api', 'inventories', query_params={ 'name': iaas_provider }, host='http://' + controller_host + ':' + controller_port, username=awx_user_name, oauth_token=controller_oauthtoken ) }}"
