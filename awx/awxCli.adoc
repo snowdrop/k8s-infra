@@ -273,9 +273,44 @@ Add nodes.
 
 [script,bash]
 ----
-awx workflow_job_template_nodes create
+awx workflow_job_template_nodes create --workflow_job_template $(awx workflow_job_templates get -f json --name VMCreate-OpenStack  | jq '.id')  --unified_job_template $(awx job_templates get -f json --name OpenStackCreateVM | jq '.id')
 
- [--extra_data JSON/YAML] [--inventory ID] [--scm_branch TEXT] [--job_type {None,,run,check}] [--job_tags TEXT] [--skip_tags TEXT] [--limit TEXT] [--diff_mode BOOLEAN]
+awx workflow_job_template_nodes create --workflow_job_template $(awx workflow_job_templates get -f json --name VMCreate-OpenStack  | jq '.id') --unified_job_template $(awx unified_job_templates list -f json --name OpenStack --type inventory_source | jq '.results[0].id')  
+
+awx workflow_job_template_nodes create --workflow_job_template $(awx workflow_job_templates get -f json --name VMCreate-OpenStack  | jq '.id')  --unified_job_template $(awx job_templates get -f json --name OpenStackCreateVM | jq '.id')
+awx workflow_job_template_nodes create --workflow_job_template $(awx workflow_job_templates get -f json --name VMCreate-OpenStack  | jq '.id')  --unified_job_template $(awx job_templates get -f json --name OpenStackCreateVM | jq '.id')
+
+--inventory $(awx inventories get -f json --name openstack | jq '.id')
+
+ [--extra_data JSON/YAML]  [--scm_branch TEXT] [--job_type {None,,run,check}] [--job_tags TEXT] [--skip_tags TEXT] [--limit TEXT] [--diff_mode BOOLEAN]
+                                              [--verbosity {None,0,1,2,3,4,5}] --workflow_job_template ID [--unified_job_template ID] [--all_parents_must_converge BOOLEAN] [--identifier TEXT]
+
+required arguments:
+  --workflow_job_template ID
+                        the ID of the associated workflow_job_template
+
+options:
+  -h, --help            show this help message and exit
+  --extra_data JSON/YAML
+                        a JSON or YAML string. You can optionally specify a file path e.g., @path/to/file.yml
+  --inventory ID        Inventory applied as a prompt, assuming job template prompts for inventory
+  --scm_branch TEXT
+  --job_type {None,,run,check}
+  --job_tags TEXT
+  --skip_tags TEXT
+  --limit TEXT
+  --diff_mode BOOLEAN
+  --verbosity {None,0,1,2,3,4,5}
+  --unified_job_template ID
+                        the ID of the associated unified_job_template
+  --all_parents_must_converge BOOLEAN
+                        If enabled then the node will only run if all of the parent nodes have met the criteria to reach this node
+  --identifier TEXT     An identifier for this node that is unique within its workflow. It is copied to workflow job nodes corresponding to this node.
+----
+
+[source]
+----
+usage: awx workflow_job_template_nodes create [-h] [--extra_data JSON/YAML] [--inventory ID] [--scm_branch TEXT] [--job_type {None,,run,check}] [--job_tags TEXT] [--skip_tags TEXT] [--limit TEXT] [--diff_mode BOOLEAN]
                                               [--verbosity {None,0,1,2,3,4,5}] --workflow_job_template ID [--unified_job_template ID] [--all_parents_must_converge BOOLEAN] [--identifier TEXT]
 
 required arguments:
@@ -300,6 +335,7 @@ options:
                         If enabled then the node will only run if all of the parent nodes have met the criteria to reach this node
   --identifier TEXT     An identifier for this node that is unique within its workflow. It is copied to workflow job nodes corresponding to this node.
 
+awx workflow_job_template_nodes create: the following arguments are required: --workflow_job_template
 ----
 
 Import the backup from the infra-prod project.
