@@ -26,12 +26,13 @@
   register: disable_systemd_zram_setup
   when: "services_state['ansible_facts']['services']['systemd-zram-setup@service'] is defined and services_state['ansible_facts']['services']['systemd-zram-setup@service']['state'] == 'running'"
 
-# - name: "swapoff"
-#   shell: "swapoff /dev/zram0; zramctl --reset /dev/zram0"
-#   become: true
-#   register: swapoff_zram
-#   failed_when: "swapoff_zram.rc != 0 and 'No such file or directory' not in swapoff_zram.stderr "
-#   changed_when: "swapoff_zram.changed and 'No such file or directory' not in swapoff_zram.stderr "
+- name: "swapoff"
+  shell: "swapoff /dev/zram0; zramctl --reset /dev/zram0"
+  become: true
+  register: swapoff_zram
+  # failed_when: "swapoff_zram.rc != 0 and 'No such file or directory' not in swapoff_zram.stderr "
+  failed_when: False
+  changed_when: "swapoff_zram.changed and 'No such file or directory' not in swapoff_zram.stderr "
 
 - name: "Remove zram-generator-defaults package"
   package:
