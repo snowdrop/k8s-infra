@@ -164,6 +164,16 @@
 - name: "Install CNI"
   include_tasks: install_cni.yml
 
+- name: "Check if nodes are already tainted"
+  shell: "kubectl get nodes -o jsonpath=\"{.items[].spec.taints[?(@.key=='node-role.kubernetes.io/master')]}\""
+  register: kc_check_tainted_nodes
+  ignore_errors: True
+
+- name: "Print taint output"
+  debug: 
+    msg: "kc_check_tainted_nodes: {{ kc_check_tainted_nodes }}"
+  when: "kc_check_tainted_nodes is defined"
+
 - name: Taint the node
   command: "kubectl taint nodes --all node-role.kubernetes.io/master-"
 
@@ -171,7 +181,7 @@
   template:
     src: "clusterrole-admin.j2"
     dest: /tmp/clusterrole-admin.yml
-  become: yes
+  <: yes
 
 - name: "Grant Cluster Admin role to the serviceaccount default of kube-system"
   shell: |
