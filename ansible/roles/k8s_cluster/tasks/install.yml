@@ -165,7 +165,8 @@
   include_tasks: install_cni.yml
 
 - name: "Check if nodes are already tainted"
-  shell: "kubectl get nodes -o jsonpath=\"{.items[].spec.taints[?(@.key=='node-role.kubernetes.io/master')]}\""
+  shell: |
+    kubectl get nodes -o jsonpath="{.items[].spec.taints[?(@.key=='node-role.kubernetes.io/master')]}"
   register: kc_check_tainted_nodes
   ignore_errors: True
 
