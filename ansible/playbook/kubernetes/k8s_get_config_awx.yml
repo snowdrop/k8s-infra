@@ -39,9 +39,8 @@
       when: st.stat.exists and st.stat.isreg
 
   tasks:
-
     - name: "Notify k8s config"
-      mail:
+      community.general.mail:
         host: "{{ snowdrop.smtp.host }}"
         port: "{{ snowdrop.smtp.port }}"
         subject: "Kubernetes config for {{ vm_name }}"
@@ -53,7 +52,7 @@
       # delegate_to: localhost
 
     - name: "Notify k8s dashboard token"
-      mail:
+      community.general.mail:
         host: "{{ snowdrop.smtp.host }}"
         port: "{{ snowdrop.smtp.port }}"
         subject: "Kubernetes dashboard for {{ vm_name }}"
