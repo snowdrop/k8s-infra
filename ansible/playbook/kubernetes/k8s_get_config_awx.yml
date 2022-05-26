@@ -1,7 +1,6 @@
 ---
 - name: "Fetch configuration"
   hosts: "{{ vm_name }}"
-  import_playbook: "k8s-install.yml"
 
   tasks:
     - name: "Fetch kubernetes configuration"
