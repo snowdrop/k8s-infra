@@ -21,6 +21,9 @@
 
 - name: "Notify executioner"
   hosts: localhost
+  collections:   # Define collections to search
+    - community.general
+    
   gather_facts: True
   vars:
     config_file: "{{ lookup('env', 'SMTP_CONFIG_FILE') }}"
