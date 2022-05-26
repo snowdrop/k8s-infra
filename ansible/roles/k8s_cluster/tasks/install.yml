@@ -180,6 +180,11 @@
   register: kc_taint_node_res
   failed_when: "kc_taint_node_res.rc != 0 and 'not found' not in kc_taint_node_res.stderr"
 
+- name: "Print taint output"
+  debug: 
+    msg: "kc_taint_node_res: {{ kc_taint_node_res }}"
+  when: "kc_taint_node_res is defined"
+
 - name: "Generate ClusterRole file for the sa default and namespace kube-system"
   template:
     src: "clusterrole-admin.j2"
