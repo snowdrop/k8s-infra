@@ -10,33 +10,35 @@
   when: "not cni_new | bool"
 
 - name: "Check if Calico is already deployed"
-  shell: "whoami"
-  register: xxx
-  when: "cni_new | bool"
-
-- name: "Print xxx output"
-  debug: 
-    msg: "xxx: {{ xxx }}"
-  when: "cni_new | bool"
-
-- name: "Check if Calico is already deployed"
   shell: "kubectl -n kube-system get daemonset.apps calico-node -o jsonpath='{.metadata.name}'"
   register: kc_calico_ds
+  ignore_errors: True
   when: "cni_new | bool"
 
 - name: "Print calico output"
   debug: 
     msg: "kc_calico_ds: {{ kc_calico_ds }}"
-  when: "cni_new | bool"
+  when: "(cni_new | bool) and kc_calico_ds is defined"
+
+- name: "Decide if Calico installation is needed"
+  set_fact:
+    install_calico: "(cni_new | bool) and (kc_calico_ds is undefined or (kc_calico_ds.rc != 0 and 'NotFound' not in kc_calico_ds.stderr))"
+
+- name: "Print Decide calico output"
+  debug: 
+    msg: "install_calico{{ item}}"
+  with_items:
+    - "install_calico: {{ install_calico }}"
+    - "install_calico: {{ install_calico }}"
 
 - name: "Generate Calico manifest file"
   template:
     src: "calico/calico.yaml.j2"
     dest: "/tmp/calico.yaml"
   become: yes
-  when: "(cni_new | bool) and kc_calico_ds.rc != 0"
+  when: "install_calico"
 
 - name: "Apply Calico manifest"
   shell: "kubectl apply -f /tmp/calico.yaml"
-  when: "(cni_new | bool) and kc_calico_ds.rc != 0"
+  when: "install_calico"
 ...

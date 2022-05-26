@@ -34,7 +34,7 @@
         name: 'ingress'
       vars:
         - remove: false
-      tags: [ingress]
+      tags: [never,ingress]
       
     - name: "Execute k8s_dashboard installation role"
       import_role:
