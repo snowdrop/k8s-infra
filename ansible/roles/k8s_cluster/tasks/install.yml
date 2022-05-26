@@ -182,7 +182,7 @@
   template:
     src: "clusterrole-admin.j2"
     dest: /tmp/clusterrole-admin.yml
-  <: yes
+  become: True
 
 - name: "Grant Cluster Admin role to the serviceaccount default of kube-system"
   shell: |
