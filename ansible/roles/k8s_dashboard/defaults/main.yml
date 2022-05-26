@@ -10,4 +10,4 @@ k8s_dashboard_token_ttl: 0
 k8s_dashboard_token_description: snowdrop-admin-user
 k8s_dashboard_token_auth_extra_group: system:bootstrappers
 
-passwordstore_enabled: true
+passwordstore_enabled: false
