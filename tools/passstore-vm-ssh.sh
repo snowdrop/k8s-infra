@@ -30,11 +30,11 @@ then
     SSH_KEY=~/.ssh/id_rsa_snowdrop
     if [ ! -f ${SSH_KEY} ]; 
     then
-      die "Missing SSH key file."
+      echo "pass show ${VM_PROVIDER}/${VM_NAME}/id_rsa)" > ${SSH_KEY}
+      chmod 600 ${SSH_KEY}
     fi
   fi
 fi
-chmod 600 ${SSH_KEY}
 
 IP=$(pass show ${VM_PROVIDER}/${VM_NAME}/ansible_ssh_host | awk 'NR==1{print $1}')
 PORT=$(pass show ${VM_PROVIDER}/${VM_NAME}/ansible_ssh_port | awk 'NR==1{print $1}')
