@@ -24,7 +24,7 @@ flavours:
 openstack:
   os_project_name: spring-boot-jenkins
   sshkey_name: "{{ hostname }}"
-  timeout: 300
+  timeout: 60000
   vm:
     title: CentOS 8 Generic Cloud Latest
     name: "{{ hostname }}"

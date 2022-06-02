@@ -49,6 +49,7 @@
   #       - "ansible_env: {{ ansible_env }}"
 
   tasks:
+
     # - name: "Set openstack_auth facts"
     #   set_fact:
     #     openstack_auth: 
@@ -67,6 +68,7 @@
             - always
       vars: 
         state: "present"
+
 
   post_tasks:
     - name: Refresh the inventory so the newly added host is available
