@@ -17,6 +17,9 @@ flavours:
   m1.xlarge:
     name: "m1.xlarge"
     disk_size: 80
+  g.standard.xxxl:
+    name: "g.standard.xxxl"
+    disk_size: 160
 
 openstack:
   os_project_name: spring-boot-jenkins
