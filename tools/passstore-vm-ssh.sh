@@ -24,8 +24,16 @@ fi
 
 if [ ! -f ${SSH_KEY} ]; 
 then
-  echo "pass show ${VM_PROVIDER}/${VM_NAME}/id_rsa)" > ${SSH_KEY}
-  chmod 600 ${SSH_KEY}
+  SSH_KEY=~/.ssh/id_rsa_snowdrop_${VM_PROVIDER}
+  if [ ! -f ${SSH_KEY} ]; 
+  then
+    SSH_KEY=~/.ssh/id_rsa_snowdrop
+    if [ ! -f ${SSH_KEY} ]; 
+    then
+      echo "pass show ${VM_PROVIDER}/${VM_NAME}/id_rsa)" > ${SSH_KEY}
+      chmod 600 ${SSH_KEY}
+    fi
+  fi
 fi
 
 IP=$(pass show ${VM_PROVIDER}/${VM_NAME}/ansible_ssh_host | awk 'NR==1{print $1}')
