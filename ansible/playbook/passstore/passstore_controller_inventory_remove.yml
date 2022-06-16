@@ -1,0 +1,43 @@
+---
+# file: passstore_controller_inventory_remove.yml
+# Required variables:
+#  . vm_name: Name of the vm
+#  . pass_provider: provider in the passstore project [hetzner]
+- name: Delete local inventory configuration
+  hosts: localhost
+  gather_facts: no
+
+  pre_tasks:
+    - name: "Validate required variables"
+      assert:
+        that:
+          - "vm_name is defined"
+          - "vm_name | length > 0"
+          - "pass_provider is defined"
+          - "pass_provider | length > 0"
+        fail_msg: "'vm_name' and 'pass_provider' must be defined"
+
+    - name: "Pull pass git database"
+      shell: "git pull"
+      args:
+        chdir: "{{ lookup('env', 'PASSWORD_STORE_DIR') }}"
+
+  tasks:
+    - name: Remove passstore entries
+      shell: "pass rm {{ pass_provider }}/{{ vm_name }} -rf"
+      register: pass_rm_res
+      changed_when: "pass_rm_res.rc == 0"
+      failed_when: "pass_rm_res.rc != 0 and 'is not in the password store' not in pass_rm_res.stderr"
+
+    - name: Remove local ssh keys
+      shell: "rm -f ~/.ssh/id_rsa_snowdrop_{{ pass_provider }}_{{ vm_name }}*"
+      changed_when: "pass_rm_res.rc == 0"
+      failed_when: "false"
+
+  post_tasks:
+    - name: "Push changes to the pass git database"
+      shell: "git push"
+      args:
+        chdir: "{{ lookup('env', 'PASSWORD_STORE_DIR') }}"
+
+...
