@@ -1,0 +1,7 @@
+---
+- name: "Remove alias"
+  ansible.builtin.lineinfile:
+    path: "{{ alias_file_name }}"
+    regexp: '^alias {{ name }}='
+    state: absent
+...

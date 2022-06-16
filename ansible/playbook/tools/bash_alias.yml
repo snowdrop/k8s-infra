@@ -1,0 +1,29 @@
+---
+- hosts: "{{ vm_name | default('localhost') }}"
+  gather_facts: true
+
+  tasks:
+- hosts: "{{ vm_name | default('localhost') }}"
+  gather_facts: true
+
+  pre_tasks:
+    - name: "Check if either state or operation are informed"
+      assert:
+        that: "state is defined or operation is defined"
+        fail_msg: "Either state or operation must be informed"
+
+    - name: "If operation is add must have a name and command"
+      assert:
+        that: "(operation is not defined) or (operation is defined and operation == 'add' and name is defined and command is defined) or (operation != 'add')"
+        fail_msg: "If operation is add, name and command are required"
+
+    - name: "If operation is remove must have a name"
+      assert:
+        that: "(operation is not defined) or (operation is defined and operation == 'remove' and name is defined) or (operation != 'remove')"
+        fail_msg: "If operation is remove, name is required"
+
+  tasks:
+    - name: "Add alias to bash_alias"
+      include_role:
+        name: "tools/bash_alias"
+...

@@ -1,0 +1,12 @@
+---
+- name: "Build alias line"
+  set_fact:
+    bash_alias: 'alias {{ name }}="{{ command }}"'
+
+- name: "Add alias"
+  ansible.builtin.lineinfile:
+    path: "{{ alias_file_name }}"
+    regexp: '^alias {{ name }}'
+    line: "{{ bash_alias }}"
+    state: present
+...

@@ -1,0 +1,25 @@
+---
+
+- name: "Check if .bash_aliases file exists"
+  stat: 
+    path: "{{ alias_file_name }}"
+  register: ba_res
+
+- name: "Create .bash_aliases file"
+  file:
+    path: "{{ alias_file_name }}"
+    mode: "0755"
+    state: "touch"
+  when: "not ba_res.stat.exists"
+
+- name: "Update bashrc with the activation of .bash_aliases"
+  blockinfile:
+    path: "${HOME}/.bashrc"
+    block: |
+      if [ -f ~/.bash_aliases ]; then
+        . ~/.bash_aliases
+      fi
+    marker: "# {mark} ANSIBLE MANAGED BLOCK (bash_aliases)"
+    state: present
+
+...
