@@ -14,7 +14,7 @@
     state: restarted
     name: libvirtd
     enabled: yes
-  become: yes
+  become: True
 
 - name: "Add users to libvirt group"
   user: 
@@ -32,5 +32,27 @@
     tasks_from: "Fedora.yml"
   vars:
     state: "absent"
-  
+
+- name: "Add or modify nofile hard limit for all users"
+  community.general.pam_limits:
+    domain: '*'
+    limit_type: hard
+    limit_item: nofile
+    value: 1048576
+  become: True
+
+- name: "Add or modify nofile soft limit for all users"
+  community.general.pam_limits:
+    domain: '*'
+    limit_type: hard
+    limit_item: nofile
+    value: 10000
+  become: True
+
+- name: "Copy sysctl.d configuration"
+  ansible.builtin.copy:
+    src: "../files/sysctl.d/10-user-watches.conf"
+    dest: "/usr/lib/sysctl.d/10-user-watches.conf"
+  become: True
+
 ...
