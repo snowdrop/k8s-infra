@@ -1,0 +1,7 @@
+---
+- name: "Uninstall misc packages"
+  package:
+    name: "{{ misc_packages }}"
+    state: absent
+  become: True
+...
