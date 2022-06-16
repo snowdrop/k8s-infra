@@ -12,11 +12,7 @@ Role Variables
 --------------
 
 The following variables are required:
-* override_public_key: Instead of using the passwordstore Hetzner RSA key use the one provided in this variable
-
-Optional variables
-* hetzner_context_name: Hetzner context to use. Will default to `snowdrop` if no context is provided.
-
+* vm_public_key: Contents of the public key to be used as the VM public key.
 
 Dependencies
 ------------
