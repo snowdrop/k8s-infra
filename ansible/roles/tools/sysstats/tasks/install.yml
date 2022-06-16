@@ -1,0 +1,15 @@
+---
+- name: "Install stats packages"
+  package:
+    name: "{{ stats_packages }}"
+    state: present
+  become: True
+
+- name: "Start stats services"
+  ansible.builtin.service:
+    name: "{{ item }}"
+    enabled: yes
+    state: started
+  become: True
+  loop: "{{ stats_services }}"
+...

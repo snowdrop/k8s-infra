@@ -1,0 +1,7 @@
+---
+- name: "Uninstall stats packages"
+  package:
+    name: "{{ stats_packages }}"
+    state: absent
+  become: True
+...
