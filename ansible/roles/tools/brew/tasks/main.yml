@@ -1,0 +1,24 @@
+---
+- include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ansible_distribution}}-{{ansible_distribution_major_version}}.yml"
+    - "{{ ansible_distribution }}.yml"
+    - "{{ ansible_os_family }}.yml"
+    - "main.yml"
+
+- name: "Install brew dependencies"
+  package:
+    name: "{{ required_dependencies }}"
+    state: present
+  become: True
+
+- name: "Install brew"
+  shell: |
+    bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+- name: "Add Homebrew to user PATH"
+  shell: |
+    echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> ${HOME}/.bash_profile
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+
+...
