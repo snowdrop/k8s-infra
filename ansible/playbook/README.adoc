@@ -1,0 +1,155 @@
+= Ansible Playbooks
+:toc: left
+:description: This document describes the implemented playbooks.
+
+== Playbooks
+
+List, description and usage of the implemented playbooks.
+
+=== `passstore_controller_inventory`
+
+This playbook generates the local inventory for the host.
+
+Variables:
+
+| Var Name | Possible Values | Default Value | Meaning |
+| --- | --- | --- | --- |
+| vm_name | | | Name that will be assigned to  the host | 
+| pass_provider | [hetzner,openstack] | hetzner | Cloud or Bare-metal provider that will host the VM |
+| k8s_type | [masters,nodes] | | k8s component, see the [k8s README](../../kubernetes/README.md#ansible-inventory) |
+| k8s_version | [117,119,121,123] | | k8s version to be installed, see the [k8s README](../../kubernetes/README.md#ansible-inventory) |
+
+This playbook will create a passwordstore folder structure that will be the base for the Ansible Inventory.
+
+An example:
+
+```bash
+$ ansible-playbook ansible/playbook/passstore_controller_inventory.yml -e vm_name=my-host -e pass_provider=hetzner -e k8s_type=masters -e k8s_version=115 --tags create
+```
+
+This execution would generate the following `pass` structure:
+
+```
+├── hetzner
+|   ├── my-host
+│   │   ├── ansible_ssh_port
+│   │   ├── groups
+│   │   │   ├── k8s_115
+│   │   │   └── masters
+│   │   ├── id_rsa
+│   │   ├── id_rsa.pub
+│   │   ├── os_password
+│   │   ├── os_user
+│   │   └── ssh_port
+```
+
+...and would also create the following ssh keys:
+
+```bash
+$ ls -l ~/.ssh/
+-rw-------. 1 me me  3242 jan 1 00:00 id_rsa_snowdrop_hetzner_my-host
+-rw-------. 1 me me   724 jan 1 00:00 id_rsa_snowdrop_hetzner_my-host.pub
+```
+
+
+=== `passstore_controller_inventory_remove`
+
+This playbook will remove the records and files created by the [`passstore_controller_inventory`](#passstore_controller_inventory) playbook.
+
+```bash
+$ ansible-playbook ansible/playbook/passstore_controller_inventory_remove.yml -e vm_name=my-host -e pass_provider=hetzner
+```
+
+Variables:
+
+| Var Name | Possible Values | Default Value | Meaning |
+| --- | --- | --- | --- |
+| vm_name | | | Name that will be assigned to  the host | 
+| pass_provider | [hetzner] | hetzner | Cloud or Bare-metal provider that will host the VM |
+
+=== `sec_host`
+
+This playbook executes several tasks regarding the security of hosts.
+
+1. Install `firewalld` and close ports
+1. Applies `sysctl` rules as described [here](https://linoxide.com/how-tos/linux-sysctl-tuning/)
+    ```yaml
+    # ignore ICMP packets (ping requests)
+    net.ipv4.icmp_echo_ignore_all=1
+    
+    # This "sanity checking" helps against spoofing attack.
+    net.ipv4.conf.all.rp_filter=1
+    
+    # Syn Flood protection
+    net.ipv4.tcp_syncookies = 1
+    ```
+1. Sets the welcome message with proprietary information.
+1. Configures `journal` so messages will persist between reboots.
+1. Install `auditd`
+1. Changes default ssh port 
+1. Update all packages
+
+The securization is executed using:
+
+```bash
+$  ansible-playbook ansible/playbook/sec_host.yml -e vm_name=<vm_name> -e provider=<provider>
+```
+
+Take into consideration that at the end of the securization the SSH port might be different that the default 22. This can be checked using:
+
+```bash
+$ pass show <path/to_host>/ansible_ssh_port
+```
+
+...such as...
+
+```bash
+$ pass show hetzner/my_host/ansible_ssh_port
+```
+
+Variables:
+
+| Var Name | Possible Values | Default Value | Meaning |
+| --- | --- | --- | --- |
+| vm_name | | | Name of the host that must already exist in the Ansible inventory. | 
+| provider | [hetzner] |  | Cloud or Bare-metal provider that hosts the VM |
+
+=== `passstore_manage_host_groups`
+
+This playbook allows to easily add and remove hosts from an ansible group managed under the password store.
+
+**WARNING**: No entries will be added or removed using this playbook within the `hosts.yaml` file !
+
+```bash
+$ ansible-playbook ansible/playbook/passstore_manage_host_groups.yml -e operation=add -e group_name=<my_group> -e vm_name=<my_host>
+```
+
+For instance, adding a host named `n01-k115` to the `k8s_115` group would be done the following way:
+
+```bash
+$ ansible-playbook ansible/playbook/passstore_manage_host_groups.yml -e operation=add -e group_name=k8s_115 -e vm_name=n01-k115
+```
+
+To remove the host from the group just remove the entry from the group folder as following...
+
+```bash
+$ ansible-playbook ansible/playbook/passstore_manage_host_groups.yml -e operation=remove -e group_name=<my_group> -e vm_name=<my_host>
+```
+
+For instance, to undo the previous host operation:
+
+```bash
+$ ansible-playbook ansible/playbook/passstore_manage_host_groups.yml -e operation=remove -e group_name=k8s_115 -e vm_name=n01-k115
+```
+
+== Modules
+
+:leveloffset: +2
+
+include::hetzner/README.adoc[]
+
+include::openstack/README.adoc[]
+
+include::kubernetes/README.adoc[]
+
+:leveloffset: -2

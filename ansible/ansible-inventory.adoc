@@ -1,0 +1,97 @@
+= Ansible Inventory
+:toc: left
+:description: This document describes the Ansible inventory implementation.
+
+== Introduction to Ansible Inventory
+
+Ansible can work against multiple systems or machines in an infrastructure, called `hosts` at the same time, using a list or group of lists know as an inventory. 
+
+Once the inventory is defined, you can select the `hosts` or `groups` where you want that Ansible runs against. The inventory is comprised of several files and scripts located under the `k8s-infra/ansible/inventory` folder.
+
+The two most important files are: 
+* `hosts.yml`: YAML file with group structure information as well as group variable assignment
+* `pass_inventory.py`: Python script that dynamically builds the inventory from the `passwordstore` project. This task is done automatically when Ansible is executed. 
+
+**Remark**: More information on the Ansible Inventory and how to build it is defined within the [Ansible User Guide](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html).
+
+=== `hosts.yml`
+
+This file contains static information for the inventory such as:
+* Group 
+* Group hierarchy
+* Group variables
+* Host-Group assignment - although we won't use it in this project
+
+Here is a sample of a *hosts yaml* file designed using YAML. 
+
+```yaml
+all: # keys must be unique, i.e. only one 'hosts' per group
+    hosts:
+        host1:
+        host2:
+            host_var: value
+    vars: # variables for group all (i.e. variables that will be inherited from all hosts) 
+        group_all_var: value 
+    children: # child groups. key order does not matter, indentation does
+        other_group: # other_group is a child of the all group
+            children: # group hierarchy can go on...
+                group_x: 
+                    hosts:
+                        host5:
+                group_y:
+                    hosts:
+                        host6:
+            vars:
+                g2_var2: value3
+            hosts:
+                host4:
+                    ansible_host: 127.0.0.1
+        last_group:
+            hosts:
+                host1:
+            vars:
+                group_last_var: value
+```
+
+More information on these documents are available:
+* [yaml – Uses a specific YAML file as an inventory source](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/yaml_inventory.html)
+* [How to build your inventory](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html)
+
+This project already includes a static inventory, at [../inventory/hosts.yml](../inventory/hosts.yml) file.
+
+=== Groups
+
+Ansible hosts can be grouped into...well groups. This allows the execution of playbooks and the definition of variables in a common matter for different hosts.
+
+Group definition is done inside the `ansible/inventory/hosts.yml` file using `yaml` format. In this file are the definitions of groups as well as the variable 
+values assigned to each group. 
+
+Host group assignment is made in `passstore` by managing entries in the `provider/host/groups` folder being each entry a group to which the host belongs. 
+
+```text
+├── provider
+|   ├── host_1
+│   │   ├── groups
+│   │   │   ├── group_1
+│   │   │   ├── group_2
+│   │   │   ├── group_3
+|   ├── host_2
+│   │   ├── groups
+│   │   │   ├── group_2
+│   │   │   ├── group_3
+```
+
+For instance, we wanted to define the ports that a k8s master needs to open. This has been done in the `hosts.yml` file having the following variable assigned to 
+the `masters` group, which is also inside a group structure so other variables are inherited. 
+
+```
+firewalld_public_ports:
+  - 6443/tcp
+  - 10250/tcp
+  - 10255/tcp
+  - 8472/udp
+  - 30000-32767/tcp
+```
+
+For information regarding actually managing host-group assignment check the [`passstore_manage_host_groups` section](#passstore_manage_host_groups). 
+
