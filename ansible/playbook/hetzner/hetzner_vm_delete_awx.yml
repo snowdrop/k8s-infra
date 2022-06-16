@@ -4,14 +4,14 @@
 #   - vm_name
 
 - name: "Delete Hetzner Server"
-  import_playbook: "hetzner-vm-delete.yml"
+  import_playbook: "hetzner_vm_delete.yml"
   vars:
     hetzner_context_name: "snowdrop"
   when: "iaas_provider is not defined or iaas_provider == 'hetzner'"
 
 - name: "Delete Hetzner Server SSH key"
-  import_playbook: "hetzner-ssh-key-delete.yml"
+  import_playbook: "hetzner_ssh_key_deletee.yml"
   tags: [always]
-  when: "iaas_provider is not defined or iaas_provider == 'hetzner'"
+  when: "(use_generic_ssh_key is defined and not ( use_generic_ssh_key | bool ) and override_public_key is not defined) and (iaas_provider is not defined or iaas_provider == 'hetzner')"
 
 ...

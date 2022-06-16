@@ -1,0 +1,4 @@
+= Hetzner Ansible Playbooks
+:toc: left
+:description: This document describes Hetzner specific playbooks.
+

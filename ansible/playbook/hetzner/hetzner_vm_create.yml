@@ -34,7 +34,7 @@
       set_fact:
         my_hostvars: "{{ hostvars[vm_name] }}"
 
-    - name: Set default hetzner_context_name if it is not defined
+    - name: "Set default hetzner_context_name if it is not defined"
       set_fact:
         hetzner_context_name: "snowdrop"
       when: hetzner_context_name is not defined
@@ -58,7 +58,7 @@
         os_user: "{{ my_hostvars.ansible_user }}"
         context_name: "{{ hetzner_context_name }}"
 
-    - name: Update inventory
+    - name: "Update inventory"
       include_role:
         name: "passstore/ansible_inventory"
         tasks_from: "add_variable"
@@ -69,9 +69,8 @@
         var_name: "ansible_ssh_host"
         var_value: "{{ ip_address }}"
 
-  # post_tasks:
-  #   - name: Refresh the inventory
-  #     meta: refresh_inventory
+    - name: Refresh the inventory
+      meta: refresh_inventory
 
   #   - name: Get vm host vars
   #     set_fact:

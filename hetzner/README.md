@@ -57,4 +57,4 @@ yum install -y ansible python-rhsm-certificates
 
 ## Install OpenShift
 
-Follow the instructions in `../ansible/README-cloud.md`
+Follow the instructions in `../ansible/README-cloud.adoc`

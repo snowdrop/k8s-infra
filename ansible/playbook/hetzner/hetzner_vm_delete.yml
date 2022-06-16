@@ -39,6 +39,7 @@
       known_hosts:
         name: "{{ hostvars[vm_name]['ansible_ssh_host'] }}"
         state: absent
+      when: "hostvars[vm_name]['ansible_ssh_host'] is defined"
       failed_when: false
 
     - name: "Push changes to the pass git database"
