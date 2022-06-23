@@ -2,10 +2,6 @@
 - hosts: "{{ vm_name | default('localhost') }}"
   gather_facts: true
 
-  tasks:
-- hosts: "{{ vm_name | default('localhost') }}"
-  gather_facts: true
-
   pre_tasks:
     - name: "Check if either state or operation are informed"
       assert:
