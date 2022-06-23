@@ -11,3 +11,5 @@ k8s_dashboard_token_description: snowdrop-admin-user
 k8s_dashboard_token_auth_extra_group: system:bootstrappers
 
 passwordstore_enabled: false
+
+kube_dashboard_go_template: "{{.data.token | base64decode}}"

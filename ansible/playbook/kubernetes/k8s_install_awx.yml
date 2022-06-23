@@ -1,6 +1,9 @@
 ---
 - name: "Install Kubernetes"
-  import_playbook: "k8s-install.yml"
+  import_playbook: "k8s_install.yml"
+
+- name: "Get k8s configuration"
+  import_playbook: "k8s_get_config.yml"
 
 - name: "Notify creator"
   hosts: localhost

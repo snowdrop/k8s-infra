@@ -1,0 +1,15 @@
+---
+- name: "Fetch configuration"
+  hosts: "{{ vm_name }}"
+
+  tasks:
+    - name: "Fetch kubernetes configuration"
+      shell: "cat /etc/kubernetes/admin.conf"
+      become: yes
+      register: k8s_config
+
+    - name: "Fetch kubernetes dashboard token"
+      shell: |
+        kubectl -n kubernetes-dashboard get secret admin-user-token-pdfg9 -o jsonpath='{.data.token}' | base64 --decode
+      register: k8s_dashboard_token
+...

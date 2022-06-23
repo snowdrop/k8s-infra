@@ -1,24 +1,10 @@
 ---
-- name: "Fetch configuration"
-  hosts: "{{ vm_name }}"
-  pre_tasks:
-    - awx.awx.controller_meta:
-      register: result
+- name: "Fetch k8s configuration"
+  import_playbook: "k8s_get_config.yml"
 
-    - name: "Show details about the collection"
-      debug: var=result
-
-  tasks:
-    - name: "Fetch kubernetes configuration"
-      shell: "cat /etc/kubernetes/admin.conf"
-      become: yes
-      register: k8s_config
-
-    - name: "Fetch kubernetes dashboard token"
-      shell: |
-        kubectl -n kubernetes-dashboard get secret admin-user-token-pdfg9 -o jsonpath='{.data.token}' | base64 --decode
-      register: k8s_dashboard_token
-
+# Requires:
+# . k8s_config
+# . k8s_dashboard_token
 - name: "Notify executioner"
   hosts: localhost
   collections:   # Define collections to search
