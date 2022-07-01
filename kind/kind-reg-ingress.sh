@@ -11,10 +11,11 @@ set -o errexit
 # Add hereafter changes done post creation date as backlog
 #
 # July 1st 2022:
+# - Test if kind, kubectl, helm are installed with needed versions
 # - Change the range from 1.18 to 1.24 as this is what kind 0.14 supports
 # - Bump the k8s default version to: 1.22
 # - Rename yes/no to y/n
-# - Use helm to install the ingress controller and test if helm command is there
+# - Use helm to install the ingress controller
 #
 # June 2nd: 
 # - Bump version of k8s to 1.21. Check then locally that you have installed kind 0.11
@@ -26,6 +27,38 @@ set -o errexit
 
 reg_name='kind-registry'
 reg_port='5000'
+
+if ! command -v kind &> /dev/null; then
+  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo "kind is not installed"
+  echo "Use a package manager (i.e 'brew install kind') or visit the official site https://kind.sigs.k8s.io"
+  exit 1
+fi
+
+if ! command -v kubectl &> /dev/null; then
+  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo "Please install kubectl 1.15 or higher"
+  exit 1
+fi
+
+if ! command -v helm &> /dev/null; then
+    echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    echo "Helm could not be found. To get helm: https://helm.sh/docs/intro/install/"
+    echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    exit 1
+fi
+
+HELM_VERSION=$(helm version 2>&1 | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+') || true
+if [[ ${HELM_VERSION} < "v3.0.0" ]]; then
+  echo "Please upgrade helm to v3.0.0 or higher"
+  exit 1
+fi
+
+KUBE_CLIENT_VERSION=$(kubectl version --client --short 2> /dev/null | awk '{print $3}' | cut -d. -f2) || true
+if [[ ${KUBE_CLIENT_VERSION} -lt 14 ]]; then
+  echo "Please update kubectl to 1.15 or higher"
+  exit 1
+fi
 
 read -p "Do you want to delete the kind cluster (y|n) - Default: no ? " cluster_delete
 cluster_delete=${cluster_delete:-n}
@@ -52,6 +85,7 @@ nodes:
     nodeRegistration:
       kubeletExtraArgs:
         node-labels: "ingress-ready=true"
+        authorization-mode: "AlwaysAllow"
   extraPortMappings:
   - containerPort: 80
     hostPort: 80
@@ -118,19 +152,12 @@ EOF
 # Install the ingress nginx controller using helm
 # Set the Service type as: NodePort (needed for kind)
 #
-if ! command -v helm &> /dev/null
-then
-    echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-    echo "Helm could not be found. To get helm: https://helm.sh/docs/intro/install/"
-    echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-    exit
-fi
-
 echo "Installing the ingress controller using Helm within the namespace: ingress"
 helm upgrade --install ingress-nginx ingress-nginx \
   --repo https://kubernetes.github.io/ingress-nginx \
   --namespace ingress --create-namespace \
-  --set controller.service.type=NodePort
+  --set controller.service.type=NodePort \
+  --set controller.hostPort.enabled=true
 
 echo "To test ingress, execute the following commands:"
 echo "kubectl create deployment demo --image=httpd --port=80; kubectl expose deployment demo"
