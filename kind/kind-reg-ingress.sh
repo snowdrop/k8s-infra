@@ -21,10 +21,10 @@ set -o errexit
 reg_name='kind-registry'
 reg_port='5000'
 
-read -p "Do you want to delete the kind cluster (yes|no) - Default: no ? " cluster_delete
-cluster_delete=${cluster_delete:-no}
-read -p "Which kubernetes version should we install (1.14 .. 1.22) - Default: 1.21 ? " version
-k8s_minor_version=${version:-1.21}
+read -p "Do you want to delete the kind cluster (y|n) - Default: no ? " cluster_delete
+cluster_delete=${cluster_delete:-n}
+read -p "Which kubernetes version should we install (1.16 .. 1.22) - Default: 1.22 ? " version
+k8s_minor_version=${version:-1.22}
 read -p "What logging verbosity do you want (0..9) - A verbosity setting of 0 logs only critical events - Default: 0 ? " logging_verbosity
 logging_verbosity=${logging_verbosity:-0}
 
@@ -62,7 +62,7 @@ nodes:
 EOF
 )
 
-if [ "$cluster_delete" == "yes" ]; then
+if [ "$cluster_delete" == "y" ]; then
   echo "Deleting kind cluster ..."
   kind delete cluster
 fi
@@ -108,7 +108,28 @@ data:
     help: "https://kind.sigs.k8s.io/docs/user/local-registry/"
 EOF
 
+#
+# Install the ingress nginx controller using helm
+# Set the Service type as: NodePort (needed for kind)
+#
+if ! command -v helm &> /dev/null
+then
+    echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    echo "Helm could not be found. To get helm: https://helm.sh/docs/intro/install/"
+    echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    exit
+fi
 
-# Deploy the nginx Ingress controller on k8s >= 1.19
-VERSION=$(curl https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/stable.txt)
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/$VERSION/deploy/static/provider/kind/deploy.yaml
+echo "Installing the ingress controller using Helm within the namespace: ingress"
+helm upgrade --install ingress-nginx ingress-nginx \
+  --repo https://kubernetes.github.io/ingress-nginx \
+  --namespace ingress --create-namespace \
+  --set controller.service.type=NodePort
+
+echo "To test ingress, execute the following commands:"
+echo "kubectl create deployment demo --image=httpd --port=80; kubectl expose deployment demo"
+echo "kubectl create ingress demo --class=nginx \\"
+echo "   --rule=\"demo.<VM_IP>.nip.io/*=demo:80\""
+echo "curl http://demo.<VM_IP>.nip.io"
+
+
