@@ -159,10 +159,12 @@ helm upgrade --install ingress-nginx ingress-nginx \
   --set controller.service.type=NodePort \
   --set controller.hostPort.enabled=true
 
+echo "###############################################"
 echo "To test ingress, execute the following commands:"
 echo "kubectl create deployment demo --image=httpd --port=80; kubectl expose deployment demo"
 echo "kubectl create ingress demo --class=nginx \\"
-echo "   --rule=\"demo.<VM_IP>.nip.io/*=demo:80\""
-echo "curl http://demo.<VM_IP>.nip.io"
+echo "   --rule=\"demo.<VM_IP>.sslip.io/*=demo:80\""
+echo "curl http://demo.<VM_IP>.sslip.io"
+echo "<html><body><h1>It works!</h1></body></html>"
 
 
