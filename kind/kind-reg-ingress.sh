@@ -10,6 +10,11 @@ set -o errexit
 #
 # Add hereafter changes done post creation date as backlog
 #
+# July 1st 2022:
+# - Bump as default to k8s: 1.22
+# - Rename yes/no to y/n
+# - Use helm to install the ingress controller and test if helm command is there
+#
 # June 2nd: 
 # - Bump version of k8s to 1.21. Check then locally that you have installed kind 0.11
 # - Fix k8s_minor_version from 1.20 to 1.21 
