@@ -11,7 +11,8 @@ set -o errexit
 # Add hereafter changes done post creation date as backlog
 #
 # July 1st 2022:
-# - Bump as default to k8s: 1.22
+# - Change the range from 1.18 to 1.24 as this is what kind 0.14 supports
+# - Bump the k8s default version to: 1.22
 # - Rename yes/no to y/n
 # - Use helm to install the ingress controller and test if helm command is there
 #
@@ -28,7 +29,7 @@ reg_port='5000'
 
 read -p "Do you want to delete the kind cluster (y|n) - Default: no ? " cluster_delete
 cluster_delete=${cluster_delete:-n}
-read -p "Which kubernetes version should we install (1.16 .. 1.22) - Default: 1.22 ? " version
+read -p "Which kubernetes version should we install (1.18 .. 1.24) - Default: 1.22 ? " version
 k8s_minor_version=${version:-1.22}
 read -p "What logging verbosity do you want (0..9) - A verbosity setting of 0 logs only critical events - Default: 0 ? " logging_verbosity
 logging_verbosity=${logging_verbosity:-0}
