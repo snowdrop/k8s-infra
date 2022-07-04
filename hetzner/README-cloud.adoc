@@ -23,7 +23,6 @@ Install the `hetzner.hcloud` Ansible collection.
 $ ansible-galaxy collection install hetzner.hcloud
 ----
 
-
 === Install hcloud CLI
 
 For more information on installing Hetzner CLI, check the https://github.com/hetznercloud/cli#installation[Installation section].
@@ -58,6 +57,7 @@ All Ansible playbooks must be launched from the root of the project, at `k8s-inf
 Select the image.
 
 [source,bash]
+----
 $ hcloud image list
 ID         TYPE     NAME              DESCRIPTION       IMAGE SIZE   DISK SIZE   CREATED                         DEPRECATED
 3          system   centos-7          CentOS 7          -            5 GB        Mon Jan 15 12:34:45 CET 2018    -
@@ -111,32 +111,11 @@ ID   NAME    CORES   CPU TYPE    MEMORY     DISK     STORAGE TYPE
 38   ccx62   48      dedicated   192.0 GB   960 GB   local
 ----
 
-
-
 === Init the hetzner context
 
 To getting started, you must get a Token for your API as described [here](https://docs.hetzner.cloud/#overview-getting-started).
 
-Then init the hetzner context using the available `hetzner-init-context` ansible playbook.
-
-[source,bash]
-----
-$ ansible-playbook hetzner/ansible/hetzner-init-context.yml
-----
-
-This playbook has the following variables.
-
-| Variable | Required | Prompt | Meaning |
-| --- | :---: | :---: | --- |
-| hetzner_context_name | x | x | context name |
-| hetzner_token | x | x | The token to register with Hetzner. |
-
-Each of the Ansible prompts can be replaced by defining it's value as an extra variable of the playbook.
-
-[source,bash]
-----
-$ ansible-playbook hetzner/ansible/hetzner-init-context.yml -e hetzner_context_name=mycontext -e hetzner_token=mytoken 
-----
+Then init the hetzner context using the available link:ansible.adoc#hetzner-init-context[`hetzner-init-context` ansible playbook].
 
 The context can be verified reviewing the configuration file.
 
@@ -155,130 +134,15 @@ active_context = "mycontext"
 
 Prior to launching the creation of the VMS the Ansible inventory must be in place. For this check the documentation regarding [initializing a host](../ansible/playbook/README.md#user-guide)
 
-> NOTE: Upon installation, Ansible will use the default SSH port to apply security scripts. One of this scripts is changing the ssh port to a non default one. 
+> NOTE: Upon installation, Ansible will use the default SSH port to apply security scripts. One of these scripts is changing the ssh port to a non default one. 
 > See the corresponding [README](../ansible/playbook/README.md).
 
 The `ansible_ssh_private_key_file` is obtained from the `passstore` using `pass get snowdrop/hetzner/<ansible_hostname>/id_rsa | tee ~/.ssh/id_rsa_snowdrop_hetzner_<ansible_hostname>`. 
 It's used so Ansible can connect to the server without requiring password.  
 
-== The VM
+== Create Server
 
-=== All-in-one creation
-
-2 new playbooks have been created to aggregate the operations executed by the different playbooks
-, `hetzner-create-server-aggregate.yml` and `hetzner-delete-server-aggregate.yml`. Each of the playbooks invokes deployment and cleanup operations on the passwordstore inventory database, VM deployment operations and VM securization.
-
-The `hetzner-create-server-aggregate.yml` playbooks calls the following playbooks:
-
-* `../../ansible/playbook/passstore_controller_inventory.yml` to set the VM passwordstore inventory information;
-* `hetzner-create-ssh-key.yml` to create the Hetzner VM SSH keys;
-* `hetzner-create-server.yml` to deploy a new server on hetzner;
-* `../../ansible/playbook/sec_host.yml` to apply the securization playbook;
-
-=== All-in-one deletion
-
-The `hetzner_vm_delete_passwordstore.yml` playbooks calls the following playbooks:
-
-* `hetzner-delete-server.yml` to delete the server from hetzner;
-* `hetzner-delete-ssh-key.yml` to delete the Hetzner VM SSH keys;
-* `../../ansible/playbook/passstore_controller_inventory.yml` to clean th VM information from the passwordstore inventory;
-
-To create and deploy a new VM simply execute the following command on the root of the `k8s-infra` project.
-
-[source,bash]
-----
-$ ansible-playbook hetzner/ansible/hetzner-create-server-aggregate.yml -e vm_name=my_vm -e k8s_type=masters -e k8s_version=119 -e salt_text=$(gpg --gen-random --armor 1 20)  --tags create
-----
-
-| Variable | Required | Default | Prompt | Meaning |
-| --- | :---: | :---: | :---: | --- |
-| k8s_type | | | | Type of k8s node (masters, nodes). Will be used to set the ansible inventory groups. |
-| k8s_version | | | | K8s version to be later installed. Will be used to set the ansible inventory groups. |
-| salt_text | x | | | Salt and pepper. |
-| vm_name | x |  | | Name of the VM to be craated. This will be both the name on Hetzner as well as on the inventory |
-
-Removing a VM also has an aggregate playbook, requiring only the `vm_name` parameter.
-
-[source,bash]
-----
-$ ansible-playbook hetzner/ansible/hetzner-delete-server-aggregate.yml -e vm_name=my_vm
-----
-
-=== Create the hetzner SSH key
-
-Prior to creating a new VM, the SSH key generated by the Ansible Inventory must be added to the Hetzner SSH Key repository. This SSH will then be used in the server creation.
-
-This is accomplished using the  [hetzner-create-ssh-key](ansible/hetzner-create-ssh-key.yml) playbook which will create an SSH Key with the name of the VM.
-
-| Variable | Required | Default | Prompt | Meaning |
-| --- | :---: | :---: | :---: | --- |
-| vm_name | x | | x | Name of the VM to be created at hetzner. |
-
-[source,bash]
-----
-$ ansible-playbook hetzner/ansible/hetzner-create-ssh-key.yml -e vm_name=${VM_NAME}
-----
-
-
-=== Create the hetzner vm
-
-The task of creating the hetzner context is also available through an Ansible playbook.
-
-[source,bash]
-----
-$ ansible-playbook hetzner/ansible/hetzner-create-server.yml
-----
-
-This will present some prompts which can be replaced by environment variables. 
-
-| Variable | Required | Default | Prompt | Meaning |
-| --- | :---: | :---: | :---: | --- |
-| hetzner_context_name | x | snowdrop | | Context name for hcloud. |
-| override_public_key |  | |  | Use a *local custom key* instead the default one. |
-| salt_text | x | | x | Salt and pepper. |
-| server_type | | cx31 |  | Server type. The list can be obtained using `hcloud server-type list`. Usually cx31 |
-| vm_image | | centos-7 |  | Hetzner image to be used as source (centos-7,...) | 
-| vm_name | x | | x | Name of the VM to be created at hetzner. |
-
-Each of the Ansible prompts can be replaced by defining it's value as an extra variable of the playbook.
-
-[source,bash]
-----
-$ ansible-playbook hetzner/ansible/hetzner-create-server.yml -e vm_name=${VM_NAME} \
--e salt_text=$(head -c 500 /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 20 | head -n 1) \
--e hetzner_context_name=snowdrop
-----
-**REMARK**: For mac's users, please execute the following command before `export LC_ALL=C`
-
-Once this task is finished it's mandatory to launch server securization, see the [Next steps](#next-steps) section.
-
-=== Delete a hetzner server
-
-Delete a hetzner server vm.
-
-| Variable | Required | Default | Prompt | Meaning |
-| --- | :---: | :---: | :---: | --- |
-| hetzner_context_name | x | snowdrop | | Context name for hcloud. |
-| vm_name | x | | x | Name of the VM to be deleted from hetzner. |
-
-[source,bash]
-----
-$ ansible-playbook hetzner/ansible/hetzner-delete-server.yml -e vm_name=my-name -e hetzner_context_name=snowdrop
-----
-
-After that, remove the Hetzner SSH key for the server.
-
-[source,bash]
-----
-$ ansible-playbook hetzner/ansible/hetzner-delete-ssh-key.yml -e vm_name=my-name
-----
-
-As well as the inventory entries for the server.
-
-[source,bash]
-----
-$ ansible-playbook ansible/playbook/passstore_controller_inventory_remove.yml -e vm_name=my-name -e pass_provider=hetzner
-----
+Several playbooks exist to create VM, check the link:ansible.adoc#_the_playbooks[Playbook List] section.
 
 === Next steps
 
@@ -287,4 +151,3 @@ Once the server is created it must be secured before installing other software. 
 == Steps to create a k8s cluster
 
 Check [the corresponding README file](../kubernetes/README.md). 
-
