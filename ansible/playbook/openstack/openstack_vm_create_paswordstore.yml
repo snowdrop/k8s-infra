@@ -10,21 +10,44 @@
 #  . k8s_version: Kubernetes version [117 ... 121], empty for no k8s installation
 
 - name: "Validate passwordstore"
-  import_playbook: "passstore_controller_check.yml"
-  tags: [always]
+  import_playbook: "../passstore/passstore_controller_check.yml"
 
 - name: "Initialize passwordstore inventory"
-  import_playbook: "passstore_controller_inventory.yml"
+  import_playbook: "../passstore/passstore_controller_inventory.yml"
   vars:
-    vm_user: "centos"
+    # vm_user: "centos"
+    vm_user: "snowdrop"
     pass_provider: "openstack"
-  tags: [create]
 
-- name: "Create Server on Openstack"
-  import_playbook: "openstack_vm_create.yml"
-  vars:
-    hetzner_context_name: "snowdrop"
-  tags: [always]
+- name: "Openstack VM create"
+  hosts: localhost
+  gather_facts: True
+    
+  pre_tasks:
+    - name: "Set openstack_auth facts"
+      set_fact:
+        openstack_auth: 
+          openstack_project_name: "{{ query('passwordstore', 'openstack/host/project_name')[0] }}"
+          openstack_console_user:  "{{ query('passwordstore', 'openstack/host/console_user')[0] }}"
+          openstack_console_password: "{{ query('passwordstore', 'openstack/host/console_pw')[0] }}"
+          openstack_user_domain:  "{{ query('passwordstore', 'openstack/host/console_domain')[0] }}"
+          openstack_project_domain: "{{ query('passwordstore', 'openstack/host/os_domain')[0] }}"
+          openstack_os_auth_url: "{{ query('passwordstore', 'openstack/host/os_auth_url')[0] }}"
+
+  tasks:
+    - name: "Execute create inventory, if tagged as so"
+      include_role:
+        name: "openstack/vm"
+        apply:
+          tags:
+            - always
+      vars: 
+        state: "present"
+
+  post_tasks:
+    - name: "Store host IP on passwordstore"
+      set_fact:
+        openstack_vm_ipv4: "{{ query('passwordstore', 'openstack/' + vm_name + '/ansible_ssh_host create=True userpass=' + openstack_output.server.accessIPv4 )[0] }}"
 
 - name: "Refresh inventory"
   hosts: localhost
@@ -33,6 +56,12 @@
   tasks:
     - name: Refresh the inventory so the newly added host is available
       meta: refresh_inventory
+
+    - name: "Add host to known hosts {{ hostvars[vm_name]['ansible_ssh_host'] }}"
+      known_hosts:
+        name: "{{ hostvars[vm_name]['ansible_ssh_host'] }}"
+        key: "{{ lookup('pipe', 'ssh-keyscan {{ hostvars[vm_name].ansible_ssh_host }}') }}"
+        hash_host: true
 
 - name:  "Wait for the VM to boot and we can ssh"
   hosts: "{{ vm_name }}"
@@ -65,7 +94,7 @@
     - role: "openstack/init_vm"
 
 - name: "Secure new server"
-  import_playbook: "sec_host.yml"
+  import_playbook: "../sec_host.yml"
   vars:
     provider: "openstack"
     hosts: "{{ vm_name }}"

@@ -1,0 +1,14 @@
+{
+  "clouds": {
+    "devstack": {
+      "auth": {
+        "project_name": "$OS_PROJECT_NAME",
+        "username": "$OS_USER_NAME",
+        "password": "$OS_PW",
+        "domain_name": "$OS_DOMAIN_NAME",
+        "project_domain_name": "$OS_PROJECT_DOMAIN_NAME",
+        "auth_url": "$OS_AUTH_URL"
+      }
+    }
+  }
+}

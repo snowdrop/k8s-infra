@@ -167,3 +167,16 @@ To select a specific flavor use the `openstack.vm.flavor` variable override.
 ```bash
 $ ansible-playbook playbook/openstack/openstack_vm_create_aggregate.yml -e k8s_type=masters -e k8s_version=121 -e '{"openstack": {"vm": {"flavor": "m1.medium", "network": "provider_net_shared"}}}' -e vm_name=${VM_NAME} --tags create
 ```
+
+## Troubleshooting
+
+### Python.h: No such file or directory error when installing openstacksdk
+
+Cause missing `python3-devel`
+
+Solution
+
+```bash
+sudo dnf install python3-devel
+```
+

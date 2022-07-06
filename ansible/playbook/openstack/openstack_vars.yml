@@ -1,0 +1,12 @@
+---
+- name: "Set pass provider"
+  set_fact:
+    pass_provider: "openstack"
+  when: "pass_provider is not defined"
+
+- name: "Set OpenStack default variables"
+  set_fact:
+    use_generic_ssh_key: True
+    generic_ssh_key_name: generic-key
+  when: "use_generic_ssh_key is not defined or (use_generic_ssh_key | bool) "
+...

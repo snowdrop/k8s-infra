@@ -36,4 +36,5 @@ openstack:
     # volumes: []
     boot_from_volume: false
 
-login_username: centos
+# login_username: centos
+openstack_security_group: spring-boot
