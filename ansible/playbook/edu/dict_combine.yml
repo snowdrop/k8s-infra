@@ -1,0 +1,22 @@
+---
+- name: "Dictionary append playbook"
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: "Set dict"
+      set_fact:
+        dict1: 
+          entry1: "value 1"
+          entry2:  "value 2"
+
+    - name: "Append to dict"
+      set_fact:
+        dict1: "{{ dict1 | combine({ 'entry3': 'value 3' }) }}"
+      when: "openstack_security_group is not defined"
+
+    - name: "Print reslting dictionary"
+      debug:
+        var: dict1
+
+...

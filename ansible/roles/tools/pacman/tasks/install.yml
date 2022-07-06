@@ -1,0 +1,12 @@
+---
+- name: "Install pacman"
+  package:
+    name: "{{ pacman_packages }}"
+    state: present
+  become: True
+
+- name: "Init pacman"
+  shell: |
+    pacman-key --init
+  become: True
+...

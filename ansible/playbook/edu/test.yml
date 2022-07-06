@@ -1,0 +1,24 @@
+---
+- name: "Test playbook"
+  hosts: localhost
+  gather_facts: true
+
+  tasks:
+    - name: Print msg variable
+      debug:
+        msg: "{{ ansible_date_time.hour }}"
+
+    - name: Set variables
+      set_fact:
+        cur_time: "{{ ansible_date_time.hour }}"
+
+    - name: Print Current time
+      debug:
+        msg:  "{{ cur_time }}"
+
+    - name: Apply the condition for working office hours
+      debug:
+        msg: "Condition is successful"
+      when:  cur_time | int >= 9 and cur_time | int <= 19
+
+...
