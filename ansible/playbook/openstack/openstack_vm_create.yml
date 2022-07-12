@@ -1,0 +1,107 @@
+---
+# Variables:
+#  - "hostname": "n311-test"
+#  - "openstack": {
+#      "os_username": "'$(pass show openstack/host/console_user)'"
+#      "os_password": "'$(pass show openstack/host/console_pw)'"
+#      "os_domain":  "'$(pass show openstack/host/console_domain)'"
+#      "os_auth_url": "https://rhos-d.infra.prod.upshift.rdu2.redhat.com:13000/v3/"
+#      "vm": {
+#        "network": "provider_net_shared"
+#        "security_group": "spring-boot"
+#        "flavor": "ci.m5.large"
+#        "volumes" : ["test-volume"]
+#      }
+#    }}
+# - name: "Validate passwordstore"
+#   import_playbook: "passstore_controller_check.yml"
+#   when: "passwordstore_enabled is not defined or (passwordstore_enabled | bool == true)"
+
+- name: "Openstack VM create"
+  hosts: localhost
+  gather_facts: True
+  # vars:
+  #   config_file: "{{ lookup('env', 'OS_CLIENT_CONFIG_FILE') }}"
+  #   ansible_private_data_dir: "{{ lookup('env', 'AWX_PRIVATE_DATA_DIR') }}" #No such file or directory :(
+  #   ansible_cp_dir: "{{ lookup('env', 'ANSIBLE_SSH_CONTROL_PATH_DIR') }}"
+    
+
+  pre_tasks:
+    - name: "Validate OpenStack required variables"
+      assert:
+        that:
+          - "openstack_security_group is defined"
+        fail_msg: "Missing mandatory variables: openstack_security_group"
+
+  #   - name: "Confirm the Config File exists"
+  #     stat: path="{{ config_file }}"
+  #     register: st
+
+  #   - name: "Load config file contents"
+  #     include_vars: "{{ config_file }}"
+  #     when: st.stat.exists and st.stat.isreg
+
+  #   - name: "Print variables"
+  #     debug:
+  #       msg: "{{ item }}"
+  #     with_items: 
+  #       - "hostvars[inventory_hostname]: {{ hostvars[inventory_hostname] }}"
+  #       - "ansible_env: {{ ansible_env }}"
+
+  tasks:
+
+    # - name: "Set openstack_auth facts"
+    #   set_fact:
+    #     openstack_auth: 
+    #       openstack_project_name: "{{ clouds.devstack.auth.project_name }}"
+    #       openstack_console_user:  "{{ clouds.devstack.auth.username }}"
+    #       openstack_console_password: "{{ clouds.devstack.auth.password }}"
+    #       openstack_user_domain:  "{{ clouds.devstack.auth.domain_name }}"
+    #       openstack_project_domain: "{{ clouds.devstack.auth.project_domain_name }}"
+    #       openstack_os_auth_url: "{{ clouds.devstack.auth.auth_url }}"
+
+    - name: "Execute create inventory, if tagged as so"
+      include_role:
+        name: "openstack/vm"
+        apply:
+          tags:
+            - always
+      vars: 
+        state: "present"
+
+
+  post_tasks:
+    - name: Refresh the inventory so the newly added host is available
+      meta: refresh_inventory
+
+- name:  "Wait for the VM to boot and we can ssh"
+  hosts: "{{ vm_name }}"
+  gather_facts: no
+
+  tasks:
+    - name: "Show 'Wait for connection to host' output"
+      debug:
+        msg: 
+          - "ip : {{ query('passwordstore', 'openstack/' + vm_name + '/ansible_ssh_host')[0] }}"
+          - "port : {{ query('passwordstore', 'openstack/' + vm_name + '/ansible_ssh_port')[0] }}"
+
+    - name: "Wait for connection to host"
+      ansible.builtin.wait_for:
+        host: "{{ query('passwordstore', 'openstack/' + vm_name + '/ansible_ssh_host')[0] }}"
+        port: "{{ query('passwordstore', 'openstack/' + vm_name + '/ansible_ssh_port')[0] }}"
+        timeout: 120
+      register: wait_for_connection_reg
+
+  post_tasks:
+    - name: "DON'T FORGET TO SECURE YOUR SERVER"
+      debug:
+        msg: "Trying to start start server securization automatically For manual execution: $ ansible-playbook ansible/playbook/sec_host.yml -e vm_name={{ vm_name }} -e provider=openstack"
+
+- name: "Openstack VM init"
+  hosts: "{{ vm_name }}"
+  gather_facts: yes
+
+  roles:
+    - role: "openstack/init_vm"
+
+...

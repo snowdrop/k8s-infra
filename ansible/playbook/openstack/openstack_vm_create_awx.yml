@@ -1,0 +1,136 @@
+---
+- name: "Gather OpenStack credentials"
+  hosts: localhost
+  gather_facts: True
+  vars:
+    controller_host: "{{ lookup('env', 'AWX_DEMO_SERVICE_PORT_80_TCP_ADDR') }}"
+    controller_port: "{{ lookup('env', 'AWX_DEMO_SERVICE_PORT_80_TCP_PORT') }}"
+    config_file: "{{ lookup('env', 'OS_CLIENT_CONFIG_FILE') }}"
+
+  pre_tasks:
+    - name: "Confirm the Config File exists"
+      stat: path="{{ config_file }}"
+      register: st
+
+    - name: "Cat config file contents"
+      shell: "cat {{ config_file }}"
+      when: st.stat.exists and st.stat.isreg
+      register: cat_output
+
+    - name: "Print config file contents"
+      debug: 
+        msg: "cat_output: {{ cat_output }}"
+      when: "cat_output is defined"
+
+    - name: "Load config file contents"
+      include_vars: "{{ config_file }}"
+      when: st.stat.exists and st.stat.isreg
+
+    - name: "Print credentials"
+      debug: 
+        msg: "{{ item }}"
+      with_items:
+        - "project_name: {{ clouds.devstack.auth.project_name }}"
+        - "username: {{ clouds.devstack.auth.username }}"
+        - "password: {{ clouds.devstack.auth.password }}"
+        - "domain_name: {{ clouds.devstack.auth.domain_name }}"
+        - "project_domain_name: {{ clouds.devstack.auth.project_domain_name }}"
+        - "auth_url: {{ clouds.devstack.auth.auth_url }}"
+
+    - name: "Set openstack_auth facts"
+      set_fact:
+        openstack_auth: 
+          openstack_project_name: "{{ clouds.devstack.auth.project_name }}"
+          openstack_console_user:  "{{ clouds.devstack.auth.username }}"
+          openstack_console_password: "{{ clouds.devstack.auth.password }}"
+          openstack_user_domain:  "{{ clouds.devstack.auth.domain_name }}"
+          openstack_project_domain: "{{ clouds.devstack.auth.project_domain_name }}"
+          openstack_os_auth_url: "{{ clouds.devstack.auth.auth_url }}"  
+
+    - name: "Print parameters"
+      debug: 
+        msg: "{{ item }}"
+      with_items:
+        - "awx_user_name: {{ awx_user_name }}"
+        - "controller_host: {{ controller_host }}"
+        - "controller_port: {{ controller_port }}"
+        - "controller_oauthtoken: {{ controller_oauthtoken }}"
+
+    - name: "Get inventory for IaaS Provider"
+      set_fact:
+        iaas_inventory: "{{ query('awx.awx.controller_api', 'inventories', query_params={ 'name': iaas_provider }, host='http://' + controller_host + ':' + controller_port, username=awx_user_name, oauth_token=controller_oauthtoken ) }}"
+
+    - name: "Print inventory"
+      debug: 
+        msg: "{{ item }}"
+      with_items:
+        - "iaas_inventory: {{ iaas_inventory }}"
+        - "iaas_inventory variable_data: {{ iaas_inventory[0]['related']['variable_data'] }}"
+        - "iaas_inventory variables: {{ iaas_inventory[0]['variables'] }}"
+
+    - name: "Get varaibles from IaaS Provider inventory"
+      set_fact:
+        iaas_inventory_vars: "{{ iaas_inventory[0]['variables'] | from_yaml }}"
+
+    - name: "Set OpenStack variables"
+      set_fact:
+        openstack: "{{ iaas_inventory_vars['openstack'] }}"
+        openstack_security_group: "{{ iaas_inventory_vars['openstack_security_group'] }}"
+
+  tasks:
+
+    - name: "Validate OpenStack required variables"
+      assert:
+        that:
+          - "openstack_security_group is defined"
+        fail_msg: "Missing mandatory variables: openstack_security_group"
+
+    # - name: "Print variables"
+    #   debug: 
+    #     msg: "{{ item }}"
+    #   with_items:
+    #     - "ansible_env: {{ ansible_env }}"
+    #     - "localhost: {{ hostvars['localhost'] | to_yaml }}"
+        
+- name: "Create Server on Openstack"
+  import_playbook: "openstack_vm_create.yml"
+  vars: 
+    openstack:
+      vm:
+        image: "{{ openstack_vm_image }}"
+        flavor: "{{ openstack_vm_flavor }}"
+  when: "iaas_provider is not defined or iaas_provider == 'openstack'"
+
+- name: "Openstack VM create"
+  hosts: localhost
+  gather_facts: True
+  vars:
+    controller_host: "{{ lookup('env', 'AWX_DEMO_SERVICE_PORT_80_TCP_ADDR') }}"
+    controller_port: "{{ lookup('env', 'AWX_DEMO_SERVICE_PORT_80_TCP_PORT') }}"
+    os_user_name:  "{{ openstack_vm_image | regex_search('^[a-zA-Z]*') | lower }}"
+
+  pre_tasks:
+    - name: "Define ssh variables"
+      set_fact:
+        ssh_key_data: "{{ lookup('file', key_path) }}"
+        ssh_key_data_pub: "{{ lookup('file', key_path + '.pub') }}"
+      when: "key_path is defined and (iaas_provider is not defined or iaas_provider == 'openstack')"
+
+  tasks:
+
+    - name: "Add user credentials to AWX as machine credential"
+      awx.awx.credential:
+        name: "openstack-{{ vm_name }}"
+        description: "User for {{ vm_name }} OpenStack VM."
+        organization: "Default"
+        credential_type: "Machine"
+        state: present
+        controller_oauthtoken: "{{ controller_oauthtoken }}"
+        controller_username: "{{ awx_user_name }}"
+        controller_host: "http://{{controller_host }}:{{ controller_port }}"
+        inputs:
+          username: "{{ os_user_name }}"
+          ssh_key_data: "{{ lookup('file', key_path) }}"
+      when: "key_path is defined and (iaas_provider is not defined or iaas_provider == 'openstack')"
+
+...

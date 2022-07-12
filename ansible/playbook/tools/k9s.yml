@@ -1,0 +1,11 @@
+---
+- hosts: "{{ vm_name | default('localhost') }}"
+  gather_facts: true
+
+  tasks:
+    - name: "Install k9s"
+      include_role:
+        name: "tools/k9s"
+      vars: 
+        state: "present"
+...

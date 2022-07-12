@@ -7,7 +7,7 @@
         pwd
         cd /
         pwd
-        cd {{ ansible_user_dir }}
+        cd {{ lookup('env','HOME') }}
         pwd
       register: shell_res
       tags: ['aaa','bbb']

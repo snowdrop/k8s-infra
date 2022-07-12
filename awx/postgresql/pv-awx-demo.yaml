@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: postgres-awx-demo-postgres
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 8Gi
+  claimRef:
+    namespace: awx
+    name: postgres-awx-demo-postgres
+  hostPath:
+    path: /tmp/pv-awx-demo
+    type: ""
+  persistentVolumeReclaimPolicy: Retain

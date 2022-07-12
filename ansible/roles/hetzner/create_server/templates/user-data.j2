@@ -28,11 +28,11 @@ users:
     sudo: ALL=(ALL) NOPASSWD:ALL
     ssh_pwauth: True
     ssh_authorized_keys:
-      - {{ ssh_public_key }}
+      - {{ vm_public_key }}
 
   - name: root
     ssh_authorized_keys:
-      - {{ ssh_public_key }}
+      - {{ vm_public_key }}
 
 runcmd:
   - timedatectl set-timezone {{ timezone }}

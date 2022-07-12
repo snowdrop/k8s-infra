@@ -1,0 +1,20 @@
+---
+- name: "Openstack VM delete"
+  hosts: localhost
+  gather_facts: False
+
+  tasks:
+
+    - name: "Execute create inventory, if tagged as so"
+      include_role:
+        name: "openstack/vm"
+      vars: 
+        state: "absent"
+        
+    - name: "Delete host from known hosts"
+      ansible.builtin.known_hosts:
+        name: "{{ hostvars[vm_name]['ansible_ssh_host'] }}"
+        state: absent
+      when: "hostvars[vm_name]['ansible_ssh_host'] is defined"
+      failed_when: false
+...

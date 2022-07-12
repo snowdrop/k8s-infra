@@ -1,0 +1,153 @@
+= Hetzner Cloud
+:icons: font
+:toc: left
+
+== Introduction
+
+This document describes the requirements and the process to execute the provisioning of a Cloud VM on hetzner.
+
+=== Scope
+
+Describe the steps to install the hetzner client and provision hetzner cloud VMs.
+
+== Requirements
+
+First of all follow the instructions in the [Ansible Installation Guide section](../ansible/playbook/README.md#installation-guide).
+
+Next, Install the `hcloud CLI` as covered hereafter.
+
+Install the `hetzner.hcloud` Ansible collection.
+
+[source,bash]
+----
+$ ansible-galaxy collection install hetzner.hcloud
+----
+
+=== Install hcloud CLI
+
+For more information on installing Hetzner CLI, check the https://github.com/hetznercloud/cli#installation[Installation section].
+ 
+In MacOS you can install using the following brew command `brew install hcloud`.
+
+For the major Linux distributions, binaries are available at their own repositories.
+
+.hcloud installation commands
+[%header,cols="2,2m"]
+|===
+| OS | Command
+
+| Ubuntu | apt install hcloud-cli
+| Fedora | dnf install hcloud
+
+|===
+
+As an alternative download the binaries from https://github.com/hetznercloud/cli/releases[releases]. Download `hcloud-linux-amd64.tar.gz` and extract the `hcloud` 
+file into the `~/bin` directory. 
+
+That's it, the CLI is installed and ready to use.
+
+== Hetzner Cloud
+
+The following guide details how to provision a Hetzner VM using the https://docs.hetzner.cloud/#overview[Hetzner Cloud APi] or the  https://github.com/hetznercloud/cli[Hetzner Cloud client].
+
+All Ansible playbooks must be launched from the root of the project, at `k8s-infra`.
+
+=== Decide on the VM infrastructure
+
+Select the image.
+
+[source,bash]
+----
+$ hcloud image list
+ID         TYPE     NAME              DESCRIPTION       IMAGE SIZE   DISK SIZE   CREATED                         DEPRECATED
+3          system   centos-7          CentOS 7          -            5 GB        Mon Jan 15 12:34:45 CET 2018    -
+168855     system   ubuntu-18.04      Ubuntu 18.04      -            5 GB        Wed May  2 13:02:30 CEST 2018   -
+5924233    system   debian-10         Debian 10         -            5 GB        Mon Jul  8 08:35:48 CEST 2019   -
+15512617   system   ubuntu-20.04      Ubuntu 20.04      -            5 GB        Thu Apr 23 19:55:14 CEST 2020   -
+40093059   app      lamp              lamp              -            20 GB       Tue Jun  8 08:21:07 CEST 2021   -
+40093134   app      wordpress         wordpress         -            20 GB       Tue Jun  8 08:21:42 CEST 2021   -
+40093140   app      jitsi             jitsi             -            20 GB       Tue Jun  8 08:21:47 CEST 2021   -
+40093190   app      nextcloud         nextcloud         -            20 GB       Tue Jun  8 08:22:07 CEST 2021   -
+40093247   app      docker-ce         docker-ce         -            20 GB       Tue Jun  8 08:22:47 CEST 2021   -
+40093435   app      gitlab            gitlab            -            20 GB       Tue Jun  8 08:24:08 CEST 2021   -
+40093620   app      big-blue-button   big-blue-button   -            40 GB       Tue Jun  8 08:25:38 CEST 2021   -
+45557056   system   debian-11         Debian 11         -            5 GB        Mon Aug 16 13:12:01 CEST 2021   -
+45778012   system   centos-stream-8   CentOS Stream 8   -            5 GB        Thu Aug  5 07:07:23 CEST 2021   -
+45780948   system   rocky-8           Rocky Linux 8     -            5 GB        Thu Aug 19 08:30:23 CEST 2021   -
+53994466   system   fedora-35         Fedora 35         -            5 GB        Wed Nov 24 10:23:53 CET 2021    Wed May 11 07:51:18 CEST 2022
+59752342   system   centos-stream-9   CentOS Stream 9   -            5 GB        Thu Jan 27 08:52:03 CET 2022    -
+67794396   system   ubuntu-22.04      Ubuntu 22.04      -            5 GB        Thu Apr 21 15:32:38 CEST 2022   -
+69726282   system   fedora-36         Fedora 36         -            5 GB        Wed May 11 07:50:00 CEST 2022   -
+71127104   app      ruby              ruby              -            20 GB       Wed May 25 12:06:36 CEST 2022   -
+71127447   app      go                go                -            20 GB       Wed May 25 12:09:31 CEST 2022   -
+----
+
+Server types.
+
+[source,bash]
+----
+$ hcloud server-type list
+ID   NAME    CORES   CPU TYPE    MEMORY     DISK     STORAGE TYPE
+1    cx11    1       shared      2.0 GB     20 GB    local
+3    cx21    2       shared      4.0 GB     40 GB    local
+5    cx31    2       shared      8.0 GB     80 GB    local
+7    cx41    4       shared      16.0 GB    160 GB   local
+9    cx51    8       shared      32.0 GB    240 GB   local
+11   ccx11   2       dedicated   8.0 GB     80 GB    local
+12   ccx21   4       dedicated   16.0 GB    160 GB   local
+13   ccx31   8       dedicated   32.0 GB    240 GB   local
+14   ccx41   16      dedicated   64.0 GB    360 GB   local
+15   ccx51   32      dedicated   128.0 GB   600 GB   local
+22   cpx11   2       shared      2.0 GB     40 GB    local
+23   cpx21   3       shared      4.0 GB     80 GB    local
+24   cpx31   4       shared      8.0 GB     160 GB   local
+25   cpx41   8       shared      16.0 GB    240 GB   local
+26   cpx51   16      shared      32.0 GB    360 GB   local
+33   ccx12   2       dedicated   8.0 GB     80 GB    local
+34   ccx22   4       dedicated   16.0 GB    160 GB   local
+35   ccx32   8       dedicated   32.0 GB    240 GB   local
+36   ccx42   16      dedicated   64.0 GB    360 GB   local
+37   ccx52   32      dedicated   128.0 GB   600 GB   local
+38   ccx62   48      dedicated   192.0 GB   960 GB   local
+----
+
+=== Init the hetzner context
+
+To getting started, you must get a Token for your API as described [here](https://docs.hetzner.cloud/#overview-getting-started).
+
+Then init the hetzner context using the available link:ansible.adoc#hetzner-init-context[`hetzner-init-context` ansible playbook].
+
+The context can be verified reviewing the configuration file.
+
+[source,bash]
+----
+$ cat  ~/.config/hcloud/cli.toml
+
+active_context = "mycontext"
+
+[[contexts]]
+  name = "mycontext"
+  token = "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
+----
+
+== The inventory
+
+Prior to launching the creation of the VMS the Ansible inventory must be in place. For this check the documentation regarding [initializing a host](../ansible/playbook/README.md#user-guide)
+
+> NOTE: Upon installation, Ansible will use the default SSH port to apply security scripts. One of these scripts is changing the ssh port to a non default one. 
+> See the corresponding [README](../ansible/playbook/README.md).
+
+The `ansible_ssh_private_key_file` is obtained from the `passstore` using `pass get snowdrop/hetzner/<ansible_hostname>/id_rsa | tee ~/.ssh/id_rsa_snowdrop_hetzner_<ansible_hostname>`. 
+It's used so Ansible can connect to the server without requiring password.  
+
+== Create Server
+
+Several playbooks exist to create VM, check the link:ansible.adoc#_the_playbooks[Playbook List] section.
+
+=== Next steps
+
+Once the server is created it must be secured before installing other software. For that check [this README file](../ansible/playbook/README.md).
+
+== Steps to create a k8s cluster
+
+Check [the corresponding README file](../kubernetes/README.md). 

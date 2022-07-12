@@ -1,0 +1,21 @@
+= AWX
+:toc: left
+:toc-title: Table of Contents
+:icons: font
+:description: AWX documentation
+:source-highlighter: highlight.js
+
+
+:leveloffset: +1
+
+include::install.adoc[]
+
+include::userguide.adoc[]
+
+include::backupNrestore.adoc[]
+
+include::awx-implementation.adoc[]
+
+include::troubleshooting.adoc[]
+
+:leveloffset: -1

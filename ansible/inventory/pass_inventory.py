@@ -1,4 +1,4 @@
-#! /usr/bin/python
+#! /usr/bin/python3
 
 # -*- coding:utf-8 -*-
 # This module reads information from a passwordstore database and turns it into an ansible dynamic inventory.
@@ -60,19 +60,19 @@ for (dirpath, dirnames, filenames) in walk(password_store_dir):
             result[dirname]['hosts'] = []
             # list all folders inside a provider
             for (provDirPath, provDirNames, provFileNames) in walk(password_store_dir + '/' + dirname):
-                for (provDirName) in provDirNames:
+                for (vmName) in provDirNames:
                     # Filter out subfolders that don't contain hosts
-                    if (provDirName not in ['openshift-accounts', 'console']):
-                        result[dirname]['hosts'].append(provDirName)
+                    if (vmName not in ['openshift-accounts', 'console']):
+                        result[dirname]['hosts'].append(vmName)
                         # Get all hosts for that provider.
-                        for (hostDirPath, hostDirNames, hostFileNames) in walk(password_store_dir + '/' + dirname + '/' + provDirName):
+                        for (hostDirPath, hostDirNames, hostFileNames) in walk(password_store_dir + '/' + dirname + '/' + vmName):
                             # Init host_vars variable with the location of the SSH RSA Private Key
-                            host_vars = {'ansible_ssh_private_key_file':'~/.ssh/id_rsa_snowdrop_' + dirname + '_' + provDirName}
+                            host_vars = {}
                             for (hostFileName) in hostFileNames:
                                 passEntryName = hostFileName.split('.')[0]
                                 # Esclude some entries that won't be included in the inventory
                                 if ('id_rsa' not in passEntryName and 'os_password' not in passEntryName):
-                                    passEntry = dirname +'/' + provDirName + '/' + passEntryName
+                                    passEntry = dirname +'/' + vmName + '/' + passEntryName
                                     pipe = Popen(['pass', 'show', passEntry], stdout=PIPE, universal_newlines=True)
                                     passLines = pipe.stdout.readlines()
                                     passEntry = passLines[0].replace('\n', '')
@@ -85,7 +85,11 @@ for (dirpath, dirnames, filenames) in walk(password_store_dir):
                                     else:
                                         host_vars.update({passEntryName:passEntry})
                                     # for (hostDirName) in hostDirNames:
-                                    #     if (provDirName not in ['openshift-accounts', 'console']):
+                                    #     if (vmName not in ['openshift-accounts', 'console']):
+                                elif ('id_rsa' in passEntryName):
+                                    host_vars.update({'ansible_ssh_private_key_file':'~/.ssh/id_rsa_snowdrop_' + dirname + '_' + vmName})
+                            if ('ansible_ssh_private_key_file' not in host_vars):
+                                host_vars.update({'ansible_ssh_private_key_file':'~/.ssh/id_rsa_snowdrop_' + dirname})
                             for (hostGroupDirPath, hostGroupDirNames, hostGroupFileNames) in walk(path.join(hostDirPath, 'groups')):
                                 for (hostGroupFileName) in hostGroupFileNames:
                                     hostGroupFileName = hostGroupFileName.split('.')[0]
@@ -93,9 +97,9 @@ for (dirpath, dirnames, filenames) in walk(password_store_dir):
                                     if (not hostGroupFileName in result):
                                         result[hostGroupFileName] = {}
                                         result[hostGroupFileName]['hosts'] = []
-                                    result[hostGroupFileName]['hosts'].append(provDirName)
+                                    result[hostGroupFileName]['hosts'].append(vmName)
                             break
-                        result['_meta']['hostvars'].update({provDirName:host_vars})
+                        result['_meta']['hostvars'].update({vmName:host_vars})
                 break
         # ansible folder
         # elif (dirname == 'ansible'):

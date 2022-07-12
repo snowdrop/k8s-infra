@@ -1,0 +1,63 @@
+= OpenStack
+:icons: font
+:toc: left
+:description: This document describes the requirements and the process to execute the provisioning of a Cloud VM on Openstack.
+
+== Prerequisites
+
+You need to have both the `decorator` and `openstacksdk` pip packages installed.
+Depending on the existing state of your machine, you might need to do:
+
+[source,bash]
+----
+[sudo] pip install [--upgrade] decorator
+[sudo] pip install [--upgrade] openstacksdk
+----
+
+Install openstack.cloud Ansible collection.
+
+[source,bash]
+----
+$ ansible-galaxy collection install openstack.cloud
+----
+
+== VM Required Information
+
+=== Images
+
+Different OS images are available on Openstack.
+
+.OpenStack Image information
+[%header,cols="2m,1,1,1"]
+|===
+| Name | OS | Version | FS
+
+| Fedora-Cloud-Base-35 | Fedora | 35 | BTRFS
+| CentOS-8-x86_64-GenericCloud-released-latest | CentOS | 8 | ????
+| CentOS-7-x86_64-GenericCloud-released-latest | CentOS | 7 | ????
+
+|===
+
+=== Flavors
+
+
+.OpenStack Flavor information
+[%header,cols="2m,1,1,1,1,1"]
+|===
+| Flavor | VCPUS | RAM | Total Disks | Root Disk | Ephmeral Disk
+
+| m1.medium | 2 | 4 GB | 40 GB | 40 GB | 0 GB 
+| ci.m1.medium | 2 | 4 GB | 40 GB | 40 GB | 0 GB 
+| ci.m1.medium.large	| 4| 4 GB | 16 GB | 16 GB | 0 GB 
+| ci.m5.large | 16 | 32GB | 40GB | 40GB | 0GB 
+|===
+
+
+
+
+:leveloffset: +1
+
+include::../ansible/playbook/openstack/README.adoc[]
+
+:leveloffset: -1
+

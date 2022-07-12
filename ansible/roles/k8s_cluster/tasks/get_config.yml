@@ -1,0 +1,6 @@
+---
+- name: "Fetch kubernetes configuration"
+  shell: "cat /etc/kubernetes/admin.conf"
+  become: True
+  register: k8s_config
+...

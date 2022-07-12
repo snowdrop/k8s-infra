@@ -1,0 +1,28 @@
+{
+    "name": "HETZNER_API_TOKEN",
+    "description": "Hetzner API Token",
+    "kind": "cloud",
+    "inputs": {
+         "fields": [
+              {
+                   "id": "hetzner_api_token",
+                   "type": "string",
+                   "label": "Hetzner API Token",
+                   "secret": true
+              }
+         ],
+         "required": [
+              "hetzner_api_token"
+         ]
+    },
+    "injectors": {
+         "env": {
+              "HCLOUD_TOKEN": "{{ hetzner_api_token }}"
+         }
+    },
+    "natural_key": {
+         "name": "HETZNER_API_TOKEN",
+         "kind": "cloud",
+         "type": "credential_type"
+    }
+}

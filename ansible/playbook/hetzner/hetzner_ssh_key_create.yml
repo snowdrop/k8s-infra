@@ -1,0 +1,34 @@
+---
+# file: hetzner-create-ssh-key.yml
+# Optional variables:
+# Should only be called when: "use_generic_ssh_key is defined and not ( use_generic_ssh_key | bool )"
+- name: "Create Hetzner SSH key Playbook"
+  hosts: localhost
+  gather_facts: no
+
+  pre_tasks:
+    - name: "Set default hetzner_context_name if it is not defined"
+      set_fact:
+        hetzner_context_name: "snowdrop"
+      when: hetzner_context_name is not defined
+
+    - name: "Validate required variables"
+      assert:
+        that:
+          - "vm_key_name is defined"
+        fail_msg: "'vm_key_name' must be defined"
+
+  tasks:
+    - name: "Activate hetzner context"
+      include_role:
+        name: "hetzner/activate_context"
+      vars:
+        context_name: "{{ hetzner_context_name }}"
+
+    - include_role:
+        name: hetzner/create_ssh_key
+      vars:
+        vm_name: "{{ vm_name }}"
+        vm_key_name: "{{ vm_key_name }}"
+
+...

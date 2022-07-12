@@ -55,6 +55,17 @@
 - name: "Flush handlers"
   meta: flush_handlers
 
+- name: "Disable selinux"
+  shell: |
+    setenforce 0
+    sed -i 's/^SELINUX=.*/SELINUX=disabled/g' /etc/selinux/config
+    getenforce
+  become: true
+
+- name: "Custom installation for Fedora"
+  include_tasks: "install_Fedora.yml"
+  when: "ansible_distribution == 'Fedora'"
+
 - name: "Add kubernetes repository"
   yum_repository:
     name: kubernetes
@@ -124,32 +135,63 @@
   command: "kubeadm config images pull --kubernetes-version {{ k8s_version }}"
   become: yes
 
-- name: Initialize cluster for k8s - {{ k8s_version }}
+- name: "Checks k8s bootstrap status"
+  stat: 
+    path: "/etc/kubernetes/admin.conf"
+  register: k8s_config_file
+
+
+- name: "Initialize cluster for k8s - {{ k8s_version }}"
   command: "kubeadm init --pod-network-cidr={{ pod_subnet }} --apiserver-advertise-address={{ api_server }} --kubernetes-version {{ k8s_version }}"
   register: kubeadm_init_res
   changed_when: "kubeadm_init_res.rc == 0"
   failed_when: "kubeadm_init_res.rc != 0  and 'already exists' not in kubeadm_init_res.stderr"
   become: yes
+  when: "not k8s_config_file.stat.exists"
+
+- name: "Checks k8s bootstrap status"
+  stat: 
+    path: ".kube/config"
+  register: home_k8s_config_file
 
 - name: "Copy config file"
   include_role:
     name: k8s_config
   vars:
     state: "present"
+  when: "not home_k8s_config_file.stat.exists"
 
 - name: "Install CNI"
   include_tasks: install_cni.yml
 
+- name: "Check if nodes are already tainted"
+  shell: |
+    kubectl get nodes -o jsonpath="{.items[].spec.taints[?(@.key=='node-role.kubernetes.io/master')]}"
+  register: kc_check_tainted_nodes
+  ignore_errors: True
+
+- name: "Print taint output"
+  debug: 
+    msg: "kc_check_tainted_nodes: {{ kc_check_tainted_nodes }}"
+  when: "kc_check_tainted_nodes is defined"
+
 - name: Taint the node
   command: "kubectl taint nodes --all node-role.kubernetes.io/master-"
+  register: kc_taint_node_res
+  failed_when: "kc_taint_node_res.rc != 0 and 'not found' not in kc_taint_node_res.stderr"
 
-- name: Generate ClusterRole file for the sa default and namespace kube-system
+- name: "Print taint output"
+  debug: 
+    msg: "kc_taint_node_res: {{ kc_taint_node_res }}"
+  when: "kc_taint_node_res is defined"
+
+- name: "Generate ClusterRole file for the sa default and namespace kube-system"
   template:
     src: "clusterrole-admin.j2"
     dest: /tmp/clusterrole-admin.yml
-  become: yes
+  become: True
 
-- name: Grant Cluster Admin role to the serviceaccount default of kube-system
+- name: "Grant Cluster Admin role to the serviceaccount default of kube-system"
   shell: |
     kubectl apply -f /tmp/clusterrole-admin.yml
 

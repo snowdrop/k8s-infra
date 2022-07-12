@@ -1,0 +1,9 @@
+---
+required_dependencies:
+  - procps-ng
+  - curl
+  - file
+  - git
+  - libxcrypt-compat
+  - "@Development Tools"
+...

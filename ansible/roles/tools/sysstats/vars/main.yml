@@ -1,0 +1,11 @@
+---
+stats_packages:
+  - sysstat
+  - lsof
+  - ioping
+  - htop
+
+stats_services:
+  - sysstat.service
+  
+...

@@ -1,15 +1,19 @@
 ---
 - include_vars: "{{ item }}"
   with_first_found:
-    - "{{ansible_distribution}}-{{ansible_distribution_major_version}}.yml"
-    - "{{ ansible_os_family }}-{{ansible_distribution_major_version}}.yml"
+    - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
+    - "{{ ansible_os_family }}-{{ ansible_distribution_major_version }}.yml"
     - "{{ ansible_distribution }}.yml"
     - "{{ ansible_os_family }}.yml"
 
+- name: "Identify installation method"
+  set_fact:
+    newer_os: "{{ (ansible_distribution == 'CentOS' or ansible_os_family == 'RedHat') and (ansible_distribution_major_version == '8' or ansible_distribution == 'Fedora') | bool }}"
+
 - name: "Add docker repository CentOS/RedHat 8"
-  shell: "yum config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo"
+  shell: "{{ add_docker_repo_command }}"
   become: yes
-  when: "(ansible_distribution == 'CentOS' or ansible_os_family == 'RedHat') and ansible_distribution_major_version == '8'"
+  when: "newer_os | bool"
 
 - name: "Add docker repository CentOS/RedHat 7"
   yum_repository:
@@ -20,6 +24,6 @@
     gpgcheck: 1
     gpgkey: https://download.docker.com/linux/centos/gpg
   become: yes
-  when: "(ansible_distribution == 'CentOS' or ansible_os_family == 'RedHat') and ansible_distribution_major_version == '7'"
+  when: "not newer_os"
 
 ...

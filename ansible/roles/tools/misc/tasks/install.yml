@@ -1,0 +1,7 @@
+---
+- name: "Install misc packages"
+  package:
+    name: "{{ misc_packages }}"
+    state: present
+  become: True
+...

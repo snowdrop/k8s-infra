@@ -1,0 +1,13 @@
+{
+    "fields": [
+        {
+            "secret": true,
+            "type": "string",
+            "id": "hetzner_api_token",
+            "label": "Hetzner API Token"
+        }
+    ],
+    "required": [
+        "hetzner_api_token"
+    ]
+}

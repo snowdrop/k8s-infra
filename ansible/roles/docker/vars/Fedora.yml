@@ -1,0 +1,10 @@
+docker_dependencies: 
+  - dnf-plugins-core
+
+add_docker_repo_command: dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
+
+docker_packages:
+  - docker-ce
+  - docker-ce-cli
+  - containerd.io
+  - docker-compose-plugin

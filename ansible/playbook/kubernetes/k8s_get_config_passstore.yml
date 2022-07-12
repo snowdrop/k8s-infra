@@ -1,0 +1,99 @@
+---
+# - name: "Get k8s configuration"
+#   import_playbook: "k8s_get_config.yml"
+
+- name: "Fetch configuration"
+  hosts: "{{ vm_name }}"
+
+  tasks:
+    - name: "Fetch kubernetes configuration"
+      import_role:
+        name: 'k8s_cluster'
+        tasks_from: 'get_config'
+      # shell: "cat /etc/kubernetes/admin.conf"
+      # become: yes
+      # register: k8s_config
+
+    - name: "Fetch kubernetes dashboard token"
+      import_role:
+        name: 'k8s_dashboard'
+        tasks_from: 'get_config'
+      # shell: |
+      #   kubectl -n kubernetes-dashboard get secret admin-user-token-pdfg9 -o jsonpath='{.data.token}' | base64 --decode
+      # register: k8s_dashboard_token
+
+    - name: "Write k8s_config contents to temporary file"
+      copy:
+        content: '{{ k8s_config.stdout }}'
+        dest: "/tmp/k8s_{{ provider }}_{{ vm_name }}.config"
+      delegate_to: localhost
+
+    - name: "Write k8s_dashboard contents to temporary file"
+      copy:
+        content: '{{ k8s_dashboard_token.stdout }}'
+        dest: "/tmp/k8s_{{ provider }}_{{ vm_name }}_dashboard"
+      delegate_to: localhost
+
+# Requires:
+# . k8s_config
+# . k8s_dashboard_token
+- name: "Update passwordstore configuration"
+  hosts: localhost
+  gather_facts: True
+
+  pre_tasks:
+    - name: "Read k8s_config temporary file"
+      set_fact:
+        k8s_config: "{{lookup('file', '/tmp/k8s_{{ provider }}_{{ vm_name }}.config') }}"
+        k8s_dashboard_token: "{{lookup('file', '/tmp/k8s_{{ provider }}_{{ vm_name }}_dashboard') }}"
+      # read:
+      #   content: '{{ k8s_config.stdout }}'
+      #   dest: "/tmp/k8s_{{ provider }}_{{ vm_name }}.config"
+      # delegate_to: localhost
+
+    # - name: "Read k8s_dashboard temporary file"
+    #   copy:
+    #     content: '{{ k8s_dashboard_token.stdout }}'
+    #     dest: "/tmp/k8s_{{ provider }}_{{ vm_name }}_dashboard"
+    #   delegate_to: localhost
+
+    # - name: "Fetch kubernetes configuration"
+    #   shell: "cat /etc/kubernetes/admin.conf"
+    #   become: yes
+    #   register: k8s_config
+
+    # - name: "Fetch kubernetes dashboard token"
+    #   shell: |
+    #     kubectl -n kubernetes-dashboard get secret admin-user-token-pdfg9 -o jsonpath='{.data.token}' | base64 --decode
+    #   register: k8s_dashboard_token
+
+    - name: "Print cluster information"
+      debug:
+        msg: "{{ item }}"
+      with_items:
+        - "k8s_config: {{ k8s_config }}"
+        - "k8s_dashboard_token: {{ k8s_dashboard_token }}"
+
+  tasks:
+    - name: "Add k8s dashboard tokento the passwordstore"
+      include_role:
+        name: "passstore/ansible_inventory"
+        tasks_from: "add_variable"
+      vars:
+        pass_l1: "snowdrop"
+        pass_l2: "{{ provider }}"
+        pass_l3: "{{ vm_name }}"
+        var_name: "k8s_dashboard_token"
+        var_value: "{{ k8s_dashboard_token }}"
+
+    - name: "Add kube config to the passwordstore"
+      include_role:
+        name: "passstore/ansible_inventory"
+        tasks_from: "add_variable"
+      vars:
+        pass_l1: "snowdrop"
+        pass_l2: "{{ provider }}"
+        pass_l3: "{{ vm_name }}"
+        var_name: "kube_config"
+        var_value: "{{ k8s_config }}"
+...

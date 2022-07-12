@@ -1,11 +1,11 @@
 ---
 # Change the ssh port
-- name: Change the ssh port number
+- name: "Change the ssh port number"
   lineinfile:
     path: /etc/ssh/sshd_config
     regexp: '^#Port'
     line: "Port {{ new_ssh_port_number }}"
-  become: yes
+  become: True
   notify: Restart sshd
 
 - name: Change SELINUX settings to allow connections to the new port
@@ -13,9 +13,9 @@
   register: selinux_change_res
   changed_when: "selinux_change_res.rc == 0"
   failed_when: "selinux_change_res.rc != 0 and 'already defined' not in selinux_change_res.stderr"
-  become: yes
+  become: True
 
-- name: Open new ssh port
+- name: "Open new ssh port"
   include_role:
     name: "sec/firewalld"
     tasks_from: "add-port"

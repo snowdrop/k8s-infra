@@ -1,8 +1,8 @@
 ---
 - include_vars: "{{ item }}"
   with_first_found:
-    - "{{ansible_distribution}}-{{ansible_distribution_major_version}}.yml"
-    - "{{ ansible_os_family }}-{{ansible_distribution_major_version}}.yml"
+    - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
+    - "{{ ansible_os_family }}-{{ ansible_distribution_major_version }}.yml"
     - "{{ ansible_distribution }}.yml"
     - "{{ ansible_os_family }}.yml"
 
@@ -14,6 +14,7 @@
     name: "{{ docker_dependencies }}"
     state: present
   become: yes
+  when: "docker_dependencies is defined"
 
 - name: "Add docker repository"
   include_tasks: add-docker-repo.yml
@@ -26,6 +27,12 @@
 
 - name: "Ensures /etc/docker dir exists"
   file: path=/etc/docker state=directory
+  become: yes
+
+- name: "Add the connection user to the docker group"
+  ansible.builtin.user:
+    name: "{{ ansible_user_id }}"
+    groups: docker
   become: yes
 
 - name: "Start docker"

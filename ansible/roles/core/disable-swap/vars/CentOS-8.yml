@@ -1,0 +1,22 @@
+---
+ntp_daemon: chronyd
+ntp_package: chrony
+
+rhbase_systemd_services:
+  - systemd-journald
+  - systemd-tmpfiles-setup-dev
+  - systemd-tmpfiles-setup
+
+base_dependencies:
+  - python3-libselinux
+  - python3-libsemanage
+  - firewalld
+  - pciutils
+
+python_bindings:
+  - python3-libselinux
+  - python3-libsemanage
+
+rhbase_package_manager: dnf
+rhbase_package_manager_configuration: /etc/dnf/dnf.conf
+...

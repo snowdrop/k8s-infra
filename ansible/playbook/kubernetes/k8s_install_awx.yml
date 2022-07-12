@@ -1,0 +1,60 @@
+---
+- name: "Install Kubernetes"
+  import_playbook: "k8s_install.yml"
+
+- name: "Get k8s configuration"
+  import_playbook: "k8s_get_config.yml"
+
+- name: "Notify creator"
+  hosts: localhost
+  gather_facts: True
+  vars:
+    config_file: "{{ lookup('env', 'SMTP_CONFIG_FILE') }}"
+
+  pre_tasks:
+    - name: "Confirm the Config File exists"
+      stat: path="{{ config_file }}"
+      register: st
+
+    - name: "Cat config file contents"
+      shell: "cat {{ config_file }}"
+      when: st.stat.exists and st.stat.isreg
+      register: cat_output
+
+    - name: "Print config file contents"
+      debug: 
+        msg: "cat_output: {{ cat_output }}"
+      when: "cat_output is defined"
+
+    - name: "Load config file contents"
+      include_vars: "{{ config_file }}"
+      when: st.stat.exists and st.stat.isreg
+
+  tasks:
+
+    - name: "Notify k8s config"
+      mail:
+        host: "{{ snowdrop.smtp.host }}"
+        port: "{{ snowdrop.smtp.port }}"
+        subject: "Kubernetes config for {{ vm_name }}"
+        body: "{{ k8s_config.stdout }}"
+        from: "{{ snowdrop.smtp.from }}"
+        to: "{{ awx_user_email }}"
+        # cc: "{{ snowdrop.smtp.cc }}"
+        charset: utf8
+      # delegate_to: localhost
+
+    - name: "Notify k8s dashboard token"
+      mail:
+        host: "{{ snowdrop.smtp.host }}"
+        port: "{{ snowdrop.smtp.port }}"
+        subject: "Kubernetes dashboard for {{ vm_name }}"
+        body: "{{ k8s_dashboard_token }}"
+        from: "{{ snowdrop.smtp.from }}"
+        to: "{{ awx_user_email }}"
+        # cc: "{{ snowdrop.smtp.cc }}"
+        charset: utf8
+      # delegate_to: localhost
+      when: "k8s_dashboard_token is defined"
+
+...

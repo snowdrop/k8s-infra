@@ -1,0 +1,164 @@
+{
+     "count": 1,
+     "next": null,
+     "previous": null,
+     "results": [
+          {
+               "type": "job_template",
+               "summary_fields": {
+                    "organization": {
+                         "id": 2,
+                         "name": "snowdrop",
+                         "description": "Snowdrop Team organization"
+                    },
+                    "inventory": {
+                         "id": 3,
+                         "name": "Localhost",
+                         "description": "",
+                         "has_active_failures": true,
+                         "total_hosts": 1,
+                         "hosts_with_active_failures": 1,
+                         "total_groups": 0,
+                         "has_inventory_sources": false,
+                         "total_inventory_sources": 0,
+                         "inventory_sources_with_failures": 0,
+                         "organization_id": 1,
+                         "kind": ""
+                    },
+                    "execution_environment": {
+                         "id": 1,
+                         "name": "AWX EE (latest)",
+                         "description": "",
+                         "image": "quay.io/ansible/awx-ee:latest"
+                    },
+                    "project": {
+                         "id": 9,
+                         "name": "K8sInfraProject",
+                         "description": "Snowdrop K8S Infra project",
+                         "status": "successful",
+                         "scm_type": "git",
+                         "allow_override": false
+                    },
+                    "last_job": {
+                         "id": 42,
+                         "name": "OpenstackCreateVM",
+                         "description": "Create OpenStack VM",
+                         "finished": "2022-05-24T08:00:03.835947Z",
+                         "status": "failed",
+                         "failed": true
+                    },
+                    "last_update": {
+                         "id": 42,
+                         "name": "OpenstackCreateVM",
+                         "description": "Create OpenStack VM",
+                         "status": "failed",
+                         "failed": true
+                    },
+                    "created_by": {
+                         "id": 1,
+                         "username": "admin",
+                         "first_name": "",
+                         "last_name": ""
+                    },
+                    "modified_by": {
+                         "id": 1,
+                         "username": "admin",
+                         "first_name": "",
+                         "last_name": ""
+                    },
+                    "object_roles": {
+                         "admin_role": {
+                              "description": "Can manage all aspects of the job template",
+                              "name": "Admin",
+                              "id": 98
+                         },
+                         "execute_role": {
+                              "description": "May run the job template",
+                              "name": "Execute",
+                              "id": 99
+                         },
+                         "read_role": {
+                              "description": "May view settings for the job template",
+                              "name": "Read",
+                              "id": 100
+                         }
+                    },
+                    "user_capabilities": {
+                         "edit": true,
+                         "delete": true,
+                         "start": true,
+                         "schedule": true,
+                         "copy": true
+                    },
+                    "labels": {
+                         "count": 0,
+                         "results": []
+                    },
+                    "survey": {
+                         "title": "",
+                         "description": ""
+                    },
+                    "credentials": [
+                         {
+                              "id": 6,
+                              "name": "OpenStackHosts-snowdrop",
+                              "description": "OpenStack Hosts",
+                              "kind": "ssh",
+                              "cloud": false
+                         },
+                         {
+                              "id": 7,
+                              "name": "openstack-jenkins",
+                              "description": "",
+                              "kind": "openstack",
+                              "cloud": true
+                         }
+                    ]
+               },
+               "created": "2022-05-23T12:00:47.178409Z",
+               "modified": "2022-05-24T07:59:50.531302Z",
+               "name": "OpenstackCreateVM",
+               "description": "Create OpenStack VM",
+               "job_type": "run",
+               "inventory": 3,
+               "project": 9,
+               "playbook": "ansible/playbook/import_public_key.yml",
+               "scm_branch": "",
+               "forks": 0,
+               "limit": "",
+               "verbosity": 4,
+               "extra_vars": "---",
+               "job_tags": "",
+               "force_handlers": false,
+               "skip_tags": "",
+               "start_at_task": "",
+               "timeout": 0,
+               "use_fact_cache": true,
+               "organization": 2,
+               "last_job_run": "2022-05-24T08:00:03.835947Z",
+               "last_job_failed": true,
+               "next_job_run": null,
+               "status": "failed",
+               "execution_environment": 1,
+               "host_config_key": "",
+               "ask_scm_branch_on_launch": false,
+               "ask_diff_mode_on_launch": false,
+               "ask_variables_on_launch": false,
+               "ask_limit_on_launch": false,
+               "ask_tags_on_launch": false,
+               "ask_skip_tags_on_launch": false,
+               "ask_job_type_on_launch": false,
+               "ask_verbosity_on_launch": false,
+               "ask_inventory_on_launch": false,
+               "ask_credential_on_launch": true,
+               "survey_enabled": true,
+               "become_enabled": false,
+               "diff_mode": false,
+               "allow_simultaneous": false,
+               "custom_virtualenv": null,
+               "job_slice_count": 1,
+               "webhook_service": "",
+               "webhook_credential": null
+          }
+     ]
+}

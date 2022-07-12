@@ -1,0 +1,28 @@
+== Role: Kubernetes Bash
+
+Improvements to the k8s user bash.
+
+=== Description
+
+This role will configure the user bash.
+
+=== Requirements
+
+None.
+
+=== Role Variables
+
+
+=== Example Playbook
+
+```
+ansible-playbook ....
+```
+
+=== License
+
+https://www.apache.org/licenses/LICENSE-2.0[Apache License 2.0]
+
+=== Author Information
+
+This role has been created by the https://github.com/orgs/snowdrop/teams[Snowdrop team].

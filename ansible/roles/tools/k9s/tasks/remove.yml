@@ -1,0 +1,5 @@
+---
+- name: "Install k9s"
+  shell: |
+    brew uninstall derailed/k9s/k9s
+...

@@ -1,0 +1,13 @@
+---
+- hosts: "{{ vm_name | default('localhost') }}"
+  gather_facts: true
+
+  tasks:
+    - name: "Add alias to bash_alias"
+      include_role:
+        name: "tools/bash_alias"
+      vars:
+        operation: "add"
+        name: "kc"
+        command: "/usr/bin/kubectl"
+...

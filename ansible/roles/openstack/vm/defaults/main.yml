@@ -17,11 +17,14 @@ flavours:
   m1.xlarge:
     name: "m1.xlarge"
     disk_size: 80
+  g.standard.xxxl:
+    name: "g.standard.xxxl"
+    disk_size: 160
 
 openstack:
   os_project_name: spring-boot-jenkins
   sshkey_name: "{{ hostname }}"
-  timeout: 300
+  timeout: 60000
   vm:
     title: CentOS 8 Generic Cloud Latest
     name: "{{ hostname }}"
@@ -33,4 +36,5 @@ openstack:
     # volumes: []
     boot_from_volume: false
 
-login_username: centos
+# login_username: centos
+openstack_security_group: spring-boot

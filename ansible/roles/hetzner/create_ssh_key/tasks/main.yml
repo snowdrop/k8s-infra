@@ -1,17 +1,21 @@
 ---
-# tasks for hetzner/create_server
-- name: Get server public key from pass
-  set_fact:
-    vm_public_key: "{{ lookup('passwordstore', 'hetzner/' + vm_name + '/id_rsa.pub' ) }}"
-  when: "override_public_key is not defined"
+# tasks for hetzner/create_ssh_key
+# Requires:
+#   - vm_key_name: Name for the created SSH key
 
-- name: Get server public key from file
-  set_fact:
-    vm_public_key: "{{ lookup('file', override_public_key ) }}"
-  when: "override_public_key is defined"
+#   - vm_public_key: Contents of the public key to allow loggin in to the VMs
+# - name: Get server public key from pass
+#   set_fact:
+#     vm_public_key: "{{ lookup('passwordstore', 'hetzner/' + vm_name + '/id_rsa.pub' ) }}"
+#   when: "override_public_key is not defined"
+
+# - name: Get server public key from file
+#   set_fact:
+#     vm_public_key: "{{ lookup('file', override_public_key ) }}"
+#   when: "override_public_key is defined"
 
 - name: "Create cloud server key"
-  shell: "hcloud ssh-key create --name {{ vm_name }} --public-key \"{{ vm_public_key }}\""
+  shell: "hcloud ssh-key create --name {{ vm_key_name }} --public-key \"{{ vm_public_key }}\""
   register: hcloud_ssh_key_res
   changed_when: "hcloud_ssh_key_res.rc == 0"
   failed_when: "hcloud_ssh_key_res.rc != 0 and ('SSH key with the same fingerprint already exists' not in hcloud_ssh_key_res.stderr)"

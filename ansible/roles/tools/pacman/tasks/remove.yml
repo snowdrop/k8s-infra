@@ -1,0 +1,8 @@
+---
+- name: "Uninstall pacman"
+  package:
+    name: "{{ pacman_packages }}"
+    state: absent
+  become: True
+
+...

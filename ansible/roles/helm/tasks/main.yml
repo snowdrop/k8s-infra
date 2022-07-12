@@ -4,17 +4,24 @@
     chmod 700 get_helm.sh
     ./get_helm.sh
 
+- name: "Check if kube config file exists"
+  stat: path="$HOME/.kube/config"
+  register: kc_res
+
 - name: Copy Tiller RBAC files
   template:
     src: "tiller-rbac.yml.j2"
     dest: /tmp/tiller-rbac.yml
+  when: kc_res.stat.exists
 
 - name: Apply Tiller RBAC files
   command: |
     kubectl --kubeconfig=$HOME/.kube/config apply -f /tmp/tiller-rbac.yml
+  when: kc_res.stat.exists
 
 - name: Initialize Heml and deploy Tiller
   command: |
     helm init --kubeconfig=$HOME/.kube/config \
      --wait --tiller-namespace {{ helm_namespace }} \
      --service-account tiller
+  when: kc_res.stat.exists

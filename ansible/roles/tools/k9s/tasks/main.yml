@@ -1,0 +1,16 @@
+---
+- include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ansible_distribution}}-{{ansible_distribution_major_version}}.yml"
+    - "{{ ansible_distribution }}.yml"
+    - "{{ ansible_os_family }}.yml"
+    - "main.yml"
+
+- name: "Uninstall"
+  include_tasks: remove.yml
+  when: state == "absent"
+
+- name: "Install"
+  include_tasks: install.yml
+  when: state == "present"
+...

@@ -1,0 +1,196 @@
+= OpenStack CLI
+:icons: font
+:toc: left
+:description: This document describes Openstack CLI commands.
+
+== References
+
+* https://docs.openstack.org/newton/user-guide/common/cli-install-openstack-command-line-clients.html
+
+== Prerequisites
+
+Install OpenStack client.
+
+[source,bash]
+----
+pip install --upgrade python-openstackclient
+----
+
+== CLI commands
+
+=== Login
+
+Login can be made using Environment Variables.
+
+To configure the login process connect to the OpenStack interface and go to the `Project > API Access`` option. From there, `OpenStack RC` file.
+
+Copy the file to a path directory, for instance `~/bin` (or `~/.local/bin`) and give it execution permission.
+
+Execute the script file and give provide the password when requested.
+
+[source,bash]
+----
+Please enter your OpenStack Password for project xxxxxxxxxx as user xxxxxxxxxxxx: 
+----
+
+That's it, you're now logged in.
+
+=== Flavor
+
+List flavors.
+
+[source,bash]
+----
+$ openstack flavor list
+
+The flavors with more than 32GB are the following...
+
+```
++--------------------------------------+------------------------------------+--------+------+-----------+-------+-----------+
+| ID                                   | Name                               |    RAM | Disk | Ephemeral | VCPUs | Is Public |
++--------------------------------------+------------------------------------+--------+------+-----------+-------+-----------+
+| 0f84ff1f-2cc8-4c99-baa2-d663577bd538 | ci.memory.xxl                      |  98304 |   60 |         0 |    12 | True      |
+| 3410bf5a-31c6-43f9-a859-a0f848552bc2 | ci.m5.xlarge                       |  49152 |   40 |         0 |    24 | True      |
+| 393bcaeb-a8bf-4a18-a893-799f01e338b8 | ci.memory.xxxl                     | 131072 |   80 |         0 |    16 | True      |
+| 52e23b17-4039-488e-9c63-543795a31bb8 | g.memory.xxxl                      | 131072 |   80 |         0 |    16 | True      |
+| 8cc169d5-184a-4392-bc27-6eac97735d62 | ocp-master-xxl                     |  49152 |   45 |         0 |    32 | True      |
+...
++--------------------------------------+------------------------------------+--------+------+-----------+-------+-----------+
+```
+----
+
+Other list commands
+
+.Filter list by RAM
+[source,bash]
+----
+openstack flavor list --min-ram 33000
+----
+
+Create a new flavor.
+
+.Create flavor
+[source,bash]
+----
+$ openstack flavor create g.standard.xxxl.ram --ram 40960 --disk 160 --vcpus 16
+----
+
+=== Server
+
+List servers.
+
+[source,bash]
+----
+$ openstack server list
+
++--------------------------------------+----------------------------+---------+---------------------------------+----------------------------------------------+-----------------+
+| ID                                   | Name                       | Status  | Networks                        | Image                                        | Flavor          |
++--------------------------------------+----------------------------+---------+---------------------------------+----------------------------------------------+-----------------+
+| xxxxxx-xxxx-xxxx-xxxx-xxxxxx | k123-fedora35-01           | SHUTOFF | provider_net_shared=x.x.x.x | Fedora-Cloud-Base-35                         | g.standard.xxxl |
+| xxxxxx-xxxx-xxxx-xxxx-xxxxxx | 20220425-k121-centos8-test | ACTIVE  | provider_net_shared=x.x.x.x  | CentOS-8-x86_64-GenericCloud-released-latest | ci.m5.large     |
+| xxxxxx-xxxx-xxxx-xxxx-xxxxxx | n119-test                  | ACTIVE  | provider_net_shared=x.x.x.x  | CentOS-7-x86_64-GenericCloud-released-latest | ci.m5.large     |
++--------------------------------------+----------------------------+---------+---------------------------------+----------------------------------------------+-----------------+
+
+----
+
+==== Resize server
+
+[source,bash]
+====
+$ nova help resize
+
+usage: nova resize [--poll] <server> <flavor>
+
+Resize a server.
+
+Positional arguments:
+  <server>  Name or ID of server.
+  <flavor>  Name or ID of new flavor.
+
+Options:
+  --poll    Report the server resize progress until it completes.
+====
+
+[source,bash]
+----
+$ nova resize --poll k123-fedora35-01 PnTAE.CPU_20_Memory_65536_Disk_200
+
+Server resizing... 100% complete
+Finished
+----
+
+Confirm resize.
+
+[source,bash]
+----
+$ nova help resize-confirm
+usage: nova resize-confirm <server>
+
+Confirm a previous resize.
+
+Positional arguments:
+  <server>  Name or ID of server.
+----
+
+[source,bash]
+----
+$ nova resize-confirm k123-fedora35-01
+----
+
+
+
+Typical errors.
+
+[source,bash]
+----
+$ nova resize --poll k123-fedora35-01 PnTAE.CPU_20_Memory_65536_Disk_200
+ERROR (Forbidden): Quota exceeded for ram: Requested 32768, but already used 98304 of 122880 ram (HTTP 403) (Request-ID: xxxxxxxxxxxxxx)
+----
+
+[source,bash]
+----
+$ nova resize --poll k123-fedora35-01 ci.m5.xlarge
+ERROR (ClientException): Unexpected API Error. Please report this at http://bugs.launchpad.net/nova/ and attach the Nova API log if possible.
+<class 'nova.exception.FlavorDiskSmallerThanMinDisk'> (HTTP 500) (Request-ID: req-774039f4-3619-4bb8-8727-31e5f99edda2)
+----
+
+== Current implementation
+
+=== Images
+
+Different OS images are available on Openstack.
+
+.OpenStack Image information
+[%header,cols="2m,1,1,1"]
+|===
+| Name | OS | Version | FS
+
+| Fedora-Cloud-Base-35 | Fedora | 35 | BTRFS
+| CentOS-8-x86_64-GenericCloud-released-latest | CentOS | 8 | ????
+| CentOS-7-x86_64-GenericCloud-released-latest | CentOS | 7 | ????
+
+|===
+
+=== Flavors
+
+
+.OpenStack Flavor information
+[%header,cols="2m,1,1,1,1,1"]
+|===
+| Flavor | VCPUS | RAM | Total Disks | Root Disk | Ephmeral Disk
+
+| m1.medium | 2 | 4 GB | 40 GB | 40 GB | 0 GB 
+| ci.m1.medium | 2 | 4 GB | 40 GB | 40 GB | 0 GB 
+| ci.m1.medium.large	| 4| 4 GB | 16 GB | 16 GB | 0 GB 
+| ci.m5.large | 16 | 32GB | 40GB | 40GB | 0GB 
+|===
+
+
+
+
+:leveloffset: +1
+
+include::../ansible/playbook/openstack/README.adoc[]
+
+:leveloffset: -1
+

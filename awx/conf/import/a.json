@@ -1,0 +1,46 @@
+[
+    {"id": 3, "type": "inventory", "url": "/api/v2/inventories/3/", "related": {"created_by": "/api/v2/users/1/", "modified_by": "/api/v2/users/1/", "hosts": "/api/v2/inventories/3/hosts/", "groups": "/api/v2/inventories/3/groups/", "root_groups": "/api/v2/inventories/3/root_groups/", "variable_data": "/api/v2/inventories/3/variable_data/", "script": "/api/v2/inventories/3/script/", "tree": "/api/v2/inventories/3/tree/", "inventory_sources": "/api/v2/inventories/3/inventory_sources/", "update_inventory_sources": "/api/v2/inventories/3/update_inventory_sources/", "activity_stream": "/api/v2/inventories/3/activity_stream/", "job_templates": "/api/v2/inventories/3/job_templates/", "ad_hoc_commands": "/api/v2/inventories/3/ad_hoc_commands/", "access_list": "/api/v2/inventories/3/access_list/", "object_roles": "/api/v2/inventories/3/object_roles/", "instance_groups": "/api/v2/inventories/3/instance_groups/", "copy": "/api/v2/inventories/3/copy/", "labels": "/api/v2/inventories/3/labels/", "organization": "/api/v2/organizations/2/"
+        }, "summary_fields": {"organization": {"id": 2, "name": "snowdrop", "description": "Snowdrop Team organization"
+            }, "created_by": {"id": 1, "username": "admin", "first_name": "", "last_name": ""
+            }, "modified_by": {"id": 1, "username": "admin", "first_name": "", "last_name": ""
+            }, "object_roles": {"admin_role": {"description": "Can manage all aspects of the inventory", "name": "Admin", "id": 59
+                }, "update_role": {"description": "May update the inventory", "name": "Update", "id": 60
+                }, "adhoc_role": {"description": "May run ad hoc commands on the inventory", "name": "Ad Hoc", "id": 61
+                }, "use_role": {"description": "Can use the inventory in a job template", "name": "Use", "id": 62
+                }, "read_role": {"description": "May view settings for the inventory", "name": "Read", "id": 63
+                }
+            }, "user_capabilities": {"edit": True, "delete": True, "copy": True, "adhoc": True
+            }, "labels": {"count": 0, "results": []
+            }
+        }, "created": "2022-05-09T10: 16: 33.792929Z", "modified": "2022-05-09T10: 16: 33.792970Z", "name": "Hetzner", "description": "Hetzner Snowdrop", "organization": 2, "kind": "", "host_filter": None, "variables": "", "has_active_failures": False, "total_hosts": 4, "hosts_with_active_failures": 0, "total_groups": 3, "has_inventory_sources": True, "total_inventory_sources": 1, "inventory_sources_with_failures": 0, "pending_deletion": False
+    },
+    {"id": 1, "type": "inventory", "url": "/api/v2/inventories/1/", "related": {"created_by": "/api/v2/users/1/", "modified_by": "/api/v2/users/1/", "hosts": "/api/v2/inventories/1/hosts/", "groups": "/api/v2/inventories/1/groups/", "root_groups": "/api/v2/inventories/1/root_groups/", "variable_data": "/api/v2/inventories/1/variable_data/", "script": "/api/v2/inventories/1/script/", "tree": "/api/v2/inventories/1/tree/", "inventory_sources": "/api/v2/inventories/1/inventory_sources/", "update_inventory_sources": "/api/v2/inventories/1/update_inventory_sources/", "activity_stream": "/api/v2/inventories/1/activity_stream/", "job_templates": "/api/v2/inventories/1/job_templates/", "ad_hoc_commands": "/api/v2/inventories/1/ad_hoc_commands/", "access_list": "/api/v2/inventories/1/access_list/", "object_roles": "/api/v2/inventories/1/object_roles/", "instance_groups": "/api/v2/inventories/1/instance_groups/", "copy": "/api/v2/inventories/1/copy/", "labels": "/api/v2/inventories/1/labels/", "organization": "/api/v2/organizations/1/"
+        }, "summary_fields": {"organization": {"id": 1, "name": "Default", "description": ""
+            }, "created_by": {"id": 1, "username": "admin", "first_name": "", "last_name": ""
+            }, "modified_by": {"id": 1, "username": "admin", "first_name": "", "last_name": ""
+            }, "object_roles": {"admin_role": {"description": "Can manage all aspects of the inventory", "name": "Admin", "id": 26
+                }, "update_role": {"description": "May update the inventory", "name": "Update", "id": 27
+                }, "adhoc_role": {"description": "May run ad hoc commands on the inventory", "name": "Ad Hoc", "id": 28
+                }, "use_role": {"description": "Can use the inventory in a job template", "name": "Use", "id": 29
+                }, "read_role": {"description": "May view settings for the inventory", "name": "Read", "id": 30
+                }
+            }, "user_capabilities": {"edit": True, "delete": True, "copy": True, "adhoc": True
+            }, "labels": {"count": 0, "results": []
+            }
+        }, "created": "2022-05-09T09: 08: 33.139976Z", "modified": "2022-05-10T08: 27: 18.279812Z", "name": "Localhost", "description": "", "organization": 1, "kind": "", "host_filter": None, "variables": "---", "has_active_failures": True, "total_hosts": 1, "hosts_with_active_failures": 1, "total_groups": 0, "has_inventory_sources": False, "total_inventory_sources": 0, "inventory_sources_with_failures": 0, "pending_deletion": False
+    },
+    {"id": 2, "type": "inventory", "url": "/api/v2/inventories/2/", "related": {"created_by": "/api/v2/users/1/", "modified_by": "/api/v2/users/1/", "hosts": "/api/v2/inventories/2/hosts/", "groups": "/api/v2/inventories/2/groups/", "root_groups": "/api/v2/inventories/2/root_groups/", "variable_data": "/api/v2/inventories/2/variable_data/", "script": "/api/v2/inventories/2/script/", "tree": "/api/v2/inventories/2/tree/", "inventory_sources": "/api/v2/inventories/2/inventory_sources/", "update_inventory_sources": "/api/v2/inventories/2/update_inventory_sources/", "activity_stream": "/api/v2/inventories/2/activity_stream/", "job_templates": "/api/v2/inventories/2/job_templates/", "ad_hoc_commands": "/api/v2/inventories/2/ad_hoc_commands/", "access_list": "/api/v2/inventories/2/access_list/", "object_roles": "/api/v2/inventories/2/object_roles/", "instance_groups": "/api/v2/inventories/2/instance_groups/", "copy": "/api/v2/inventories/2/copy/", "labels": "/api/v2/inventories/2/labels/", "organization": "/api/v2/organizations/2/"
+        }, "summary_fields": {"organization": {"id": 2, "name": "snowdrop", "description": "Snowdrop Team organization"
+            }, "created_by": {"id": 1, "username": "admin", "first_name": "", "last_name": ""
+            }, "modified_by": {"id": 1, "username": "admin", "first_name": "", "last_name": ""
+            }, "object_roles": {"admin_role": {"description": "Can manage all aspects of the inventory", "name": "Admin", "id": 54
+                }, "update_role": {"description": "May update the inventory", "name": "Update", "id": 55
+                }, "adhoc_role": {"description": "May run ad hoc commands on the inventory", "name": "Ad Hoc", "id": 56
+                }, "use_role": {"description": "Can use the inventory in a job template", "name": "Use", "id": 57
+                }, "read_role": {"description": "May view settings for the inventory", "name": "Read", "id": 58
+                }
+            }, "user_capabilities": {"edit": True, "delete": True, "copy": True, "adhoc": True
+            }, "labels": {"count": 0, "results": []
+            }
+        }, "created": "2022-05-09T10: 16: 20.009024Z", "modified": "2022-05-10T10: 35: 21.395003Z", "name": "OpenStack", "description": "OpenStack Jenkins", "organization": 2, "kind": "", "host_filter": None, "variables": "---\\nopenstack_security_group: spring-boot\\nopenstack_network: provider_net_shared", "has_active_failures": False, "total_hosts": 4, "hosts_with_active_failures": 0, "total_groups": 9, "has_inventory_sources": True, "total_inventory_sources": 1, "inventory_sources_with_failures": 0, "pending_deletion": False
+    }

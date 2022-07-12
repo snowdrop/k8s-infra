@@ -1,0 +1,27 @@
+---
+- include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ansible_distribution}}-{{ansible_distribution_major_version}}.yml"
+    - "{{ ansible_distribution }}.yml"
+    - "{{ ansible_os_family }}.yml"
+
+- name: "Disable SWAP in fstab"
+  replace:
+    path: /etc/fstab
+    regexp: '^([^#].*?\sswap\s+sw\s+.*)$'
+    replace: '# \1'
+  become: true
+
+- name: "Disable SWAP with swapoff"
+  shell:  |
+    swapoff -a
+  become: true
+
+- name: "Remove SWAP from system"
+  include_tasks: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
+    - "{{ ansible_distribution }}.yml"
+    - "{{ ansible_os_family }}.yml"
+
+...

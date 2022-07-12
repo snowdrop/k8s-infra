@@ -1,0 +1,33 @@
+---
+- name: "Add kubectl alias"
+  include_role:
+    name: "tools/bash_alias"
+  vars:
+    name: "kc"
+    command: "/usr/bin/kubectl"
+    operation: "add"
+
+- name: "Install sysstats tools"
+  include_role:
+    name: "tools/sysstats"
+  vars:
+    state: "present"
+
+- name: "Install misc tools"
+  include_role:
+    name: "tools/misc"
+  vars:
+    state: "present"
+
+- name: "Install brew"
+  include_role:
+    name: "tools/brew"
+  vars:
+    state: "present"
+
+- name: "Install k9s"
+  include_role:
+    name: "tools/k9s"
+  vars:
+    state: "present"
+...

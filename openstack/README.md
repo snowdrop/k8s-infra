@@ -40,7 +40,7 @@ $ VM_NAME=vm20210221-t01
 ```
 
 ```bash
-$ ansible-playbook playbook/openstack_vm_create_aggregate.yml -e k8s_type=masters -e k8s_version=121 -e '{"openstack": {"vm": {"network": "provider_net_shared"}}}' -e vm_name=${VM_NAME} --tags create
+$ ansible-playbook playbook/openstack/openstack_vm_create_aggregate.yml -e k8s_type=masters -e k8s_version=121 -e '{"openstack": {"vm": {"network": "provider_net_shared"}}}' -e vm_name=${VM_NAME} --tags create
 ```
 
 This playbook should finish with something like:
@@ -90,7 +90,7 @@ ansible-playbook playbook/openstack.yml \
 To delete a VM, simply execute the `openstack_vm_remove_aggregate` playbook.
 
 ```bash
-$ ansible-playbook playbook/openstack_vm_remove_aggregate.yml -e vm_name=${VM_NAME}
+$ ansible-playbook playbook/openstack/openstack_vm_remove_aggregate.yml -e vm_name=${VM_NAME}
 ```
 
 ```
@@ -150,7 +150,7 @@ e.g.
 To select a specific image use the `openstack.vm.image` variable override.
 
 ```bash
-$ ansible-playbook playbook/openstack_vm_create_aggregate.yml -e k8s_type=masters -e k8s_version=121 -e '{"openstack": {"vm": {"image": "CentOS-8-x86_64-GenericCloud-released-latest", "network": "provider_net_shared"}}}' -e vm_name=${VM_NAME} --tags create
+$ ansible-playbook playbook/openstack/openstack_vm_create_aggregate.yml -e k8s_type=masters -e k8s_version=121 -e '{"openstack": {"vm": {"image": "CentOS-8-x86_64-GenericCloud-released-latest", "network": "provider_net_shared"}}}' -e vm_name=${VM_NAME} --tags create
 ```
 
 ## Choose a flavor
@@ -159,11 +159,24 @@ $ ansible-playbook playbook/openstack_vm_create_aggregate.yml -e k8s_type=master
 | --- | --- | --- | --- | --- | --- |
 | m1.medium | 2 | 4 GB | 40 GB | 40 GB | 0 GB |
 | ci.m1.medium | 2 | 4 GB | 40 GB | 40 GB | 0 GB |
-| ci.m1.medium.large	| 4	| 4 GB | 16 GB | 16 GB | 0 GB |
-| ci.m5.large | ??? | ??? | ??? | ??? | ??? |
+| ci.m1.medium.large	| 4| 4 GB | 16 GB | 16 GB | 0 GB |
+| ci.m5.large | 16 | 32GB | 40GB | 40GB | 0GB |
 
 To select a specific flavor use the `openstack.vm.flavor` variable override.
 
 ```bash
-$ ansible-playbook playbook/openstack_vm_create_aggregate.yml -e k8s_type=masters -e k8s_version=121 -e '{"openstack": {"vm": {"flavor": "m1.medium", "network": "provider_net_shared"}}}' -e vm_name=${VM_NAME} --tags create
+$ ansible-playbook playbook/openstack/openstack_vm_create_aggregate.yml -e k8s_type=masters -e k8s_version=121 -e '{"openstack": {"vm": {"flavor": "m1.medium", "network": "provider_net_shared"}}}' -e vm_name=${VM_NAME} --tags create
 ```
+
+## Troubleshooting
+
+### Python.h: No such file or directory error when installing openstacksdk
+
+Cause missing `python3-devel`
+
+Solution
+
+```bash
+sudo dnf install python3-devel
+```
+

@@ -1,1 +1,3 @@
 k8s_config_filename: remote-k8s-config.yml
+
+default_k8s_config_file: /etc/kubernetes/admin.conf

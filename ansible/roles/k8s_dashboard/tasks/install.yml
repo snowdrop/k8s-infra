@@ -33,8 +33,12 @@
 
 - name: "Add the dashboard token to the passwordstore"
   set_fact:
-    k8s_dashboard_token: "{{ query('passwordstore', pass_provider + '/' + ansible_hostname + '/k8s_dashboard_token overwrite=yes nosymbols=true create=True userpass=' + k8s_dashboard_token_res.stdout)[0] | lower }}"
-  when: passwordstore_enabled | bool
+    k8s_dashboard_token: "{{ k8s_dashboard_token_res.stdout }}"
+
+- name: "Add the dashboard token to the passwordstore"
+  set_fact:
+    k8s_dashboard_token_pass: "{{ query('passwordstore', pass_provider + '/' + ansible_hostname + '/k8s_dashboard_token overwrite=yes nosymbols=true create=True userpass=' + k8s_dashboard_token_res)[0] | lower }}"
+  when: "passwordstore_enabled is defined and passwordstore_enabled"
 
 - name: Print kubernetes dashboard URL & Token
   debug:
@@ -45,7 +49,7 @@
       - "Kubectl will make Dashboard available at: " 
       - "http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/"
       - ""
-      - "Use {{ k8s_dashboard_token_res.stdout }} as token"
+      - "Use {{ k8s_dashboard_token }} as token"
       - ""
       - "More information on: https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/"
 ...

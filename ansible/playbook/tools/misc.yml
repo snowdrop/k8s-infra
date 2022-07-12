@@ -1,0 +1,9 @@
+---
+- hosts: "{{ vm_name | default('localhost') }}"
+  gather_facts: true
+
+  tasks:
+    - name: "Install misc tools"
+      include_role:
+        name: "tools/misc"
+...

@@ -1,0 +1,58 @@
+---
+- name: "Get Fedora configuration"
+  include_vars: 
+    file: "Fedora.yml"
+
+- name: "Install required dependencies"
+  package:
+    name: "{{ required_dependencies }}"
+    state: present
+  become: true
+
+- name: "Start libvirtd"
+  systemd:
+    state: restarted
+    name: libvirtd
+    enabled: yes
+  become: True
+
+- name: "Add users to libvirt group"
+  user: 
+    name: "{{ item }}"
+    groups: "libvirt"
+    append: True
+  with_items:
+    - "snowdrop"
+    - "fedora"
+  become: True
+
+- name: "Disable SWAP"
+  import_role:
+    name: "core/disable-swap"
+    tasks_from: "Fedora.yml"
+  vars:
+    state: "absent"
+
+- name: "Add or modify nofile hard limit for all users"
+  community.general.pam_limits:
+    domain: '*'
+    limit_type: hard
+    limit_item: nofile
+    value: 1048576
+  become: True
+
+- name: "Add or modify nofile soft limit for all users"
+  community.general.pam_limits:
+    domain: '*'
+    limit_type: hard
+    limit_item: nofile
+    value: 10000
+  become: True
+
+- name: "Copy sysctl.d configuration"
+  ansible.builtin.copy:
+    src: "../files/sysctl.d/10-user-watches.conf"
+    dest: "/usr/lib/sysctl.d/10-user-watches.conf"
+  become: True
+
+...
