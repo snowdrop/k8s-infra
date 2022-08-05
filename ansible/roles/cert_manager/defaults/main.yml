@@ -1,4 +1,4 @@
 cert_manager:
-    version: v0.12.0
+    version: v1.7.3
     namespace: cert-manager
 remove: false
