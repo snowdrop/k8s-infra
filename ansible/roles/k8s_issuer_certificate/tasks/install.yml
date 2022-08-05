@@ -3,11 +3,13 @@
 
 - set_fact:
     renewBefore: 8759h # 1 year - 1h
+    duration: 8760h
     letsencrypt_url: https://acme-{{ letsencrypt_env }}-v02.api.letsencrypt.org/directory
   when: letsencrypt_env == "staging"
 
 - set_fact:
     renewBefore: 2136h # 3 months - 24h
+    duration: 2190h
     letsencrypt_url: https://acme-v02.api.letsencrypt.org/directory
   when: letsencrypt_env == "prod"
 
