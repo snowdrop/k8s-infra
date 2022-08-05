@@ -1,5 +1,5 @@
 {% set dnsNameList = (item.names.split(",")) %}
-apiVersion: cert-manager.io/v1alpha2
+apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: {{ item.name }}
@@ -8,8 +8,10 @@ metadata:
   namespace: {{ item.namespace }}
 spec:
   renewBefore: {{ renewBefore }}
-  keySize: 2048
-  keyAlgorithm: rsa
+  duration: {{ duration }}
+  privateKey:
+    size: 2048
+    algorithm: RSA
   issuerRef:
     kind: Issuer
     name: letsencrypt-{{ letsencrypt_env }}-{{ item.name }}
