@@ -10,7 +10,7 @@ spec:
   renewBefore: {{ renewBefore }}
   privateKey:
     size: 2048
-    algorithm: rsa
+    algorithm: RSA
   issuerRef:
     kind: Issuer
     name: letsencrypt-{{ letsencrypt_env }}-{{ item.name }}
