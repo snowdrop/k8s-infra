@@ -8,8 +8,9 @@ metadata:
   namespace: {{ item.namespace }}
 spec:
   renewBefore: {{ renewBefore }}
-  keySize: 2048
-  keyAlgorithm: rsa
+  privateKey:
+    size: 2048
+    algorithm: rsa
   issuerRef:
     kind: Issuer
     name: letsencrypt-{{ letsencrypt_env }}-{{ item.name }}
