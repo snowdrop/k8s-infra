@@ -10,6 +10,10 @@ set -o errexit
 #
 # Add hereafter changes done post creation date as backlog
 #
+# Sep 14th 2022:
+# - Bump version to k8s 1.25
+# - Switch docker API from v1 to v2 (see https://github.com/snowdrop/k8s-infra/issues/270)
+#
 # July 1st 2022:
 # - Test if kind, kubectl, helm are installed with needed versions
 # - Change the range from 1.18 to 1.24 as this is what kind 0.14 supports
@@ -21,6 +25,7 @@ set -o errexit
 # - Bump version of k8s to 1.21. Check then locally that you have installed kind 0.11
 # - Fix k8s_minor_version from 1.20 to 1.21 
 # - Add 2 external NodePort: 30000, 31000 which could be used instead using K8s Service instead of Ingress
+#
 # Aug 20
 # - Change the URL to install nginx ingress - https://github.com/snowdrop/k8s-infra/issues/212
 # - Mention v1.22. Still use as default v1.21
@@ -62,8 +67,8 @@ fi
 
 read -p "Do you want to delete the kind cluster (y|n) - Default: no ? " cluster_delete
 cluster_delete=${cluster_delete:-n}
-read -p "Which kubernetes version should we install (1.18 .. 1.24) - Default: 1.22 ? " version
-k8s_minor_version=${version:-1.22}
+read -p "Which kubernetes version should we install (1.18 .. 1.25) - Default: 1.24 ? " version
+k8s_minor_version=${version:-1.24}
 read -p "What logging verbosity do you want (0..9) - A verbosity setting of 0 logs only critical events - Default: 0 ? " logging_verbosity
 logging_verbosity=${logging_verbosity:-0}
 
@@ -111,8 +116,10 @@ fi
 # - Configures containerd to use the local Docker registry
 # - Enables Ingress on ports 80 and 443
 if [ "$k8s_minor_version" != "default" ]; then
-  patch_version=$(wget -q https://registry.hub.docker.com/v1/repositories/kindest/node/tags -O - | \
-  jq -r '.[].name' | grep -E "^v${k8s_minor_version}.[0-9]+$" | \
+  token=$(curl -s "https://auth.docker.io/token?service=registry.docker.io&scope=repository:kindest/node:pull" | jq -r '.token')
+  patch_version=$(curl -H "Authorization: Bearer $token" -s "https://registry-1.docker.io/v2/kindest/node/tags/list" | \
+  jq -r '.tags[]' | \
+  grep -E "^v${k8s_minor_version}.[0-9]+$" | \
   cut -d. -f3 | sort -rn | head -1)
   k8s_version="v${k8s_minor_version}.${patch_version}"
   kindCmd+=" --image kindest/node:${k8s_version}"
