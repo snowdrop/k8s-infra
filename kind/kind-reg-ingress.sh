@@ -13,6 +13,7 @@ set -o errexit
 # Sep 14th 2022:
 # - Bump version to k8s 1.25
 # - Switch docker API from v1 to v2 (see https://github.com/snowdrop/k8s-infra/issues/270)
+# - Use jq to get the version of the client returned by "kubectl version"
 #
 # July 1st 2022:
 # - Test if kind, kubectl, helm are installed with needed versions
@@ -59,7 +60,7 @@ if [[ ${HELM_VERSION} < "v3.0.0" ]]; then
   exit 1
 fi
 
-KUBE_CLIENT_VERSION=$(kubectl version --client --short 2> /dev/null | awk '{print $3}' | cut -d. -f2) || true
+KUBE_CLIENT_VERSION=$(kubectl version -o json 2> /dev/null | jq -r '.clientVersion.gitVersion' | cut -d. -f2) || true
 if [[ ${KUBE_CLIENT_VERSION} -lt 14 ]]; then
   echo "Please update kubectl to 1.15 or higher"
   exit 1
