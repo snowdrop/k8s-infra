@@ -120,7 +120,7 @@ fi
 if [ ${version} == "latest" ]; then
   kindCmd+=""
 else
-  kind_image_sha=$(wget -s https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/images.json -O - | \
+  kind_image_sha=$(wget -q https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/images.json -O - | \
   jq -r '.[] | select(.k8s == "1.18").sha')
   kindCmd+=" --image ${kind_image_sha}"
 fi
