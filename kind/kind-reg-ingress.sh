@@ -122,7 +122,7 @@ if [ ${version} == "latest" ]; then
 else
   kind_image_sha=$(wget -s https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/images.json -O - | \
   jq -r '.[] | select(.k8s == "1.18").sha')
-  kindCmd+=" --image ${kind_image_sha}"
+  kindCmd+=""
 fi
 
 echo "Creating a Kind cluster with Kubernetes version : ${k8s_version} and logging verbosity: ${logging_verbosity}"
