@@ -118,11 +118,11 @@ if [ "$cluster_delete" == "y" ]; then
 fi
 
 if [ ${version} == "latest" ]; then
-  kindCmd+=" --image kindest/node:latest"
+  kindCmd+=""
 else
   kind_image_sha=$(wget -s https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/images.json -O - | \
   jq -r '.[] | select(.k8s == "1.18").sha')
-  kindCmd+=""
+  kindCmd+=" --image ${kind_image_sha}"
 fi
 
 echo "Creating a Kind cluster using kindest/node: ${version} and logging verbosity: ${logging_verbosity}"
