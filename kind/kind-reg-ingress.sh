@@ -125,7 +125,7 @@ else
   kindCmd+=""
 fi
 
-echo "Creating a Kind cluster with Kubernetes version : ${k8s_version} and logging verbosity: ${logging_verbosity}"
+echo "Creating a Kind cluster using kindest/node: ${version} and logging verbosity: ${logging_verbosity}"
 echo "${kindCfg}" | ${kindCmd} --config=-
 
 # Start a local Docker registry (unless it already exists)
