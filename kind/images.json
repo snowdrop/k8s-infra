@@ -1,0 +1,42 @@
+[
+  {
+    "k8s": "1.25",
+    "version": "1.25.0",
+    "sha": "kindest/node:v1.25.0@sha256:428aaa17ec82ccde0131cb2d1ca6547d13cf5fdabcc0bbecf749baa935387cbf"
+  },
+  {
+    "k8s": "1.24",
+    "version": "1.24.4",
+    "sha": "kindest/node:v1.24.4@sha256:adfaebada924a26c2c9308edd53c6e33b3d4e453782c0063dc0028bdebaddf98"
+  },
+  {
+    "k8s": "1.23",
+    "version": "1.23.10",
+    "sha": "kindest/node:v1.23.10@sha256:f047448af6a656fae7bc909e2fab360c18c487ef3edc93f06d78cdfd864b2d12"
+  },
+  {
+    "k8s": "1.22",
+    "version": "1.22.13",
+    "sha": "kindest/node:v1.22.13@sha256:4904eda4d6e64b402169797805b8ec01f50133960ad6c19af45173a27eadf959"
+  },
+  {
+    "k8s": "1.21",
+    "version": "1.21.14",
+    "sha": "kindest/node:v1.21.14@sha256:f9b4d3d1112f24a7254d2ee296f177f628f9b4c1b32f0006567af11b91c1f301"
+  },
+  {
+    "k8s": "1.20",
+    "version": "1.20.15",
+    "sha": "kindest/node:v1.20.15@sha256:d67de8f84143adebe80a07672f370365ec7d23f93dc86866f0e29fa29ce026fe"
+  },
+  {
+    "k8s": "1.19",
+    "version": "1.19.16",
+    "sha": "kindest/node:v1.19.16@sha256:707469aac7e6805e52c3bde2a8a8050ce2b15decff60db6c5077ba9975d28b98"
+  },
+  {
+    "k8s": "1.18",
+    "version": "v1.18.20",
+    "sha": "kindest/node:v1.18.20@sha256:61c9e1698c1cb19c3b1d8151a9135b379657aee23c59bde4a8d87923fcb43a91"
+  }
+]
