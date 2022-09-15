@@ -10,6 +10,10 @@ set -o errexit
 #
 # Add hereafter changes done post creation date as backlog
 #
+# Sep 15th 2022:
+#  - Switched to use the images.json file containing the sha of the kindest/node images supported by kind for the different k8s distro
+#  - Review the logic to use as default the latest image
+# 
 # Sep 14th 2022:
 # - Bump version to k8s 1.25
 # - Switch docker API from v1 to v2 (see https://github.com/snowdrop/k8s-infra/issues/270)
@@ -24,7 +28,7 @@ set -o errexit
 #
 # June 2nd: 
 # - Bump version of k8s to 1.21. Check then locally that you have installed kind 0.11
-# - Fix k8s_minor_version from 1.20 to 1.21 
+# - Fix k8s_minor_version from 1.20 to 1.21
 # - Add 2 external NodePort: 30000, 31000 which could be used instead using K8s Service instead of Ingress
 #
 # Aug 20
@@ -68,8 +72,8 @@ fi
 
 read -p "Do you want to delete the kind cluster (y|n) - Default: no ? " cluster_delete
 cluster_delete=${cluster_delete:-n}
-read -p "Which kubernetes version should we install (1.18 .. 1.25) - Default: 1.24 ? " version
-k8s_minor_version=${version:-1.24}
+read -p "Which kubernetes version should we install (1.18 .. 1.25) - Default: latest ? " version
+version=${version:-latest}
 read -p "What logging verbosity do you want (0..9) - A verbosity setting of 0 logs only critical events - Default: 0 ? " logging_verbosity
 logging_verbosity=${logging_verbosity:-0}
 
@@ -113,19 +117,12 @@ if [ "$cluster_delete" == "y" ]; then
   kind delete cluster
 fi
 
-# Create a kind cluster
-# - Configures containerd to use the local Docker registry
-# - Enables Ingress on ports 80 and 443
-if [ "$k8s_minor_version" != "default" ]; then
-  token=$(curl -s "https://auth.docker.io/token?service=registry.docker.io&scope=repository:kindest/node:pull" | jq -r '.token')
-  patch_version=$(curl -H "Authorization: Bearer $token" -s "https://registry-1.docker.io/v2/kindest/node/tags/list" | \
-  jq -r '.tags[]' | \
-  grep -E "^v${k8s_minor_version}.[0-9]+$" | \
-  cut -d. -f3 | sort -rn | head -1)
-  k8s_version="v${k8s_minor_version}.${patch_version}"
-  kindCmd+=" --image kindest/node:${k8s_version}"
+if [ ${version} == "latest" ]; then
+  kindCmd+=" --image kindest/node:latest"
 else
-  k8s_version=$k8s_minor_version
+  kind_image_sha=$(wget -s https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/images.json -O - | \
+  jq -r '.[] | select(.k8s == "1.18").sha')
+  kindCmd+=" --image ${kind_image_sha}"
 fi
 
 echo "Creating a Kind cluster with Kubernetes version : ${k8s_version} and logging verbosity: ${logging_verbosity}"
