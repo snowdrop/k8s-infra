@@ -117,6 +117,7 @@ if [ "$cluster_delete" == "y" ]; then
   kind delete cluster
 fi
 
+echo "=== Get the tag version of the image to be installed for the kubernetes version: ${version} ..."
 if [ ${version} == "latest" ]; then
   kindCmd+=""
 else
