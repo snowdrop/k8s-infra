@@ -207,9 +207,11 @@ nodes:
   - containerPort: 80
     hostPort: 80
     protocol: TCP
+    listenAddress: "0.0.0.0"
   - containerPort: 443
     hostPort: 443
     protocol: TCP
+    listenAddress: "0.0.0.0"
   - containerPort: 30000
     hostPort: 30000
     protocol: tcp
