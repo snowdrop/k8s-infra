@@ -20,7 +20,12 @@ set -o errexit
 #
 # Ovt 19th 2022:
 #  - Backport here changed done on kind-reg-ingress script
-#
+#  - Add alias k=kubectl
+#  - Remove '' around EOF as var was not extrapolated
+#  - Use a relative path _tmp directory
+
+shopt -s expand_aliases
+alias k='kubectl'
 
 reg_name='kind-registry'
 reg_server='localhost'
@@ -61,7 +66,12 @@ fi
 
 
 current_dir=$(pwd)
-temp_cert_dir=$(mktemp -d 2>/dev/null || mktemp -d -t 'temp_cert_dir')
+#temp_cert_dir=$(mktemp -d 2>/dev/null || mktemp -d -t 'temp_cert_dir')
+temp_cert_dir="_tmp"
+
+if [ -d ${temp_cert_dir} ];then
+  mkdir -p _tmp
+fi
 
 echo ""
 echo "Welcome to our"
@@ -97,7 +107,7 @@ logging_verbosity=${logging_verbosity:-0}
 kindCmd="kind -v ${logging_verbosity} create cluster"
 
 create_openssl_cfg() {
-CFG=$(cat <<'EOF'
+CFG=$(cat <<EOF
 [req]
 distinguished_name = subject
 x509_extensions    = x509_ext
