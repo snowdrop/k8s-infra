@@ -99,6 +99,8 @@ read -p "IP address of the VM running docker - Default: 127.0.0.1 ? " VM_IP
 VM_IP=${VM_IP:-127.0.1}
 read -p "Do you want to delete the kind cluster (y|n) - Default: y ? " cluster_delete
 cluster_delete=${cluster_delete:-y}
+read -p "Do you want install ingress nginx (y|n) - Default: y ? " install_ingress
+install_ingress=${install_ingress:-y}
 read -p "Which kubernetes version should we install (1.18 .. 1.25) - Default: latest ? " version
 version=${version:-latest}
 read -p "What logging verbosity do you want to use with kind (0..9) - A verbosity setting of 0 logs only critical events - Default: 0 ? " logging_verbosity
@@ -133,7 +135,7 @@ subjectAltName          = @alt_names
 DNS.1 = kind-registry
 DNS.2 = localhost
 DNS.3 = registry.local
-DNS.4 = ${VM_IP}.nip.io
+DNS.4 = ${VM_IP}.sslip.io
 EOF
 )
 echo "$CFG"
@@ -184,8 +186,8 @@ containerdConfigPatches:
 - |-
   [plugins."io.containerd.grpc.v1.cri".registry.mirrors."registry.local:${reg_port}"]
     endpoint = ["https://registry.local:${reg_port}"]
-  [plugins."io.containerd.grpc.v1.cri".registry.mirrors."${VM_IP}.nip.io:${reg_port}"]
-    endpoint = ["https://${VM_IP}.nip.io:${reg_port}"]
+  [plugins."io.containerd.grpc.v1.cri".registry.mirrors."${VM_IP}.sslip.io:${reg_port}"]
+    endpoint = ["https://${VM_IP}.sslip.io:${reg_port}"]
   [plugins."io.containerd.grpc.v1.cri".registry.configs."registry.local:${reg_port}".tls]
     cert_file = "/etc/docker/certs.d/${reg_server}/client.crt"
     key_file  = "/etc/docker/certs.d/${reg_server}/client.key"
@@ -283,17 +285,18 @@ while IFS= read -r container; do
 done <<< "$containers"
 
 echo "Copy the client.crt to the docker cert.d folder"
-sudo mkdir -p /etc/docker/certs.d/${VM_IP}.nip.io:5000
-sudo cp $certfile /etc/docker/certs.d/${VM_IP}.nip.io:5000/ca.crt
+sudo mkdir -p /etc/docker/certs.d/${VM_IP}.sslip.io:5000
+sudo cp $certfile /etc/docker/certs.d/${VM_IP}.sslip.io:5000/ca.crt
 sudo service docker restart
 
 echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 echo "Log on to the docker registry using the address and user/password"
-echo "docker login ${VM_IP}.nip.io:5000 -u admin -p snowdrop"
+echo "docker login ${VM_IP}.sslip.io:5000 -u admin -p snowdrop"
 echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 
 popd
 
+if [ "install_ingress" == "y" ]; then
 #
 # Install the ingress nginx controller using helm
 # Set the Service type as: NodePort (needed for kind)
@@ -309,6 +312,8 @@ echo "###############################################"
 echo "To test ingress, execute the following commands:"
 echo "kubectl create deployment demo --image=httpd --port=80; kubectl expose deployment demo"
 echo "kubectl create ingress demo --class=nginx \\"
-echo "   --rule=\"demo.<VM_IP>.sslip.io/*=demo:80\""
-echo "curl http://demo.<VM_IP>.sslip.io"
+echo "   --rule=\"demo.${VM_IP}.sslip.io/*=demo:80\""
+echo "curl http://demo.${VM_IP}.sslip.io"
 echo "<html><body><h1>It works!</h1></body></html>"
+
+fi
