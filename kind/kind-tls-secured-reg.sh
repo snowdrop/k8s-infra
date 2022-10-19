@@ -18,12 +18,47 @@ set -o errexit
 #
 # Add hereafter changes done post creation date as backlog
 #
-# MMMM dd:
+# Ovt 19th 2022:
+#  - Backport here changed done on kind-reg-ingress script
+#
 
 reg_name='kind-registry'
 reg_server='localhost'
 reg_port='5000'
 reg_image_version='2.6.2'
+
+if ! command -v kind &> /dev/null; then
+  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo "kind is not installed"
+  echo "Use a package manager (i.e 'brew install kind') or visit the official site https://kind.sigs.k8s.io"
+  exit 1
+fi
+
+if ! command -v kubectl &> /dev/null; then
+  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo "Please install kubectl 1.15 or higher"
+  exit 1
+fi
+
+if ! command -v helm &> /dev/null; then
+    echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    echo "Helm could not be found. To get helm: https://helm.sh/docs/intro/install/"
+    echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    exit 1
+fi
+
+HELM_VERSION=$(helm version 2>&1 | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+') || true
+if [[ ${HELM_VERSION} < "v3.0.0" ]]; then
+  echo "Please upgrade helm to v3.0.0 or higher"
+  exit 1
+fi
+
+KUBE_CLIENT_VERSION=$(kubectl version -o json 2> /dev/null | jq -r '.clientVersion.gitVersion' | cut -d. -f2) || true
+if [[ ${KUBE_CLIENT_VERSION} -lt 14 ]]; then
+  echo "Please update kubectl to 1.15 or higher"
+  exit 1
+fi
+
 
 current_dir=$(pwd)
 temp_cert_dir=$(mktemp -d 2>/dev/null || mktemp -d -t 'temp_cert_dir')
@@ -50,10 +85,12 @@ echo "- Deploying an ingress controller"
 echo "- Copying the generated certificate here: $HOME/local-registry.crt"
 echo ""
 
+read -p "IP address of the VM running docker - Default: 127.0.0.1 ? " VM_IP
+VM_IP=${VM_IP:-127.0.1}
 read -p "Do you want to delete the kind cluster (y|n) - Default: y ? " cluster_delete
 cluster_delete=${cluster_delete:-y}
-read -p "Which kubernetes version should we install (1.14 .. 1.21 (= default) .. 1.22) - Default: default ? " version
-k8s_minor_version=${version:-default}
+read -p "Which kubernetes version should we install (1.18 .. 1.25) - Default: latest ? " version
+version=${version:-latest}
 read -p "What logging verbosity do you want to use with kind (0..9) - A verbosity setting of 0 logs only critical events - Default: 0 ? " logging_verbosity
 logging_verbosity=${logging_verbosity:-0}
 
@@ -86,6 +123,7 @@ subjectAltName          = @alt_names
 DNS.1 = kind-registry
 DNS.2 = localhost
 DNS.3 = registry.local
+DNS.4 = ${VM_IP.nip.io
 EOF
 )
 echo "$CFG"
@@ -102,15 +140,13 @@ if [ "$cluster_delete" == "y" ]; then
   docker network rm kind || true
 fi
 
-echo "=== Get the tag version of the image to be installed for the kubernetes version: ${k8s_minor_version}  ..."
-if [ "$k8s_minor_version" != "default" ]; then
-  patch_version=$(wget -q https://registry.hub.docker.com/v1/repositories/kindest/node/tags -O - | \
-  jq -r '.[].name' | grep -E "^v${k8s_minor_version}.[0-9]+$" | \
-  cut -d. -f3 | sort -rn | head -1)
-  k8s_version="v${k8s_minor_version}.${patch_version}"
-  kindCmd+=" --image kindest/node:${k8s_version}"
+echo "=== Get the tag version of the image to be installed for the kubernetes version: ${version} ..."
+if [ ${version} == "latest" ]; then
+  kindCmd+=""
 else
-  k8s_version=$k8s_minor_version
+  kind_image_sha=$(wget -q https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/images.json -O - | \
+  jq -r --arg VERSION "$version" '.[] | select(.k8s == $VERSION).sha')
+  kindCmd+=" --image ${kind_image_sha}"
 fi
 
 # Generate the Self signed certificate using openssl
@@ -138,11 +174,20 @@ containerdConfigPatches:
 - |-
   [plugins."io.containerd.grpc.v1.cri".registry.mirrors."registry.local:${reg_port}"]
     endpoint = ["https://registry.local:${reg_port}"]
+  [plugins."io.containerd.grpc.v1.cri".registry.mirrors."${VM_IP}.nip.io:${reg_port}"]
+    endpoint = ["https://${VM_IP}.nip.io:${reg_port}"]
   [plugins."io.containerd.grpc.v1.cri".registry.configs."registry.local:${reg_port}".tls]
     cert_file = "/etc/docker/certs.d/${reg_server}/client.crt"
     key_file  = "/etc/docker/certs.d/${reg_server}/client.key"
 nodes:
 - role: control-plane
+  kubeadmConfigPatches:
+  - |
+    kind: InitConfiguration
+    nodeRegistration:
+      kubeletExtraArgs:
+        node-labels: "ingress-ready=true"
+        authorization-mode: "AlwaysAllow"
   extraMounts:
     - containerPath: /etc/docker/certs.d/${reg_server}
       hostPath: $(pwd)/certs/${reg_server}
@@ -233,7 +278,21 @@ cp ${certfile} $HOME/local-registry.crt
 
 popd
 
-# Deploy the nginx Ingress controller on k8s >= 1.19
-echo "==== Deploy the nginx Ingress controller"
-VERSION=$(curl https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/stable.txt)
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/${VERSION}/deploy/static/provider/kind/deploy.yaml
+#
+# Install the ingress nginx controller using helm
+# Set the Service type as: NodePort (needed for kind)
+#
+echo "Installing the ingress controller using Helm within the namespace: ingress"
+helm upgrade --install ingress-nginx ingress-nginx \
+  --repo https://kubernetes.github.io/ingress-nginx \
+  --namespace ingress --create-namespace \
+  --set controller.service.type=NodePort \
+  --set controller.hostPort.enabled=true
+
+echo "###############################################"
+echo "To test ingress, execute the following commands:"
+echo "kubectl create deployment demo --image=httpd --port=80; kubectl expose deployment demo"
+echo "kubectl create ingress demo --class=nginx \\"
+echo "   --rule=\"demo.<VM_IP>.sslip.io/*=demo:80\""
+echo "curl http://demo.<VM_IP>.sslip.io"
+echo "<html><body><h1>It works!</h1></body></html>"
