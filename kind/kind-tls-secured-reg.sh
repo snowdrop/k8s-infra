@@ -282,9 +282,13 @@ while IFS= read -r container; do
   docker exec "$container" systemctl restart containerd
 done <<< "$containers"
 
-# Copy the client.cert to $HOME directory
-echo "==== Copy the client.cert generated for the docker registry to $HOME/local-registry.crt"
-cp ${certfile} $HOME/local-registry.crt
+# Copy the client.crt to the docker cert.d folder
+sudo mkdir -p /etc/docker/certs.d/${VM_IP}.nip.io:5000
+sudo cp _tmp/certs/localhost/client.crt /etc/docker/certs.d/${VM_IP}.nip.io:5000/ca.crt
+sudo service docker restart
+
+echo "Log on to the docker registry using the address and user/password"
+echo "docker login ${VM_IP}.nip.io:5000 -u admin -p snowdrop"
 
 popd
 
