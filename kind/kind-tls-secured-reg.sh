@@ -123,7 +123,7 @@ subjectAltName          = @alt_names
 DNS.1 = kind-registry
 DNS.2 = localhost
 DNS.3 = registry.local
-DNS.4 = ${VM_IP.nip.io
+DNS.4 = ${VM_IP}.nip.io
 EOF
 )
 echo "$CFG"
