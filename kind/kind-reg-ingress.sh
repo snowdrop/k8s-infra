@@ -12,6 +12,7 @@ set -o errexit
 #
 # Nov 16th 2022:
 # - Adding the parameter watchIngressWithoutClass to the helm chart to avoid to have to define the ingressClassName which is mandatory
+# - Support to pass arguments "./kind-reg-ingress.sh y latest 0" if we do not want to use user input
 #
 # Sep 15th 2022:
 #  - Switched to use the images.json file containing the sha of the kindest/node images supported by kind for the different k8s distro
@@ -73,12 +74,26 @@ if [[ ${KUBE_CLIENT_VERSION} -lt 14 ]]; then
   exit 1
 fi
 
-read -p "Do you want to delete the kind cluster (y|n) - Default: no ? " cluster_delete
-cluster_delete=${cluster_delete:-n}
-read -p "Which kubernetes version should we install (1.18 .. 1.25) - Default: latest ? " version
-version=${version:-latest}
-read -p "What logging verbosity do you want (0..9) - A verbosity setting of 0 logs only critical events - Default: 0 ? " logging_verbosity
-logging_verbosity=${logging_verbosity:-0}
+if [[ "$1" = "y" ||  "$1" = "yes" ]]; then
+  cluster_delete=$1
+else
+  read -p "Do you want to delete the kind cluster (y|n) - Default: no ? " cluster_delete
+  cluster_delete=${cluster_delete:-n}
+fi
+
+if [[ "$2" != "" ]]; then
+  version=$2
+else
+  read -p "Which kubernetes version should we install (1.18 .. 1.25) - Default: latest ? " version
+  version=${version:-latest}
+fi
+
+if [[ "$2" != "" ]]; then
+  logging_verbosity=$3
+else
+  read -p "What logging verbosity do you want (0..9) - A verbosity setting of 0 logs only critical events - Default: 0 ? " logging_verbosity
+  logging_verbosity=${logging_verbosity:-0}
+fi
 
 kindCmd="kind -v ${logging_verbosity} create cluster"
 
