@@ -10,6 +10,9 @@ set -o errexit
 #
 # Add hereafter changes done post creation date as backlog
 #
+# Nov 16th 2022:
+# - Adding the parameter watchIngressWithoutClass to the helm chart to avoid to have to define the ingressClassName which is mandatory
+#
 # Sep 15th 2022:
 #  - Switched to use the images.json file containing the sha of the kindest/node images supported by kind for the different k8s distro
 #  - Review the logic to use as default the latest image
@@ -163,14 +166,15 @@ helm upgrade --install ingress-nginx ingress-nginx \
   --repo https://kubernetes.github.io/ingress-nginx \
   --namespace ingress --create-namespace \
   --set controller.service.type=NodePort \
-  --set controller.hostPort.enabled=true
+  --set controller.hostPort.enabled=true \
+  --set controller.watchIngressWithoutClass=true
 
 echo "###############################################"
 echo "To test ingress, execute the following commands:"
 echo "kubectl create deployment demo --image=httpd --port=80; kubectl expose deployment demo"
 echo "kubectl create ingress demo --class=nginx \\"
-echo "   --rule=\"demo.<VM_IP>.sslip.io/*=demo:80\""
-echo "curl http://demo.<VM_IP>.sslip.io"
+echo "   --rule=\"demo.<VM_IP>.nip.io/*=demo:80\""
+echo "curl http://demo.<VM_IP>.nip.io"
 echo "<html><body><h1>It works!</h1></body></html>"
 
 
