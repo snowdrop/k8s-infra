@@ -10,6 +10,10 @@ set -o errexit
 #
 # Add hereafter changes done post creation date as backlog
 #
+# Dec 8th 2022:
+#
+# - Add a new parameter api_server_ip to configure the API IP address listening to
+#
 # Nov 16th 2022:
 # - Adding the parameter watchIngressWithoutClass to the helm chart to avoid to have to define the ingressClassName which is mandatory
 # - Support to pass arguments "./kind-reg-ingress.sh y latest 0" if we do not want to use user input
@@ -88,11 +92,18 @@ else
   version=${version:-latest}
 fi
 
-if [[ "$2" != "" ]]; then
+if [[ "$3" != "" ]]; then
   logging_verbosity=$3
 else
   read -p "What logging verbosity do you want (0..9) - A verbosity setting of 0 logs only critical events - Default: 0 ? " logging_verbosity
   logging_verbosity=${logging_verbosity:-0}
+fi
+
+if [[ "$4" != "" ]]; then
+  api_server_ip=$4
+else
+  read -p "What should be the IP address to be used - Default: 127.0.0.1 ? " api_server_ip
+  api_server_ip=${api_server_ip:-127.0.0.1}
 fi
 
 kindCmd="kind -v ${logging_verbosity} create cluster"
@@ -101,6 +112,8 @@ kindCmd="kind -v ${logging_verbosity} create cluster"
 kindCfg=$(cat <<EOF
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
+networking:
+  apiServerAddress: "${api_server_ip}"
 containerdConfigPatches:
 - |-
   [plugins."io.containerd.grpc.v1.cri".registry.mirrors."localhost:${reg_port}"]
@@ -113,7 +126,7 @@ nodes:
     nodeRegistration:
       kubeletExtraArgs:
         node-labels: "ingress-ready=true"
-        authorization-mode: "AlwaysAllow"
+        authorization-mode: "AlwaysAllow"""
   extraPortMappings:
   - containerPort: 80
     hostPort: 80
