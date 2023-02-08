@@ -163,15 +163,23 @@ kubectl apply -f https://github.com/knative/serving/releases/download/knative-v$
 
 echo "Install the core components of Knative Serving"
 kubectl apply -f https://github.com/knative/serving/releases/download/knative-v${knative_version}/serving-core.yaml
+kubectl -n knative-serving rollout status deployment activator
+kubectl -n knative-serving rollout status deployment autoscaler
+kubectl -n knative-serving rollout status deployment controller
+kubectl -n knative-serving rollout status deployment domain-mapping
+kubectl -n knative-serving rollout status deployment domainmapping-webhook
+kubectl -n knative-serving rollout status deployment webhook
 
 echo "Install the Knative Kourier controller"
 kubectl apply -f https://github.com/knative/net-kourier/releases/download/knative-v${knative_version}/kourier.yaml
+kubectl -n knative-serving rollout status deployment net-kourier-controller
+kubectl -n kourier-system rollout status deployment 3scale-kourier-gateway
 
 echo "Configure Knative Serving to use Kourier by default"
 kubectl patch configmap/config-network \
   -n knative-serving \
   --type merge \
-  -p '{"data":{"ingress.class":"kourier.ingress.networking.knative.dev"}}'
+  -p '{"data":{"ingress-class":"kourier.ingress.networking.knative.dev"}}'
 
 echo "Configure the Knative domain to: $SERVER_IP.nip.io"
 KNATIVE_DOMAIN="${SERVER_IP}.nip.io"
@@ -184,11 +192,27 @@ kubectl patch -n kourier-system svc kourier --type='json' -p='[{"op": "replace",
 kubectl patch -n kourier-system svc kourier --type='json' -p='[{"op": "replace", "path": "/spec/ports/1/nodePort", "value": 31443}]'
 kubectl patch -n kourier-system svc kourier --type='json' -p='[{"op": "replace", "path": "/spec/type", "value": "NodePort"}]'
 
-echo "To test, execute the following commands: "
-knCmd="kn service create hello \
-  --image gcr.io/knative-samples/helloworld-go \
-  --port 8080 \
-  --env TARGET=Knative"
+echo "####### TO TEST ########"
+echo "Execute the following commands: "
+knCmd="cat <<-EOF | kubectl apply -f -
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: hello
+spec:
+  template:
+    spec:
+      containers:
+      - image: gcr.io/knative-samples/helloworld-go
+        env:
+        - name: TARGET
+          value: Go Hello example
+EOF"
 
 echo "$knCmd"
+echo "Then wait till the pods are created before to curl it: http://hello.default.${SERVER_IP}.nip.io"
+echo "Sometimes the revision hangs as deployment has been modified, then do"
+echo "kubectl scale --replicas=0 deployment/hello-00001-deployment"
+echo "kubectl scale --replicas=1 deployment/hello-00001-deployment"
+
 
