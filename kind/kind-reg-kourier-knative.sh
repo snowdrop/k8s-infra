@@ -169,15 +169,17 @@ kubectl apply -f https://github.com/knative/net-kourier/releases/download/knativ
 
 echo "Configure Knative Serving to use Kourier by default"
 kubectl patch configmap/config-network \
-  --namespace knative-serving \
+  -n knative-serving \
   --type merge \
-  --patch '{"data":{"ingress-class":"kourier.ingress.networking.knative.dev"}}'
+  -p '{"data":{"ingress.class":"kourier.ingress.networking.knative.dev"}}'
 
-echo "Configure the Knative domain to use: $SERVER_IP.nip.io"
+echo "Configure the Knative domain to: $SERVER_IP.nip.io"
 KNATIVE_DOMAIN="${SERVER_IP}.nip.io"
-kubectl patch configmap -n knative-serving config-domain -p "{\"data\": {\"$KNATIVE_DOMAIN\": \"\"}}"
+kubectl patch configmap/config-domain \
+  -n knative-serving \
+  -p "{\"data\": {\"$KNATIVE_DOMAIN\": \"\"}}"
 
-echo "Patching the kourier service to use the nodePort 31080 and type: nodePort"
+echo "Patching the kourier service to use the nodePort 31080 and type nodePort"
 kubectl patch -n kourier-system svc kourier --type='json' -p='[{"op": "replace", "path": "/spec/ports/0/nodePort", "value": 31080}]'
 kubectl patch -n kourier-system svc kourier --type='json' -p='[{"op": "replace", "path": "/spec/ports/1/nodePort", "value": 31443}]'
 kubectl patch -n kourier-system svc kourier --type='json' -p='[{"op": "replace", "path": "/spec/type", "value": "NodePort"}]'
