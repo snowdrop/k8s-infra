@@ -24,7 +24,7 @@
         var_name: "kube_config"
         var_value: "{{ k8s_config }}"
 
-    - name: "Add k8s dashboard tokento the passwordstore"
+    - name: "Add k8s dashboard token to the passwordstore"
       include_role:
         name: "passstore/ansible_inventory"
         tasks_from: "add_variable"
