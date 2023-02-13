@@ -13,32 +13,27 @@
         name: 'k8s_dashboard'
       vars:
         - remove: true
-      tags: [k8s_dashboard]
 
     - name: "Execute Ingress Controller uninstall role"
       import_role:
         name: 'ingress'
       vars:
         - remove: true
-      tags: [ingress]
 
     - name: "Execute k8s_cluster uninstall role"
       import_role:
         name: 'k8s_cluster'
       vars:
         - remove: true
-      tags: [always,k8s_cluster]
 
     - name: "Execute docker uninstall role"
       import_role:
         name: 'docker'
       vars:
         state: 'absent'
-      tags: [docker]
 
     - name: "Execute containerd uninstall role"
       import_role:
         name: 'containerd'
       vars:
         state: 'absent'
-      tags: [containerd]
