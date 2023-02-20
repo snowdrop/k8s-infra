@@ -10,6 +10,10 @@ set -o errexit
 #
 # Add hereafter changes done post creation date as backlog
 #
+# Feb 20th 2023:
+#
+# - Adding a new parameter to set the name of the cluster
+#
 # Dec 8th 2022:
 #
 # - Add a new parameter api_server_ip to configure the API IP address listening to
@@ -93,20 +97,27 @@ else
 fi
 
 if [[ "$3" != "" ]]; then
-  logging_verbosity=$3
+  cluster_name=$3
+else
+  read -p "Cluster name - Default: kind ? " cluster_name
+  cluster_name=${cluster_name:-kind}
+fi
+
+if [[ "$4" != "" ]]; then
+  logging_verbosity=$4
 else
   read -p "What logging verbosity do you want (0..9) - A verbosity setting of 0 logs only critical events - Default: 0 ? " logging_verbosity
   logging_verbosity=${logging_verbosity:-0}
 fi
 
-if [[ "$4" != "" ]]; then
-  api_server_ip=$4
+if [[ "$5" != "" ]]; then
+  api_server_ip=$5
 else
   read -p "What should be the IP address to be used - Default: 127.0.0.1 ? " api_server_ip
   api_server_ip=${api_server_ip:-127.0.0.1}
 fi
 
-kindCmd="kind -v ${logging_verbosity} create cluster"
+kindCmd="kind -v ${logging_verbosity} create cluster -n ${cluster_name}"
 
 # Kind cluster config template
 kindCfg=$(cat <<EOF
@@ -145,7 +156,7 @@ EOF
 
 if [ "$cluster_delete" == "y" ]; then
   echo "Deleting kind cluster ..."
-  kind delete cluster
+  kind delete cluster -n ${cluster_name}
 fi
 
 echo "=== Get the tag version of the image to be installed for the kubernetes version: ${version} ..."
