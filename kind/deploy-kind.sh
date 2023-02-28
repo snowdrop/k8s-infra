@@ -16,8 +16,63 @@
 set -o errexit
 
 log_message() {
-  if [ "${LOGGING_VERBOSITY}" -ge "$1" ]; then
-    echo "$2"
+    if [ "${LOGGING_VERBOSITY}" -ge "$1" ]; then
+        echo "$2"
+    fi
+}
+
+show_usage() {
+    log_message "0" "Usage: "
+    log_message "0" "  ./deploy.sh [parameters,...]"
+    log_message "0" ""
+    log_message "0" "Parameters: "
+    log_message "0" "  --help: This help message"
+    log_message "0" ""
+    log_message "0" "  --cluster-name <name>                 Name of the cluster. Default: kind"
+    log_message "0" "  --delete-kind-cluster                 Deletes the Kind cluster prior to creating a new one."
+    log_message "0" "  --ingress [nginx,knative]             Ingress to be deployed. One of nginx,knative. Default: nginx"
+    log_message "0" "  --knative-version <version>           KNative version to be used. Default: 1.9.0"
+    log_message "0" "  --kubernetes-version <version>        Kubernetes version to be install"
+    log_message "0" "                                        Default: latest"
+    log_message "0" "  --registry-image-version <version>    Version of the registry container to be used. Default: 2.6.2"
+    log_message "0" "  --registry-port <port>                Port to publish the registry. Default: 5000"
+    log_message "0" "  --server-ip <ip-address>              IP address to be used. Default: 127.0.0.1"
+    log_message "0" "  --verbosity <value>                   Logging verbosity (0..9)"
+    log_message "0" "                                        A verbosity setting of 0 logs only critical events."
+    log_message "0" "                                        Default: 0"
+}
+
+check_pre_requisites() {
+  if ! command -v kind &> /dev/null; then
+    log_message "0" "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    log_message "0" "kind is not installed"
+    log_message "0" "Use a package manager (i.e 'brew install kind') or visit the official site https://kind.sigs.k8s.io"
+    exit 1
+  fi
+
+  if ! command -v kubectl &> /dev/null; then
+    log_message "0" "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    log_message "0" "Please install kubectl 1.15 or higher"
+    exit 1
+  fi
+
+  if ! command -v helm &> /dev/null; then
+    log_message "0" "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    log_message "0" "Helm could not be found. To get helm: https://helm.sh/docs/intro/install/"
+    log_message "0" "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    exit 1
+  fi
+
+  HELM_VERSION=$(helm version 2>&1 | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+') || true
+  if [[ ${HELM_VERSION} < "v3.0.0" ]]; then
+    log_message "0" "Please upgrade helm to v3.0.0 or higher"
+    exit 1
+  fi
+
+  KUBE_CLIENT_VERSION=$(kubectl version -o json 2> /dev/null | jq -r '.clientVersion.gitVersion' | cut -d. -f2) || true
+  if [[ ${KUBE_CLIENT_VERSION} -lt 14 ]]; then
+    log_message "0" "Please update kubectl to 1.15 or higher"
+    exit 1
   fi
 }
 
@@ -54,7 +109,13 @@ EOF
 echo "$CFG"
 }
 
-deployIngressKnative() {
+delete_kind_cluster() {
+  log_message "5" "kindCfg: Deleting kind cluster ${CLUSTER_NAME}..."
+  kind delete cluster -n ${CLUSTER_NAME}
+  docker container rm kind-registry -f
+}
+
+deploy_ingress_knative() {
   log_message "1" "Deploying KNative Ingress"
   echo "Install the required custom resources of knative"
   kubectl apply -f https://github.com/knative/serving/releases/download/knative-v${KNATIVE_VERSION}/serving-crds.yaml
@@ -114,7 +175,7 @@ EOF"
   log_message "0" "kubectl scale --replicas=1 deployment/hello-00001-deployment"
 }
 
-deployIngressNginx() {
+deploy_ingress_nginx() {
   log_message "1" "Deploying nginx Ingress"
   #
   # Install the ingress nginx controller using helm
@@ -128,6 +189,58 @@ deployIngressNginx() {
     --set controller.hostPort.enabled=true \
     --set controller.watchIngressWithoutClass=true
 }
+
+##### /Functions
+
+###### Command Line Parser
+UNMANAGED_PARAMS=""
+CLUSTER_NAME="kind"
+DELETE_KIND_CLUSTER="n"
+INGRESS="nginx"
+KNATIVE_VERSION="1.9.0"
+KUBERNETES_VERSION="latest"
+LOGGING_VERBOSITY="0"
+REGISTRY_IMAGE_VERSION="2.6.2"
+REGISTRY_PORT="5000"
+SECURE_REGISTRY="n"
+SERVER_IP="127.0.0.1"
+SHOW_HELP="n"
+
+while [ $# -gt 0 ]; do
+  if [[ $1 == *"--"* ]];
+  then
+    param="${1/--/}";
+    case $1 in
+      --help) SHOW_HELP="y"; break 2 ;;
+      --cluster-name) CLUSTER_NAME="$2"; shift ;;
+      --delete-kind-cluster) DELETE_KIND_CLUSTER="y" ;;
+      --ingress) INGRESS="$2"; shift ;;
+      --knative-version) KNATIVE_VERSION="$2"; shift ;;
+      --kubernetes-version) KUBERNETES_VERSION="$2"; shift ;;
+      --registry-image-version) REGISTRY_IMAGE_VERSION="$2"; shift ;;
+      --registry-port) REGISTRY_PORT="$2"; shift ;;
+      --secure-registry) SECURE_REGISTRY="y" ;;
+      --server-ip) SERVER_IP="$2"; shift ;;
+      --verbosity) LOGGING_VERBOSITY="$2"; shift ;;
+      *) UNMANAGED_PARAMS="${UNMANAGED_PARAMS} $1 $2" ;;
+    esac;
+  #elif [[ $1 == "-D"* ]];
+  #then
+  #  UNMANAGED_PARAMS="${UNMANAGED_PARAMS} $1";
+  fi
+  shift
+done
+
+if [[ "$SHOW_HELP" == "y" ]]; then
+  show_usage
+  exit 0
+else
+  check_pre_requisites
+fi
+
+###### /Command Line Parser
+
+###### Execution
 
 kindCfgExtraMounts=""
 registry_name="${CLUSTER_NAME}-registry"
@@ -253,9 +366,7 @@ log_message "1" ""
 log_message "1" ""
 
 if [ "$DELETE_KIND_CLUSTER" == "y" ]; then
-  log_message "5" "kindCfg: Deleting kind cluster ${CLUSTER_NAME}..."
-  kind delete cluster -n ${CLUSTER_NAME}
-  docker container rm kind-registry -f
+  delete_kind_cluster
 fi
 
 log_message "1" "=== Get the tag version of the image to be installed for the kubernetes version: ${KUBERNETES_VERSION} ..."
@@ -355,10 +466,9 @@ else
   docker network connect "kind" "${registry_name}" > /dev/null 2>&1 &
 fi
 
-
 log_message "1" "INGRESS: ${INGRESS}"
 if [ "${INGRESS}" == 'knative' ]; then
-  deployIngressKnative
+  deploy_ingress_knative
 elif [ "${INGRESS}" == 'nginx' ]; then
-  deployIngressNginx
+  deploy_ingress_nginx
 fi
