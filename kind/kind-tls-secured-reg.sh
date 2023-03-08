@@ -293,6 +293,8 @@ if [[ "$OSTYPE" != "darwin"* ]]; then
   sudo service docker restart
 fi
 
+echo "Certificate and keys generated are available: ${temp_cert_dir}"
+
 echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 echo "Log on to the docker registry using the address and user/password"
 echo "docker login ${VM_IP}.sslip.io:5000 -u admin -p snowdrop"
