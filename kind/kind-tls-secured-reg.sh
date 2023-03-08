@@ -23,6 +23,7 @@ set -o errexit
 #  - Skip the execution of the command "sudo service" on macos
 #  - Fix wrong default IP: 127.0.1 -> 127.0.0.1
 #  - Checking the var install_ingress to install ingress controller
+#  - Copy the certs folder to the directory $HOME/.kind-registry
 # Oct 19th 2022:
 #  - Backport here changed done on kind-reg-ingress script
 #  - Add alias k=kubectl
@@ -178,6 +179,13 @@ openssl req -x509 \
   -config req.cnf \
   -sha256
 
+if [ ! -d $HOME/.kind_registry ]; then
+  mkdir -p $HOME/.kind_registry
+fi
+
+cp -r ${temp_cert_dir}/certs $HOME/.kind_registry/certs
+echo "Certificate and keys generated are available: $HOME/.kind_registry/certs/${reg_server}"
+
 # Kind configuration
 kindCfg=$(cat <<EOF
 kind: Cluster
@@ -292,8 +300,6 @@ sudo cp $certfile /etc/docker/certs.d/${VM_IP}.sslip.io:5000/ca.crt
 if [[ "$OSTYPE" != "darwin"* ]]; then
   sudo service docker restart
 fi
-
-echo "Certificate and keys generated are available: ${temp_cert_dir}"
 
 echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 echo "Log on to the docker registry using the address and user/password"
