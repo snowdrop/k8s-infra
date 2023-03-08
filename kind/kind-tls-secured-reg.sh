@@ -18,7 +18,9 @@ set -o errexit
 #
 # Add hereafter changes done post creation date as backlog
 #
-# Ovt 19th 2022:
+# Feb 8th 2023:
+#  - Fix issue with tmpDir
+# Oct 19th 2022:
 #  - Backport here changed done on kind-reg-ingress script
 #  - Add alias k=kubectl
 #  - Remove '' around EOF as var was not extrapolated
@@ -66,12 +68,7 @@ fi
 
 
 current_dir=$(pwd)
-#temp_cert_dir=$(mktemp -d 2>/dev/null || mktemp -d -t 'temp_cert_dir')
-temp_cert_dir="_tmp"
-
-if [ -d ${temp_cert_dir} ];then
-  mkdir -p _tmp
-fi
+temp_cert_dir=$(mktemp -d 2>/dev/null || mktemp -d -t '_tmpdir')
 
 echo ""
 echo "Welcome to our"
