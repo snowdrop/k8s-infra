@@ -20,6 +20,9 @@ set -o errexit
 #
 # Feb 8th 2023:
 #  - Fix issue with tmpDir
+#  - Skip the execution of the command "sudo service" on macos
+#  - Fix wrong default IP: 127.0.1 -> 127.0.0.1
+#  - Checking the var install_ingress to install ingress controller
 # Oct 19th 2022:
 #  - Backport here changed done on kind-reg-ingress script
 #  - Add alias k=kubectl
@@ -93,7 +96,7 @@ echo "- Copying the generated certificate here: $HOME/local-registry.crt"
 echo ""
 
 read -p "IP address of the VM running docker - Default: 127.0.0.1 ? " VM_IP
-VM_IP=${VM_IP:-127.0.1}
+VM_IP=${VM_IP:-127.0.0.1}
 read -p "Do you want to delete the kind cluster (y|n) - Default: y ? " cluster_delete
 cluster_delete=${cluster_delete:-y}
 read -p "Do you want install ingress nginx (y|n) - Default: y ? " install_ingress
@@ -138,7 +141,7 @@ EOF
 echo "$CFG"
 }
 
-if [ "$cluster_delete" == "y" ]; then
+if [ "${cluster_delete}" == "y" ]; then
   echo "==== Deleting kind cluster ..."
   kind delete cluster
 
@@ -286,7 +289,9 @@ done <<< "$containers"
 echo "Copy the client.crt to the docker cert.d folder"
 sudo mkdir -p /etc/docker/certs.d/${VM_IP}.sslip.io:5000
 sudo cp $certfile /etc/docker/certs.d/${VM_IP}.sslip.io:5000/ca.crt
-sudo service docker restart
+if [[ "$OSTYPE" != "darwin"* ]]; then
+  sudo service docker restart
+fi
 
 echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 echo "Log on to the docker registry using the address and user/password"
@@ -295,7 +300,7 @@ echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 
 popd
 
-if [ "install_ingress" == "y" ]; then
+if [ "${install_ingress}" == "y" ]; then
 #
 # Install the ingress nginx controller using helm
 # Set the Service type as: NodePort (needed for kind)
