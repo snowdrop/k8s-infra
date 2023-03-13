@@ -21,59 +21,121 @@ log_message() {
     fi
 }
 
+print_logo() {
+  log_message "1" ""
+  log_message "1" "Welcome to our"
+  log_message "1" "                                                                   "
+  log_message "1" "   _____                                  _                        "
+  log_message "1" "  / ____|                                | |                       "
+  log_message "1" " | (___    _ __     ___   __      __   __| |  _ __    ___    _ __  "
+  log_message "1" "  \___ \  | '_ \   / _ \  \ \ /\ / /  / _  | |  __|  / _ \  | \ _ \ "
+  log_message "1" "  ____) | | | | | | (_) |  \ V  V /  | (_| | | |    | (_) | | |_) |"
+  log_message "1" " |_____/  |_| |_|  \___/    \_/\_/    \__,_| |_|     \___/  |  __/ "
+  log_message "1" "                                                            | |    "
+  log_message "1" "                                                            |_|    "
+  log_message "1" " Kind installation script"
+  log_message "1" ""
+  log_message "1" "- Deploying a local secured (using htpasswd) docker registry"
+  log_message "1" "- Generating a selfsigned certificate (using openssl) to expose the registry as a HTTP/HTTPS endpoint"
+  log_message "1" "- Setting a docker network between the containers: kind and registry and alias \"registry.local\""
+  log_message "1" "- Allowing to access the repository using as address \"registry.local:${REGISTRY_PORT}\" within a pod, from laptop or when a pod is created"
+  log_message "1" "- Exposing 2 additional NodePort: 30000 and 31000"
+  log_message "1" "- Deploying an ingress controller"
+  log_message "1" "- Copying the generated certificate here: $HOME/local-registry.crt"
+  log_message "1" ""
+  log_message "1" ""
+  log_message "5" "Variables used:"
+  log_message "5" ""
+  log_message "5" "CLUSTER_NAME: ${CLUSTER_NAME}"
+  log_message "5" "DELETE_KIND_CLUSTER: ${DELETE_KIND_CLUSTER}"
+  log_message "5" "INGRESS: ${INGRESS}"
+  log_message "5" "KNATIVE_VERSION: ${KNATIVE_VERSION}"
+  log_message "5" "KUBERNETES_VERSION: ${KUBERNETES_VERSION}"
+  log_message "5" "LOGGING_VERBOSITY: ${LOGGING_VERBOSITY}"
+  log_message "5" "REGISTRY_IMAGE_VERSION: ${REGISTRY_IMAGE_VERSION}"
+  log_message "5" "REGISTRY_PASSWORD: ${REGISTRY_PASSWORD}"
+  log_message "5" "REGISTRY_PORT: ${REGISTRY_PORT}"
+  log_message "5" "REGISTRY_USER: ${REGISTRY_USER}"
+  log_message "5" "SECURE_REGISTRY: ${SECURE_REGISTRY}"
+  log_message "5" "SERVER_IP: ${SERVER_IP}"
+  log_message "5" "SHOW_HELP: ${SHOW_HELP}"
+  log_message "5" "USE_EXISTING_CLUSTER: ${USE_EXISTING_CLUSTER}"
+}
+
 show_usage() {
+    log_message "0" ""
     log_message "0" "Usage: "
-    log_message "0" "  ./deploy.sh [parameters,...]"
+    log_message "0" "  ./deploy-kind.sh [parameters,...]"
     log_message "0" ""
-    log_message "0" "Parameters: "
-    log_message "0" "  --help: This help message"
+    log_message "0" "Required parameters: "
+    log_message "0" "  --ingress [nginx,kourier]           Ingress to be deployed. One of nginx,kourier."
     log_message "0" ""
-    log_message "0" "  --cluster-name <name>                 Name of the cluster. Default: kind"
-    log_message "0" "  --delete-kind-cluster                 Deletes the Kind cluster prior to creating a new one."
-    log_message "0" "  --ingress [nginx,knative]             Ingress to be deployed. One of nginx,knative. Default: nginx"
-    log_message "0" "  --knative-version <version>           KNative version to be used. Default: 1.9.0"
-    log_message "0" "  --kubernetes-version <version>        Kubernetes version to be install"
-    log_message "0" "                                        Default: latest"
-    log_message "0" "  --registry-image-version <version>    Version of the registry container to be used. Default: 2.6.2"
-    log_message "0" "  --registry-port <port>                Port to publish the registry. Default: 5000"
-    log_message "0" "  --server-ip <ip-address>              IP address to be used. Default: 127.0.0.1"
-    log_message "0" "  --verbosity <value>                   Logging verbosity (0..9)"
-    log_message "0" "                                        A verbosity setting of 0 logs only critical events."
-    log_message "0" "                                        Default: 0"
+    log_message "0" "Optional parameters: "
+    log_message "0" "  -h, --help:                         This help message"
+    log_message "0" ""
+    log_message "0" "  --cluster-name <name>               Name of the cluster. Default: kind"
+    log_message "0" "  --delete-kind-cluster               Deletes the Kind cluster prior to creating a new one. Default: No"
+    log_message "0" "  --knative-version <version>         KNative version to be used. Default: 1.9.0"
+    log_message "0" "  --kubernetes-version <version>      Kubernetes version to be install"
+    log_message "0" "                                      Default: latest"
+    log_message "0" "  --registry-image-version <version>  Version of the registry container to be used. Default: 2.6.2"
+    log_message "0" "  --registry-password <password>      Registry user password. Default: snowdrop"
+    log_message "0" "  --registry-port <port>              Port to publish the registry. Default: 5000"
+    log_message "0" "  --registry-user <user>              Registry user. Default: admin"
+    log_message "0" "  --secure-registry                   Secure the docker registry. Default: No"
+    log_message "0" "  --server-ip <ip-address>            IP address to be used. Default: 127.0.0.1"
+    log_message "0" "  --use-existing-cluster              Uses existing kind cluster if it already exists. Default: No"
+    log_message "0" "  -v, --verbosity <value>             Logging verbosity (0..9). Default: 1"
+    log_message "0" "                                      A verbosity setting of 0 logs only critical events."
+    log_message "0" "                                      Default: 0"
 }
 
 check_pre_requisites() {
+  log_message "1" "Checking pre requisites..."
+
+  log_message "1" "Checking if kind exists..."
   if ! command -v kind &> /dev/null; then
     log_message "0" "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
     log_message "0" "kind is not installed"
     log_message "0" "Use a package manager (i.e 'brew install kind') or visit the official site https://kind.sigs.k8s.io"
     exit 1
   fi
+  log_message "1" "...passed!"
 
+  log_message "1" "Checking if kubectl exists..."
   if ! command -v kubectl &> /dev/null; then
     log_message "0" "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
     log_message "0" "Please install kubectl 1.15 or higher"
     exit 1
   fi
+  log_message "1" "...passed!"
 
+  log_message "1" "Checking if helm exists..."
   if ! command -v helm &> /dev/null; then
     log_message "0" "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
     log_message "0" "Helm could not be found. To get helm: https://helm.sh/docs/intro/install/"
     log_message "0" "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
     exit 1
   fi
+  log_message "1" "...passed!"
 
+  log_message "1" "Checking helm version..."
+  log_message "5" "helm version"
   HELM_VERSION=$(helm version 2>&1 | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+') || true
   if [[ ${HELM_VERSION} < "v3.0.0" ]]; then
     log_message "0" "Please upgrade helm to v3.0.0 or higher"
     exit 1
   fi
+  log_message "1" "...passed!"
 
+  log_message "1" "Checking kubectl version..."
+  log_message "5" "kubectl version -o json 2> /dev/null | jq -r '.clientVersion.gitVersion' | cut -d. -f2"
   KUBE_CLIENT_VERSION=$(kubectl version -o json 2> /dev/null | jq -r '.clientVersion.gitVersion' | cut -d. -f2) || true
   if [[ ${KUBE_CLIENT_VERSION} -lt 14 ]]; then
     log_message "0" "Please update kubectl to 1.15 or higher"
     exit 1
   fi
+  log_message "1" "...passed."
 }
 
 create_openssl_cfg() {
@@ -115,7 +177,7 @@ delete_kind_cluster() {
   docker container rm kind-registry -f
 }
 
-deploy_ingress_knative() {
+deploy_ingress_kourier() {
   log_message "1" "Deploying KNative Ingress"
   echo "Install the required custom resources of knative"
   kubectl apply -f https://github.com/knative/serving/releases/download/knative-v${KNATIVE_VERSION}/serving-crds.yaml
@@ -196,19 +258,21 @@ deploy_ingress_nginx() {
 UNMANAGED_PARAMS=""
 CLUSTER_NAME="kind"
 DELETE_KIND_CLUSTER="n"
-INGRESS="nginx"
 KNATIVE_VERSION="1.9.0"
 KUBERNETES_VERSION="latest"
-LOGGING_VERBOSITY="0"
+LOGGING_VERBOSITY="1"
 REGISTRY_IMAGE_VERSION="2.6.2"
+REGISTRY_PASSWORD="snowdrop"
 REGISTRY_PORT="5000"
+REGISTRY_USER="admin"
 SECURE_REGISTRY="n"
 SERVER_IP="127.0.0.1"
 SHOW_HELP="n"
+USE_EXISTING_CLUSTER="n"
 
 while [ $# -gt 0 ]; do
-  if [[ $1 == *"--"* ]];
-  then
+  log_message "0" "$1"
+  if [[ $1 == *"--"* ]]; then
     param="${1/--/}";
     case $1 in
       --help) SHOW_HELP="y"; break 2 ;;
@@ -218,44 +282,65 @@ while [ $# -gt 0 ]; do
       --knative-version) KNATIVE_VERSION="$2"; shift ;;
       --kubernetes-version) KUBERNETES_VERSION="$2"; shift ;;
       --registry-image-version) REGISTRY_IMAGE_VERSION="$2"; shift ;;
+      --registry-password) REGISTRY_PASSWORD="$2"; shift ;;
       --registry-port) REGISTRY_PORT="$2"; shift ;;
+      --registry-user) REGISTRY_USER="$2"; shift ;;
       --secure-registry) SECURE_REGISTRY="y" ;;
       --server-ip) SERVER_IP="$2"; shift ;;
+      --use-existing-cluster) USE_EXISTING_CLUSTER="y"; ;;
       --verbosity) LOGGING_VERBOSITY="$2"; shift ;;
-      *) UNMANAGED_PARAMS="${UNMANAGED_PARAMS} $1 $2" ;;
+      *) INVALID_SWITCH="$1" ; break 2 ;;
     esac;
-  #elif [[ $1 == "-D"* ]];
-  #then
-  #  UNMANAGED_PARAMS="${UNMANAGED_PARAMS} $1";
+    shift
+  elif [[ $1 == *"-"* ]]; then
+    case $1 in
+      -h) SHOW_HELP="y"; break 2 ;;
+      -v) LOGGING_VERBOSITY="$2"; shift ;;
+      *) INVALID_SWITCH="$1" ; break 2 ;;
+    esac;
+    shift
   fi
-  shift
 done
 
 if [[ "$SHOW_HELP" == "y" ]]; then
   show_usage
   exit 0
-else
-  check_pre_requisites
+elif [[ -v INVALID_SWITCH ]]; then
+  log_message "0" "ERROR: Invalid switch ${INVALID_SWITCH}"
+  show_usage
+  exit 1
+elif [ ! -v INGRESS ]; then
+    log_message "0" "ERROR: Ingress is not defined."
+  show_usage
+  exit 1
 fi
 
 ###### /Command Line Parser
 
 ###### Execution
 
+print_logo
+
+check_pre_requisites
+
 kindCfgExtraMounts=""
 registry_name="${CLUSTER_NAME}-registry"
 registry_server='localhost'
 temp_cert_dir="_tmp"
 
-if [ "${INGRESS}" == 'knative' ]; then
+if [ "${INGRESS}" == 'kourier' ]; then
   CONTAINER_80_PORT=31080
   CONTAINER_443_PORT=31443
 elif [ "${INGRESS}" == 'nginx' ]; then
   CONTAINER_80_PORT=80
   CONTAINER_443_PORT=443
+else
+    log_message "0" "ERROR: Invalid ingress ${INGRESS}."
+    show_usage
+    exit 1  
 fi
 
-if [ "${SECURE_REGISTRY}" == 'y' ] && [ "${INGRESS}" == 'nginx' ]; then
+if [ "${SECURE_REGISTRY}" == 'y' ]; then
   if [ ! -d ${temp_cert_dir} ];then
     mkdir -p _tmp
   fi
@@ -342,44 +427,39 @@ EOF
 
 log_message "5" "kindCfg: ${kindCfg}"
 
-log_message "1" ""
-log_message "1" "Welcome to our"
-log_message "1" "                                                                   "
-log_message "1" "   _____                                  _                        "
-log_message "1" "  / ____|                                | |                       "
-log_message "1" " | (___    _ __     ___   __      __   __| |  _ __    ___    _ __  "
-log_message "1" "  \___ \  | '_ \   / _ \  \ \ /\ / /  / _  | |  __|  / _ \  | \ _ \ "
-log_message "1" "  ____) | | | | | | (_) |  \ V  V /  | (_| | | |    | (_) | | |_) |"
-log_message "1" " |_____/  |_| |_|  \___/    \_/\_/    \__,_| |_|     \___/  |  __/ "
-log_message "1" "                                                            | |    "
-log_message "1" "                                                            |_|    "
-log_message "1" " Kind installation script"
-log_message "1" ""
-log_message "1" "- Deploying a local secured (using htpasswd) docker registry"
-log_message "1" "- Generating a selfsigned certificate (using openssl) to expose the registry as a HTTP/HTTPS endpoint"
-log_message "1" "- Setting a docker network between the containers: kind and registry and alias \"registry.local\""
-log_message "1" "- Allowing to access the repository using as address \"registry.local:${REGISTRY_PORT}\" within a pod, from laptop or when a pod is created"
-log_message "1" "- Exposing 2 additional NodePort: 30000 and 31000"
-log_message "1" "- Deploying an ingress controller"
-log_message "1" "- Copying the generated certificate here: $HOME/local-registry.crt"
-log_message "1" ""
-log_message "1" ""
-
 if [ "$DELETE_KIND_CLUSTER" == "y" ]; then
+  log_message "0" "Deleting Kind cluster..."
   delete_kind_cluster
 fi
 
-log_message "1" "=== Get the tag version of the image to be installed for the kubernetes version: ${KUBERNETES_VERSION} ..."
-if [ ${KUBERNETES_VERSION} == "latest" ]; then
-  kindCmd+=""
-else
-  kind_image_sha=$(wget -q https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/images.json -O - | \
-  jq -r --arg VERSION "$KUBERNETES_VERSION" '.[] | select(.k8s == $VERSION).sha')
-  kindCmd+=" --image ${kind_image_sha}"
-fi
+log_message "1" "Checking if kind cluster already exists..."
+kind_get_clusters=$(kind get clusters | grep "${CLUSTER_NAME}")
 
-log_message "1" "Creating a Kind cluster using kindest/node: ${KUBERNETES_VERSION} and logging verbosity: ${LOGGING_VERBOSITY}"
-echo "${kindCfg}" | ${kindCmd} --config=-
+if [ $? -eq 0 ]; then
+  log_message "1" "Cluster already exists..."
+  if [ "$USE_EXISTING_CLUSTER" == "y" ]; then
+    log_message "1" "...using existing cluster..."
+    log_message "1" "Exporting cluster kubeconfig..."
+    log_message "5" "CMD: kind export kubeconfig -n ${CLUSTER_NAME}"
+    kind export kubeconfig -n ${CLUSTER_NAME}
+    log_message "1" "...done!"
+  else
+    log_message "0" "...ERROR: cluster exists and not using current cluster!"
+    exit 1
+  fi
+else 
+  log_message "1" "=== Get the tag version of the image to be installed for the kubernetes version: ${KUBERNETES_VERSION} ..."
+  if [ ${KUBERNETES_VERSION} == "latest" ]; then
+    kindCmd+=""
+  else
+    kind_image_sha=$(wget -q https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/images.json -O - | \
+    jq -r --arg VERSION "$KUBERNETES_VERSION" '.[] | select(.k8s == $VERSION).sha')
+    kindCmd+=" --image ${kind_image_sha}"
+  fi
+
+  log_message "1" "Creating a Kind cluster using kindest/node: ${KUBERNETES_VERSION} and logging verbosity: ${LOGGING_VERBOSITY}"
+  echo "${kindCfg}" | ${kindCmd} --config=-
+fi
 
 # Document the local registry
 # https://github.com/kubernetes/enhancements/tree/master/keps/sig-cluster-lifecycle/generic/1755-communicating-a-local-registry
@@ -395,12 +475,10 @@ data:
     help: "https://kind.sigs.k8s.io/docs/user/local-registry/"
 EOF
 
-
-
-if [ "${SECURE_REGISTRY}" == 'y' ] && [ "${INGRESS}" == 'nginx' ]; then
-  log_message "1" "==== Create the htpasswd file where user: admin and password: snowdrop"
+if [ "${SECURE_REGISTRY}" == 'y' ]; then
+  log_message "1" "==== Create the htpasswd file where user: ${REGISTRY_USER} and password: ${REGISTRY_PASSWORD}"
   mkdir -p auth
-  docker run --entrypoint htpasswd registry:2.7.0 -Bbn admin snowdrop > auth/htpasswd
+  docker run --entrypoint htpasswd registry:2.7.0 -Bbn ${REGISTRY_USER} ${REGISTRY_PASSWORD} > auth/htpasswd
 
   log_message "1" "==== Creating a docker registry"
   docker run -d \
@@ -449,7 +527,7 @@ if [ "${SECURE_REGISTRY}" == 'y' ] && [ "${INGRESS}" == 'nginx' ]; then
 
   log_message "1" "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   log_message "1" "Log on to the docker registry using the address and user/password"
-  log_message "1" "docker login ${SERVER_IP}.sslip.io:5000 -u admin -p snowdrop"
+  log_message "1" "docker login ${SERVER_IP}.sslip.io:5000 -u ${REGISTRY_USER} -p ${REGISTRY_PASSWORD}"
   log_message "1" "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 
   popd
@@ -467,8 +545,8 @@ else
 fi
 
 log_message "1" "INGRESS: ${INGRESS}"
-if [ "${INGRESS}" == 'knative' ]; then
-  deploy_ingress_knative
+if [ "${INGRESS}" == 'kourier' ]; then
+  deploy_ingress_kourier
 elif [ "${INGRESS}" == 'nginx' ]; then
   deploy_ingress_nginx
 fi
