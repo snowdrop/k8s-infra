@@ -15,51 +15,121 @@
 
 set -o errexit
 
+######################
+# Logging and Output #
+######################
+
+# Defining some colors for output
+NC='\033[0m' # No Color
+COLOR_RESET="\033[0m" # Reset color
+BLACK="\033[0;30m"
+BLUE='\033[0;34m'
+BROWN="\033[0;33m"
+GREEN='\033[0;32m'
+GREY="\033[0;90m"
+CYAN='\033[0;36m'
+MAGENTA='\033[0;35m'
+RED='\033[0;31m'
+PURPLE="\033[0;35m"
+WHITE='\033[0;37m'
+YELLOW='\033[0;33m'
+
 log_message() {
-    if [ "${LOGGING_VERBOSITY}" -ge "$1" ]; then
-        echo "$2"
+    VERBOSITY_LEVEL=$1
+    MESSAGE="${@:2}"
+    if [ "${LOGGING_VERBOSITY}" -ge "${VERBOSITY_LEVEL}" ]; then
+        echo -e "${MESSAGE}"
     fi
 }
 
+repeat_char(){
+    COLOR=${1}
+	for i in {1..70}; do echo -ne "${!COLOR}$2${NC}"; done
+}
+
+msg() {
+    VERBOSITY_LEVEL=${1}
+    COLOR=${2}
+    MSG="${@:3}"
+    # echo -e "\n${!COLOR}## ${MSG}${NC}"
+    log_message ${VERBOSITY_LEVEL} "\n${!COLOR}## ${MSG}${NC}"
+}
+
+succeeded() {
+    VERBOSITY_LEVEL=$1
+    MSG="${@:2}"
+#   echo -e "${GREEN}NOTE:${NC} $1"
+    log_message ${VERBOSITY_LEVEL} "${GREEN}SUCCESS:${NC} ${MSG}"
+}
+
+note() {
+    VERBOSITY_LEVEL=$1
+    MSG="${@:2}"
+#   echo -e "${BLUE}NOTE:${NC} $1"
+    log_message ${VERBOSITY_LEVEL} "${BLUE}NOTE:${NC} ${MSG}"
+}
+
+warn() {
+#   echo -e "${YELLOW}WARN:${NC} $1"
+    log_message 1 "${YELLOW}WARN:${NC} $1"
+}
+
+error() {
+#   echo -e "${RED}ERROR:${NC} $1"
+    log_message 0 "${RED}ERROR:${NC} $1"
+}
+
+log() {
+    VERBOSITY_LEVEL=${1}
+    COLOR=${2}
+    MSG="${@:3}"
+    echo; repeat_char ${COLOR} '#'; msg ${1} ${MSG}; repeat_char ${COLOR} '#'; echo
+}
+
+#######################
+# /Logging and Output #
+#######################
+
+
 print_logo() {
-  log_message "1" ""
-  log_message "1" "Welcome to our"
-  log_message "1" "                                                                   "
-  log_message "1" "   _____                                  _                        "
-  log_message "1" "  / ____|                                | |                       "
-  log_message "1" " | (___    _ __     ___   __      __   __| |  _ __    ___    _ __  "
-  log_message "1" "  \___ \  | '_ \   / _ \  \ \ /\ / /  / _  | |  __|  / _ \  | \ _ \ "
-  log_message "1" "  ____) | | | | | | (_) |  \ V  V /  | (_| | | |    | (_) | | |_) |"
-  log_message "1" " |_____/  |_| |_|  \___/    \_/\_/    \__,_| |_|     \___/  |  __/ "
-  log_message "1" "                                                            | |    "
-  log_message "1" "                                                            |_|    "
-  log_message "1" " Kind installation script"
-  log_message "1" ""
-  log_message "1" "- Deploying a local secured (using htpasswd) docker registry"
-  log_message "1" "- Generating a selfsigned certificate (using openssl) to expose the registry as a HTTP/HTTPS endpoint"
-  log_message "1" "- Setting a docker network between the containers: kind and registry and alias \"registry.local\""
-  log_message "1" "- Allowing to access the repository using as address \"registry.local:${REGISTRY_PORT}\" within a pod, from laptop or when a pod is created"
-  log_message "1" "- Exposing 2 additional NodePort: 30000 and 31000"
-  log_message "1" "- Deploying an ingress controller"
-  log_message "1" "- Copying the generated certificate here: $HOME/local-registry.crt"
-  log_message "1" ""
-  log_message "1" ""
-  log_message "5" "Variables used:"
-  log_message "5" ""
-  log_message "5" "CLUSTER_NAME: ${CLUSTER_NAME}"
-  log_message "5" "DELETE_KIND_CLUSTER: ${DELETE_KIND_CLUSTER}"
-  log_message "5" "INGRESS: ${INGRESS}"
-  log_message "5" "KNATIVE_VERSION: ${KNATIVE_VERSION}"
-  log_message "5" "KUBERNETES_VERSION: ${KUBERNETES_VERSION}"
-  log_message "5" "LOGGING_VERBOSITY: ${LOGGING_VERBOSITY}"
-  log_message "5" "REGISTRY_IMAGE_VERSION: ${REGISTRY_IMAGE_VERSION}"
-  log_message "5" "REGISTRY_PASSWORD: ${REGISTRY_PASSWORD}"
-  log_message "5" "REGISTRY_PORT: ${REGISTRY_PORT}"
-  log_message "5" "REGISTRY_USER: ${REGISTRY_USER}"
-  log_message "5" "SECURE_REGISTRY: ${SECURE_REGISTRY}"
-  log_message "5" "SERVER_IP: ${SERVER_IP}"
-  log_message "5" "SHOW_HELP: ${SHOW_HELP}"
-  log_message "5" "USE_EXISTING_CLUSTER: ${USE_EXISTING_CLUSTER}"
+    log_message "1" ""
+    log_message "1" "Welcome to our"
+    log_message "1" "                                                                   "
+    log_message "1" "   _____                                  _                        "
+    log_message "1" "  / ____|                                | |                       "
+    log_message "1" " | (___    _ __     ___   __      __   __| |  _ __    ___    _ __  "
+    log_message "1" "  \___ \  | '_ \   / _ \  \ \ /\ / /  / _  | |  __|  / _ \  | \ _ \ "
+    log_message "1" "  ____) | | | | | | (_) |  \ V  V /  | (_| | | |    | (_) | | |_) |"
+    log_message "1" " |_____/  |_| |_|  \___/    \_/\_/    \__,_| |_|     \___/  |  __/ "
+    log_message "1" "                                                            | |    "
+    log_message "1" "                                                            |_|    "
+    log_message "1" " Kind installation script"
+    log_message "1" ""
+    log_message "1" "- Deploying a local secured (using htpasswd) docker registry"
+    log_message "1" "- Generating a selfsigned certificate (using openssl) to expose the registry as a HTTP/HTTPS endpoint"
+    log_message "1" "- Setting a docker network between the containers: kind and registry and alias \"registry.local\""
+    log_message "1" "- Allowing to access the repository using as address \"registry.local:${REGISTRY_PORT}\" within a pod, from laptop or when a pod is created"
+    log_message "1" "- Exposing 2 additional NodePort: 30000 and 31000"
+    log_message "1" "- Deploying an ingress controller"
+    log_message "1" "- Copying the generated certificate here: $HOME/local-registry.crt"
+    log_message "1" ""
+    log_message "1" ""
+    log_message "5" "Variables used:"
+    log_message "5" ""
+    log_message "5" "CLUSTER_NAME: ${CLUSTER_NAME}"
+    log_message "5" "DELETE_KIND_CLUSTER: ${DELETE_KIND_CLUSTER}"
+    log_message "5" "INGRESS: ${INGRESS}"
+    log_message "5" "KNATIVE_VERSION: ${KNATIVE_VERSION}"
+    log_message "5" "KUBERNETES_VERSION: ${KUBERNETES_VERSION}"
+    log_message "5" "LOGGING_VERBOSITY: ${LOGGING_VERBOSITY}"
+    log_message "5" "REGISTRY_IMAGE_VERSION: ${REGISTRY_IMAGE_VERSION}"
+    log_message "5" "REGISTRY_PASSWORD: ${REGISTRY_PASSWORD}"
+    log_message "5" "REGISTRY_PORT: ${REGISTRY_PORT}"
+    log_message "5" "REGISTRY_USER: ${REGISTRY_USER}"
+    log_message "5" "SECURE_REGISTRY: ${SECURE_REGISTRY}"
+    log_message "5" "SERVER_IP: ${SERVER_IP}"
+    log_message "5" "SHOW_HELP: ${SHOW_HELP}"
+    log_message "5" "USE_EXISTING_CLUSTER: ${USE_EXISTING_CLUSTER}"
 }
 
 show_usage() {
@@ -76,8 +146,7 @@ show_usage() {
     log_message "0" "  --cluster-name <name>               Name of the cluster. Default: kind"
     log_message "0" "  --delete-kind-cluster               Deletes the Kind cluster prior to creating a new one. Default: No"
     log_message "0" "  --knative-version <version>         KNative version to be used. Default: 1.9.0"
-    log_message "0" "  --kubernetes-version <version>      Kubernetes version to be install"
-    log_message "0" "                                      Default: latest"
+    log_message "0" "  --kubernetes-version <version>      Kubernetes version to be install. Default: latest"
     log_message "0" "  --registry-image-version <version>  Version of the registry container to be used. Default: 2.6.2"
     log_message "0" "  --registry-password <password>      Registry user password. Default: snowdrop"
     log_message "0" "  --registry-port <port>              Port to publish the registry. Default: 5000"
@@ -87,55 +156,54 @@ show_usage() {
     log_message "0" "  --use-existing-cluster              Uses existing kind cluster if it already exists. Default: No"
     log_message "0" "  -v, --verbosity <value>             Logging verbosity (0..9). Default: 1"
     log_message "0" "                                      A verbosity setting of 0 logs only critical events."
-    log_message "0" "                                      Default: 0"
 }
 
 check_pre_requisites() {
-  log_message "1" "Checking pre requisites..."
+  note "1" "Checking pre requisites..."
 
-  log_message "1" "Checking if kind exists..."
+  note "1" "Checking if kind exists..."
   if ! command -v kind &> /dev/null; then
-    log_message "0" "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-    log_message "0" "kind is not installed"
-    log_message "0" "Use a package manager (i.e 'brew install kind') or visit the official site https://kind.sigs.k8s.io"
+    error "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    error "kind is not installed"
+    error "Use a package manager (i.e 'brew install kind') or visit the official site https://kind.sigs.k8s.io"
     exit 1
   fi
-  log_message "1" "...passed!"
+  succeeded "1" "...passed!"
 
-  log_message "1" "Checking if kubectl exists..."
+  note "1" "Checking if kubectl exists..."
   if ! command -v kubectl &> /dev/null; then
-    log_message "0" "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-    log_message "0" "Please install kubectl 1.15 or higher"
+    error "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    error "Please install kubectl 1.15 or higher"
     exit 1
   fi
-  log_message "1" "...passed!"
+  succeeded "1" "...passed!"
 
-  log_message "1" "Checking if helm exists..."
+  note "1" "Checking if helm exists..."
   if ! command -v helm &> /dev/null; then
-    log_message "0" "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-    log_message "0" "Helm could not be found. To get helm: https://helm.sh/docs/intro/install/"
-    log_message "0" "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    error "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    error "Helm could not be found. To get helm: https://helm.sh/docs/intro/install/"
+    error "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
     exit 1
   fi
-  log_message "1" "...passed!"
+  succeeded "1" "...passed!"
 
-  log_message "1" "Checking helm version..."
+  note "1" "Checking helm version..."
   log_message "5" "helm version"
   HELM_VERSION=$(helm version 2>&1 | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+') || true
   if [[ ${HELM_VERSION} < "v3.0.0" ]]; then
-    log_message "0" "Please upgrade helm to v3.0.0 or higher"
+    error "Please upgrade helm to v3.0.0 or higher"
     exit 1
   fi
-  log_message "1" "...passed!"
+  succeeded "1" "...passed!"
 
-  log_message "1" "Checking kubectl version..."
+  note "1" "Checking kubectl version..."
   log_message "5" "kubectl version -o json 2> /dev/null | jq -r '.clientVersion.gitVersion' | cut -d. -f2"
   KUBE_CLIENT_VERSION=$(kubectl version -o json 2> /dev/null | jq -r '.clientVersion.gitVersion' | cut -d. -f2) || true
   if [[ ${KUBE_CLIENT_VERSION} -lt 14 ]]; then
-    log_message "0" "Please update kubectl to 1.15 or higher"
+    error "Please update kubectl to 1.15 or higher"
     exit 1
   fi
-  log_message "1" "...passed."
+  succeeded "1" "...passed."
 }
 
 create_openssl_cfg() {
@@ -271,7 +339,7 @@ SHOW_HELP="n"
 USE_EXISTING_CLUSTER="n"
 
 while [ $# -gt 0 ]; do
-  log_message "0" "$1"
+  log_message "9" "$1"
   if [[ $1 == *"--"* ]]; then
     param="${1/--/}";
     case $1 in
@@ -303,16 +371,16 @@ while [ $# -gt 0 ]; do
 done
 
 if [[ "$SHOW_HELP" == "y" ]]; then
-  show_usage
-  exit 0
+    show_usage
+    exit 0
 elif [[ -v INVALID_SWITCH ]]; then
-  log_message "0" "ERROR: Invalid switch ${INVALID_SWITCH}"
-  show_usage
-  exit 1
+    error "Invalid switch ${INVALID_SWITCH}"
+    show_usage
+    exit 1
 elif [ ! -v INGRESS ]; then
-    log_message "0" "ERROR: Ingress is not defined."
-  show_usage
-  exit 1
+    error "Ingress is not defined."
+    show_usage
+    exit 1
 fi
 
 ###### /Command Line Parser
