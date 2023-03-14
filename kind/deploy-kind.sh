@@ -565,24 +565,24 @@ while [ $# -gt 0 ]; do
       --server-ip) SERVER_IP="$2"; shift ;;
       --use-existing-cluster) USE_EXISTING_CLUSTER="y"; ;;
       --verbosity) LOGGING_VERBOSITY="$2"; shift ;;
-      *) INVALID_SWITCH="$1" ; break 2 ;;
+      *) INVALID_SWITCH="${INVALID_SWITCH} $1" ; break 2 ;;
     esac;
     shift
   elif [[ $1 == *"-"* ]]; then
     case $1 in
       -h) SHOW_HELP="y"; break 2 ;;
       -v) LOGGING_VERBOSITY="$2"; shift ;;
-      *) INVALID_SWITCH="$1" ; break 2 ;;
+      *) INVALID_SWITCH="${INVALID_SWITCH} $1" ; break 2 ;;
     esac;
     shift
   fi
 done
 
-if [[ "$SHOW_HELP" == "y" ]]; then
+if [ "$SHOW_HELP" == "y" ]; then
     show_usage
     exit 0
-elif [[ -v INVALID_SWITCH ]]; then
-    error "Invalid switch ${INVALID_SWITCH}"
+elif [ -v INVALID_SWITCH ]; then
+    error "Invalid switch(es) ${INVALID_SWITCH}"
     show_usage
     exit 1
 elif [ ! -v INGRESS ]; then
