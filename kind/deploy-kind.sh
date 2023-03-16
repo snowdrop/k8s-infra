@@ -135,27 +135,31 @@ print_logo() {
 show_usage() {
     log_message "0" ""
     log_message "0" "Usage: "
-    log_message "0" "  ./deploy-kind.sh [parameters,...]"
+    log_message "0" "\t./deploy-kind.sh command [parameters,...]"
+    log_message "0" ""
+    log_message "0" "Available commands: "
+    log_message "0" "\tinstall:\t\t\t\tInstall the kind cluster"
+    log_message "0" "\tremove:\t\t\t\t\tRemove the kind cluster"
     log_message "0" ""
     log_message "0" "Required parameters: "
-    log_message "0" "  --ingress [nginx,kourier]           Ingress to be deployed. One of nginx,kourier."
+    log_message "0" "\t--ingress [nginx,kourier]:\t\tIngress to be deployed. One of nginx,kourier."
     log_message "0" ""
     log_message "0" "Optional parameters: "
-    log_message "0" "  -h, --help:                         This help message"
+    log_message "0" "\t-h, --help:\t\t\t\tThis help message"
     log_message "0" ""
-    log_message "0" "  --cluster-name <name>               Name of the cluster. Default: kind"
-    log_message "0" "  --delete-kind-cluster               Deletes the Kind cluster prior to creating a new one. Default: No"
-    log_message "0" "  --knative-version <version>         KNative version to be used. Default: 1.9.0"
-    log_message "0" "  --kubernetes-version <version>      Kubernetes version to be install. Default: latest"
-    log_message "0" "  --registry-image-version <version>  Version of the registry container to be used. Default: 2.6.2"
-    log_message "0" "  --registry-password <password>      Registry user password. Default: snowdrop"
-    log_message "0" "  --registry-port <port>              Port to publish the registry. Default: 5000"
-    log_message "0" "  --registry-user <user>              Registry user. Default: admin"
-    log_message "0" "  --secure-registry                   Secure the docker registry. Default: No"
-    log_message "0" "  --server-ip <ip-address>            IP address to be used. Default: 127.0.0.1"
-    log_message "0" "  --use-existing-cluster              Uses existing kind cluster if it already exists. Default: No"
-    log_message "0" "  -v, --verbosity <value>             Logging verbosity (0..9). Default: 1"
-    log_message "0" "                                      A verbosity setting of 0 logs only critical events."
+    log_message "0" "\t--cluster-name <name>\t\t\tName of the cluster. Default: kind"
+    log_message "0" "\t--delete-kind-cluster\t\t\tDeletes the Kind cluster prior to creating a new one. Default: No"
+    log_message "0" "\t--knative-version <version>\t\tKNative version to be used. Default: 1.9.0"
+    log_message "0" "\t--kubernetes-version <version>\t\tKubernetes version to be install. Default: latest"
+    log_message "0" "\t--registry-image-version <version>\tVersion of the registry container to be used. Default: 2.6.2"
+    log_message "0" "\t--registry-password <password>\t\tRegistry user password. Default: snowdrop"
+    log_message "0" "\t--registry-port <port>\t\t\tPort to publish the registry. Default: 5000"
+    log_message "0" "\t--registry-user <user>\t\t\tRegistry user. Default: admin"
+    log_message "0" "\t--secure-registry\t\t\tSecure the docker registry. Default: No"
+    log_message "0" "\t--server-ip <ip-address>\t\tIP address to be used. Default: 127.0.0.1"
+    log_message "0" "\t--use-existing-cluster\t\t\tUses existing kind cluster if it already exists. Default: No"
+    log_message "0" "\t-v, --verbosity <value>\t\t\tLogging verbosity (0..9). Default: 1"
+    log_message "0" "\t\t\t\t\t\tA verbosity setting of 0 logs only critical events."
 }
 
 check_pre_requisites() {
@@ -241,8 +245,10 @@ echo "$CFG"
 
 delete_kind_cluster() {
   warn "Deleting kind cluster ${CLUSTER_NAME}..."
+  note "5" "kind delete cluster -n ${CLUSTER_NAME}"
   kind delete cluster -n ${CLUSTER_NAME}
   docker container rm kind-registry -f
+  succeeded "1" "...kind cluster deleted!"
 }
 
 deploy_ingress_kourier() {
@@ -512,7 +518,7 @@ EOF
             kind export kubeconfig -n ${CLUSTER_NAME}
             succeeded "1" "...done!"
         else
-            error "Cluster exists but not using existing cluster (--use-existing-cluster)!"
+            error "Cluster already exists. Either use the existing cluster (--use-existing-cluster) or delete the cluster (--delete-kind-cluster)."
             exit 1
         fi
     else 
@@ -528,10 +534,45 @@ EOF
         echo "${kindCfg}" | ${kindCmd} --config=-
     fi
 }
+
+function install() {
+    deploy_kind_cluster
+
+    deploy_kind_cluster
+
+    deploy_docker_registry
+
+    note "1" "INGRESS: ${INGRESS}"
+    if [ "${INGRESS}" == 'kourier' ]; then
+        deploy_ingress_kourier
+    elif [ "${INGRESS}" == 'nginx' ]; then
+        deploy_ingress_nginx
+    fi
+}
+
+function remove() {
+    echo "1: $1"
+    echo "2: $2"
+    echo "3: $3"
+    delete_kind_cluster
+}
+
+function validate_ingress() {
+    if [ "${INGRESS}" == 'kourier' ]; then
+        CONTAINER_80_PORT=31080
+        CONTAINER_443_PORT=31443
+    elif [ "${INGRESS}" == 'nginx' ]; then
+        CONTAINER_80_PORT=80
+        CONTAINER_443_PORT=443
+    else
+        error "Invalid ingress ${INGRESS}."
+        show_usage
+        exit 1  
+    fi
+}
 ##### /Functions
 
 ###### Command Line Parser
-UNMANAGED_PARAMS=""
 CLUSTER_NAME="kind"
 DELETE_KIND_CLUSTER="n"
 KNATIVE_VERSION="1.9.0"
@@ -547,45 +588,60 @@ SHOW_HELP="n"
 USE_EXISTING_CLUSTER="n"
 
 while [ $# -gt 0 ]; do
-  note "9" "$1"
-  if [[ $1 == *"--"* ]]; then
-    param="${1/--/}";
-    case $1 in
-      --help) SHOW_HELP="y"; break 2 ;;
-      --cluster-name) CLUSTER_NAME="$2"; shift ;;
-      --delete-kind-cluster) DELETE_KIND_CLUSTER="y" ;;
-      --ingress) INGRESS="$2"; shift ;;
-      --knative-version) KNATIVE_VERSION="$2"; shift ;;
-      --kubernetes-version) KUBERNETES_VERSION="$2"; shift ;;
-      --registry-image-version) REGISTRY_IMAGE_VERSION="$2"; shift ;;
-      --registry-password) REGISTRY_PASSWORD="$2"; shift ;;
-      --registry-port) REGISTRY_PORT="$2"; shift ;;
-      --registry-user) REGISTRY_USER="$2"; shift ;;
-      --secure-registry) SECURE_REGISTRY="y" ;;
-      --server-ip) SERVER_IP="$2"; shift ;;
-      --use-existing-cluster) USE_EXISTING_CLUSTER="y"; ;;
-      --verbosity) LOGGING_VERBOSITY="$2"; shift ;;
-      *) INVALID_SWITCH="${INVALID_SWITCH} $1" ; break 2 ;;
-    esac;
+    note "9" "$1"
+    if [[ $1 == *"--"* ]]; then
+        param="${1/--/}";
+        case $1 in
+        --help) SHOW_HELP="y"; break 2 ;;
+        --cluster-name) CLUSTER_NAME="$2"; shift ;;
+        --delete-kind-cluster) DELETE_KIND_CLUSTER="y" ;;
+        --ingress) INGRESS="$2"; shift ;;
+        --knative-version) KNATIVE_VERSION="$2"; shift ;;
+        --kubernetes-version) KUBERNETES_VERSION="$2"; shift ;;
+        --registry-image-version) REGISTRY_IMAGE_VERSION="$2"; shift ;;
+        --registry-password) REGISTRY_PASSWORD="$2"; shift ;;
+        --registry-port) REGISTRY_PORT="$2"; shift ;;
+        --registry-user) REGISTRY_USER="$2"; shift ;;
+        --secure-registry) SECURE_REGISTRY="y" ;;
+        --server-ip) SERVER_IP="$2"; shift ;;
+        --use-existing-cluster) USE_EXISTING_CLUSTER="y"; ;;
+        --verbosity) LOGGING_VERBOSITY="$2"; shift ;;
+        *) INVALID_SWITCH="${INVALID_SWITCH} $1" ; break 2 ;;
+        esac;
     shift
-  elif [[ $1 == *"-"* ]]; then
-    case $1 in
-      -h) SHOW_HELP="y"; break 2 ;;
-      -v) LOGGING_VERBOSITY="$2"; shift ;;
-      *) INVALID_SWITCH="${INVALID_SWITCH} $1" ; break 2 ;;
-    esac;
-    shift
+    elif [[ $1 == *"-"* ]]; then
+        case $1 in
+            -h) SHOW_HELP="y"; break 2 ;;
+            -v) LOGGING_VERBOSITY="$2"; shift ;;
+            *) INVALID_SWITCH="${INVALID_SWITCH} $1" ; break 2 ;;
+        esac;
+        shift
+    else
+        case $1 in
+            install) COMMAND="install" ;;
+            remove) COMMAND="remove" ;;
+            *) INVALID_SWITCH="${INVALID_COMMAND} $1" ; break 2 ;;
+        esac;
+        shift
   fi
 done
 
 if [ "$SHOW_HELP" == "y" ]; then
     show_usage
     exit 0
+elif [ -v INVALID_COMMAND ]; then
+    error "Invalid command ${INVALID_COMMAND}"
+    show_usage
+    exit 1
 elif [ -v INVALID_SWITCH ]; then
     error "Invalid switch(es) ${INVALID_SWITCH}"
     show_usage
     exit 1
-elif [ ! -v INGRESS ]; then
+elif [ ! -v COMMAND ]; then
+    error "A command must be provided!!!"
+    show_usage
+    exit 1
+elif [ ${COMMAND} == 'install' ] && [ ! -v INGRESS ]; then
     error "Ingress is not defined."
     show_usage
     exit 1
@@ -604,24 +660,7 @@ registry_name="${CLUSTER_NAME}-registry"
 registry_server='localhost'
 temp_cert_dir="_tmp"
 
-if [ "${INGRESS}" == 'kourier' ]; then
-  CONTAINER_80_PORT=31080
-  CONTAINER_443_PORT=31443
-elif [ "${INGRESS}" == 'nginx' ]; then
-  CONTAINER_80_PORT=80
-  CONTAINER_443_PORT=443
-else
-    error "Invalid ingress ${INGRESS}."
-    show_usage
-    exit 1  
-fi
-deploy_kind_cluster
-
-deploy_docker_registry
-
-note "1" "INGRESS: ${INGRESS}"
-if [ "${INGRESS}" == 'kourier' ]; then
-  deploy_ingress_kourier
-elif [ "${INGRESS}" == 'nginx' ]; then
-  deploy_ingress_nginx
-fi
+case ${COMMAND} in
+    install) validate_ingress ; install ;;
+    remove) remove ;;
+esac;
