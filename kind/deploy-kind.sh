@@ -244,11 +244,27 @@ echo "$CFG"
 }
 
 delete_kind_cluster() {
-  warn "Deleting kind cluster ${CLUSTER_NAME}..."
-  note "5" "kind delete cluster -n ${CLUSTER_NAME}"
-  kind delete cluster -n ${CLUSTER_NAME}
-  docker container rm kind-registry -f
-  succeeded "1" "...kind cluster deleted!"
+    note "1" "Checking if cluster exists..."
+    existing_kind_cluster=''
+    get_kind_cluster existing_kind_cluster
+    note "5" "${existing_kind_cluster}"
+    if [ ! "${existing_kind_cluster}" == "" ]; then
+        warn "Deleting kind cluster ${CLUSTER_NAME}..."
+        note "5" "kind delete cluster -n ${CLUSTER_NAME}"
+        kind delete cluster -n ${CLUSTER_NAME}
+        succeeded "1" "...kind cluster deleted!"
+    else
+        warn "...no kind cluster found!"
+    fi
+    note "1" "Checking if kind registry container exists..."
+    docker_container_id=$(docker container ls --filter name=^kind-registry$ --all --quiet)
+    if [ ! ${docker_container_id} == "" ]; then
+        note "1" "...yes, removing docker kind registry container..."
+        docker container rm kind-registry -f
+        succeeded "1" "Docker kind registry container removed."
+    else 
+        note "1" "...no, that was easy!"
+    fi
 }
 
 deploy_ingress_kourier() {
@@ -413,6 +429,10 @@ EOF
     fi
 }
 
+get_kind_cluster() {
+    eval "$1=$(kind get clusters | { grep "${CLUSTER_NAME}" || test $? = 1; })"
+}
+
 deploy_kind_cluster() {
 
     if [ "${SECURE_REGISTRY}" == 'y' ]; then
@@ -551,10 +571,17 @@ function install() {
 }
 
 function remove() {
-    echo "1: $1"
-    echo "2: $2"
-    echo "3: $3"
     delete_kind_cluster
+    note "1" "Removing docker network..."
+    note "1" "Checking if docker network exists..."
+    docker_network_id=$(docker network ls --filter name=^kind$ --quiet)
+    if [ ! ${docker_network_id} == "" ]; then
+        note "1" "...yes, removing docker network..."
+        docker network rm kind
+        succeeded "1" "Docker network removed."
+    else 
+        note "1" "...no, nothing to be done then."
+    fi
 }
 
 function validate_ingress() {
