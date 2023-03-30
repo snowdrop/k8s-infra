@@ -13,9 +13,10 @@ set -o errexit
 # Feb 20th 2023:
 #
 # - Adding a new parameter to set the name of the cluster
+# March 30th 2023:
+# - Bump version to k8s 1.26
 #
 # Dec 8th 2022:
-#
 # - Add a new parameter api_server_ip to configure the API IP address listening to
 #
 # Nov 16th 2022:
@@ -92,7 +93,7 @@ fi
 if [[ "$2" != "" ]]; then
   version=$2
 else
-  read -p "Which kubernetes version should we install (1.18 .. 1.25) - Default: latest ? " version
+  read -p "Which kubernetes version should we install (1.18 .. 1.26) - Default: latest ? " version
   version=${version:-latest}
 fi
 
