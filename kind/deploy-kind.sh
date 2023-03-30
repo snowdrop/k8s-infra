@@ -151,7 +151,7 @@ show_usage() {
     log_message "0" "\t--delete-kind-cluster\t\t\tDeletes the Kind cluster prior to creating a new one. Default: No"
     log_message "0" "\t--knative-version <version>\t\tKNative version to be used. Default: 1.9.0"
     log_message "0" "\t--kubernetes-version <version>\t\tKubernetes version to be install. Default: latest"
-    log_message "0" "\t--provider <provider>\t\tContainer Runtime [docker,podman]. Default: docker"
+    log_message "0" "\t--provider <provider>\t\t\tContainer Runtime [docker,podman]. Default: docker"
     log_message "0" "\t--registry-image-version <version>\tVersion of the registry container to be used. Default: 2.6.2"
     log_message "0" "\t--registry-password <password>\t\tRegistry user password. Default: snowdrop"
     log_message "0" "\t--registry-port <port>\t\t\tPort to publish the registry. Default: 5000"
