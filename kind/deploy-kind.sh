@@ -151,6 +151,7 @@ show_usage() {
     log_message "0" "\t--delete-kind-cluster\t\t\tDeletes the Kind cluster prior to creating a new one. Default: No"
     log_message "0" "\t--knative-version <version>\t\tKNative version to be used. Default: 1.9.0"
     log_message "0" "\t--kubernetes-version <version>\t\tKubernetes version to be install. Default: latest"
+    log_message "0" "\t--provider <provider>\t\tContainer Runtime [docker,podman]. Default: docker"
     log_message "0" "\t--registry-image-version <version>\tVersion of the registry container to be used. Default: 2.6.2"
     log_message "0" "\t--registry-password <password>\t\tRegistry user password. Default: snowdrop"
     log_message "0" "\t--registry-port <port>\t\t\tPort to publish the registry. Default: 5000"
@@ -257,7 +258,8 @@ delete_kind_cluster() {
         warn "...no kind cluster found!"
     fi
     note "1" "Checking if kind registry container exists..."
-    docker_container_id=$(docker container ls --filter name=^kind-registry$ --all --quiet)
+    #docker_container_id=$(docker container ls --filter name=^kind-registry$ --all --quiet)
+    docker_container_id=$(${CRI_PROVIDER} container ls --filter name=^kind-registry$ --all --quiet)
     if [ ! ${docker_container_id} == "" ]; then
         note "1" "...yes, removing docker kind registry container..."
         docker container rm kind-registry -f
@@ -265,6 +267,22 @@ delete_kind_cluster() {
     else 
         note "1" "...no, that was easy!"
     fi
+
+    if [ "${CRI_PROVIDER}" == 'podman' ]; then
+        note "1" "Check if podman Control Plane container exists..."
+        podman_cp_container_name="${CLUSTER_NAME}-control-plane"
+        podman_cp_container_id=$(${CRI_PROVIDER} container ls --filter name=^${podman_cp_container_name}$ --all --quiet)
+        if [ ! ${podman_cp_container_id} == "" ]; then
+            note "1" "Delete control Plane container..."
+            ${CRI_PROVIDER} container stop ${CLUSTER_NAME}-control-plane
+            ${CRI_PROVIDER} container rm ${CLUSTER_NAME}-control-plane
+            succeeded "...done"
+        else
+            note "1" "...no, so nothing to be done!"
+        fi
+    fi
+
+
 }
 
 deploy_ingress_kourier() {
@@ -417,16 +435,23 @@ EOF
     else
         note "1" "Start a local Docker registry (unless it is already started)"
         # Start a local Docker registry (unless it already exists)
-        running="$(docker inspect -f '{{.State.Running}}' "${registry_name}" 2>/dev/null || true)"
+        running="$(${CRI_PROVIDER} inspect -f '{{.State.Running}}' "${registry_name}" 2>/dev/null || true)"
         if [ "${running}" != 'true' ]; then
-            docker run \
+            ${CRI_PROVIDER} run \
             -d --restart=always -p "${REGISTRY_PORT}:5000" --name "${registry_name}" \
             registry:2
         fi
 
         # Connect the local Docker registry with the kind network
-        docker network connect "kind" "${registry_name}" > /dev/null 2>&1 &
+        ${CRI_PROVIDER} network connect "kind" "${registry_name}" > /dev/null 2>&1 &
+        if [ "${CRI_PROVIDER}" == 'podman' ]; then
+            warn "Set the kind registry as an insecure registry by adding the following configuration to the /etc/containers/registries.conf.d/kind-registry.conf file"
+            log_message "0" '[[registry]]'
+            log_message "0" 'location = "localhost:5000"'
+            log_message "0" 'insecure = true'
+        fi
     fi
+
 }
 
 get_kind_cluster() {
@@ -504,11 +529,11 @@ nodes:
   ${kindCfgExtraMounts}
   extraPortMappings:
   - containerPort: ${CONTAINER_80_PORT}
-    hostPort: 80
+    hostPort: ${HOST_80_PORT}
     protocol: TCP
     listenAddress: "0.0.0.0"
   - containerPort: ${CONTAINER_443_PORT}
-    hostPort: 443
+    hostPort: ${HOST_443_PORT}
     protocol: TCP
     listenAddress: "0.0.0.0"
   - containerPort: 30000
@@ -558,8 +583,6 @@ EOF
 function install() {
     deploy_kind_cluster
 
-    deploy_kind_cluster
-
     deploy_docker_registry
 
     note "1" "INGRESS: ${INGRESS}"
@@ -572,13 +595,13 @@ function install() {
 
 function remove() {
     delete_kind_cluster
-    note "1" "Removing docker network..."
-    note "1" "Checking if docker network exists..."
-    docker_network_id=$(docker network ls --filter name=^kind$ --quiet)
+    note "1" "Removing ${CRI_PROVIDER} network..."
+    note "1" "Checking if ${CRI_PROVIDER} network exists..."
+    docker_network_id=$(${CRI_PROVIDER} network ls --filter name=^kind$ --quiet)
     if [ ! ${docker_network_id} == "" ]; then
-        note "1" "...yes, removing docker network..."
-        docker network rm kind
-        succeeded "1" "Docker network removed."
+        note "1" "...yes, removing ${CRI_PROVIDER} network..."
+        ${CRI_PROVIDER} network rm kind
+        succeeded "1" "${CRI_PROVIDER} network removed."
     else 
         note "1" "...no, nothing to be done then."
     fi
@@ -593,6 +616,23 @@ function validate_ingress() {
         CONTAINER_443_PORT=443
     else
         error "Invalid ingress ${INGRESS}."
+        show_usage
+        exit 1  
+    fi
+}
+
+function validate_cri() {
+    note "1" "CRI Provider: ${CRI_PROVIDER}"
+    if [ "${CRI_PROVIDER}" == 'docker' ]; then
+        unset KIND_EXPERIMENTAL_PROVIDER
+        HOST_80_PORT=80
+        HOST_443_PORT=443
+    elif [ "${CRI_PROVIDER}" == 'podman' ]; then
+        export KIND_EXPERIMENTAL_PROVIDER=podman
+        HOST_80_PORT=30080
+        HOST_443_PORT=30443
+    else
+        error "Invalid CRI provider ${CRI_PROVIDER}."
         show_usage
         exit 1  
     fi
@@ -613,6 +653,7 @@ SECURE_REGISTRY="n"
 SERVER_IP="127.0.0.1"
 SHOW_HELP="n"
 USE_EXISTING_CLUSTER="n"
+CRI_PROVIDER=docker
 
 while [ $# -gt 0 ]; do
     note "9" "$1"
@@ -625,6 +666,7 @@ while [ $# -gt 0 ]; do
         --ingress) INGRESS="$2"; shift ;;
         --knative-version) KNATIVE_VERSION="$2"; shift ;;
         --kubernetes-version) KUBERNETES_VERSION="$2"; shift ;;
+        --provider) CRI_PROVIDER="$2"; shift ;;
         --registry-image-version) REGISTRY_IMAGE_VERSION="$2"; shift ;;
         --registry-password) REGISTRY_PASSWORD="$2"; shift ;;
         --registry-port) REGISTRY_PORT="$2"; shift ;;
@@ -681,6 +723,8 @@ fi
 print_logo
 
 check_pre_requisites
+
+validate_cri
 
 kindCfgExtraMounts=""
 registry_name="${CLUSTER_NAME}-registry"
