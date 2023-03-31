@@ -152,6 +152,7 @@ show_usage() {
     log_message "0" "\t--knative-version <version>\t\tKNative version to be used. Default: 1.9.0"
     log_message "0" "\t--kubernetes-version <version>\t\tKubernetes version to be install. Default: latest"
     log_message "0" "\t--provider <provider>\t\t\tContainer Runtime [docker,podman]. Default: docker"
+    log_message "0" "\t--port-map <port map list>\t\t\tList of ports to map on kind config. e.g. 'ContainerPort1:HostPort1,ContainerPort2:HostPort2,...'"
     log_message "0" "\t--registry-image-version <version>\tVersion of the registry container to be used. Default: 2.6.2"
     log_message "0" "\t--registry-password <password>\t\tRegistry user password. Default: snowdrop"
     log_message "0" "\t--registry-port <port>\t\t\tPort to publish the registry. Default: 5000"
@@ -508,6 +509,19 @@ EOF
     fi
 
     kindCmd="kind -v ${LOGGING_VERBOSITY} create cluster  -n ${CLUSTER_NAME}"
+    kindExtraPortMappings=""
+    IFS=',' read -ra ADDR <<< "${PORT_MAP}"
+    for i in "${ADDR[@]}"; do
+        IFS=':' read -ra PORTS <<< "${i}"
+        kindExtraPortMappings+=$(cat <<EOF
+  - containerPort: ${PORTS[0]}
+    hostPort: ${PORTS[1]}
+    protocol: TCP
+    listenAddress: "0.0.0.0"
+EOF
+)
+        kindExtraPortMappings+="\n"
+    done
 
 # Kind cluster config template
     kindCfg=$(cat <<EOF
@@ -542,9 +556,13 @@ nodes:
   - containerPort: 31000
     hostPort: 31000
     protocol: tcp
+  - containerPort: 31080
+    hostPort: 31080
+    protocol: TCP
+    listenAddress: "0.0.0.0"
+${kindExtraPortMappings}
 EOF
 )
-
     note "5" "kindCfg: ${kindCfg}"
 
     if [ "$DELETE_KIND_CLUSTER" == "y" ]; then
@@ -654,6 +672,7 @@ SERVER_IP="127.0.0.1"
 SHOW_HELP="n"
 USE_EXISTING_CLUSTER="n"
 CRI_PROVIDER=docker
+PORT_MAP=""
 
 while [ $# -gt 0 ]; do
     note "9" "$1"
@@ -667,6 +686,7 @@ while [ $# -gt 0 ]; do
         --knative-version) KNATIVE_VERSION="$2"; shift ;;
         --kubernetes-version) KUBERNETES_VERSION="$2"; shift ;;
         --provider) CRI_PROVIDER="$2"; shift ;;
+        --port-map) PORT_MAP="$2"; shift ;;
         --registry-image-version) REGISTRY_IMAGE_VERSION="$2"; shift ;;
         --registry-password) REGISTRY_PASSWORD="$2"; shift ;;
         --registry-port) REGISTRY_PORT="$2"; shift ;;
