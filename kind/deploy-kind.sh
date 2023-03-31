@@ -259,10 +259,10 @@ delete_kind_cluster() {
     fi
     note "1" "Checking if kind registry container exists..."
     #docker_container_id=$(docker container ls --filter name=^kind-registry$ --all --quiet)
-    docker_container_id=$(${CRI_PROVIDER} container ls --filter name=^kind-registry$ --all --quiet)
+    docker_container_id=$(${CRI_PROVIDER} container ls --filter name=^${CLUSTER_NAME}-registry$ --all --quiet)
     if [ ! ${docker_container_id} == "" ]; then
         note "1" "...yes, removing docker kind registry container..."
-        docker container rm kind-registry -f
+        ${CRI_PROVIDER} container rm ${CLUSTER_NAME}-registry -f
         succeeded "1" "Docker kind registry container removed."
     else 
         note "1" "...no, that was easy!"
@@ -379,10 +379,10 @@ EOF
         note "1" "Securing registry..."
         note "1" "==== Create the htpasswd file where user: ${REGISTRY_USER} and password: ${REGISTRY_PASSWORD}"
         mkdir -p auth
-        docker run --entrypoint htpasswd registry:2.7.0 -Bbn ${REGISTRY_USER} ${REGISTRY_PASSWORD} > auth/htpasswd
+        ${CRI_PROVIDER} run --entrypoint htpasswd registry:2.7.0 -Bbn ${REGISTRY_USER} ${REGISTRY_PASSWORD} > auth/htpasswd
 
         note "1" "==== Creating a docker registry"
-        docker run -d \
+        ${CRI_PROVIDER} run -d \
             -p 5000:5000 \
             --restart=always \
             --name ${registry_name} \
@@ -397,7 +397,7 @@ EOF
 
         # connect the container registry to the cluster network
         # (the network may already be connected)
-        docker network connect kind "${registry_name}" --alias registry.local || true
+        ${CRI_PROVIDER} network connect kind "${registry_name}" --alias registry.local || true
 
         # Upload the self-signed certificate to the kind container
         name="${name:-"kind"}"
