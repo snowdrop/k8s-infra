@@ -3,7 +3,9 @@
 :toc: left
 :description: This document describes the requirements and the process to execute the provisioning of a Cloud VM on Openstack.
 
+
 == Prerequisites
+// tag::rhos_prerequisites[]
 
 You need to have both the `decorator` and `openstacksdk` pip packages installed.
 Depending on the existing state of your machine, you might need to do:
@@ -20,6 +22,7 @@ Install openstack.cloud Ansible collection.
 ----
 $ ansible-galaxy collection install openstack.cloud
 ----
+// end::rhos_prerequisites[]
 
 == VM Required Information
 

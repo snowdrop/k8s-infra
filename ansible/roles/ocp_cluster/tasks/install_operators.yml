@@ -1,0 +1,151 @@
+---
+- name: "Copy install-operators-role.yaml"
+  ansible.builtin.copy:
+    src: "install-operators-role.yaml"
+    dest: "{{ work_directory }}/install-operators-role.yaml"
+    mode: '0644'
+  when: install_operators
+
+- name: "Allow user to install operators in their namespaces"
+  ansible.builtin.shell: 
+    cmd: |
+                ./oc apply -f install-operators-role.yaml
+                ./oc adm policy add-cluster-role-to-user install-operators-role {{ ocp_user }}
+  args:
+    chdir: "{{ work_directory }}"
+  environment: 
+    KUBECONFIG: "{{ KUBECONFIG }}"
+  when: install_operators
+
+- name: "Install OpenShift Serverless Operator and activate knative components"
+  ansible.builtin.shell: 
+    cmd: |
+                    cat <<-EOF | ./oc apply -f -
+                    apiVersion: operators.coreos.com/v1alpha1
+                    kind: Subscription
+                    metadata:
+                      name: serverless-operator
+                      namespace: openshift-operators
+                    spec:
+                      source: redhat-operators
+                      sourceNamespace: openshift-marketplace
+                      name: serverless-operator
+                      installPlanApproval: Automatic
+                      channel: '${OPENSHIFT_VERSION:0:3}'
+                    EOF
+                    until ./oc -n openshift-operators wait --for condition=available deployment/knative-operator deployment/knative-openshift deployment/knative-openshift-ingress --timeout=240s; do
+                      echo "Waiting for the operator"; sleep 2;
+                    done
+    
+                    # Red Hat Serverless for OpenShift operator creates the knative-serving namespace by default on
+                    # '4.6' channel. This command creates a new namespace only if it does not exist.
+                    ./oc create namespace knative-serving --dry-run -o yaml | ./oc apply -f -
+                    cat <<-EOF | ./oc apply -f -
+                    apiVersion: operator.knative.dev/v1alpha1
+                    kind: KnativeServing
+                    metadata:
+                      name: knative-serving
+                      namespace: knative-serving
+                    EOF
+                    ./oc -n knative-serving wait --for=condition=ready --timeout=120s knativeserving.operator.knative.dev/knative-serving
+  args:
+    chdir: "{{ work_directory }}"
+  environment: 
+    KUBECONFIG: "{{ KUBECONFIG }}"
+  when: install_operators
+
+- name: "Install OpenShift Datagrid Operator"
+  ansible.builtin.shell: 
+    cmd: |
+                    INSTALL_NAMESPACE=datagrid-operator
+                    WATCH_NAMESPACE=datagrid-cluster
+
+                    echo Creating Datagrid operator namespace
+                    ./oc new-project $INSTALL_NAMESPACE --skip-config-write=true
+
+                    echo Creating an operator group
+                    cat <<-EOF | ./oc apply -f -
+                    apiVersion: operators.coreos.com/v1
+                    kind: OperatorGroup
+                    metadata:
+                      name: datagrid
+                      namespace: $INSTALL_NAMESPACE
+                    EOF
+
+                    echo Creating Datagrid cluster namespace
+                    ./oc new-project $WATCH_NAMESPACE --skip-config-write=true
+
+                    echo Creating a subscription for Datagrid operator
+                    cat <<-EOF | ./oc apply -f -
+                    apiVersion: operators.coreos.com/v1alpha1
+                    kind: Subscription
+                    metadata:
+                      name: datagrid-operator
+                      namespace: $INSTALL_NAMESPACE
+                    spec:
+                      channel: 8.2.x
+                      installPlanApproval: Automatic
+                      name: datagrid
+                      source: redhat-operators
+                      sourceNamespace: openshift-marketplace
+                      startingCSV: datagrid-operator.v8.2.2
+                    EOF
+
+                    until ./oc -n $INSTALL_NAMESPACE wait --for condition=available deployment/infinispan-operator-new-deploy --timeout=120s; do
+                      echo "Waiting for the operator"; sleep 2;
+                    done
+
+                    echo Adding rights to qe user for using Datagrid cluster namespace
+                    ./oc policy add-role-to-user admin {{ ocp_user }} --rolebinding-name=admin -n $WATCH_NAMESPACE
+  args:
+    chdir: "{{ work_directory }}"
+  environment: 
+    KUBECONFIG: "{{ KUBECONFIG }}"
+  when: install_operators
+
+# More info: https://docs.openshift.com/container-platform/4.5/monitoring/monitoring-your-own-services.html
+- name: "Configure Services Monitoring with Prometheus"
+  ansible.builtin.shell: 
+    cmd: |
+                echo "Adding role to add Service Monitor CRDs..."
+                cat <<EOF > ./monitor-crd-edit-role.yaml
+                kind: ClusterRole
+                apiVersion: rbac.authorization.k8s.io/v1
+                metadata:
+                  name: monitor-crd-edit
+                rules:
+                - apiGroups: ["monitoring.coreos.com", "apiextensions.k8s.io"]
+                  resources: ["prometheusrules", "servicemonitors", "podmonitors", "customresourcedefinitions"]
+                  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+                EOF
+                ./oc apply -f monitor-crd-edit-role.yaml
+                ./oc adm policy add-cluster-role-to-user monitor-crd-edit {{ ocp_user }}
+
+                echo "Configure cluster monitoring"
+                cat <<EOF > ./cluster-monitoring-config.yaml
+                apiVersion: v1
+                kind: ConfigMap
+                metadata:
+                  name: cluster-monitoring-config
+                  namespace: openshift-monitoring
+                data:
+                  config.yaml: |
+                    # For OCP 4.6 and later
+                    enableUserWorkload: true
+                    # For OCP 4.5 and earlier
+                    techPreviewUserWorkload:
+                      enabled: true
+                EOF
+                ./oc apply -f cluster-monitoring-config.yaml
+
+                PROMETHEUS_NAMESPACE=openshift-user-workload-monitoring
+                echo "Wait for the $PROMETHEUS_NAMESPACE namespace"
+                timeout 240s bash -c "until ./oc get namespace/$PROMETHEUS_NAMESPACE; do echo 'Waiting for namespace '$PROMETHEUS_NAMESPACE; sleep 2; done"
+                
+                ./oc adm policy add-role-to-user edit {{ ocp_user }} -n openshift-user-workload-monitoring
+  args:
+    chdir: "{{ work_directory }}"
+  environment: 
+    KUBECONFIG: "{{ KUBECONFIG }}"
+  when: install_operators
+...

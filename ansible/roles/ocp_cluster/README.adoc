@@ -1,0 +1,123 @@
+= Role: Openshift Container Platform Cluster
+:icons: font
+:revdate: {docdate}
+:toc: left
+
+== Description
+
+This role installs an OCP cluster on a RHOS cloud.
+
+== Requirements
+
+TODO
+
+== Role Variables
+
+[%header,cols="1,4"]
+|===
+| Parameter | Comments
+
+| `state`
+
+[.fuchsia]#string# / [.red]#required# 
+a| State of the cluster.
+
+Choices: 
+
+* `present` to install the cluster
+* `absent` to remove the cluster
+
+| `work_directory`
+
+[.fuchsia]#string# / [.red]#required# | Temporary work directory 
+
+| `installation_dir`
+
+[.fuchsia]#string#
+a| Installation folder for the OCP files, where `ocp_install_dir` is a role variable.
+Default: `work_directory/<ocp_install_dir>`
+
+|===
+
+
+[NOTE]
+======
+The full set of predefined variables can be found in the link:defaults/main.yml[default file].
+
+.Check the `defaults/main.yml` file contents
+[%collapsible]
+====
+
+[source,yaml]
+----
+include::defaults/main.yml[]
+----
+
+====
+
+======
+
+The version of the cluster to be installed can be changed using the parameter `k8s_version`.
+The following versions are currently link:vars/main.yml[supported].
+
+== Example Playbook
+
+.Sample playbook for deploying OCP on RHOS
+[source,yaml]
+----
+- name: "Install OCP"
+  hosts: localhost
+  gather_facts: true
+
+  pre_tasks:
+    - name: "Set openstack_auth facts"
+      set_fact:
+        openstack_auth: 
+          openstack_project_name: "rhos_project"
+          openstack_console_user:  "rhos_user"
+          openstack_console_password: "rhos_password"
+          openstack_user_domain:  "rhos_user_domain"
+          openstack_project_domain: "rhos_project_domain"
+          openstack_os_auth_url: "rhos_auth_url"
+          
+  tasks:
+    - name: "Deploy OCP"
+      import_role:
+        name: 'ocp_cluster'
+      vars:
+        state: present
+----
+
+.Sample playbook for removing OCP deployed on RHOS
+[source,yaml]
+----
+- name: "Uninstall OCP"
+  hosts: localhost
+  gather_facts: true
+
+  pre_tasks:
+    - name: "Set openstack_auth facts"
+      set_fact:
+        openstack_auth: 
+          openstack_project_name: "rhos_project"
+          openstack_console_user:  "rhos_user"
+          openstack_console_password: "rhos_password"
+          openstack_user_domain:  "rhos_user_domain"
+          openstack_project_domain: "rhos_project_domain"
+          openstack_os_auth_url: "rhos_auth_url"
+          
+  tasks:
+    - name: "Deploy OCP"
+      import_role:
+        name: 'ocp_cluster'
+      vars:
+        state: absent
+----
+
+== License
+
+https://www.apache.org/licenses/LICENSE-2.0[Apache License 2.0]
+
+== Author Information
+
+This role has been created by the https://github.com/orgs/snowdrop/teams[Snowdrop team].

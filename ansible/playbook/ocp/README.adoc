@@ -1,51 +1,149 @@
-# Table of Contents
+= OCP Ansible Playbooks
+:icons: font
+:toc: left
+:description: This document describes OCP specific playbooks.
 
-* [Introduction](#introduction)
-* [Prerequisites](#prerequisites)
-* [Provision a VM on OpenStack](#provision-a-vm-on-openstack)
-   * [Delete a VM](#delete-a-vm)
-   * [Connect to the new instance](#connect-to-the-new-instance)
-   * [Choose an image](#choose-an-image)
-   
-# Introduction
+== Before you start
 
-This document describes the requirements and the process to execute the provisioning of a Cloud VM on Openstack.
+[IMPORTANT]
+====
+The Ansible commands should be executed within the ansible folder !
+====
 
-# Prerequisites
+== OCP On OpenStack
 
-You need to have both the `decorator` and `openstacksdk` pip packages installed.
-Depending on the existing state of your machine, you might need to do:
+Playbooks to deploy and remove an OCP cluster to RHOS.
 
-```bash
-[sudo] pip install [--upgrade] decorator
-[sudo] pip install [--upgrade] openstacksdk
-```
+.List of OCP RHOS playbooks
+[cols="2m,1m,5"]
+|===
+|Playbook File |Description
 
-Install openstack.cloud Ansible collection.
+| ocp_openstack_install.yml
+| Deploy an OCP cluster on RHOS.
 
-```bash
-$ ansible-galaxy collection install openstack.cloud
-```
+| ocp_openstack_remove.yml
+| Remove an OCP cluster on RHOS.
 
-# Provision a VM on OpenStack
+| ocp_openstack_info.yml
+| Print information from the OCP cluster, for dev/testing purposes.
 
-> **IMPORTANT** : The Ansible commands should be executed within the ansible folder !
+| ocp_openstack_test.yml
+| Test some functionalities, for dev/testing purposes only!
+|===
 
-The first thing that needs to be done is to provision a fairly large CentOS virtual machine top of the Cloud operating system OpenStack.
+// tag::deploy_ocp_on_rhos[]
+=== Deploy OCP Cluster on RHOS
 
-This can of course be done via the OpenStack UI or can be automated using our Ansible openstack playbook. For the sake of the examples, and since the VM name will be used around several steps, the `VM_NAME` env variable will store the vm name.
+First obtain the OCP pull secret which can be obained from https://console.redhat.com/openshift/install/pull-secret.
 
-```bash
+Execute the playbook.
+
+.Command to execute the OCP deployment playbook.
+[source,bash]
+----
+ansible-playbook -i inventory/ playbook/ocp/ocp_openstack_install.yml -e work_directory=/opt/ocp -e openshift_pull_secret=${OCP_PULL_SECRET} -K
+----
+
+The playbook will result on the deployment of several RHOS VMs for control plane and worker nodes.
+
+.Note on the RHOS VM flavors
+[NOTE]
+====
+The RHOS flavors to be used on the VMs that will result on the OCP cluster are
+defined by the `openstack_flavor_control_plane` and `openstack_flavor_compute` 
+variables, having as default the values from the role defaults file.
+
+.Ansible Role default flavor configuration
+[source,yaml]
+----
+include::../../roles/ocp_cluster/defaults/main.yml[tag=rhos_default_flavors]
+----
+
+The list of flavors is identified on the link:../../../openstack/README.adoc#Flavors[OpenStack README file].
+====
+// end::deploy_ocp_on_rhos[]
+
+// tag::undeploy_ocp_on_rhos[]
+=== Undeploy OCP Cluster on RHOS
+
+[WARNING]
+====
+For the removal process to be successfull the OCP installation directory 
+(`installation_dir`) must be provided as it store information on the RHOS
+objects associated to the project.
+====
+
+.Command to execute the OCP cluster removal playbook.
+[source,bash]
+----
+ansible-playbook -i inventory/ playbook/ocp/ocp_openstack_remove.yml \
+  -e work_directory=/opt/ocp \
+  -e installation_dir=/opt/ocp/openshift-data/
+----
+// end::undeploy_ocp_on_rhos[]
+
+=== Other OCP RHOS Playbooks
+
+[source,bash]
+----
+ansible-playbook playbook/ocp/ocp_openstack_info.yml -e work_directory=/opt/ocp -e installation_dir=/opt/ocp/openshift-data/ -e ocp_cluster_name=ocp -e snowdrop_domain="snowdrop.dev"  -vv
+----
+
+== Playbooks
+
+=== PasswordStore
+
+Create OpenStack instance based on passwordstore
+
+.openstack_vm_create_paswordstore parameters
+[cols="2m,1m,5"]
+|===
+|Field name |Mandatory |Description
+
+| vm_name
+| x
+| Name of the VM being created. Will be used both as hostname as well as Ansible Inventory name.
+
+| openstack.vm.network
+| x
+| Value for the OpenStack provider network. `provider_net_shared`
+
+| openstack.vm.image
+| x
+| OpenStack VM image, e.g. `Fedora-Cloud-Base-35`.
+
+| openstack.vm.flavor"
+| x
+| OpenStack VM flavor (size), e.g. `m1.medium`.
+
+| key_name
+| -
+| Use an existing SSH key (value) instead of creating one for the VM.
+
+| k8s_type
+| *for k8s hosts.*
+| Kubernetes host type [master,worker].
+
+| k8s_version
+| *for k8s hosts.*
+| Kubernetes version to be associated with the host, e.g. for version `1.23` use `123`. This is actually an Ansible Inventory group having definitions associated with each of the Kubernetes version.
+|===
+
+[source,bash]
+----
 $ VM_NAME=vm20210221-t01
-```
+----
 
-```bash
-$ ansible-playbook playbook/openstack/openstack_vm_create_aggregate.yml -e k8s_type=masters -e k8s_version=121 -e '{"openstack": {"vm": {"network": "provider_net_shared"}}}' -e vm_name=${VM_NAME} --tags create
-```
+[source,bash]
+----
+$ ansible-playbook playbook/openstack/openstack_vm_create_paswordstore.yml -e k8s_type=masters -e k8s_version=123 -e '{"openstack": {"vm": {"network": "provider_net_shared","image": "Fedora-Cloud-Base-35", "flavor": "m1.medium"}}}' -e key_name=test-adm-key -e vm_name=${VM_NAME} 
+----
 
 This playbook should finish with something like:
 
-```
+[source]
+....
 PLAY RECAP **********************************************************************************************************************************************************************************************************************
 localhost                  : ok=68   changed=20   unreachable=0    failed=0    skipped=13   rescued=0    ignored=1   
 vm20210221-t01             : ok=32   changed=20   unreachable=0    failed=0    skipped=1    rescued=0    ignored=0   
@@ -72,28 +170,26 @@ sec/firewalld : firewalld - Manage firewall ports ------------------------------
 sec/sshd_port : Change the ssh port number ------------------------------------------------- 4.60s
 sec/firewalld : firewalld - Manage firewall services --------------------------------------- 4.58s
 sec/firewalld : Restart firewalld ---------------------------------------------------------- 4.51s
-```
+....
 
 The playbook also uses the variables defined in `roles/openstack/vm/defaults/main.yml`. Those variables can also be overridden using the syntax above.
 
-For example to override the VM flavor, network and security group, one would execute the following command:
+[source,yaml]
+----
+include::../../roles/openstack/vm/defaults/main.yml[]
+----
 
-```
-ansible-playbook playbook/openstack.yml \
-   -e vm_name=${VM_NAME} \
-   -e type=cloude \
-   -e '{"state": "present", "hostname": "somehostname", "openstack": {"timeout": "600","os_username": "username", "os_password": "password", "os_domain": "domain", "os_auth_url": "https://somehost:13000/v3", "os_project_id": "someprojectid", "vm": {"network": "some_network", "security_group": "some_security_group", "flavor": "m1.medium"}}}'`
-```
-
-## Delete a VM
+=== Delete a VM
 
 To delete a VM, simply execute the `openstack_vm_remove_aggregate` playbook.
 
-```bash
-$ ansible-playbook playbook/openstack/openstack_vm_remove_aggregate.yml -e vm_name=${VM_NAME}
-```
+[source,bash]
+----
+ansible-playbook -i inventory/ playbook/ocp/ocp_openstack_install.yml -e target_dir=/home/ajc102/docs/redhat/_tmp/ocp
+----
 
-```
+[source]
+....
 PLAY RECAP **********************************************************************************************************************************************************************************************************************
 localhost                  : ok=17   changed=5    unreachable=0    failed=0    skipped=1    rescued=0    ignored=2   
 
@@ -116,19 +212,21 @@ openstack/vm : include_tasks ---------------------------------------------------
 Validate required variables ---------------------------------------------------------------- 0.08s
 openstack/vm : Print Openstack output ------------------------------------------------------ 0.07s
 openstack/vm : include_tasks --------------------------------------------------------------- 0.07s
-```
+....
 
-## Connect to the new instance
+=== Connect to the new instance
 
 Since all the information related to the host will be managed by our ansible passwordstore roles, which also stores the ssh public and secret keys locally on the `~/.ssh` folder, to login to the newly created VM is as simple as launching the following command.
 
-```bash
+[source,bash]
+----
 $ ssh -i ~/.ssh/id_rsa_snowdrop_openstack_${VM_NAME} `pass show openstack/${VM_NAME}/os_user | head -n 1`@`pass show openstack/${VM_NAME}/ansible_ssh_host | head -n 1` -p `pass show openstack/${VM_NAME}/ansible_ssh_port | head -n 1`
-```
+----
 
 This should connect ot the newly created VM.
 
-```
+[source]
+====
 Last login: Thu Jan 1 00:00:00 1970 from x.x.x.x
 ------------------
 
@@ -137,46 +235,5 @@ Access is forbidden to all unauthorized person.
 All activity is being monitored.
 
 Welcome to vm20210221-t01..
-```
-
-## Choose an image
-
-Different OS images are available on Openstack.
-
-e.g.
-* CentOS-7-x86_64-GenericCloud-released-latest
-* CentOS-8-x86_64-GenericCloud-released-latest
-
-To select a specific image use the `openstack.vm.image` variable override.
-
-```bash
-$ ansible-playbook playbook/openstack/openstack_vm_create_aggregate.yml -e k8s_type=masters -e k8s_version=121 -e '{"openstack": {"vm": {"image": "CentOS-8-x86_64-GenericCloud-released-latest", "network": "provider_net_shared"}}}' -e vm_name=${VM_NAME} --tags create
-```
-
-## Choose a flavor
-
-| Flavor | VCPUS | RAM | Total Disks | Root Disk | Ephmeral Disk |
-| --- | --- | --- | --- | --- | --- |
-| m1.medium | 2 | 4 GB | 40 GB | 40 GB | 0 GB |
-| ci.m1.medium | 2 | 4 GB | 40 GB | 40 GB | 0 GB |
-| ci.m1.medium.large	| 4| 4 GB | 16 GB | 16 GB | 0 GB |
-| ci.m5.large | 16 | 32GB | 40GB | 40GB | 0GB |
-
-To select a specific flavor use the `openstack.vm.flavor` variable override.
-
-```bash
-$ ansible-playbook playbook/openstack/openstack_vm_create_aggregate.yml -e k8s_type=masters -e k8s_version=121 -e '{"openstack": {"vm": {"flavor": "m1.medium", "network": "provider_net_shared"}}}' -e vm_name=${VM_NAME} --tags create
-```
-
-## Troubleshooting
-
-### Python.h: No such file or directory error when installing openstacksdk
-
-Cause missing `python3-devel`
-
-Solution
-
-```bash
-sudo dnf install python3-devel
-```
+====
 

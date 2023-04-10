@@ -1,0 +1,46 @@
+additionalTrustBundlePolicy: Proxyonly
+apiVersion: v1
+baseDomain: {{ snowdrop_domain }}
+compute:
+- architecture: amd64
+  hyperthreading: Enabled
+  name: worker
+  platform:
+    openstack:
+      type: {{ openstack_flavor_compute }}
+  replicas: 3
+controlPlane:
+  architecture: amd64
+  hyperthreading: Enabled
+  name: master
+  platform: {}
+  replicas: 3
+metadata:
+  creationTimestamp: null
+  name: {{ ocp_cluster_name }}
+networking:
+  clusterNetwork:
+  - cidr: 10.128.0.0/14
+    hostPrefix: 23
+  machineNetwork:
+  - cidr: 172.208.0.0/16
+#  - cidr: 10.0.0.0/16
+  networkType: OVNKubernetes
+  serviceNetwork:
+  - 172.30.0.0/16
+platform:
+  openstack:
+    apiFloatingIP: {{ rhos_floating_ip_api_address }}
+#    apiVIPs:
+#    - 10.0.0.5
+    cloud: openstack
+    computeFlavor: {{ openstack_flavor_control_plane }}
+    defaultMachinePlatform:
+      type: {{ openstack_flavor_control_plane }}
+    externalDNS: null
+    externalNetwork: {{ openstack_network_provider }}
+#    ingressVIPs:
+#    - 10.0.0.7
+publish: External
+pullSecret: '{{ openshift_pull_secret }}'
+sshKey: '{{ shared_ssh_public_key }}'

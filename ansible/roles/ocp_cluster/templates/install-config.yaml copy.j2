@@ -1,0 +1,73 @@
+apiVersion: v1
+baseDomain: {{ snowdrop_domain }}
+metadata:
+  name: {{ ocp_cluster_name }}
+controlPlane:
+#  name: master
+#  platform: {}
+#  replicas: 3
+  architecture: amd64
+  hyperthreading: Enabled
+  name: master
+  platform: {}
+  replicas: 3
+compute:
+#- name: worker
+#  platform:
+#    openstack:
+#      type: {{ openstack_flavor_compute }}
+#  replicas: 3
+- architecture: amd64
+  hyperthreading: Enabled
+  name: worker
+  platform: {}
+#  platform:
+#    openstack:
+#      type: {{ openstack_flavor_compute }}
+  replicas: 3
+networking:
+#    clusterNetwork:
+#    - cidr: 10.128.0.0/14
+  hostPrefix: 23
+  machineCIDR: 172.208.0.0/16
+  networkType: OpenShiftSDN
+#    serviceNetwork:
+#    - 172.30.0.0/16
+    clusterNetwork:
+    - cidr: 172.20.0.0/14
+#      hostPrefix: 23
+#    machineCIDR: 172.208.0.0/16
+#    machineNetwork:
+#    - cidr: 172.208.0.0/16
+#    networkType: OpenShiftSDN
+#    serviceNetwork:
+#    - 172.30.0.0/16
+platform:
+  openstack:
+#    cloud: openstack
+#    computeFlavor: {{ openstack_flavor_control_plane }}
+#    externalDNS: null
+#    externalNetwork: {{ openstack_network_provider }}
+#    lbFloatingIP: {{ openstack_floating_ip }}
+#    octaviaSupport: "0"
+#    region: "regionOne"
+#    trunkSupport: "1"
+    apiFloatingIP: 10.0.213.201
+    apiVIPs:
+    - 172.208.0.5
+#    - 172.31.0.5
+    cloud: openstack
+    computeFlavor: {{ openstack_flavor_control_plane }}
+    defaultMachinePlatform:
+      type: ci.m1.xlarge
+    externalDNS: null
+    externalNetwork: {{ openstack_network_provider }}
+    ingressVIPs:
+    - 172.208.0.7
+#    lbFloatingIP: {{ openstack_floating_ip }}
+    octaviaSupport: "0"
+    region: regionOne
+    trunkSupport: "1"
+publish: External
+pullSecret: '{{ openshift_pull_secret }}'
+sshKey: '{{ shared_ssh_public_key }}'

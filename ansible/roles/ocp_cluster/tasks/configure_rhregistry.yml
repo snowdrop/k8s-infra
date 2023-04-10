@@ -1,0 +1,35 @@
+---
+# https://docs.openshift.com/container-platform/4.3/applications/projects/configuring-project-creation.html#modifying-template-for-new-projects_configuring-project-creation
+# https://docs.openshift.com/container-platform/4.3/registry/registry-options.html#registry-authentication-enabled-registry-overview_registry-options
+# https://access.redhat.com/RegistryAuthentication
+#
+# alternative option, didn't try:
+# https://docs.openshift.com/container-platform/4.3/openshift_images/managing_images/using-image-pull-secrets.html#images-update-global-pull-secret_using-image-pull-secrets
+- name: "Create a project template that has preconfigured access token for the Red Hat registry"
+  ansible.builtin.shell: 
+    cmd: "./oc adm create-bootstrap-project-template -o json > project-template.json"
+  args:
+    chdir: "{{ work_directory }}"
+  environment: 
+    KUBECONFIG: "{{ KUBECONFIG }}"
+
+- name: "Template add-secret.jq"
+  ansible.builtin.template:
+    src: "templates/add-secret.jq.j2"
+    dest: "{{ work_directory }}/add-secret.jq"
+    mode: '0644'
+  when: configure_rh_reg
+
+- name: "Create a project template that has preconfigured access token for the Red Hat registry"
+  ansible.builtin.shell: 
+    cmd: |
+        jq -f add-secret.jq project-template.json > project-template-modified.json
+
+        ./oc create -f project-template-modified.json -n openshift-config
+        ./oc patch project.config.openshift.io/cluster --patch '{"spec":{"projectRequestTemplate":{"name":"project-request"}}}' --type=merge
+  args:
+    chdir: "{{ work_directory }}"
+  environment: 
+    KUBECONFIG: "{{ KUBECONFIG }}"
+  when: configure_rh_reg
+...

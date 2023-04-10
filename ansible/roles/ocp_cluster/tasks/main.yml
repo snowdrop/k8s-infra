@@ -1,0 +1,34 @@
+---
+- name: "Create work directory"
+  ansible.builtin.file:
+    path: "{{ work_directory }}"
+    state: directory
+  register: create_work_dir_res
+
+- name: "Template OpenStack auth"
+  ansible.builtin.template:
+    src: "templates/clouds.yaml.j2"
+    dest: "{{ work_directory }}/clouds.yaml"
+    mode: '0600'
+
+- name: "Set default installation_dir, if not defined"
+  ansible.builtin.set_fact:
+    installation_dir: "{{ work_directory }}/{{ ocp_install_dir }}"
+  when: installation_dir is undefined
+
+- include_tasks: install.yml
+  # vars:
+  #   installation_dir: "{{ installation_dir }}"
+  when: state == 'present'
+
+- include_tasks: remove.yml
+  # vars:
+  #   installation_dir: "{{ work_directory }}/{{ ocp_install_dir }}"
+  when: state == 'absent'
+
+- name: "Delete OpenStack auth file"
+  ansible.builtin.file:
+    path: "templates/clouds.yaml.j2"
+    state: absent
+...
+# ansible-playbook -i inventory/ playbook/ocp/ocp_openstack_info.yml -e work_directory=/opt/ocp -e installation_dir=/opt/ocp/openshift-data/

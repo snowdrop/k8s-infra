@@ -1,0 +1,54 @@
+= OCP on OpenStack
+Antonio Costa
+:revdate: {docdate}
+:icons: font
+:toc: left
+:toclevels: 3
+:description: This document describes the installation procedure to deploy an OCP cluster on RHOS.
+
+== Introduction
+
+Using the Ansible OCP Cluster role, this document describes the procedure to deploy an OCP cluster on RHOS.
+
+[glossary]
+== Acronyms
+
+[glossary]
+OCP:: OpenShift Container Platform
+RHOS:: RedHat OpenStack
+
+== Overview
+
+To perform the installation task the Ansible playbook and role used to install an OCP cluster on a RHOS cloud use the link:https://docs.openshift.com/container-platform/4.12/installing/index.html[OpenShift install] procedure for OpenStack. 
+
+[NOTE]
+====
+More detailed information on the installation procedure is available in the link:https://docs.openshift.com/container-platform/4.12/installing/installing_openstack/preparing-to-install-on-openstack.html[RedHat OpenShift / Installing on OpenStack] page.
+====
+
+The deployment process generates an `install-config.yaml` file that is fed to the `openshift-install` process which generates the RHOS VMs and deploys the OCP cluster on them.
+
+== Prerequisites
+
+The prerequisites for using RHOS Ansible Playbooks are the following.
+
+._Click to open the details_
+[%collapsible]
+====
+
+[]
+======
+include::../openstack/README.adoc[tag=rhos_prerequisites]
+======
+
+====
+
+More information on the link:../openstack/README.adoc[OpenStack README] for this project.
+
+== Deploy OCP cluster on RHOS
+
+include::../ansible/playbook/ocp/README.adoc[tag=deploy_ocp_on_rhos]
+
+== Remove existing OCP cluster on RHOS
+
+include::../ansible/playbook/ocp/README.adoc[tag=undeploy_ocp_on_rhos]

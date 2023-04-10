@@ -1,0 +1,400 @@
+---
+- name: "INFO OCP"
+  hosts: localhost
+  gather_facts: true
+
+  pre_tasks:
+    - name: "Set openstack_auth facts"
+      set_fact:
+        openstack_auth: 
+          openstack_project_name: "{{ query('passwordstore', 'openstack/host/project_name')[0] }}"
+          openstack_console_user:  "{{ query('passwordstore', 'openstack/host/console_user')[0] }}"
+          openstack_console_password: "{{ query('passwordstore', 'openstack/host/console_pw')[0] }}"
+          openstack_user_domain:  "{{ query('passwordstore', 'openstack/host/console_domain')[0] }}"
+          openstack_project_domain: "{{ query('passwordstore', 'openstack/host/os_domain')[0] }}"
+          openstack_os_auth_url: "{{ query('passwordstore', 'openstack/host/os_auth_url')[0] }}"
+          
+  tasks:
+    # - name: "Add API Floating IP to /etc/hosts"
+    #   ansible.builtin.lineinfile:
+    #     dest: /etc/hosts
+    #     regexp: '.*api.{{ ocp_cluster_name }}.{{ snowdrop_domain }}.*$'
+    #     line: "{{ rhos_floating_ip_api_address }} api.{{ ocp_cluster_name }}.{{ snowdrop_domain }}"
+    #     state: present
+    #   become: true
+
+    # - name: "Add Ingress Floating IP to /etc/hosts"
+    #   ansible.builtin.lineinfile:
+    #     dest: /etc/hosts
+    #     regexp: '.*console-openshift-console.apps.{{ ocp_cluster_name }}.{{ snowdrop_domain }}.*$'
+    #     line: "{{ rhos_floating_ip_ingress_address }} console-openshift-console.apps.{{ ocp_cluster_name }}.{{ snowdrop_domain }} oauth-openshift.apps.{{ ocp_cluster_name }}.{{ snowdrop_domain }} integrated-oauth-server-openshift-authentication.apps.{{ ocp_cluster_name }}.{{ snowdrop_domain }} prometheus-k8s-openshift-monitoring.apps.{{ ocp_cluster_name }}.{{ snowdrop_domain }} grafana-openshift-monitoring.apps.{{ ocp_cluster_name }}.{{ snowdrop_domain }}"
+    #     state: present
+    #   become: true
+
+      - name: "Get Ingress Floating IP information"
+        openstack.cloud.floating_ip_info:
+          auth:
+            project_name: "{{ openstack_auth.openstack_project_name }}"
+            username: "{{ openstack_auth.openstack_console_user }}"
+            password: "{{ openstack_auth.openstack_console_password }}"
+            user_domain_name: "{{ openstack_auth.openstack_user_domain }}"
+            project_domain_name: "{{ openstack_auth.openstack_project_domain }}"
+            auth_url: "{{ openstack_auth.openstack_os_auth_url }}"
+          floating_ip_address: "{{ rhos_floating_ip_ingress_address }}"
+        register: rhos_floating_ip_ingress_info_res
+
+      - name: "Get Ingress port information"
+        openstack.cloud.port_info:
+          auth:
+            project_name: "{{ openstack_auth.openstack_project_name }}"
+            username: "{{ openstack_auth.openstack_console_user }}"
+            password: "{{ openstack_auth.openstack_console_password }}"
+            user_domain_name: "{{ openstack_auth.openstack_user_domain }}"
+            project_domain_name: "{{ openstack_auth.openstack_project_domain }}"
+            auth_url: "{{ openstack_auth.openstack_os_auth_url }}"
+          filters:
+            name: "{{ ocp_cluster_id }}-ingress-port"
+        register: rhos_ocp_cluster_ingress_port
+
+      - name: "Print Port details"
+        debug:
+          msg: "{{ item }}"
+          verbosity: 0
+        loop:
+          - "rhos_floating_ip_ingress_info_res: {{ rhos_floating_ip_ingress_info_res }}"
+          - "rhos_ocp_cluster_ingress_port: {{ rhos_ocp_cluster_ingress_port }}"
+
+      - name: "Set facts for Floating IP Set"
+        ansible.builtin.set_fact:
+          ingress_floating_ip_id: "{{ rhos_floating_ip_ingress_info_res.floating_ips[0].id }}"
+          ingress_port_ip: "{{ rhos_ocp_cluster_ingress_port.openstack_ports[0].fixed_ips[0].ip_address }}"
+          ingress_port_id: "{{ rhos_ocp_cluster_ingress_port.openstack_ports[0].id }}"
+
+      #- name: "Set fact from ingress Floating IP"
+      #  ansible.builtin.set_fact:
+      #    rhos_floating_ip_ingress: "{{ rhos_floating_ip_ingress_show_res.stdout | from_json }}"
+
+      - name: "Associate the Floating IP with the ingress server"
+        ansible.builtin.shell: 
+          cmd: |
+            openstack --os-cloud openstack floating ip set --fixed-ip-address {{ ingress_port_ip }} --port {{ ingress_port_id }} {{ ingress_floating_ip_id }}
+        args:
+          chdir: "{{ work_directory }}"
+
+      # and create a DNS record for it
+      # https://docs.openshift.com/container-platform/4.3/installing/installing_openstack/installing-openstack-installer-custom.html#installation-osp-configuring-api-floating-ip_installing-openstack-installer-custom
+      - name: "Template nsupdate ingress"
+        ansible.builtin.template:
+          src: "templates/nsupdate-api.txt.j2"
+          dest: "{{ work_directory }}/nsupdate-api.txt"
+          mode: '0644'
+        when: use_dns
+
+      - name: "Run nsupdate"
+        ansible.builtin.shell: 
+          cmd: |
+            export OPENSTACK_PORT_INGRESS=$(openstack port list -f value -c Name | grep -x "{{ ocp_cluster_name }}-.....-ingress-port")
+            export OPENSTACK_FLOATING_IP_INGRESS=$(openstack floating ip create --description "Ingress {{ ocp_cluster_name }}.{{ snowdrop_domain }}" --port {{ rhos_floating_ip_ingress_address }} -f value -c floating_ip_address {{ openstack_network_provider }})
+            nsupdate -v -k xpaasqe.dnskey nsupdate-ingress.txt
+        args:
+          chdir: "{{ work_directory }}"
+        when: use_dns
+
+      # at this point, the OpenShift cluster is running in stock configuration
+      - name: "Wait a little (because why not, it helps the installer...)"
+        ansible.builtin.pause:
+          seconds: 60
+
+      # https://docs.openshift.com/container-platform/4.3/installing/installing_openstack/installing-openstack-installer-custom.html#cli-logging-in-kubeadmin_installing-openstack-installer-custom
+      - name: "Use kubeadmin for initial cluster configuration"
+        ansible.builtin.set_fact:
+          KUBECONFIG: "{{ installation_dir }}/auth/kubeconfig"
+
+      # TODO: oc create must use kubeconfig located on {{ installation_dir }}/auth/kubeconfig
+      # https://docs.openshift.com/container-platform/4.3/authentication/identity_providers/configuring-htpasswd-identity-provider.html
+      - name: "Configure htpasswd auth provider"
+        ansible.builtin.shell: 
+          cmd: |
+            htpasswd -c -B -b users.htpasswd admin admin
+            htpasswd -b users.htpasswd {{ ocp_user }} {{ ocp_user }}
+            ./oc create secret generic htpass-secret --from-file=htpasswd=users.htpasswd -n openshift-config
+        args:
+          chdir: "{{ work_directory }}"
+        environment: 
+          KUBECONFIG: "{{ KUBECONFIG }}"
+
+      - name: "Template htpasswd-provider"
+        ansible.builtin.copy:
+          src: "htpasswd-provider.yaml"
+          dest: "{{ work_directory }}/htpasswd-provider.yaml"
+          mode: '0644'
+
+      - name: "Create user accounts 'admin' and {{ ocp_user }}"
+        ansible.builtin.shell: 
+          cmd: |
+            ./oc apply -f htpasswd-provider.yaml
+            ./oc adm policy add-cluster-role-to-user cluster-admin admin
+            ./oc adm policy add-cluster-role-to-user basic-user {{ ocp_user }}
+        args:
+          chdir: "{{ work_directory }}"
+        environment: 
+          KUBECONFIG: "{{ KUBECONFIG }}"
+
+      - name: "Wait a minute, it takes a while for the new auth to start working"
+        ansible.builtin.pause:
+          seconds: 60
+
+      # https://docs.openshift.com/container-platform/4.3/applications/projects/configuring-project-creation.html#modifying-template-for-new-projects_configuring-project-creation
+      # https://docs.openshift.com/container-platform/4.3/registry/registry-options.html#registry-authentication-enabled-registry-overview_registry-options
+      # https://access.redhat.com/RegistryAuthentication
+      #
+      # alternative option, didn't try:
+      # https://docs.openshift.com/container-platform/4.3/openshift_images/managing_images/using-image-pull-secrets.html#images-update-global-pull-secret_using-image-pull-secrets
+      - name: "Create a project template that has preconfigured access token for the Red Hat registry"
+        ansible.builtin.shell: 
+          cmd: "./oc adm create-bootstrap-project-template -o json > project-template.json"
+        args:
+          chdir: "{{ work_directory }}"
+        environment: 
+          KUBECONFIG: "{{ KUBECONFIG }}"
+
+      - name: "Template add-secret.jq"
+        ansible.builtin.template:
+          src: "templates/add-secret.jq.j2"
+          dest: "{{ work_directory }}/add-secret.jq"
+          mode: '0644'
+        when: configure_rh_reg
+
+      - name: "Create a project template that has preconfigured access token for the Red Hat registry"
+        ansible.builtin.shell: 
+          cmd: |
+              jq -f add-secret.jq project-template.json > project-template-modified.json
+
+              ./oc create -f project-template-modified.json -n openshift-config
+              ./oc patch project.config.openshift.io/cluster --patch '{"spec":{"projectRequestTemplate":{"name":"project-request"}}}' --type=merge
+        args:
+          chdir: "{{ work_directory }}"
+        environment: 
+          KUBECONFIG: "{{ KUBECONFIG }}"
+        when: configure_rh_reg
+
+      # https://docs.openshift.com/container-platform/4.3/registry/configuring-registry-operator.html#images-configuration-cas_configuring-registry-operator
+      - name: "Add internal CA as trusted for internal registries"
+        ansible.builtin.shell: 
+          cmd: |
+                      wget -q https://password.corp.redhat.com/RH-IT-Root-CA.crt
+                      ./oc create configmap registry-ca -n openshift-config \
+                        --from-file=docker-registry.upshift.redhat.com=RH-IT-Root-CA.crt \
+                        --from-file=brew-pulp-docker01.web.prod.ext.phx2.redhat.com..8888=RH-IT-Root-CA.crt \
+                        --from-file=docker-registry.engineering.redhat.com=RH-IT-Root-CA.crt \
+                        --from-file=registry-proxy.engineering.redhat.com=RH-IT-Root-CA.crt \
+                        --from-file=registry.stage.redhat.io=RH-IT-Root-CA.crt
+                      ./oc patch image.config.openshift.io/cluster --patch '{"spec":{"additionalTrustedCA":{"name":"registry-ca"}}}' --type=merge
+        args:
+          chdir: "{{ work_directory }}"
+
+      # https://docs.openshift.com/container-platform/4.3/registry/configuring-registry-operator.html#registry-operator-default-crd_configuring-registry-operator
+      - name: "Expose image registry publicly"
+        ansible.builtin.shell: 
+          cmd: |
+            ./oc patch configs.imageregistry.operator.openshift.io/cluster --patch '{"spec":{"defaultRoute":true}}' --type=merge
+        args:
+          chdir: "{{ work_directory }}"
+
+      # Use Quarkus logo for OpenShift console
+      # https://docs.openshift.com/container-platform/4.3/web_console/customizing-the-web-console.html#adding-a-custom-logo_customizing-web-console
+      - name: "Download logo and create CM"
+        ansible.builtin.shell: 
+          cmd: |
+            wget -q -O quarkus-logo.png https://design.jboss.org/quarkus/logo/final/PNG/quarkus_logo_horizontal_rgb_450px_reverse.png
+            ./oc create configmap console-custom-logo --from-file quarkus-logo.png -n openshift-config
+        args:
+          chdir: "{{ work_directory }}"
+        when: use_logo
+
+      - name: "Template custom-logo.yaml"
+        ansible.builtin.copy:
+          src: "custom-logo.yaml"
+          dest: "{{ work_directory }}/custom-logo.yaml"
+          mode: '0644'
+        when: use_logo
+
+      - name: "Apply logo to OpenShift console"
+        ansible.builtin.shell: 
+          cmd: |
+            ./oc apply -f custom-logo.yaml
+        args:
+          chdir: "{{ work_directory }}"
+        when: use_logo
+
+      - name: "Copy install-operators-role.yaml"
+        ansible.builtin.copy:
+          src: "install-operators-role.yaml"
+          dest: "{{ work_directory }}/install-operators-role.yaml"
+          mode: '0644'
+        when: install_operators
+
+      - name: "Allow user to install operators in their namespaces"
+        ansible.builtin.shell: 
+          cmd: |
+                      ./oc apply -f install-operators-role.yaml
+                      ./oc adm policy add-cluster-role-to-user install-operators-role {{ ocp_user }}
+        args:
+          chdir: "{{ work_directory }}"
+        when: install_operators
+
+      - name: "Install OpenShift Serverless Operator and activate knative components"
+        ansible.builtin.shell: 
+          cmd: |
+                          cat <<-EOF | ./oc apply -f -
+                          apiVersion: operators.coreos.com/v1alpha1
+                          kind: Subscription
+                          metadata:
+                            name: serverless-operator
+                            namespace: openshift-operators
+                          spec:
+                            source: redhat-operators
+                            sourceNamespace: openshift-marketplace
+                            name: serverless-operator
+                            installPlanApproval: Automatic
+                            channel: '${OPENSHIFT_VERSION:0:3}'
+                          EOF
+                          until ./oc -n openshift-operators wait --for condition=available deployment/knative-operator deployment/knative-openshift deployment/knative-openshift-ingress --timeout=240s; do
+                            echo "Waiting for the operator"; sleep 2;
+                          done
+          
+                          # Red Hat Serverless for OpenShift operator creates the knative-serving namespace by default on
+                          # '4.6' channel. This command creates a new namespace only if it does not exist.
+                          ./oc create namespace knative-serving --dry-run -o yaml | ./oc apply -f -
+                          cat <<-EOF | ./oc apply -f -
+                          apiVersion: operator.knative.dev/v1alpha1
+                          kind: KnativeServing
+                          metadata:
+                            name: knative-serving
+                            namespace: knative-serving
+                          EOF
+                          ./oc -n knative-serving wait --for=condition=ready --timeout=120s knativeserving.operator.knative.dev/knative-serving
+        args:
+          chdir: "{{ work_directory }}"
+        when: install_operators
+
+      - name: "Install OpenShift Datagrid Operator"
+        ansible.builtin.shell: 
+          cmd: |
+                          INSTALL_NAMESPACE=datagrid-operator
+                          WATCH_NAMESPACE=datagrid-cluster
+
+                          echo Creating Datagrid operator namespace
+                          ./oc new-project $INSTALL_NAMESPACE --skip-config-write=true
+
+                          echo Creating an operator group
+                          cat <<-EOF | ./oc apply -f -
+                          apiVersion: operators.coreos.com/v1
+                          kind: OperatorGroup
+                          metadata:
+                            name: datagrid
+                            namespace: $INSTALL_NAMESPACE
+                          EOF
+
+                          echo Creating Datagrid cluster namespace
+                          ./oc new-project $WATCH_NAMESPACE --skip-config-write=true
+
+                          echo Creating a subscription for Datagrid operator
+                          cat <<-EOF | ./oc apply -f -
+                          apiVersion: operators.coreos.com/v1alpha1
+                          kind: Subscription
+                          metadata:
+                            name: datagrid-operator
+                            namespace: $INSTALL_NAMESPACE
+                          spec:
+                            channel: 8.2.x
+                            installPlanApproval: Automatic
+                            name: datagrid
+                            source: redhat-operators
+                            sourceNamespace: openshift-marketplace
+                            startingCSV: datagrid-operator.v8.2.2
+                          EOF
+
+                          until ./oc -n $INSTALL_NAMESPACE wait --for condition=available deployment/infinispan-operator-new-deploy --timeout=120s; do
+                            echo "Waiting for the operator"; sleep 2;
+                          done
+
+                          echo Adding rights to qe user for using Datagrid cluster namespace
+                          ./oc policy add-role-to-user admin {{ ocp_user }} --rolebinding-name=admin -n $WATCH_NAMESPACE
+        args:
+          chdir: "{{ work_directory }}"
+        when: install_operators
+
+      # More info: https://docs.openshift.com/container-platform/4.5/monitoring/monitoring-your-own-services.html
+      - name: "Configure Services Monitoring with Prometheus"
+        ansible.builtin.shell: 
+          cmd: |
+                      echo "Adding role to add Service Monitor CRDs..."
+                      cat <<EOF > ./monitor-crd-edit-role.yaml
+                      kind: ClusterRole
+                      apiVersion: rbac.authorization.k8s.io/v1
+                      metadata:
+                        name: monitor-crd-edit
+                      rules:
+                      - apiGroups: ["monitoring.coreos.com", "apiextensions.k8s.io"]
+                        resources: ["prometheusrules", "servicemonitors", "podmonitors", "customresourcedefinitions"]
+                        verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+                      EOF
+                      ./oc apply -f monitor-crd-edit-role.yaml
+                      ./oc adm policy add-cluster-role-to-user monitor-crd-edit {{ ocp_user }}
+
+                      echo "Configure cluster monitoring"
+                      cat <<EOF > ./cluster-monitoring-config.yaml
+                      apiVersion: v1
+                      kind: ConfigMap
+                      metadata:
+                        name: cluster-monitoring-config
+                        namespace: openshift-monitoring
+                      data:
+                        config.yaml: |
+                          # For OCP 4.6 and later
+                          enableUserWorkload: true
+                          # For OCP 4.5 and earlier
+                          techPreviewUserWorkload:
+                            enabled: true
+                      EOF
+                      ./oc apply -f cluster-monitoring-config.yaml
+
+                      PROMETHEUS_NAMESPACE=openshift-user-workload-monitoring
+                      echo "Wait for the $PROMETHEUS_NAMESPACE namespace"
+                      timeout 240s bash -c "until ./oc get namespace/$PROMETHEUS_NAMESPACE; do echo 'Waiting for namespace '$PROMETHEUS_NAMESPACE; sleep 2; done"
+                      
+                      ./oc adm policy add-role-to-user edit {{ ocp_user }} -n openshift-user-workload-monitoring
+        args:
+          chdir: "{{ work_directory }}"
+
+      # this should be the last "./oc" command
+      - name: "Remove kubeadmin, the admin user is a cluster admin"
+        ansible.builtin.shell: 
+          cmd: |
+            ./oc delete secrets kubeadmin -n kube-system
+        args:
+          chdir: "{{ work_directory }}"
+        when: remove_kubeadmin
+
+      - name: "Archive the installation data directory"
+        ansible.builtin.shell: 
+          cmd: |
+            tar -czf {{ ocp_cluster_name }}-data.tar.gz {{ installation_dir }}'
+        args:
+          chdir: "{{ work_directory }}"
+
+      - name: "Display cluster details once more"
+        ansible.builtin.shell: 
+          cmd: |
+            ./openshift-install --dir "{{ installation_dir }}" wait-for install-complete
+        args:
+          chdir: "{{ work_directory }}"
+        register: ocp_cluster_details
+
+      - name: "Print OCP cluster details"
+        debug:
+          msg: "{{ ocp_cluster_details }}"
+          verbosity: 0
+
+...

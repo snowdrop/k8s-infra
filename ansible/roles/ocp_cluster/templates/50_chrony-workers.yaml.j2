@@ -1,0 +1,17 @@
+apiVersion: machineconfiguration.openshift.io/v1
+kind: MachineConfig
+metadata:
+    name: chrony-workers
+    labels:
+    machineconfiguration.openshift.io/role: worker
+spec:
+    config:
+    ignition:
+        version: 2.2.0
+    storage:
+        files:
+        - path: /etc/chrony.conf
+        contents:
+            source: data:text/plain;charset=utf-8;base64,{{ chrony_conf | base64 -w 0 }}
+        mode: 0644
+        filesystem: root

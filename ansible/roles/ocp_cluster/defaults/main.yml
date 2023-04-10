@@ -1,0 +1,34 @@
+ocp_mirror: https://mirror.openshift.com/pub/openshift-v4/clients/ocp
+ocp_version: 4.12.8
+ocp_cluster_name: ocp
+ocp_user: snowdrop
+ocp_install_dir: openshift-data
+
+# tag::rhos_default_flavors[]
+# OpenStack flavors
+# ci.m5.xlarge
+# vCPU: 24
+# RAM: 48GB
+# ci.m5.large
+# vCPU: 16
+# RAM: 32GB
+# ci.m1.xlarge
+# vCPU: 8
+# RAM: 16GB
+# ci.m1.large
+# vCPU: 4
+# RAM: 8GB
+openstack_flavor_control_plane: ci.m1.xlarge
+openstack_flavor_compute: ci.m1.large	
+# end::rhos_default_flavors[]
+# provider_net_cci_13
+# provider_net_shared
+openstack_network_provider: provider_net_cci_13
+
+snowdrop_domain: snowdrop.dev
+project_name: snowdrop
+use_logo: false
+install_operators: false
+use_dns: false
+configure_rh_reg: false
+remove_kubeadmin: false

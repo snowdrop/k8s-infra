@@ -1,0 +1,10 @@
+apiVersion: operator.openshift.io/v1
+kind: Console
+metadata:
+  name: cluster
+spec:
+  customization:
+    customLogoFile:
+      key: quarkus-logo.png
+      name: console-custom-logo
+    customProductName: Quarkus QE OpenShift cluster
