@@ -556,10 +556,6 @@ nodes:
   - containerPort: 31000
     hostPort: 31000
     protocol: tcp
-  - containerPort: 31080
-    hostPort: 31080
-    protocol: TCP
-    listenAddress: "0.0.0.0"
 ${kindExtraPortMappings}
 EOF
 )
