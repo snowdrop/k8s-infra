@@ -660,6 +660,7 @@ USE_EXISTING_CLUSTER="n"
 CRI_PROVIDER=docker
 PORT_MAP=""
 
+set +e
 while [ $# -gt 0 ]; do
     note "9" "$1"
     if [[ $1 == *"--"* ]]; then
@@ -700,6 +701,7 @@ while [ $# -gt 0 ]; do
         shift
   fi
 done
+set -e
 
 if [ "$SHOW_HELP" == "y" ]; then
     show_usage
@@ -721,6 +723,11 @@ elif [ ${COMMAND} == 'install' ] && [ ! -v INGRESS ]; then
     show_usage
     exit 1
 fi
+
+case ${COMMAND} in
+    install) validate_ingress ;;
+esac;
+
 
 ###### /Command Line Parser
 
