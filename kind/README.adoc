@@ -10,22 +10,25 @@ The goal of this project is to simplify our life when we use kubernetes
 on a laptop. It currently supports the following features: 
 
 * Create/delete a K8s cluster using the latest cluster version, or the one you specify, 
-* Launch a local container registry exposed on port `localhost:5000`, 
-* Set up an Ingress
-controller to route the traffic. 
+* Launch a local container images registry exposed on port `localhost:5000`, 
+* Set up an Ingress controller to route the traffic. 
 
-The bash script has been developed supporting the installation of a docker registry according to the following options: 
+The bash script has been developed supporting the installation of a container images registry according to the following options: 
 
 * Unsecure: plain HTTP
-* Secured: HTTP/HTTPS endpoints available
+* Secured: HTTP/HTTPS endpoints available and authentication using [htpasswd](https://httpd.apache.org/docs/current/programs/htpasswd.html)
 
 == Prerequisite
 
 To be able to install Kind using this project the following tools are required.
 
+* A container runtime:
+** Podman: https://podman.io/
+** Docker: https://docs.docker.com/get-docker/
 * jq: https://stedolan.github.io/jq/download/
 * Kind: https://github.com/kubernetes-sigs/kind/releases
-* Docker desktop: https://www.docker.com/products/docker-desktop
+* kubectl: https://kubernetes.io/docs/tasks/tools/
+* helm: https://helm.sh/
 * openssl
 
 == Usage
@@ -60,7 +63,7 @@ Other relevant parameters are the following.
 | `--ingress`
 
 [.fuchsia]#string# / [.red]#required# 
-a| Ingress to be deployed. 
+a| Ingress controller to be deployed.
 
 Choices: 
 
@@ -99,9 +102,9 @@ Choices:
 |===
 
 
-== Deploy
+== Install
 
-Deploying a kind cluster is as simple as executing the following command.
+Creating a kubernetes cluster is as simple as executing the following command.
 
 .kind deploy statement
 [source,bash]
@@ -113,8 +116,11 @@ curl -s -L "https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/deplo
 
 Allow using an insecure container registry.
 
+*On Linux*
+
 Add the `kind-registry.conf` file to the `/etc/containers/registries.conf.d/` folder having the following contents.
 
+.Allow using the newly created insecure registry 
 [source]
 ----
 [[registry]]
@@ -122,7 +128,11 @@ location = "localhost:5000"
 insecure = true
 ----
 
-== Undeploy
+*On MAC OS*
+
+TBD
+
+== Remove
 
 To undeploying a previousy deployed kind cluster use the `remove` action on the kind deploy script.
 
