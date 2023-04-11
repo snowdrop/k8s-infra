@@ -103,7 +103,7 @@ print_logo() {
     log_message "1" " |_____/  |_| |_|  \___/    \_/\_/    \__,_| |_|     \___/  |  __/ "
     log_message "1" "                                                            | |    "
     log_message "1" "                                                            |_|    "
-    log_message "1" " Kind installation script"
+    log_message "1" "Managing a kubernetes cluster using kind"
     log_message "1" ""
     note "5" "Variables used:"
     note "5" ""
