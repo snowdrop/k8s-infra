@@ -156,51 +156,54 @@ show_usage() {
 }
 
 check_pre_requisites() {
-  note "1" "Checking pre requisites..."
+    note "1" "Checking pre requisites..."
 
-  note "1" "Checking if kind exists..."
-  if ! command -v kind &> /dev/null; then
-    error "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-    error "kind is not installed"
-    error "Use a package manager (i.e 'brew install kind') or visit the official site https://kind.sigs.k8s.io"
-    exit 1
-  fi
-  succeeded "1" "...passed!"
+    note "1" "Checking if kind exists..."
+    if ! command -v kind &> /dev/null; then
+        error "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+        error "kind is not installed"
+        error "Use a package manager (i.e 'brew install kind') or visit the official site https://kind.sigs.k8s.io"
+        exit 1
+    fi
+    succeeded "1" "...passed!"
 
-  note "1" "Checking if kubectl exists..."
-  if ! command -v kubectl &> /dev/null; then
-    error "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-    error "Please install kubectl 1.15 or higher"
-    exit 1
-  fi
-  succeeded "1" "...passed!"
+    if [ ${COMMAND} == "install" ]; then
+        note "1" "Checking if kubectl exists..."
+        if ! command -v kubectl &> /dev/null; then
+            error "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+            error "Please install kubectl 1.15 or higher"
+            exit 1
+        fi
+        succeeded "1" "...passed!"
 
-  note "1" "Checking if helm exists..."
-  if ! command -v helm &> /dev/null; then
-    error "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-    error "Helm could not be found. To get helm: https://helm.sh/docs/intro/install/"
-    error "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-    exit 1
-  fi
-  succeeded "1" "...passed!"
+        note "1" "Checking if helm exists..."
+        if ! command -v helm &> /dev/null; then
+            error "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+            error "Helm could not be found. To get helm: https://helm.sh/docs/intro/install/"
+            error "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+            exit 1
+        fi
+        succeeded "1" "...passed!"
 
-  note "1" "Checking helm version..."
-  log_message "5" "helm version"
-  HELM_VERSION=$(helm version 2>&1 | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+') || true
-  if [[ ${HELM_VERSION} < "v3.0.0" ]]; then
-    error "Please upgrade helm to v3.0.0 or higher"
-    exit 1
-  fi
-  succeeded "1" "...passed!"
+        note "1" "Checking helm version..."
+        log_message "5" "helm version"
+        HELM_VERSION=$(helm version 2>&1 | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+') || true
+        if [[ ${HELM_VERSION} < "v3.0.0" ]]; then
+            error "Please upgrade helm to v3.0.0 or higher"
+            exit 1
+        fi
+        succeeded "1" "...passed!"
 
-  note "1" "Checking kubectl version..."
-  log_message "5" "kubectl version -o json 2> /dev/null | jq -r '.clientVersion.gitVersion' | cut -d. -f2"
-  KUBE_CLIENT_VERSION=$(kubectl version -o json 2> /dev/null | jq -r '.clientVersion.gitVersion' | cut -d. -f2) || true
-  if [[ ${KUBE_CLIENT_VERSION} -lt 14 ]]; then
-    error "Please update kubectl to 1.15 or higher"
-    exit 1
-  fi
-  succeeded "1" "...passed."
+        note "1" "Checking kubectl version..."
+        log_message "5" "kubectl version -o json 2> /dev/null | jq -r '.clientVersion.gitVersion' | cut -d. -f2"
+        KUBE_CLIENT_VERSION=$(kubectl version -o json 2> /dev/null | jq -r '.clientVersion.gitVersion' | cut -d. -f2) || true
+        if [[ ${KUBE_CLIENT_VERSION} -lt 14 ]]; then
+            error "Please update kubectl to 1.15 or higher"
+            exit 1
+        fi
+        succeeded "1" "...passed."
+    fi
+    succeeded "1" "...pre requisites check passed!"
 }
 
 create_openssl_cfg() {
