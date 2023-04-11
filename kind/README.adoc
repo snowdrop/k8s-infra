@@ -16,7 +16,7 @@ on a laptop. It currently supports the following features:
 The bash script has been developed supporting the installation of a container images registry according to the following options: 
 
 * Unsecure: plain HTTP
-* Secured: HTTP/HTTPS endpoints available and authentication using [htpasswd](https://httpd.apache.org/docs/current/programs/htpasswd.html)
+* Secured: HTTP/HTTPS endpoints available and authentication using https://httpd.apache.org/docs/current/programs/htpasswd.html[htpasswd]
 
 == Prerequisite
 
