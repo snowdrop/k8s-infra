@@ -1,0 +1,204 @@
+= How to create a Kubernetes cluster locally
+:icons: font
+:revdate: {docdate}
+:toc: left
+:toclevels: 2
+
+== Introduction
+
+The goal of this project is to simplify our life when we use kubernetes
+on a laptop. It currently supports the following features: 
+
+* Create/delete a K8s cluster using the latest cluster version, or the one you specify, 
+* Launch a local container registry exposed on port `localhost:5000`, 
+* Set up an Ingress
+controller to route the traffic. 
+
+The bash script has been developed supporting the installation of a docker registry according to the following options: 
+
+* Unsecure: plain HTTP
+* Secured: HTTP/HTTPS endpoints available
+
+== Prerequisite
+
+To be able to install Kind using this project the following tools are required.
+
+* jq: https://stedolan.github.io/jq/download/
+* Kind: https://github.com/kubernetes-sigs/kind/releases
+* Docker desktop: https://www.docker.com/products/docker-desktop
+* openssl
+
+== Usage
+
+From the repository root execute the following command.
+
+[source,bash]
+----
+./kind/deploy.sh command [parameters,...]
+----
+
+The available commands are:
+
+.Script commands
+[%header,cols="2m,4"]
+|===
+| Command | Meaning
+
+| install | Install the kind cluster
+| remove | Remove the kind cluster
+|===
+
+=== Relevant options
+
+Other relevant parameters are the following.
+
+.Script commands
+[%header,cols="2,5"]
+|===
+| Command | Meaning
+
+| `--ingress`
+
+[.fuchsia]#string# / [.red]#required# 
+a| Ingress to be deployed. 
+
+Choices: 
+
+* nginx
+* kourier
+
+| `--cluster-name`
+
+[.fuchsia]#string#
+a| Name of the cluster.
+
+Default: kind
+
+| `--port-map`
+
+[.fuchsia]#string#
+a| Comma separated list of ports to map on kind config.
+
+_e.g._: `ContainerPort1:HostPort1,...`
+
+[WARNING]
+====
+The ports required to be accessed from outside the kind cluster must be mapped between the host and the kind container using this parameter.
+====
+
+| `--provider`
+
+[.fuchsia]#string#
+a| Allows selecting the container runtime to be used. 
+
+Choices: 
+
+* *`docker` <= Default*
+* `podman`
+
+|===
+
+
+== Deploy
+
+Deploying a kind cluster is as simple as executing the following command.
+
+.kind deploy statement
+[source,bash]
+----
+curl -s -L "https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/deploy.sh" | bash -s install --ingress nginx --cluster-name twm --provider podman --port-map "30000:30000,31000:31000"
+----
+
+=== Post deployment steps
+
+Allow using an insecure container registry.
+
+Add the `kind-registry.conf` file to the `/etc/containers/registries.conf.d/` folder having the following contents.
+
+[source]
+----
+[[registry]]
+location = "localhost:5000"
+insecure = true
+----
+
+== Undeploy
+
+To undeploying a previousy deployed kind cluster use the `remove` action on the kind deploy script.
+
+.kind undeploy statement
+[source,bash]
+----
+curl -s -L "https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/deploy.sh" | bash -s remove --cluster-name twm
+----
+
+== Secured docker registry
+
+To deploy a local secured (using htpasswd) docker registry use the `--secure-registry` parameter.
+
+The security related parameters are the following.
+
+.Security related parameters
+[%header,cols="2,5"]
+|===
+| Command | Meaning
+
+| `--secure-registry`
+| Secure the docker registry.
+
+| `--registry-user`
+
+[.fuchsia]#string#
+a| Registry user.
+
+*Default: `admin`*
+
+| `--registry-password`
+
+[.fuchsia]#string#
+a| Registry user password.
+
+*Default: `snowdrop`*
+
+|===
+
+
+When the cluster is created, add to your `/etc/hosts` file a new entry
+to map the `localhost ip` address with the name of the registry
+
+....
+::1 
+127.0.0.1 registry.local kind-registry
+....
+
+The certificate generated is available at `$HOME/local-registry.crt`
+
+You can log on to the registry using the user and password as defined previously.
+
+[source,bash]
+----
+docker login -u admin -p snowdrop registry.local:5000
+----
+
+*REMARK*: If needed by the tools such as podman, crt, crictl, … move the
+file of the certificate under by example
+`/etc/docker/certs.d/kind-registry:5000/client.cert`
+
+=== How to check
+
+To verify if the ingress route is working, use the following example
+part of the
+https://kind.sigs.k8s.io/docs/user/ingress/#using-ingress[kind]
+documentation like
+https://kind.sigs.k8s.io/docs/user/local-registry/#using-the-registry[this
+page] too to tag/push a container image to the `localhost:5000` registry
+
+'''''
+
+*1*: The kubernetes `default version` depends on the version of the kind
+tool installed (e.g. 1.20.2 corresponds to kind 0.10.0). See the release
+note to find such information like the list of the
+https://github.com/kubernetes-sigs/kind/releases[supported images]. The
+list of the `kind - kubernetes` images and their version (1.14.x,
+1.15.y,…) can be consulted
+https://registry.hub.docker.com/v1/repositories/kindest/node/tags[here]
