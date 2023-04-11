@@ -126,7 +126,7 @@ print_logo() {
 show_usage() {
     log_message "0" ""
     log_message "0" "Usage: "
-    log_message "0" "\t./deploy-kind.sh command [parameters,...]"
+    log_message "0" "\t./deploy.sh command [parameters,...]"
     log_message "0" ""
     log_message "0" "Available commands: "
     log_message "0" "\tinstall:\t\t\t\tInstall the kind cluster"
