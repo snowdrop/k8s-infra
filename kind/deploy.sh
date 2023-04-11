@@ -105,15 +105,6 @@ print_logo() {
     log_message "1" "                                                            |_|    "
     log_message "1" " Kind installation script"
     log_message "1" ""
-    log_message "1" "- Deploying a local secured (using htpasswd) docker registry"
-    log_message "1" "- Generating a selfsigned certificate (using openssl) to expose the registry as a HTTP/HTTPS endpoint"
-    log_message "1" "- Setting a docker network between the containers: kind and registry and alias \"registry.local\""
-    log_message "1" "- Allowing to access the repository using as address \"registry.local:${REGISTRY_PORT}\" within a pod, from laptop or when a pod is created"
-    log_message "1" "- Exposing 2 additional NodePort: 30000 and 31000"
-    log_message "1" "- Deploying an ingress controller"
-    log_message "1" "- Copying the generated certificate here: $HOME/local-registry.crt"
-    log_message "1" ""
-    log_message "1" ""
     note "5" "Variables used:"
     note "5" ""
     note "5" "CLUSTER_NAME: ${CLUSTER_NAME}"
@@ -509,18 +500,28 @@ EOF
     fi
 
     kindCmd="kind -v ${LOGGING_VERBOSITY} create cluster  -n ${CLUSTER_NAME}"
-    kindExtraPortMappings=""
+    kindExtraPortMappings=$(cat <<EOF
+  - containerPort: ${CONTAINER_80_PORT}
+    hostPort: ${HOST_80_PORT}
+    protocol: TCP
+    listenAddress: "0.0.0.0"
+  - containerPort: ${CONTAINER_443_PORT}
+    hostPort: ${HOST_443_PORT}
+    protocol: TCP
+    listenAddress: "0.0.0.0"
+EOF
+)
     IFS=',' read -ra ADDR <<< "${PORT_MAP}"
     for i in "${ADDR[@]}"; do
         IFS=':' read -ra PORTS <<< "${i}"
         kindExtraPortMappings+=$(cat <<EOF
+
   - containerPort: ${PORTS[0]}
     hostPort: ${PORTS[1]}
     protocol: TCP
     listenAddress: "0.0.0.0"
 EOF
 )
-        kindExtraPortMappings+="\n"
     done
 
 # Kind cluster config template
@@ -542,20 +543,6 @@ nodes:
         authorization-mode: "AlwaysAllow"
   ${kindCfgExtraMounts}
   extraPortMappings:
-  - containerPort: ${CONTAINER_80_PORT}
-    hostPort: ${HOST_80_PORT}
-    protocol: TCP
-    listenAddress: "0.0.0.0"
-  - containerPort: ${CONTAINER_443_PORT}
-    hostPort: ${HOST_443_PORT}
-    protocol: TCP
-    listenAddress: "0.0.0.0"
-  - containerPort: 30000
-    hostPort: 30000
-    protocol: tcp
-  - containerPort: 31000
-    hostPort: 31000
-    protocol: tcp
 ${kindExtraPortMappings}
 EOF
 )
