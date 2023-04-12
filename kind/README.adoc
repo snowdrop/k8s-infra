@@ -37,7 +37,7 @@ From the repository root execute the following command.
 
 [source,bash]
 ----
-./kind/deploy.sh command [parameters,...]
+./kind/kind.sh command [parameters,...]
 ----
 
 The available commands are:
@@ -109,7 +109,7 @@ Creating a kubernetes cluster is as simple as executing the following command.
 .kind deploy statement
 [source,bash]
 ----
-curl -s -L "https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/deploy.sh" | bash -s install --ingress nginx --cluster-name twm --provider podman --port-map "30000:30000,31000:31000"
+curl -s -L "https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/kind.sh" | bash -s install --ingress nginx --cluster-name twm --provider podman --port-map "30000:30000,31000:31000"
 ----
 
 === Post deployment steps
@@ -162,7 +162,7 @@ To undeploying a previousy deployed kind cluster use the `remove` action on the 
 .kind undeploy statement
 [source,bash]
 ----
-curl -s -L "https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/deploy.sh" | bash -s remove --cluster-name twm
+curl -s -L "https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/kind.sh" | bash -s remove --cluster-name twm
 ----
 
 == Secured docker registry
