@@ -114,10 +114,16 @@ curl -s -L "https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/deplo
 
 === Post deployment steps
 
-Allow using an insecure container registry.
+==== Allow using an insecure container registry
 
-*On Linux*
+*Using Podman*
 
+Check the link:https://podman.io/getting-started/installation.html[Podman installation]
+ document.
+
+.Instructions for Podman
+[%collapsible]
+====
 Add the `kind-registry.conf` file to the `/etc/containers/registries.conf.d/` folder having the following contents.
 
 .Allow using the newly created insecure registry 
@@ -127,10 +133,27 @@ Add the `kind-registry.conf` file to the `/etc/containers/registries.conf.d/` fo
 location = "localhost:5000"
 insecure = true
 ----
+====
 
-*On MAC OS*
+*Using Docker*
 
-TBD
+Check the link:https://docs.docker.com/registry/insecure/[Test an insecure registry
+]
+Docker document.
+
+.Instructions for Docker
+[%collapsible]
+====
+Add the following contents to the `/etc/docker/daemon.json` file.
+
+[source,json]
+----
+{
+  "insecure-registries" : ["localhost:5000"]
+}
+----
+
+====
 
 == Remove
 
