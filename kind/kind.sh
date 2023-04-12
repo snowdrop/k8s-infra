@@ -59,14 +59,14 @@ succeeded() {
     VERBOSITY_LEVEL=$1
     MSG="${@:2}"
 #   echo -e "${GREEN}NOTE:${NC} $1"
-    log_message ${VERBOSITY_LEVEL} "${GREEN}\xE2\x9C\x94${NC} ${MSG}"
+    log_message ${VERBOSITY_LEVEL} "${GREEN}\xE2\x9C\x85${NC} ${MSG}"
 }
 
 note() {
     VERBOSITY_LEVEL=$1
     MSG="${@:2}"
 #   echo -e "${BLUE}NOTE:${NC} $1"
-    log_message ${VERBOSITY_LEVEL} "${BLUE}\xE2\x84\xB9${NC} ${MSG}"
+    log_message ${VERBOSITY_LEVEL} "${BLUE}\xE2\x9D\x95${NC} ${MSG}"
 }
 
 warn() {
