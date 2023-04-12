@@ -136,7 +136,7 @@ show_usage() {
     log_message "0" "\t--ingress [nginx,kourier]:\t\tIngress to be deployed. One of nginx,kourier."
     log_message "0" ""
     log_message "0" "Optional parameters: "
-    log_message "0" "\t-h, --help:\t\t\t\tThis help message"
+    log_message "0" "\t-h, --help\t\t\t\tThis help message"
     log_message "0" ""
     log_message "0" "\t--cluster-name <name>\t\t\tName of the cluster. Default: kind"
     log_message "0" "\t--delete-kind-cluster\t\t\tDeletes the Kind cluster prior to creating a new one. Default: No"
