@@ -129,17 +129,15 @@ show_usage() {
     log_message "0" "\t./kind.sh command [parameters,...]"
     log_message "0" ""
     log_message "0" "Available commands: "
-    log_message "0" "\tinstall\t\t\t\tInstall the kind cluster"
+    log_message "0" "\tinstall\t\t\t\t\tInstall the kind cluster"
     log_message "0" "\tremove\t\t\t\t\tRemove the kind cluster"
     log_message "0" ""
-    log_message "0" "Required parameters: "
-    log_message "0" "\t--ingress [nginx,kourier]:\t\tIngress to be deployed. One of nginx,kourier."
-    log_message "0" ""
-    log_message "0" "Optional parameters: "
+    log_message "0" "Parameters: "
     log_message "0" "\t-h, --help\t\t\t\tThis help message"
     log_message "0" ""
     log_message "0" "\t--cluster-name <name>\t\t\tName of the cluster. Default: kind"
     log_message "0" "\t--delete-kind-cluster\t\t\tDeletes the Kind cluster prior to creating a new one. Default: No"
+    log_message "0" "\t--ingress [nginx,kourier]:\t\tIngress to be deployed. One of nginx,kourier. Default: nginx"
     log_message "0" "\t--knative-version <version>\t\tKNative version to be used. Default: 1.9.0"
     log_message "0" "\t--kubernetes-version <version>\t\tKubernetes version to be install. Default: latest"
     log_message "0" "\t--provider <provider>\t\t\tContainer Runtime [docker,podman]. Default: docker"
@@ -619,7 +617,7 @@ function validate_ingress() {
         CONTAINER_80_PORT=80
         CONTAINER_443_PORT=443
     else
-        error "Invalid ingress ${INGRESS}."
+        error "Invalid ingress ${INGRESS}, choose one of nginx or kourier."
         show_usage
         exit 1  
     fi
@@ -646,6 +644,7 @@ function validate_cri() {
 ###### Command Line Parser
 CLUSTER_NAME="kind"
 DELETE_KIND_CLUSTER="n"
+INGRESS="nginx"
 KNATIVE_VERSION="1.9.0"
 KUBERNETES_VERSION="latest"
 LOGGING_VERBOSITY="1"
@@ -719,7 +718,7 @@ elif [ ! -v COMMAND ]; then
     show_usage
     exit 1
 elif [ ${COMMAND} == 'install' ] && [ ! -v INGRESS ]; then
-    error "Ingress is not defined."
+    error "The Ingress controller to be installed is not defined (nginx, kourier)."
     show_usage
     exit 1
 fi
