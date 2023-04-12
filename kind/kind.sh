@@ -42,6 +42,14 @@ log_message() {
     fi
 }
 
+log_message_nonl() {
+    VERBOSITY_LEVEL=$1
+    MESSAGE="${@:2}"
+    if [ "${LOGGING_VERBOSITY}" -ge "${VERBOSITY_LEVEL}" ]; then
+        echo -e -n "${MESSAGE}"
+    fi
+}
+
 repeat_char(){
     COLOR=${1}
 	for i in {1..70}; do echo -ne "${!COLOR}$2${NC}"; done
@@ -59,14 +67,22 @@ succeeded() {
     VERBOSITY_LEVEL=$1
     MSG="${@:2}"
 #   echo -e "${GREEN}NOTE:${NC} $1"
-    log_message ${VERBOSITY_LEVEL} "${GREEN}\xE2\x9C\x85${NC} ${MSG}"
+    # log_message ${VERBOSITY_LEVEL} "${GREEN}\xE2\x9C\x85${NC} ${MSG}"
+    log_message ${VERBOSITY_LEVEL} "${GREEN}\xE2\x9C\x94${NC} ${MSG}"
 }
 
 note() {
     VERBOSITY_LEVEL=$1
     MSG="${@:2}"
 #   echo -e "${BLUE}NOTE:${NC} $1"
-    log_message ${VERBOSITY_LEVEL} "${BLUE}\xE2\x9D\x95${NC} ${MSG}"
+    log_message ${VERBOSITY_LEVEL} "${BLUE}!${NC} ${MSG}"
+}
+
+note_noln() {
+    VERBOSITY_LEVEL=$1
+    MSG="${@:2}"
+#   echo -e "${BLUE}NOTE:${NC} $1"
+    log_message_nonl ${VERBOSITY_LEVEL} "${BLUE}!${NC} ${MSG}"
 }
 
 warn() {
@@ -156,50 +172,50 @@ show_usage() {
 check_pre_requisites() {
     note "1" "Checking pre requisites..."
 
-    note "1" "Checking if kind exists..."
+    note_noln "2" "Checking if kind exists... "
     if ! command -v kind &> /dev/null; then
         error "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
         error "kind is not installed"
         error "Use a package manager (i.e 'brew install kind') or visit the official site https://kind.sigs.k8s.io"
         exit 1
     fi
-    succeeded "1" "...passed!"
+    succeeded "2" " "
 
     if [ ${COMMAND} == "install" ]; then
-        note "1" "Checking if kubectl exists..."
+        note_noln "2" "Checking if kubectl exists... "
         if ! command -v kubectl &> /dev/null; then
             error "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
             error "Please install kubectl 1.15 or higher"
             exit 1
         fi
-        succeeded "1" "...passed!"
+        succeeded "2" ""
 
-        note "1" "Checking if helm exists..."
+        note_noln "2" "Checking if helm exists... "
         if ! command -v helm &> /dev/null; then
             error "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
             error "Helm could not be found. To get helm: https://helm.sh/docs/intro/install/"
             error "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
             exit 1
         fi
-        succeeded "1" "...passed!"
+        succeeded "2" ""
 
-        note "1" "Checking helm version..."
+        note_noln "2" "Checking helm version... "
         log_message "5" "helm version"
         HELM_VERSION=$(helm version 2>&1 | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+') || true
         if [[ ${HELM_VERSION} < "v3.0.0" ]]; then
             error "Please upgrade helm to v3.0.0 or higher"
             exit 1
         fi
-        succeeded "1" "...passed!"
+        succeeded "2" ""
 
-        note "1" "Checking kubectl version..."
+        note_noln "2" "Checking kubectl version... "
         log_message "5" "kubectl version -o json 2> /dev/null | jq -r '.clientVersion.gitVersion' | cut -d. -f2"
         KUBE_CLIENT_VERSION=$(kubectl version -o json 2> /dev/null | jq -r '.clientVersion.gitVersion' | cut -d. -f2) || true
         if [[ ${KUBE_CLIENT_VERSION} -lt 14 ]]; then
             error "Please update kubectl to 1.15 or higher"
             exit 1
         fi
-        succeeded "1" "...passed."
+        succeeded "2" ""
     fi
     succeeded "1" "...pre requisites check passed!"
 }
@@ -262,17 +278,14 @@ delete_kind_cluster() {
     fi
 
     if [ "${CRI_PROVIDER}" == 'podman' ]; then
-        note "1" "Check if podman Control Plane container exists..."
+        note_noln "1" "Delete Podman Control Plane container..."
         podman_cp_container_name="${CLUSTER_NAME}-control-plane"
         podman_cp_container_id=$(${CRI_PROVIDER} container ls --filter name=^${podman_cp_container_name}$ --all --quiet)
         if [ ! ${podman_cp_container_id} == "" ]; then
-            note "1" "Delete control Plane container..."
             ${CRI_PROVIDER} container stop ${CLUSTER_NAME}-control-plane
             ${CRI_PROVIDER} container rm ${CLUSTER_NAME}-control-plane
-            succeeded "...done"
-        else
-            note "1" "...no, so nothing to be done!"
         fi
+        succeeded "1" " "
     fi
 
 
@@ -339,18 +352,19 @@ EOF"
 }
 
 deploy_ingress_nginx() {
-  note "1" "Deploying nginx Ingress"
+  note_noln "1" "Deploying nginx Ingress"
   #
   # Install the ingress nginx controller using helm
   # Set the Service type as: NodePort (needed for kind)
   #
-  note "1" "Installing the ingress controller using Helm within the namespace: ingress"
   helm upgrade --install ingress-nginx ingress-nginx \
     --repo https://kubernetes.github.io/ingress-nginx \
     --namespace ingress --create-namespace \
     --set controller.service.type=NodePort \
     --set controller.hostPort.enabled=true \
     --set controller.watchIngressWithoutClass=true
+  succeeded "1" " "
+  note "2" "Ingress controller installed within the namespace: ingress"
 }
 
 deploy_docker_registry() {
@@ -602,8 +616,8 @@ function remove() {
     docker_network_id=$(${CRI_PROVIDER} network ls --filter name=^kind$ --quiet)
     if [ ! ${docker_network_id} == "" ]; then
         note "1" "...yes, removing ${CRI_PROVIDER} network..."
-        ${CRI_PROVIDER} network rm kind
-        succeeded "1" "${CRI_PROVIDER} network removed."
+        ${CRI_PROVIDER} network rm -f kind
+        succeeded "1" " "
     else 
         note "1" "...no, nothing to be done then."
     fi
