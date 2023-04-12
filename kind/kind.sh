@@ -66,7 +66,7 @@ note() {
     VERBOSITY_LEVEL=$1
     MSG="${@:2}"
 #   echo -e "${BLUE}NOTE:${NC} $1"
-    log_message ${VERBOSITY_LEVEL} "${BLUE}\xF0\x9F\x9B\x88${NC} ${MSG}"
+    log_message ${VERBOSITY_LEVEL} "${BLUE}\xE2\x84\xB9${NC} ${MSG}"
 }
 
 warn() {
