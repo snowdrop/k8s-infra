@@ -85,7 +85,7 @@ Default: kind
 | `--port-map`
 
 [.fuchsia]#string#
-a| Comma separated list of ports to map on kind config.
+a| Comma separated list of extra ports mappings. See https://kind.sigs.k8s.io/docs/user/configuration/#extra-port-mappings[kind config].
 
 _e.g._: `ContainerPort1:HostPort1,...`
 
@@ -102,7 +102,7 @@ a| Allows selecting the container runtime to be used.
 Choices: 
 
 * *`docker` <= Default*
-* `podman`
+* `podman` (see: https://kind.sigs.k8s.io/docs/user/rootless/#creating-a-kind-cluster-with-rootless-podman[kind rootless podman doc])
 
 |===
 
