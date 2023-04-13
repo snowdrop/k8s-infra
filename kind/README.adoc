@@ -20,20 +20,20 @@ The bash script has been developed supporting the installation of a container im
 
 == Prerequisite
 
-To be able to install Kind using this project the following tools are required.
+To be able to create a kubernetes cluster using this project, the following tools are required:
 
 * A container runtime:
 ** Podman: https://podman.io/
 ** Docker: https://docs.docker.com/get-docker/
-* jq: https://stedolan.github.io/jq/download/
 * Kind: https://github.com/kubernetes-sigs/kind/releases
 * kubectl: https://kubernetes.io/docs/tasks/tools/
 * helm: https://helm.sh/
-* openssl
+* jq: https://stedolan.github.io/jq/download/ (optional)
+* openssl (optional)
 
 == Usage
 
-From the repository root execute the following command.
+Open a terminal and at the root of this repository, execute the following command:
 
 [source,bash]
 ----
@@ -45,10 +45,10 @@ The available commands are:
 .Script commands
 [%header,cols="2m,4"]
 |===
-| Command | Meaning
+| Command | Description
 
-| install | Install the kind cluster
-| remove | Remove the kind cluster
+| install | Create a "kind" kubernetes cluster
+| remove | Remove the "kind" kubernetes cluster
 |===
 
 === Relevant options
@@ -58,7 +58,7 @@ Other relevant parameters are the following.
 .Script commands
 [%header,cols="2,5"]
 |===
-| Command | Meaning
+| Command | Description
 
 | `--ingress`
 
@@ -174,7 +174,7 @@ The security related parameters are the following.
 .Security related parameters
 [%header,cols="2,5"]
 |===
-| Command | Meaning
+| Command | Description
 
 | `--secure-registry`
 | Secure the docker registry.
