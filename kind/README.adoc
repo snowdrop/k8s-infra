@@ -30,7 +30,7 @@ To be able to use the bash script, the following tools are required:
 * A container runtime:
 ** Podman: https://podman.io/
 ** Docker: https://docs.docker.com/get-docker/
-* Kind: https://github.com/kubernetes-sigs/kind/releases
+* kind: https://github.com/kubernetes-sigs/kind/releases
 * kubectl: https://kubernetes.io/docs/tasks/tools/
 * helm: https://helm.sh/
 * jq: https://stedolan.github.io/jq/download/ (optional)
