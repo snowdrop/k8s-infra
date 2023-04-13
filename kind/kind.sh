@@ -602,6 +602,11 @@ EOF
         fi
         note "1" "Creating a Kind cluster using kindest/node: ${KUBERNETES_VERSION} and logging verbosity: ${LOGGING_VERBOSITY}"
         echo "${kindCfg}" | ${kindCmd} --config=-
+
+        if [ "${CRI_PROVIDER}" == 'podman' ]; then
+            sudo -E kind get kubeconfig > ${HOME}/.kube/config
+        fi
+        
     fi
 }
 
