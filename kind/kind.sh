@@ -351,7 +351,7 @@ EOF"
 }
 
 deploy_ingress_nginx() {
-  note_start_task "1" "Deploying nginx Ingress"
+  note "1" "Deploy nginx Ingress..."
   #
   # Install the ingress nginx controller using helm
   # Set the Service type as: NodePort (needed for kind)
@@ -362,7 +362,7 @@ deploy_ingress_nginx() {
     --set controller.service.type=NodePort \
     --set controller.hostPort.enabled=true \
     --set controller.watchIngressWithoutClass=true
-  succeeded "1" " "
+  succeeded "1" "Deploy nginx Ingress..."
   note "2" "Ingress controller installed within the namespace: ingress"
 }
 
@@ -452,11 +452,12 @@ EOF
         fi
 
         # Connect the local Container registry with the kind network
-        note "1" "${CRI_COMMAND} inspect -f='{{json .NetworkSettings.Networks.kind}}' ${registry_name}"
         note_start_task "1" "Connect the local Container registry with the kind network ${registry_name}..."
         if [ "$(${CRI_COMMAND} inspect -f='{{json .NetworkSettings.Networks.kind}}' ${registry_name})" = 'null' ]; then
-            #${CRI_COMMAND} network connect "kind" "${registry_name}" > /dev/null 2>&1 &
-            ${CRI_COMMAND} network connect "kind" "${registry_name}" --alias registry.local
+            ${CRI_COMMAND} network connect "kind" "${registry_name}" > /dev/null 2>&1 &
+            succeeded "1" "Connect the local Container registry with the kind network ${registry_name}..."
+        else   
+            warn "Connect the local Container registry with the kind network ${registry_name}... already connected."
         fi
         if [ "${CRI_COMMAND}" == 'podman' ]; then
             warn "Set the kind registry as an insecure registry by adding the following configuration to the /etc/containers/registries.conf.d/kind-registry.conf file"
@@ -615,7 +616,6 @@ function install() {
 
     deploy_docker_registry
 
-    note "1" "INGRESS: ${INGRESS}"
     if [ "${INGRESS}" == 'kourier' ]; then
         deploy_ingress_kourier
     elif [ "${INGRESS}" == 'nginx' ]; then
