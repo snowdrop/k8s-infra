@@ -17,7 +17,7 @@ and will let to create or delete a cluster using the ttps://kind.sigs.k8s.io/[ki
 
 The container registry is started as a `container`, its network shared with the host and can be deployed using the mode:
 
-* Unsecure: plain HTTP without user authentication
+* Unsecure: plain HTTP without user authentication (default)
 * Secured: HTTP/TLS using https://httpd.apache.org/docs/current/programs/htpasswd.html[htpasswd] to authenticate the users
 
 == Prerequisite
