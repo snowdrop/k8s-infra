@@ -10,10 +10,10 @@ The goal of this project is to simplify our life when we use kubernetes
 on a laptop. It currently supports the following features: 
 
 * Create/delete a K8s cluster using the latest cluster version, or the one you specify, 
-* Launch a local container images registry exposed on port `localhost:5000`, 
+* Launch a local container registry exposed on port `localhost:5000`, 
 * Set up an Ingress controller to route the traffic. 
 
-The bash script has been developed supporting the installation of a container images registry according to the following options: 
+The bash script has been developed supporting the installation of a container registry according to the following options: 
 
 * Unsecure: plain HTTP
 * Secured: HTTP/HTTPS endpoints available and authentication using https://httpd.apache.org/docs/current/programs/htpasswd.html[htpasswd]
