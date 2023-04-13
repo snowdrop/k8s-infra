@@ -78,7 +78,7 @@ note() {
     log_message ${VERBOSITY_LEVEL} "${BLUE}!${NC} ${MSG}"
 }
 
-note_noln() {
+note_start_task() {
     VERBOSITY_LEVEL=$1
     MSG="${@:2}"
 #   echo -e "${BLUE}NOTE:${NC} $1"
@@ -170,9 +170,9 @@ show_usage() {
 }
 
 check_pre_requisites() {
-    note_noln "1" "Checking pre requisites..."
+    note_start_task "1" "Checking pre requisites..."
 
-    note_noln "2" "Checking if kind exists..."
+    note_start_task "2" "Checking if kind exists..."
     if ! command -v kind &> /dev/null; then
         error "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
         error "kind is not installed"
@@ -182,7 +182,7 @@ check_pre_requisites() {
     succeeded "2" "Checking if kind exists..."
 
     if [ ${COMMAND} == "install" ]; then
-        note_noln "2" "Checking if kubectl exists... "
+        note_start_task "2" "Checking if kubectl exists... "
         if ! command -v kubectl &> /dev/null; then
             error "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
             error "Please install kubectl 1.15 or higher"
@@ -190,7 +190,7 @@ check_pre_requisites() {
         fi
         succeeded "2" ""
 
-        note_noln "2" "Checking if helm exists... "
+        note_start_task "2" "Checking if helm exists... "
         if ! command -v helm &> /dev/null; then
             error "Checking if helm exists..."
             error "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
@@ -200,7 +200,7 @@ check_pre_requisites() {
         fi
         succeeded "2" "Checking if helm exists... "
 
-        note_noln "2" "Checking helm version... "
+        note_start_task "2" "Checking helm version... "
         log_message "5" "helm version"
         HELM_VERSION=$(helm version 2>&1 | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+') || true
         if [[ ${HELM_VERSION} < "v3.0.0" ]]; then
@@ -209,7 +209,7 @@ check_pre_requisites() {
         fi
         succeeded "2" "Checking helm version..."
 
-        note_noln "2" "Checking kubectl version... "
+        note_start_task "2" "Checking kubectl version... "
         log_message "5" "kubectl version -o json 2> /dev/null | jq -r '.clientVersion.gitVersion' | cut -d. -f2"
         KUBE_CLIENT_VERSION=$(kubectl version -o json 2> /dev/null | jq -r '.clientVersion.gitVersion' | cut -d. -f2) || true
         if [[ ${KUBE_CLIENT_VERSION} -lt 14 ]]; then
@@ -257,34 +257,34 @@ echo "$CFG"
 delete_kind_cluster() {
     existing_kind_cluster=''
     get_kind_cluster existing_kind_cluster
-    note_noln "1" "Removing kind cluster (${existing_kind_cluster})..."
+    note_start_task "1" "Removing kind cluster (${existing_kind_cluster})..."
     if [ ! "${existing_kind_cluster}" == "" ]; then
-        warn "Deleting kind cluster ${CLUSTER_NAME}..."
-        note "5" "kind delete cluster -n ${CLUSTER_NAME}"
-        kind delete cluster -n ${CLUSTER_NAME}
+        ${KIND_COMMAND} delete cluster -n ${CLUSTER_NAME}
         succeeded "1" "Removing kind cluster (${existing_kind_cluster})..."
     else
         warn "Removing kind cluster (${existing_kind_cluster})... no cluster to be removed"
     fi
-    note_noln "1" "Removing kind registry container..."
+    note_start_task "1" "Removing kind registry container..."
     #docker_container_id=$(docker container ls --filter name=^kind-registry$ --all --quiet)
-    docker_container_id=$(${CRI_PROVIDER} container ls --filter name=^${CLUSTER_NAME}-registry$ --all --quiet)
+    docker_container_id=$(${CRI_COMMAND} container ls --filter name=^${CLUSTER_NAME}-registry$ --all --quiet)
     if [ ! ${docker_container_id} == "" ]; then
-        ${CRI_PROVIDER} container rm ${CLUSTER_NAME}-registry -f
+        ${CRI_COMMAND} container rm ${CLUSTER_NAME}-registry -f
         succeeded "1" "Removing kind registry container..."
     else 
         warn "Removing kind registry container... no container to be removed."
     fi
 
-    if [ "${CRI_PROVIDER}" == 'podman' ]; then
-        note_noln "1" "Delete Podman Control Plane container..."
+    if [ "${CRI_COMMAND}" == 'podman' ]; then
+        note_start_task "1" "Delete Podman Control Plane container..."
         podman_cp_container_name="${CLUSTER_NAME}-control-plane"
-        podman_cp_container_id=$(${CRI_PROVIDER} container ls --filter name=^${podman_cp_container_name}$ --all --quiet)
+        podman_cp_container_id=$(${CRI_COMMAND} container ls --filter name=^${podman_cp_container_name}$ --all --quiet)
         if [ ! ${podman_cp_container_id} == "" ]; then
-            ${CRI_PROVIDER} container stop ${CLUSTER_NAME}-control-plane
-            ${CRI_PROVIDER} container rm ${CLUSTER_NAME}-control-plane
+            ${CRI_COMMAND} container stop ${CLUSTER_NAME}-control-plane
+            ${CRI_COMMAND} container rm ${CLUSTER_NAME}-control-plane
+            succeeded "1" "Delete Podman Control Plane container..."
+        else
+            warn "Delete Podman Control Plane container... nothing to be done."
         fi
-        succeeded "1" "Delete Podman Control Plane container..."
     fi
 
 
@@ -351,7 +351,7 @@ EOF"
 }
 
 deploy_ingress_nginx() {
-  note_noln "1" "Deploying nginx Ingress"
+  note_start_task "1" "Deploying nginx Ingress"
   #
   # Install the ingress nginx controller using helm
   # Set the Service type as: NodePort (needed for kind)
@@ -385,10 +385,10 @@ EOF
         note "1" "Securing registry..."
         note "1" "==== Create the htpasswd file where user: ${REGISTRY_USER} and password: ${REGISTRY_PASSWORD}"
         mkdir -p auth
-        ${CRI_PROVIDER} run --entrypoint htpasswd registry:2.7.0 -Bbn ${REGISTRY_USER} ${REGISTRY_PASSWORD} > auth/htpasswd
+        ${CRI_COMMAND} run --entrypoint htpasswd registry:2.7.0 -Bbn ${REGISTRY_USER} ${REGISTRY_PASSWORD} > auth/htpasswd
 
         note "1" "==== Creating a docker registry"
-        ${CRI_PROVIDER} run -d \
+        ${CRI_COMMAND} run -d \
             -p 5000:5000 \
             --restart=always \
             --name ${registry_name} \
@@ -403,11 +403,11 @@ EOF
 
         # connect the container registry to the cluster network
         # (the network may already be connected)
-        ${CRI_PROVIDER} network connect kind "${registry_name}" --alias registry.local || true
+        ${CRI_COMMAND} network connect kind "${registry_name}" --alias registry.local || true
 
         # Upload the self-signed certificate to the kind container
         name="${name:-"kind"}"
-        containers="$(kind get nodes --name="$name" 2>/dev/null)"
+        containers="$(${KIND_COMMAND} get nodes --name="$name" 2>/dev/null)"
         if [[ "$containers" == "" ]]; then
             log_message "1" "No kind nodes found for cluster \"$name\"" >&2
             exit 1
@@ -439,29 +439,39 @@ EOF
 
         popd
     else
-        note "1" "Start a local Docker registry (unless it is already started)"
+        note "1" "1-------------> ${registry_name}"
+        note_start_task "1" "Start local Container registry ${registry_name}..."
         # Start a local Docker registry (unless it already exists)
-        running="$(${CRI_PROVIDER} inspect -f '{{.State.Running}}' "${registry_name}" 2>/dev/null || true)"
+        running="$(${CRI_COMMAND} inspect -f '{{.State.Running}}' "${registry_name}" 2>/dev/null || true)"
         if [ "${running}" != 'true' ]; then
-            ${CRI_PROVIDER} run \
-            -d --restart=always -p "${REGISTRY_PORT}:5000" --name "${registry_name}" \
-            registry:2
+            ${CRI_COMMAND} run -d --restart=always -p "${REGISTRY_PORT}:5000" \
+              --name "${registry_name}" registry:2
+            succeeded "1" "Start a local Container registry ${registry_name}..."
+        else   
+            warn "Start a local Container registry ${registry_name}... already running."
         fi
 
-        # Connect the local Docker registry with the kind network
-        ${CRI_PROVIDER} network connect "kind" "${registry_name}" > /dev/null 2>&1 &
-        if [ "${CRI_PROVIDER}" == 'podman' ]; then
+        # Connect the local Container registry with the kind network
+        note "1" "${CRI_COMMAND} inspect -f='{{json .NetworkSettings.Networks.kind}}' ${registry_name}"
+        note_start_task "1" "Connect the local Container registry with the kind network ${registry_name}..."
+        if [ "$(${CRI_COMMAND} inspect -f='{{json .NetworkSettings.Networks.kind}}' ${registry_name})" = 'null' ]; then
+            #${CRI_COMMAND} network connect "kind" "${registry_name}" > /dev/null 2>&1 &
+            ${CRI_COMMAND} network connect "kind" "${registry_name}" --alias registry.local
+        fi
+        if [ "${CRI_COMMAND}" == 'podman' ]; then
             warn "Set the kind registry as an insecure registry by adding the following configuration to the /etc/containers/registries.conf.d/kind-registry.conf file"
+            log_message "0" ""
             log_message "0" '[[registry]]'
             log_message "0" 'location = "localhost:5000"'
             log_message "0" 'insecure = true'
+            log_message "0" ""
         fi
     fi
 
 }
 
 get_kind_cluster() {
-    eval "$1=$(kind get clusters | { grep "${CLUSTER_NAME}" || test $? = 1; })"
+    eval "$1=$(${KIND_COMMAND} get clusters | { grep "${CLUSTER_NAME}" || test $? = 1; })"
 }
 
 deploy_kind_cluster() {
@@ -513,7 +523,7 @@ EOF
 )
     fi
 
-    kindCmd="kind -v ${LOGGING_VERBOSITY} create cluster  -n ${CLUSTER_NAME}"
+    kindCmd="${KIND_COMMAND} -v ${LOGGING_VERBOSITY} create cluster  -n ${CLUSTER_NAME}"
     kindExtraPortMappings=$(cat <<EOF
   - containerPort: ${CONTAINER_80_PORT}
     hostPort: ${HOST_80_PORT}
@@ -569,13 +579,13 @@ EOF
     fi
 
     note "1" "Checking if kind cluster exists..."
-    kind_get_clusters=$(kind get clusters | { grep "${CLUSTER_NAME}" || test $? = 1; }) 
+    kind_get_clusters=$(${KIND_COMMAND} get clusters | { grep "${CLUSTER_NAME}" || test $? = 1; }) 
     if [ ! "${kind_get_clusters}" == "" ]; then
         note "1" "Cluster already exists..."
         if [ "$USE_EXISTING_CLUSTER" == "y" ]; then
             note "1" "...using existing cluster. Exporting cluster kubeconfig..."
             note "5" "CMD: kind export kubeconfig -n ${CLUSTER_NAME}"
-            kind export kubeconfig -n ${CLUSTER_NAME}
+            ${KIND_COMMAND} export kubeconfig -n ${CLUSTER_NAME}
             succeeded "1" "...done!"
         else
             error "Cluster already exists. Either use the existing cluster (--use-existing-cluster) or delete the cluster (--delete-kind-cluster)."
@@ -610,13 +620,13 @@ function install() {
 
 function remove() {
     delete_kind_cluster
-    note_noln "1" "Removing ${CRI_PROVIDER} network..."
-    docker_network_id=$(${CRI_PROVIDER} network ls --filter name=^kind$ --quiet)
+    note_start_task "1" "Removing ${CRI_COMMAND} network..."
+    docker_network_id=$(${CRI_COMMAND} network ls --filter name=^kind$ --quiet)
     if [ ! ${docker_network_id} == "" ]; then
-        ${CRI_PROVIDER} network rm -f kind
-        succeeded "1" "Removing ${CRI_PROVIDER} network..."
+        NETWORK_RM=$(${CRI_COMMAND} network rm -f kind)
+        succeeded "1" "Removing ${CRI_COMMAND} network..."
     else 
-        warn "Removing ${CRI_PROVIDER} network... nothing to be done!"
+        warn "Removing ${CRI_COMMAND} network... nothing to be done!"
     fi
 }
 
@@ -637,10 +647,15 @@ function validate_ingress() {
 function validate_cri() {
     note "2" "CRI Provider: ${CRI_PROVIDER}"
     if [ "${CRI_PROVIDER}" == 'docker' ]; then
+        CRI_COMMAND="docker"
+        KIND_COMMAND=kind
         unset KIND_EXPERIMENTAL_PROVIDER
         HOST_80_PORT=80
         HOST_443_PORT=443
     elif [ "${CRI_PROVIDER}" == 'podman' ]; then
+        CRI_COMMAND="sudo podman"
+        # WARN: NO SUPPORT FOR ROOTLESS PODMAN CONTAINERS YET
+        KIND_COMMAND="sudo --preserve-env kind"
         export KIND_EXPERIMENTAL_PROVIDER=podman
         HOST_80_PORT=30080
         HOST_443_PORT=30443
@@ -654,8 +669,11 @@ function validate_cri() {
 
 ###### Command Line Parser
 CLUSTER_NAME="kind"
+CRI_PROVIDER=docker
+CRI_COMMAND=docker
 DELETE_KIND_CLUSTER="n"
 INGRESS="nginx"
+KIND_COMMAND=kind
 KNATIVE_VERSION="1.9.0"
 KUBERNETES_VERSION="latest"
 LOGGING_VERBOSITY="1"
@@ -667,7 +685,6 @@ SECURE_REGISTRY="n"
 SERVER_IP="127.0.0.1"
 SHOW_HELP="n"
 USE_EXISTING_CLUSTER="n"
-CRI_PROVIDER=docker
 PORT_MAP=""
 
 set +e
