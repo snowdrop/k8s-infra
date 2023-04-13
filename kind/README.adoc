@@ -6,21 +6,23 @@
 
 == Introduction
 
-The goal of this project is to simplify our life when we use kubernetes
-on a laptop. It currently supports the following features: 
+The goal of this project is to simplify the life of the developers to manage a kubernetes
+cluster with the following default features:
 
-* Create/delete a K8s cluster using the latest cluster version, or the one you specify, 
-* Launch a local container registry on the specified port `e.g. localhost:5000`,
-* Set up an Ingress controller to route the traffic. 
+* Launch a container registry using the specified port `e.g. localhost:5000`,
+* Set up an Ingress controller to route the external traffic to the cluster.
 
-The bash script has been developed supporting the installation of a container registry according to the following options: 
+For that purpose, a bash script has been developed: `./kind.sh`, which can be acessed using curl ``
+and will let to create or delete a kubernetes cluster using the ttps://kind.sigs.k8s.io/[kind] tool.
 
-* Unsecure: plain HTTP
-* Secured: HTTP/HTTPS endpoints available and authentication using https://httpd.apache.org/docs/current/programs/htpasswd.html[htpasswd]
+The container registry is started as a `container`, its network shared with the host and can be deployed using the mode:
+
+* Unsecure: plain HTTP without user authentication
+* Secured: HTTP/TLS using https://httpd.apache.org/docs/current/programs/htpasswd.html[htpasswd] to authenticate the users
 
 == Prerequisite
 
-To be able to create a kubernetes cluster using this project, the following tools are required:
+To be able to use the bash script, the following tools are required:
 
 * A container runtime:
 ** Podman: https://podman.io/
