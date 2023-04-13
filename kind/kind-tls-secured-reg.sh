@@ -135,8 +135,7 @@ subjectAltName          = @alt_names
 [alt_names]
 DNS.1 = kind-registry
 DNS.2 = localhost
-DNS.3 = registry.local
-DNS.4 = ${VM_IP}.sslip.io
+DNS.3 = ${VM_IP}.nip.io
 EOF
 )
 echo "$CFG"
@@ -192,11 +191,11 @@ kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 containerdConfigPatches:
 - |-
-  [plugins."io.containerd.grpc.v1.cri".registry.mirrors."registry.local:${reg_port}"]
-    endpoint = ["https://registry.local:${reg_port}"]
-  [plugins."io.containerd.grpc.v1.cri".registry.mirrors."${VM_IP}.sslip.io:${reg_port}"]
-    endpoint = ["https://${VM_IP}.sslip.io:${reg_port}"]
-  [plugins."io.containerd.grpc.v1.cri".registry.configs."registry.local:${reg_port}".tls]
+  [plugins."io.containerd.grpc.v1.cri".registry.mirrors."${reg_name}:${reg_port}"]
+    endpoint = ["https://${reg_name}:${reg_port}"]
+  [plugins."io.containerd.grpc.v1.cri".registry.mirrors."${VM_IP}.nip.io:${reg_port}"]
+    endpoint = ["https://${VM_IP}.nip.io:${reg_port}"]
+  [plugins."io.containerd.grpc.v1.cri".registry.configs."${reg_name}:${reg_port}".tls]
     cert_file = "/etc/docker/certs.d/${reg_server}/client.crt"
     key_file  = "/etc/docker/certs.d/${reg_server}/client.key"
 nodes:
@@ -270,7 +269,7 @@ docker run -d \
 
 # connect the container registry to the cluster network
 # (the network may already be connected)
-docker network connect kind "${reg_name}" --alias registry.local || true
+docker network connect kind "${reg_name}" || true
 
 # Upload the self-signed certificate to the kind container
 name="${name:-"kind"}"
@@ -295,37 +294,38 @@ while IFS= read -r container; do
 done <<< "$containers"
 
 echo "Copy the client.crt to the docker cert.d folder"
-sudo mkdir -p /etc/docker/certs.d/${VM_IP}.sslip.io:5000
-sudo cp $certfile /etc/docker/certs.d/${VM_IP}.sslip.io:5000/ca.crt
-if [[ "$OSTYPE" != "darwin"* ]]; then
-  sudo service docker restart
-fi
+#sudo mkdir -p /etc/docker/certs.d/${VM_IP}.nip.io:5000
+#sudo cp $certfile /etc/docker/certs.d/${VM_IP}.nip.io:5000/ca.crt
+mkdir -p $HOME/.docker/certs.d/${reg_name}:${reg_port}
+cp $certfile $HOME/.docker/certs.d/${reg_name}:${reg_port}/ca.crt
+#if [[ "$OSTYPE" != "darwin"* ]]; then
+#  sudo service docker restart
+#fi
 
 echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 echo "Log on to the docker registry using the address and user/password"
-echo "docker login ${VM_IP}.sslip.io:5000 -u admin -p snowdrop"
+echo "docker login ${reg_name}:5000 -u admin -p snowdrop"
 echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 
 popd
 
 if [ "${install_ingress}" == "y" ]; then
-#
-# Install the ingress nginx controller using helm
-# Set the Service type as: NodePort (needed for kind)
-#
-echo "Installing the ingress controller using Helm within the namespace: ingress"
-helm upgrade --install ingress-nginx ingress-nginx \
-  --repo https://kubernetes.github.io/ingress-nginx \
-  --namespace ingress --create-namespace \
-  --set controller.service.type=NodePort \
-  --set controller.hostPort.enabled=true
+  #
+  # Install the ingress nginx controller using helm
+  # Set the Service type as: NodePort (needed for kind)
+  #
+  echo "Installing the ingress controller using Helm within the namespace: ingress"
+  helm upgrade --install ingress-nginx ingress-nginx \
+    --repo https://kubernetes.github.io/ingress-nginx \
+    --namespace ingress --create-namespace \
+    --set controller.service.type=NodePort \
+    --set controller.hostPort.enabled=true
 
-echo "###############################################"
-echo "To test ingress, execute the following commands:"
-echo "kubectl create deployment demo --image=httpd --port=80; kubectl expose deployment demo"
-echo "kubectl create ingress demo --class=nginx \\"
-echo "   --rule=\"demo.${VM_IP}.sslip.io/*=demo:80\""
-echo "curl http://demo.${VM_IP}.sslip.io"
-echo "<html><body><h1>It works!</h1></body></html>"
-
+  echo "###############################################"
+  echo "To test ingress, execute the following commands:"
+  echo "kubectl create deployment demo --image=httpd --port=80; kubectl expose deployment demo"
+  echo "kubectl create ingress demo --class=nginx \\"
+  echo "   --rule=\"demo.${VM_IP}.nip.io/*=demo:80\""
+  echo "curl http://demo.${VM_IP}.nip.io"
+  echo "<html><body><h1>It works!</h1></body></html>"
 fi
