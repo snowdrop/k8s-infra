@@ -18,7 +18,7 @@ For that purpose, a bash script has been developed: `./kind.sh`, which can also 
 
 and will let to create or delete a cluster using the https://kind.sigs.k8s.io/[kind] tool.
 
-The container registry is started as a `container`, its network shared with the host and can be deployed using the mode:
+The docker registry is started as a `container`, its network shared with the host and can be deployed using the mode:
 
 * Unsecure: plain HTTP without user authentication (default)
 * Secured: HTTP/TLS using https://httpd.apache.org/docs/current/programs/htpasswd.html[htpasswd] to authenticate the users
