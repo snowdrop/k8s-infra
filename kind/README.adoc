@@ -16,7 +16,7 @@ For that purpose, a bash script has been developed: `./kind.sh`, which can also 
 
 `curl -s -L "https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/kind.sh" | bash -s ...`
 
-and will let to create or delete a cluster using the ttps://kind.sigs.k8s.io/[kind] tool.
+and will let to create or delete a cluster using the https://kind.sigs.k8s.io/[kind] tool.
 
 The container registry is started as a `container`, its network shared with the host and can be deployed using the mode:
 
