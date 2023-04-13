@@ -46,7 +46,7 @@ log_message_nonl() {
     VERBOSITY_LEVEL=$1
     MESSAGE="${@:2}"
     if [ "${LOGGING_VERBOSITY}" -ge "${VERBOSITY_LEVEL}" ]; then
-        echo -e -n "${MESSAGE}"
+        echo -ne "${MESSAGE}\033[0K\r"
     fi
 }
 
@@ -153,14 +153,14 @@ show_usage() {
     log_message "0" ""
     log_message "0" "\t--cluster-name <name>\t\t\tName of the cluster. Default: kind"
     log_message "0" "\t--delete-kind-cluster\t\t\tDeletes the Kind cluster prior to creating a new one. Default: No"
-    log_message "0" "\t--ingress [nginx,kourier]:\t\tIngress to be deployed. One of nginx,kourier. Default: nginx"
+    log_message "0" "\t--ingress [nginx,kourier]\t\tIngress to be deployed. One of nginx,kourier. Default: nginx"
     log_message "0" "\t--knative-version <version>\t\tKNative version to be used. Default: 1.9.0"
     log_message "0" "\t--kubernetes-version <version>\t\tKubernetes version to be install. Default: latest"
     log_message "0" "\t--provider <provider>\t\t\tContainer Runtime [docker,podman]. Default: docker"
     log_message "0" "\t--port-map <port map list>\t\tList of ports to map on kind config. e.g. 'ContainerPort1:HostPort1,ContainerPort2:HostPort2,...'"
     log_message "0" "\t--registry-image-version <version>\tVersion of the registry container to be used. Default: 2.6.2"
     log_message "0" "\t--registry-password <password>\t\tRegistry user password. Default: snowdrop"
-    log_message "0" "\t--registry-port <port>\t\t\tPort to publish the registry. Default: 5000"
+    log_message "0" "\t--registry-port <port>\t\t\tPort of the registry. Default: 5000"
     log_message "0" "\t--registry-user <user>\t\t\tRegistry user. Default: admin"
     log_message "0" "\t--secure-registry\t\t\tSecure the docker registry. Default: No"
     log_message "0" "\t--server-ip <ip-address>\t\tIP address to be used. Default: 127.0.0.1"
@@ -170,16 +170,16 @@ show_usage() {
 }
 
 check_pre_requisites() {
-    note "1" "Checking pre requisites..."
+    note_noln "1" "Checking pre requisites..."
 
-    note_noln "2" "Checking if kind exists... "
+    note_noln "2" "Checking if kind exists..."
     if ! command -v kind &> /dev/null; then
         error "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
         error "kind is not installed"
         error "Use a package manager (i.e 'brew install kind') or visit the official site https://kind.sigs.k8s.io"
         exit 1
     fi
-    succeeded "2" " "
+    succeeded "2" "Checking if kind exists..."
 
     if [ ${COMMAND} == "install" ]; then
         note_noln "2" "Checking if kubectl exists... "
@@ -192,32 +192,33 @@ check_pre_requisites() {
 
         note_noln "2" "Checking if helm exists... "
         if ! command -v helm &> /dev/null; then
+            error "Checking if helm exists..."
             error "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
             error "Helm could not be found. To get helm: https://helm.sh/docs/intro/install/"
             error "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
             exit 1
         fi
-        succeeded "2" ""
+        succeeded "2" "Checking if helm exists... "
 
         note_noln "2" "Checking helm version... "
         log_message "5" "helm version"
         HELM_VERSION=$(helm version 2>&1 | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+') || true
         if [[ ${HELM_VERSION} < "v3.0.0" ]]; then
-            error "Please upgrade helm to v3.0.0 or higher"
+            error "Checking helm version... Please upgrade helm to v3.0.0 or higher"
             exit 1
         fi
-        succeeded "2" ""
+        succeeded "2" "Checking helm version..."
 
         note_noln "2" "Checking kubectl version... "
         log_message "5" "kubectl version -o json 2> /dev/null | jq -r '.clientVersion.gitVersion' | cut -d. -f2"
         KUBE_CLIENT_VERSION=$(kubectl version -o json 2> /dev/null | jq -r '.clientVersion.gitVersion' | cut -d. -f2) || true
         if [[ ${KUBE_CLIENT_VERSION} -lt 14 ]]; then
-            error "Please update kubectl to 1.15 or higher"
+            error "Checking kubectl version... Please update kubectl to 1.15 or higher"
             exit 1
         fi
-        succeeded "2" ""
+        succeeded "2" "Checking kubectl version..."
     fi
-    succeeded "1" "...pre requisites check passed!"
+    succeeded "1" "Pre requisites check passed!"
 }
 
 create_openssl_cfg() {
@@ -254,27 +255,25 @@ echo "$CFG"
 }
 
 delete_kind_cluster() {
-    note "1" "Checking if cluster exists..."
     existing_kind_cluster=''
     get_kind_cluster existing_kind_cluster
-    note "5" "${existing_kind_cluster}"
+    note_noln "1" "Removing kind cluster (${existing_kind_cluster})..."
     if [ ! "${existing_kind_cluster}" == "" ]; then
         warn "Deleting kind cluster ${CLUSTER_NAME}..."
         note "5" "kind delete cluster -n ${CLUSTER_NAME}"
         kind delete cluster -n ${CLUSTER_NAME}
-        succeeded "1" "...kind cluster deleted!"
+        succeeded "1" "Removing kind cluster (${existing_kind_cluster})..."
     else
-        warn "...no kind cluster found!"
+        warn "Removing kind cluster (${existing_kind_cluster})... no cluster to be removed"
     fi
-    note "1" "Checking if kind registry container exists..."
+    note_noln "1" "Removing kind registry container..."
     #docker_container_id=$(docker container ls --filter name=^kind-registry$ --all --quiet)
     docker_container_id=$(${CRI_PROVIDER} container ls --filter name=^${CLUSTER_NAME}-registry$ --all --quiet)
     if [ ! ${docker_container_id} == "" ]; then
-        note "1" "...yes, removing docker kind registry container..."
         ${CRI_PROVIDER} container rm ${CLUSTER_NAME}-registry -f
-        succeeded "1" "Docker kind registry container removed."
+        succeeded "1" "Removing kind registry container..."
     else 
-        note "1" "...no, that was easy!"
+        warn "Removing kind registry container... no container to be removed."
     fi
 
     if [ "${CRI_PROVIDER}" == 'podman' ]; then
@@ -285,7 +284,7 @@ delete_kind_cluster() {
             ${CRI_PROVIDER} container stop ${CLUSTER_NAME}-control-plane
             ${CRI_PROVIDER} container rm ${CLUSTER_NAME}-control-plane
         fi
-        succeeded "1" " "
+        succeeded "1" "Delete Podman Control Plane container..."
     fi
 
 
@@ -611,15 +610,13 @@ function install() {
 
 function remove() {
     delete_kind_cluster
-    note "1" "Removing ${CRI_PROVIDER} network..."
-    note "1" "Checking if ${CRI_PROVIDER} network exists..."
+    note_noln "1" "Removing ${CRI_PROVIDER} network..."
     docker_network_id=$(${CRI_PROVIDER} network ls --filter name=^kind$ --quiet)
     if [ ! ${docker_network_id} == "" ]; then
-        note "1" "...yes, removing ${CRI_PROVIDER} network..."
         ${CRI_PROVIDER} network rm -f kind
-        succeeded "1" " "
+        succeeded "1" "Removing ${CRI_PROVIDER} network..."
     else 
-        note "1" "...no, nothing to be done then."
+        warn "Removing ${CRI_PROVIDER} network... nothing to be done!"
     fi
 }
 
@@ -638,7 +635,7 @@ function validate_ingress() {
 }
 
 function validate_cri() {
-    note "1" "CRI Provider: ${CRI_PROVIDER}"
+    note "2" "CRI Provider: ${CRI_PROVIDER}"
     if [ "${CRI_PROVIDER}" == 'docker' ]; then
         unset KIND_EXPERIMENTAL_PROVIDER
         HOST_80_PORT=80
