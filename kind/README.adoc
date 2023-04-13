@@ -1,4 +1,4 @@
-= How to create a Kubernetes cluster locally
+= How to easily manage a Kubernetes cluster using kind
 :icons: font
 :revdate: {docdate}
 :toc: left
