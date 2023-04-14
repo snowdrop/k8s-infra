@@ -6,13 +6,13 @@ set -o errexit
 # Script creating a Kubernetes cluster using kind tool and :
 # - Deploying a local secured (using htpasswd) docker registry
 # - Generating a selfsigned certificate (using openssl) to expose the registry as a HTTP/HTTPS endpoint
-# - Setting a docker network between the 2 containers: kind and registry and alias "registry.local"
-# - Allowing to access the repository using as address "registry.local:5000" within a pod, from laptop or when a pod is created
+# - Setting a docker network between the 2 containers: kind and registry and alias "kind-registry"
+# - Allowing to access the repository using as address "kind-registry:5000" within a pod, from laptop or when a pod is created
 # - Exposing 2 additional NodePort: 30000 and 31000
 # - Deploying an ingress controller
-# - Copying the generated certificate here: $HOME/local-registry.crt
+# - Copying the generated certificate here: $HOME/.registry/certs and htpasswd $HOME/.registry/auth
 #
-# Remark: Please add to your /etc/hosts file --> "127.0.0.1 registry.local kind-registry
+# Remark: Please add to your /etc/hosts file --> "127.0.0.1 kind-registry kind-registry
 #
 # Creation: September 30th - 2021
 #
@@ -89,8 +89,8 @@ echo " Kind installation script"
 echo ""
 echo "- Deploying a local secured (using htpasswd) docker registry"
 echo "- Generating a selfsigned certificate (using openssl) to expose the registry as a HTTP/HTTPS endpoint"
-echo "- Setting a docker network between the containers: kind and registry and alias \"registry.local\""
-echo "- Allowing to access the repository using as address \"registry.local:5000\" within a pod, from laptop or when a pod is created"
+echo "- Setting a docker network between the containers: kind and registry and alias \"kind-registry\""
+echo "- Allowing to access the repository using as address \"kind-registry:5000\" within a pod, from laptop or when a pod is created"
 echo "- Exposing 2 additional NodePort: 30000 and 31000"
 echo "- Deploying an ingress controller"
 echo "- Copying the generated certificate here: $HOME/local-registry.crt"
