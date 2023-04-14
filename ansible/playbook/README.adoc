@@ -17,7 +17,7 @@ Variables:
 | vm_name | | | Name that will be assigned to  the host | 
 | pass_provider | [hetzner,openstack] | hetzner | Cloud or Bare-metal provider that will host the VM |
 | k8s_type | [masters,nodes] | | k8s component, see the [k8s README](../../kubernetes/README.md#ansible-inventory) |
-| k8s_version | [117,119,121,123] | | k8s version to be installed, see the [k8s README](../../kubernetes/README.md#ansible-inventory) |
+| k8s_version | [119,121,123,124] | | k8s version to be installed, see the [k8s README](../../kubernetes/README.md#ansible-inventory) |
 
 This playbook will create a passwordstore folder structure that will be the base for the Ansible Inventory.
 

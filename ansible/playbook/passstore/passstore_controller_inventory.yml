@@ -35,8 +35,8 @@
 
     - name: Check k8s_version value
       fail:
-        msg: "Invalid k8s version {{ k8s_version }}. Should be in [117 ... 121]"
-      when: "k8s_version | length > 0 and not k8s_version in ['117', '118', '119', '120', '121', '123'] "
+        msg: "Invalid k8s version {{ k8s_version }}. Should be in [119 ... 124]"
+      when: "k8s_version | length > 0 and not k8s_version in ['119', '121', '123', '124'] "
 
   tasks:
     - name: "Execute create inventory, if tagged as so"
