@@ -255,18 +255,6 @@ mkdir -p $HOME/.registry/auth
 docker run --entrypoint htpasswd registry:2.7.0 -Bbn admin snowdrop > $HOME/.registry/auth/htpasswd
 
 echo "==== Creating a docker registry"
-echo "docker run -d \
-  -p 5000:5000 \
-  --restart=always \
-  --name ${reg_name} \
-  -v $HOME/.registry/auth:/auth \
-  -v $HOME/.registry/certs/${reg_name}:/certs \
-  -e REGISTRY_AUTH=htpasswd \
-  -e REGISTRY_AUTH_HTPASSWD_REALM="Registry Realm" \
-  -e REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd \
-  -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/client.crt \
-  -e REGISTRY_HTTP_TLS_KEY=/certs/client.key \
-  registry:${reg_image_version}"
 
 docker run -d \
   -p 5000:5000 \
@@ -308,16 +296,12 @@ while IFS= read -r container; do
 done <<< "$containers"
 
 echo "Copy the client.crt to the docker cert.d folder"
-#sudo mkdir -p /etc/docker/certs.d/${VM_IP}.nip.io:5000
-#sudo cp $certfile /etc/docker/certs.d/${VM_IP}.nip.io:5000/ca.crt
 mkdir -p $HOME/.docker/certs.d/${reg_name}:${reg_port}
 cp $certfile $HOME/.docker/certs.d/${reg_name}:${reg_port}/client.crt
-#if [[ "$OSTYPE" != "darwin"* ]]; then
-#  sudo service docker restart
-#fi
 
 echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 echo "Add kind-registry as new entry for 127.0.0.1 within /etc/hosts"
+echo "To avoid to get a permission denied on the mounted volume /certs, disable SELINUX=disabled within the file /etc/selinux/config and reboot !"
 echo "Log on to the docker registry using the address and user/password"
 echo "docker login ${reg_name}:5000 -u admin -p snowdrop"
 echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
