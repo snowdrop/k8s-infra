@@ -298,12 +298,13 @@ echo "Copy the client.crt to the docker cert.d folder"
 #sudo mkdir -p /etc/docker/certs.d/${VM_IP}.nip.io:5000
 #sudo cp $certfile /etc/docker/certs.d/${VM_IP}.nip.io:5000/ca.crt
 mkdir -p $HOME/.docker/certs.d/${reg_name}:${reg_port}
-cp $certfile $HOME/.docker/certs.d/${reg_name}:${reg_port}/ca.crt
+cp $certfile $HOME/.docker/certs.d/${reg_name}:${reg_port}/client.crt
 #if [[ "$OSTYPE" != "darwin"* ]]; then
 #  sudo service docker restart
 #fi
 
 echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+echo "Add kind-registry as new entry for 127.0.0.1 within /etc/hosts"
 echo "Log on to the docker registry using the address and user/password"
 echo "docker login ${reg_name}:5000 -u admin -p snowdrop"
 echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
