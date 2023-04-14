@@ -210,7 +210,7 @@ nodes:
         authorization-mode: "AlwaysAllow"
   extraMounts:
     - containerPath: /etc/docker/certs.d/${reg_name}
-      hostPath: $(pwd)/certs/${reg_name}
+      hostPath: $HOME/.registry/certs/${reg_name}
   extraPortMappings:
   - containerPort: 80
     hostPort: 80
@@ -255,6 +255,19 @@ mkdir -p $HOME/.registry/auth
 docker run --entrypoint htpasswd registry:2.7.0 -Bbn admin snowdrop > $HOME/.registry/auth/htpasswd
 
 echo "==== Creating a docker registry"
+echo "docker run -d \
+  -p 5000:5000 \
+  --restart=always \
+  --name ${reg_name} \
+  -v $HOME/.registry/auth:/auth \
+  -v $HOME/.registry/certs/${reg_name}:/certs \
+  -e REGISTRY_AUTH=htpasswd \
+  -e REGISTRY_AUTH_HTPASSWD_REALM="Registry Realm" \
+  -e REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd \
+  -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/client.crt \
+  -e REGISTRY_HTTP_TLS_KEY=/certs/client.key \
+  registry:${reg_image_version}"
+
 docker run -d \
   -p 5000:5000 \
   --restart=always \
