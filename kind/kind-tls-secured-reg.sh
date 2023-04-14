@@ -34,7 +34,7 @@ shopt -s expand_aliases
 alias k='kubectl'
 
 reg_name='kind-registry'
-reg_server='localhost'
+#reg_server='localhost'
 reg_port='5000'
 reg_image_version='2.6.2'
 
@@ -163,7 +163,7 @@ fi
 
 # Generate the Self signed certificate using openssl
 pushd $temp_cert_dir
-mkdir -p certs/${reg_server}
+mkdir -p certs/${reg_name}
 
 echo "==== Generate the openssl config"
 create_openssl_cfg > req.cnf
@@ -173,17 +173,18 @@ openssl req -x509 \
   -nodes \
   -days 365 \
   -newkey rsa:4096 \
-  -keyout certs/${reg_server}/client.key \
-  -out certs/${reg_server}/client.crt \
+  -keyout certs/${reg_name}/client.key \
+  -out certs/${reg_name}/client.crt \
   -config req.cnf \
   -sha256
 
-if [ ! -d $HOME/.kind_registry ]; then
-  mkdir -p $HOME/.kind_registry
+if [ ! -d $HOME/.registry ]; then
+  mkdir -p $HOME/.registry
 fi
 
-cp -r ${temp_cert_dir}/certs $HOME/.kind_registry/certs
-echo "Certificate and keys generated are available: $HOME/.kind_registry/certs/${reg_server}"
+
+cp -r ${temp_cert_dir}/certs $HOME/.registry
+echo "Certificate and keys generated are available: $HOME/.registry/certs/${reg_name}"
 
 # Kind configuration
 kindCfg=$(cat <<EOF
@@ -196,8 +197,8 @@ containerdConfigPatches:
   [plugins."io.containerd.grpc.v1.cri".registry.mirrors."${VM_IP}.nip.io:${reg_port}"]
     endpoint = ["https://${VM_IP}.nip.io:${reg_port}"]
   [plugins."io.containerd.grpc.v1.cri".registry.configs."${reg_name}:${reg_port}".tls]
-    cert_file = "/etc/docker/certs.d/${reg_server}/client.crt"
-    key_file  = "/etc/docker/certs.d/${reg_server}/client.key"
+    cert_file = "/etc/docker/certs.d/${reg_name}/client.crt"
+    key_file  = "/etc/docker/certs.d/${reg_name}/client.key"
 nodes:
 - role: control-plane
   kubeadmConfigPatches:
@@ -208,8 +209,8 @@ nodes:
         node-labels: "ingress-ready=true"
         authorization-mode: "AlwaysAllow"
   extraMounts:
-    - containerPath: /etc/docker/certs.d/${reg_server}
-      hostPath: $(pwd)/certs/${reg_server}
+    - containerPath: /etc/docker/certs.d/${reg_name}
+      hostPath: $(pwd)/certs/${reg_name}
   extraPortMappings:
   - containerPort: 80
     hostPort: 80
@@ -250,16 +251,16 @@ data:
 EOF
 
 echo "==== Create the htpasswd file where user: admin and password: snowdrop"
-mkdir -p auth
-docker run --entrypoint htpasswd registry:2.7.0 -Bbn admin snowdrop > auth/htpasswd
+mkdir -p $HOME/.registry/auth
+docker run --entrypoint htpasswd registry:2.7.0 -Bbn admin snowdrop > $HOME/.registry/auth/htpasswd
 
 echo "==== Creating a docker registry"
 docker run -d \
   -p 5000:5000 \
   --restart=always \
   --name ${reg_name} \
-  -v $(pwd)/auth:/auth \
-  -v $(pwd)/certs/${reg_server}:/certs \
+  -v $HOME/.registry/auth:/auth \
+  -v $HOME/.registry/certs/${reg_name}:/certs \
   -e REGISTRY_AUTH=htpasswd \
   -e REGISTRY_AUTH_HTPASSWD_REALM="Registry Realm" \
   -e REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd \
@@ -280,7 +281,7 @@ if [[ "$containers" == "" ]]; then
 fi
 
 CERT_DIR=/usr/local/share/ca-certificates
-certfile="certs/${reg_server}/client.crt"
+certfile="certs/${reg_name}/client.crt"
 
 while IFS= read -r container; do
   echo "==== Copying ${certfile} to ${container}:${CERT_DIR}"
