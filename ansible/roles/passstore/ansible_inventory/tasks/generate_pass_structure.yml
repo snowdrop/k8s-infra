@@ -8,7 +8,7 @@
   fail:
     msg:
       - "The {{ pass_l3 }} host folder already exists in pass, to execute the creation first remove that folder using the required playbook."
-      - "$ ansible-playbook ansible/playbook/passstore_controller_inventory_remove.yml -e vm_name={{ pass_l3 }} -e pass_provider={{ pass_l2 }}"
+      - "$ ansible-playbook ansible/playbook/passstore/passstore_controller_inventory_remove.yml -e vm_name={{ pass_l3 }} -e pass_provider={{ pass_l2 }}"
   when: "host_folder_stat.stat.exists"
 
 - name: "Build the password creation statement"
