@@ -300,7 +300,10 @@ delete_kind_cluster() {
     case "$?" in
         0) succeeded "1" "Removing kind cluster (${CLUSTER_NAME})..." ;;
         130) warn "Removing kind cluster (${CLUSTER_NAME})... no cluster to be removed" ;;
-        *) warn "Removing kind cluster (${CLUSTER_NAME})... unsuccessful" ;;
+        *) 
+            error "Removing kind cluster (${CLUSTER_NAME})... unsuccessful, try removing the cluster manually executing '${KIND_COMMAND} delete cluster -n ${CLUSTER_NAME}'" 
+            exit 1
+        ;;
     esac
     set -e
     note_start_task "1" "Removing kind registry container..."
