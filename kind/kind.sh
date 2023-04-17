@@ -499,7 +499,6 @@ EOF
         SCRIPT_RESULT_MESSAGE+="\n"
         SCRIPT_RESULT_MESSAGE+="  * Log on to the container registry using the address and user/password\n"
         SCRIPT_RESULT_MESSAGE+="    ${CRI_COMMAND} login ${SERVER_IP}.sslip.io:${REGISTRY_PORT} -u ${REGISTRY_USER} -p ${REGISTRY_PASSWORD}\n"
-        SCRIPT_RESULT_MESSAGE+="\n"
 
         popd
     else
@@ -690,6 +689,12 @@ EOF
         fi
         
     fi
+    SCRIPT_RESULT_MESSAGE+="\n"
+    SCRIPT_RESULT_MESSAGE+="  * ${CLUSTER_NAME} kind cluster has been deployed\n"
+    SCRIPT_RESULT_MESSAGE+="\n"
+    SCRIPT_RESULT_MESSAGE+="  * Cluster configuration has been copied to ${HOME}/.kube/config\n"
+    SCRIPT_RESULT_MESSAGE+="\n"
+    SCRIPT_RESULT_MESSAGE+="  * Execute 'kind get kubeconfig --name ${CLUSTER_NAME}' to obtain the cluster configuration\n"
 }
 
 function install() {
