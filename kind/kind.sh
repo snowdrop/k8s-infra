@@ -488,9 +488,9 @@ EOF
         done <<< "$containers"
 
         log_message "1" "Copy the client.crt to the docker cert.d folder"
-        mkdir -p $HOME/.docker/certs.d/<${SERVER_IP}.sslip.io:${REGISTRY_PORT}
-        cp $certfile $HOME/.docker/certs.d/<${SERVER_IP}.sslip.io:${REGISTRY_PORT}/client.crt
-        cp $HOME/.registry/certs/${REGISTRY_NAME}/client.key $HOME/.docker/certs.d/<${SERVER_IP}.sslip.io:${REGISTRY_PORT}/client.key
+        mkdir -p $HOME/.docker/certs.d/${SERVER_IP}.sslip.io:${REGISTRY_PORT}
+        cp $certfile $HOME/.docker/certs.d/${SERVER_IP}.sslip.io:${REGISTRY_PORT}/client.crt
+        cp $HOME/.registry/certs/${REGISTRY_NAME}/client.key $HOME/.docker/certs.d/${SERVER_IP}.sslip.io:${REGISTRY_PORT}/client.key
         eval ${DOCKER_RESTART_COMMAND}
 
         SCRIPT_RESULT_MESSAGE+="\n"
