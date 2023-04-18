@@ -445,9 +445,9 @@ EOF
         ${CRI_COMMAND} run -d \
             -p ${REGISTRY_PORT}:5000 \
             --restart=always \
-            --name ${registry_name} \
+            --name ${REGISTRY_NAME} \
             -v $HOME/.registry/auth:/auth \
-            -v $HOME/.registry/certs/${registry_name}:/certs \
+            -v $HOME/.registry/certs/${REGISTRY_NAME}:/certs \
             -e REGISTRY_AUTH=htpasswd \
             -e REGISTRY_AUTH_HTPASSWD_REALM="Registry Realm" \
             -e REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd \
@@ -459,7 +459,7 @@ EOF
         # connect the container registry to the cluster network
         # (the network may already be connected)
         note_start_task "2" "Connect the container registry to the cluster network..."
-        ${CRI_COMMAND} network connect kind "${registry_name}" || true
+        ${CRI_COMMAND} network connect kind "${REGISTRY_NAME}" || true
         succeeded "2" "Connect the container registry to the cluster network.  "
 
         # Upload the self-signed certificate to the kind container
@@ -471,7 +471,7 @@ EOF
         fi
 
         CERT_DIR=/usr/local/share/ca-certificates
-        certfile="$HOME/.registry/certs/${registry_name}/client.crt"
+        certfile="$HOME/.registry/certs/${REGISTRY_NAME}/client.crt"
 
         while IFS= read -r container; do
             note_start_task "1" "Copying ${certfile} to ${container}:${CERT_DIR}"
@@ -488,16 +488,10 @@ EOF
         done <<< "$containers"
 
         log_message "1" "Copy the client.crt to the docker cert.d folder"
-        if [[ "$OSTYPE" != "darwin"* ]]; then
-            sudo mkdir -p /etc/docker/certs.d/${SERVER_IP}.sslip.io:${REGISTRY_PORT}
-            sudo cp $certfile /etc/docker/certs.d/${SERVER_IP}.sslip.io:${REGISTRY_PORT}/client.crt
-        else
-            mkdir -p $HOME/.docker/certs.d/<${SERVER_IP}.sslip.io:${REGISTRY_PORT}
-            cp $certfile $HOME/.docker/certs.d/<${SERVER_IP}.sslip.io:${REGISTRY_PORT}/client.crt
-            cp $HOME/.registry/certs/${registry_name}/client.key $HOME/.docker/certs.d/<${SERVER_IP}.sslip.io:${REGISTRY_PORT}/client.key
-            #sudo service docker restart
-            eval ${DOCKER_RESTART_COMMAND}
-        fi
+        mkdir -p $HOME/.docker/certs.d/<${SERVER_IP}.sslip.io:${REGISTRY_PORT}
+        cp $certfile $HOME/.docker/certs.d/<${SERVER_IP}.sslip.io:${REGISTRY_PORT}/client.crt
+        cp $HOME/.registry/certs/${REGISTRY_NAME}/client.key $HOME/.docker/certs.d/<${SERVER_IP}.sslip.io:${REGISTRY_PORT}/client.key
+        eval ${DOCKER_RESTART_COMMAND}
 
         SCRIPT_RESULT_MESSAGE+="\n"
         SCRIPT_RESULT_MESSAGE+="  * Log on to the container registry using the address and user/password\n"
@@ -505,24 +499,24 @@ EOF
 
         popd
     else
-        note "5" "1-------------> ${registry_name}"
-        note_start_task "1" "Starting local Container registry ${registry_name}..."
-        running="$(${CRI_COMMAND} inspect -f '{{.State.Running}}' "${registry_name}" 2>/dev/null || true)"
+        note "5" "1-------------> ${REGISTRY_NAME}"
+        note_start_task "1" "Starting local Container registry ${REGISTRY_NAME}..."
+        running="$(${CRI_COMMAND} inspect -f '{{.State.Running}}' "${REGISTRY_NAME}" 2>/dev/null || true)"
         if [ "${running}" != 'true' ]; then
             ${CRI_COMMAND} run -d --restart=always -p "${REGISTRY_PORT}:5000" \
-              --name "${registry_name}" registry:2
-            succeeded "1" "Starting a local Container registry ${registry_name}..."
+              --name "${REGISTRY_NAME}" registry:2
+            succeeded "1" "Starting a local Container registry ${REGISTRY_NAME}..."
         else   
-            warn "Starting a local Container registry ${registry_name}... already running."
+            warn "Starting a local Container registry ${REGISTRY_NAME}... already running."
         fi
 
         # Connect the local Container registry with the kind network
-        note_start_task "1" "Connecting the local Container registry with the kind network ${registry_name}..."
-        if [ "$(${CRI_COMMAND} inspect -f='{{json .NetworkSettings.Networks.kind}}' ${registry_name})" = 'null' ]; then
-            ${CRI_COMMAND} network connect "kind" "${registry_name}" > /dev/null 2>&1 &
-            succeeded "1" "Connecting the local Container registry with the kind network ${registry_name}..."
+        note_start_task "1" "Connecting the local Container registry with the kind network ${REGISTRY_NAME}..."
+        if [ "$(${CRI_COMMAND} inspect -f='{{json .NetworkSettings.Networks.kind}}' ${REGISTRY_NAME})" = 'null' ]; then
+            ${CRI_COMMAND} network connect "kind" "${REGISTRY_NAME}" > /dev/null 2>&1 &
+            succeeded "1" "Connecting the local Container registry with the kind network ${REGISTRY_NAME}..."
         else   
-            warn "Connecting the local Container registry with the kind network ${registry_name}... already connected."
+            warn "Connecting the local Container registry with the kind network ${REGISTRY_NAME}... already connected."
         fi
 
         SCRIPT_REQUIRED_STEPS+="\n"
@@ -566,7 +560,7 @@ deploy_kind_cluster() {
         fi
         # Generate the Self signed certificate using openssl
         pushd $temp_cert_dir
-        mkdir -p $HOME/.registry/certs/${registry_name}
+        mkdir -p $HOME/.registry/certs/${REGISTRY_NAME}
 
         note "1" "==== Generate the openssl config"
         create_openssl_cfg > req.cnf
@@ -576,33 +570,33 @@ deploy_kind_cluster() {
             -nodes \
             -days 365 \
             -newkey rsa:4096 \
-            -keyout $HOME/.registry/certs/${registry_name}/client.key \
-            -out $HOME/.registry/certs/${registry_name}/client.crt \
+            -keyout $HOME/.registry/certs/${REGISTRY_NAME}/client.key \
+            -out $HOME/.registry/certs/${REGISTRY_NAME}/client.crt \
             -config req.cnf \
             -sha256
         kindCfgContainerdConfigPatches=$(cat <<EOF
 - |-
-  [plugins."io.containerd.grpc.v1.cri".registry.mirrors."${registry_name}:${REGISTRY_PORT}"]
-    endpoint = ["https://${registry_name}:${REGISTRY_PORT}"]
+  [plugins."io.containerd.grpc.v1.cri".registry.mirrors."${REGISTRY_NAME}:${REGISTRY_PORT}"]
+    endpoint = ["https://${REGISTRY_NAME}:${REGISTRY_PORT}"]
   [plugins."io.containerd.grpc.v1.cri".registry.mirrors."${SERVER_IP}.sslip.io:${REGISTRY_PORT}"]
     endpoint = ["https://${SERVER_IP}.sslip.io:${REGISTRY_PORT}"]
-  [plugins."io.containerd.grpc.v1.cri".registry.configs."${registry_name}:${REGISTRY_PORT}".tls]
-    cert_file = "/etc/docker/certs.d/${registry_name}/client.crt"
-    key_file  = "/etc/docker/certs.d/${registry_name}/client.key"
+  [plugins."io.containerd.grpc.v1.cri".registry.configs."${REGISTRY_NAME}:${REGISTRY_PORT}".tls]
+    cert_file = "/etc/docker/certs.d/${REGISTRY_NAME}/client.crt"
+    key_file  = "/etc/docker/certs.d/${REGISTRY_NAME}/client.key"
 EOF
 )
 
         kindCfgExtraMounts=$(cat <<EOF
 extraMounts:
-  - containerPath: /etc/docker/certs.d/${registry_name}
-    hostPath: $HOME/.registry/certs/${registry_name}
+  - containerPath: /etc/docker/certs.d/${REGISTRY_NAME}
+    hostPath: $HOME/.registry/certs/${REGISTRY_NAME}
 EOF
 )
     else
         kindCfgContainerdConfigPatches=$(cat <<EOF
 - |-
   [plugins."io.containerd.grpc.v1.cri".registry.mirrors."localhost:${REGISTRY_PORT}"]
-    endpoint = ["http://${registry_name}:${REGISTRY_PORT}"]
+    endpoint = ["http://${REGISTRY_NAME}:${REGISTRY_PORT}"]
 EOF
 )
     fi
@@ -890,7 +884,7 @@ check_pre_requisites
 validate_cri
 
 kindCfgExtraMounts=""
-registry_name="${CLUSTER_NAME}-registry"
+REGISTRY_NAME="${CLUSTER_NAME}-registry"
 registry_server='localhost'
 temp_cert_dir="_tmp"
 
@@ -902,7 +896,7 @@ case ${COMMAND} in
         log_message "0" ""
         succeeded "0" " ################### Installation completed! ###################"
         SCRIPT_REQUIRED_STEPS+="\n"
-        SCRIPT_REQUIRED_STEPS+="  * Add to your /etc/hosts file: 127.0.0.1 localhost ${registry_name}\n"
+        SCRIPT_REQUIRED_STEPS+="  * Add to your /etc/hosts file: 127.0.0.1 localhost ${REGISTRY_NAME}\n"
         SCRIPT_REQUIRED_STEPS+="\n"
         SCRIPT_REQUIRED_STEPS+="  * To avoid to get a permission denied on the mounted volume /certs, disable SELINUX=disabled within the file /etc/selinux/config and reboot !\n"
         succeeded "0" "${SCRIPT_RESULT_MESSAGE}"
