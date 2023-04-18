@@ -885,7 +885,6 @@ validate_cri
 
 kindCfgExtraMounts=""
 REGISTRY_NAME="${CLUSTER_NAME}-registry"
-registry_server='localhost'
 temp_cert_dir="_tmp"
 
 case ${COMMAND} in
