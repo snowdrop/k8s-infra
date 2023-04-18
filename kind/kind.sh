@@ -283,7 +283,7 @@ subjectAltName          = @alt_names
 [alt_names]
 DNS.1 = kind-registry
 DNS.2 = localhost
-DNS.3 = ${SERVER_IP}.sslip.io
+DNS.3 = ${REGISTRY_NAME}
 EOF
 )
 echo "$CFG"
@@ -488,14 +488,14 @@ EOF
         done <<< "$containers"
 
         log_message "1" "Copy the client.crt to the docker cert.d folder"
-        mkdir -p $HOME/.docker/certs.d/${SERVER_IP}.sslip.io:${REGISTRY_PORT}
-        cp $certfile $HOME/.docker/certs.d/${SERVER_IP}.sslip.io:${REGISTRY_PORT}/client.crt
-        cp $HOME/.registry/certs/${REGISTRY_NAME}/client.key $HOME/.docker/certs.d/${SERVER_IP}.sslip.io:${REGISTRY_PORT}/client.key
+        mkdir -p $HOME/.docker/certs.d/${REGISTRY_NAME}:${REGISTRY_PORT}
+        cp $certfile $HOME/.docker/certs.d/${REGISTRY_NAME}:${REGISTRY_PORT}/client.crt
+        cp $HOME/.registry/certs/${REGISTRY_NAME}/client.key $HOME/.docker/certs.d/${REGISTRY_NAME}:${REGISTRY_PORT}/client.key
         eval ${DOCKER_RESTART_COMMAND}
 
         SCRIPT_RESULT_MESSAGE+="\n"
         SCRIPT_RESULT_MESSAGE+="  * Log on to the container registry using the address and user/password\n"
-        SCRIPT_RESULT_MESSAGE+="    ${CRI_COMMAND} login ${SERVER_IP}.sslip.io:${REGISTRY_PORT} -u ${REGISTRY_USER} -p ${REGISTRY_PASSWORD}\n"
+        SCRIPT_RESULT_MESSAGE+="    ${CRI_COMMAND} login ${REGISTRY_NAME}:${REGISTRY_PORT} -u ${REGISTRY_USER} -p ${REGISTRY_PASSWORD}\n"
 
         popd
     else
@@ -532,7 +532,7 @@ EOF
                         SCRIPT_REQUIRED_STEPS+="  * Edit the daemon.json file. If you use Docker Desktop for Mac or Docker Desktop for Windows, click the Docker icon, choose Settings and then choose Docker Engine.\n"
                     ;;
                 esac
-                SCRIPT_REQUIRED_STEPS+='    {"insecure-registries" : ["${SERVER_IP}.sslip.io:${REGISTRY_PORT}"]}\n'
+                SCRIPT_REQUIRED_STEPS+='    {"insecure-registries" : ["${REGISTRY_NAME}:${REGISTRY_PORT}"]}\n'
             ;;
             "podman") 
                 SCRIPT_REQUIRED_STEPS+="  * Set the kind registry as an insecure registry by adding the following configuration to the /etc/containers/registries.conf.d/kind-registry.conf file\n"
@@ -543,7 +543,7 @@ EOF
         esac
         SCRIPT_RESULT_MESSAGE+="\n"
         SCRIPT_RESULT_MESSAGE+="  * Log on to the container registry using the address\n"
-        SCRIPT_RESULT_MESSAGE+="    ${CRI_COMMAND} login ${SERVER_IP}.sslip.io:${REGISTRY_PORT}\n"
+        SCRIPT_RESULT_MESSAGE+="    ${CRI_COMMAND} login ${REGISTRY_NAME}:${REGISTRY_PORT}\n"
     fi
 
 }
@@ -578,8 +578,6 @@ deploy_kind_cluster() {
 - |-
   [plugins."io.containerd.grpc.v1.cri".registry.mirrors."${REGISTRY_NAME}:${REGISTRY_PORT}"]
     endpoint = ["https://${REGISTRY_NAME}:${REGISTRY_PORT}"]
-  [plugins."io.containerd.grpc.v1.cri".registry.mirrors."${SERVER_IP}.sslip.io:${REGISTRY_PORT}"]
-    endpoint = ["https://${SERVER_IP}.sslip.io:${REGISTRY_PORT}"]
   [plugins."io.containerd.grpc.v1.cri".registry.configs."${REGISTRY_NAME}:${REGISTRY_PORT}".tls]
     cert_file = "/etc/docker/certs.d/${REGISTRY_NAME}/client.crt"
     key_file  = "/etc/docker/certs.d/${REGISTRY_NAME}/client.key"
@@ -754,7 +752,8 @@ function check_os() {
             NETWORK_RM_CMD="${CRI_COMMAND} network rm -f kind"
         ;;
         "darwin"*) 
-            DOCKER_RESTART_COMMAND='echo -e "${YELLOW}\xE2\x9A\xA0 : Script paused to Restart the Docker service manually. ${NC}" ; read -n1 -s -r -p $"Press any key to continue..." key' 
+            # DOCKER_RESTART_COMMAND='echo -e "${YELLOW}\xE2\x9A\xA0 : Script paused to Restart the Docker service manually. ${NC}" ; read -n1 -s -r -p $"Press any key to continue..." key' 
+            DOCKER_RESTART_COMMAND='echo ""' 
             NETWORK_RM_CMD="${CRI_COMMAND} network rm kind"
         ;;
         *) error "Unknown OS"; exit 1 ;;
