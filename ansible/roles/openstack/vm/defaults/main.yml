@@ -17,6 +17,9 @@ flavours:
   m1.xlarge:
     name: "m1.xlarge"
     disk_size: 80
+  g.standard.xxl:
+    name: "g.standard.xxl"
+    disk_size: 120
   g.standard.xxxl:
     name: "g.standard.xxxl"
     disk_size: 160
