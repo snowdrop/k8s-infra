@@ -8,10 +8,23 @@
     volume_name: "{{ vm_name }}-volume"
   no_log: True
 
-- name: "DEBUG"
+- name: "DEBUG openstack_auth"
   debug:
     msg: "openstack_auth: {{ openstack_auth }}"
 
+- name: "DEBUG volumes"
+  debug:
+    msg: "ocp_vm_volume_item_test: {{ ocp_vm_volume_item_test }}"
+  loop: >-
+    {{ 
+      openstack.vm.volumes 
+      | map('dict2items') 
+      | flatten 
+      | map(attribute='name') 
+    }}
+  loop_control:
+    loop_var: ocp_vm_volume_item_test
+      
 - name: "Gather information about a previously created VM"
   openstack.cloud.server_info:
     auth:
@@ -67,31 +80,14 @@
         project_domain_name: "{{ openstack_auth.openstack_project_domain }}"
         auth_url: "{{ openstack_auth.openstack_os_auth_url }}"
       state: present
-      size: "{{ flavours[openstack.vm.flavor].disk_size | default(40) }}"
-      display_name: "{{ volume_name }}"
+      # display_name: "{{ volume_name }}"
+      # size: "{{ flavours[openstack.vm.flavor].disk_size | default(40) }}"
+      display_name: "{{ ocp_vm_volume_item.name }}"
+      size: "{{ ocp_vm_volume_item.size }}"
       volume_type: "ceph"
-
-  # - name: "Create VM instance"
-  #   os_server:
-  #     auth:
-  #       project_name: "{{ openstack_auth.openstack_project_name }}"
-  #       username: "{{ openstack_auth.openstack_console_user }}"
-  #       password: "{{ openstack_auth.openstack_console_password }}"
-  #       user_domain_name: "{{ openstack_auth.openstack_user_domain }}"
-  #       project_domain_name: "{{ openstack_auth.openstack_project_domain }}"
-  #       auth_url: "{{ openstack_auth.openstack_os_auth_url }}"
-  #     name: "{{ vm_name }}"
-  #     image: "{{ openstack.vm.image }}"
-  #     key_name: "{{ vm_name }}"
-  #     state: "{{ state }}"
-  #     timeout: "{{ openstack.timeout }}"
-  #     flavor: "{{ openstack.vm.flavor }}"
-  #     auto_floating_ip: yes
-  #     network: "{{ openstack.vm.network }}"
-  #     security_groups: "{{ openstack_security_group }}"
-  #     volumes: "{{ volume_name }}"
-  #     boot_from_volume: "{{ openstack.vm.boot_from_volume }}"
-  #   register: openstack_output
+    loop: "{{ openstack.vm.volumes }}"
+    loop_control:
+      loop_var: ocp_vm_volume_item
 
   - name: "Get information about keypairs using optional parameters"
     openstack.cloud.keypair_info:
