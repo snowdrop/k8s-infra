@@ -11,19 +11,6 @@
 - name: "DEBUG openstack_auth"
   debug:
     msg: "openstack_auth: {{ openstack_auth }}"
-
-- name: "DEBUG volumes"
-  debug:
-    msg: "ocp_vm_volume_item_test: {{ ocp_vm_volume_item_test }}"
-  loop: >-
-    {{ 
-      openstack.vm.volumes 
-      | map('dict2items') 
-      | flatten 
-      | map(attribute='name') 
-    }}
-  loop_control:
-    loop_var: ocp_vm_volume_item_test
       
 - name: "Gather information about a previously created VM"
   openstack.cloud.server_info:
@@ -123,7 +110,7 @@
       auto_floating_ip: yes
       network: "{{ openstack.vm.network }}"
       security_groups: "{{ openstack_security_group }}"
-      volumes: "{{ volume_name }}"
+      volumes: "{{ openstack.vm.volumes | map(attribute='name')  }}"
       boot_from_volume: "{{ openstack.vm.boot_from_volume }}"
       userdata: |
         #cloud-config
