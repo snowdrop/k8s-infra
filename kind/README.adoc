@@ -224,9 +224,9 @@ docker login -u admin -p snowdrop kind-registry:5000
 file of the certificate under by example
 `/etc/docker/certs.d/kind-registry:5000/client.cert`
 
-=== How to check
+== How to check
 
-==== Container registry
+=== Container registry
 
 To verify if you can use the (secured) container registry, then execute the following commands:
 [source,bash]
@@ -249,7 +249,7 @@ NAME                     READY   STATUS    RESTARTS   AGE
 hello-7689699f4b-mbrr2   1/1     Running   0          21s
 ----
 
-==== Ingress controller
+=== Ingress controller
 
 To verify if the ingress route is working, use the following example
 part of the
