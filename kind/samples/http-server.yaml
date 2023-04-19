@@ -1,0 +1,49 @@
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: snowdrop-sample
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sample-webapp-deployment
+  namespace: snowdrop-sample
+  labels:
+    app: sample-webapp
+spec:
+  selector:
+    matchLabels:
+      app: sample-webapp
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: sample-webapp
+    spec:
+      containers:
+      - name: sample-webapp
+        image: nginx
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            memory: 256Mi
+            cpu: "250m"
+          requests:
+            memory: 128Mi
+            cpu: "80m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sample-webapp
+  namespace: snowdrop-sample
+spec:
+  selector:
+    app: sample-webapp
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 30081   
+  type: NodePort
