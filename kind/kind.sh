@@ -2,13 +2,14 @@
 
 #
 # Script creating a Kubernetes cluster using kind tool
-# deploying a private docker registry and kourier to route the traffic
+# deploying a (private) docker registry
+# ingress contoller (nginx, kourier)
 #
-# Creation: March 8 Feb - 2023
+# Creation: April - 2023
 #
 # Add hereafter changes done post creation date as backlog
 #
-# Feb 8th 2023:
+# MMM dd YYYY:
 #
 # -
 #
@@ -119,7 +120,9 @@ print_logo() {
     log_message "1" " |_____/  |_| |_|  \___/    \_/\_/    \__,_| |_|     \___/  |  __/ "
     log_message "1" "                                                            | |    "
     log_message "1" "                                                            |_|    "
-    log_message "1" "Managing a kubernetes cluster using kind"
+    log_message "1" "Script to create/delete a Kubernetes cluster using kind like a : "
+    log_message "1" "(private) docker ontainer registry"
+    log_message "1" "ingress controller (nginx, kourier)"
     log_message "1" ""
     note "5" "Variables used:"
     note "5" ""
