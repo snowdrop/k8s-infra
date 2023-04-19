@@ -208,16 +208,16 @@ to map the `localhost ip` address with the name of the registry
 
 ....
 ::1 
-127.0.0.1 registry.local kind-registry
+127.0.0.1 kind-registry kind-registry
 ....
 
-The certificate generated is available at `$HOME/local-registry.crt`
+The certificate generated is available at `~/.registry/certs/<CLUSTER_NAME>-registry`
 
 You can log on to the registry using the user and password as defined previously.
 
 [source,bash]
 ----
-docker login -u admin -p snowdrop registry.local:5000
+docker login -u admin -p snowdrop kind-registry:5000
 ----
 
 *REMARK*: If needed by the tools such as podman, crt, crictl, … move the
@@ -225,6 +225,31 @@ file of the certificate under by example
 `/etc/docker/certs.d/kind-registry:5000/client.cert`
 
 === How to check
+
+==== Container registry
+
+To verify if you can use the (secured) container registry, then execute the following commands:
+[source,bash]
+----
+docker pull gcr.io/google-samples/hello-app:1.0
+docker tag gcr.io/google-samples/hello-app:1.0 kind-registry:5000/google-samples/hello-app:1.0
+
+docker logout kind-registry:5000
+docker login kind-registry:5000 -u admin -p snowdrop
+docker push kind-registry:5000/google-samples/hello-app:1.0
+
+kubectl delete secret regcred
+kubectl create secret docker-registry regcred --docker-server=kind-registry:5000 --docker-username=admin --docker-password=snowdrop
+kubectl patch serviceaccount default -p '{"imagePullSecrets": [{"name": "regcred"}]}'
+kubectl delete deployment hello
+kubectl create deployment hello --image=kind-registry:5000/google-samples/hello-app:1.0
+
+kubectl get pod -lapp=hello
+NAME                     READY   STATUS    RESTARTS   AGE
+hello-7689699f4b-mbrr2   1/1     Running   0          21s
+----
+
+==== Ingress controller
 
 To verify if the ingress route is working, use the following example
 part of the
