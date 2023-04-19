@@ -164,6 +164,7 @@ show_usage() {
     log_message "0" "\t--registry-user <user>\t\t\tRegistry user. Default: admin"
     log_message "0" "\t--secure-registry\t\t\tSecure the docker registry. Default: No"
     log_message "0" "\t--server-ip <ip-address>\t\tIP address to be used. Default: 127.0.0.1"
+    log_message "0" "\t--skip-ingress-installation \t\tSkip the installation of an ingress. Default: No"
     log_message "0" "\t--use-existing-cluster\t\t\tUses existing kind cluster if it already exists. Default: No"
     log_message "0" "\t-v, --verbosity <value>\t\t\tLogging verbosity (0..9). Default: 1"
     log_message "0" "\t\t\t\t\t\tA verbosity setting of 0 logs only critical events."
@@ -697,10 +698,12 @@ function install() {
 
     deploy_docker_registry
 
-    if [ "${INGRESS}" == 'kourier' ]; then
-        deploy_ingress_kourier
-    elif [ "${INGRESS}" == 'nginx' ]; then
-        deploy_ingress_nginx
+    if [ "${SKIP_INGRESS_INSTALLATION}" == 'n' ]; then
+        if [ "${INGRESS}" == 'kourier' ]; then
+            deploy_ingress_kourier
+        elif [ "${INGRESS}" == 'nginx' ]; then
+            deploy_ingress_nginx
+        fi
     fi
 }
 
@@ -795,6 +798,7 @@ REGISTRY_PORT="5000"
 REGISTRY_USER="admin"
 SCRIPT_RESULT_MESSAGE=""
 SCRIPT_REQUIRED_STEPS="# Required Steps:\n"
+SKIP_INGRESS_INSTALLATION="n"
 SECURE_REGISTRY="n"
 SERVER_IP="127.0.0.1"
 SHOW_HELP="n"
@@ -820,6 +824,7 @@ while [ $# -gt 0 ]; do
         --registry-port) REGISTRY_PORT="$2"; shift ;;
         --registry-user) REGISTRY_USER="$2"; shift ;;
         --secure-registry) SECURE_REGISTRY="y" ;;
+        --skip-ingress-installation) SKIP_INGRESS_INSTALLATION="y" ;;
         --server-ip) SERVER_IP="$2"; shift ;;
         --use-existing-cluster) USE_EXISTING_CLUSTER="y"; ;;
         --verbosity) LOGGING_VERBOSITY="$2"; shift ;;
