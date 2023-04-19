@@ -164,6 +164,7 @@ show_usage() {
     log_message "0" "\t--registry-user <user>\t\t\tRegistry user. Default: admin"
     log_message "0" "\t--secure-registry\t\t\tSecure the docker registry. Default: No"
     log_message "0" "\t--server-ip <ip-address>\t\tIP address to be used. Default: 127.0.0.1"
+    log_message "0" "\t--skip-ingress-installation \t\tSkip the installation of an ingress. Default: No"
     log_message "0" "\t--use-existing-cluster\t\t\tUses existing kind cluster if it already exists. Default: No"
     log_message "0" "\t-v, --verbosity <value>\t\t\tLogging verbosity (0..9). Default: 1"
     log_message "0" "\t\t\t\t\t\tA verbosity setting of 0 logs only critical events."
@@ -180,6 +181,42 @@ check_pre_requisites() {
         exit 1
     fi
     succeeded "2" "Checking if kind exists..."
+
+    note "2" "CRI Provider: ${CRI_PROVIDER}"
+    if [ "${CRI_PROVIDER}" == 'docker' ]; then
+        note_start_task "2" "Checking if docker exists..."
+        if ! command -v docker &> /dev/null; then
+            error "docker is not installed"
+            error "Use a package manager (i.e. 'brew install docker') or visit the official site https://docs.docker.com/engine/install/"
+            exit 1
+        fi
+
+        case "$OSTYPE" in
+            "linux-gnu"*) 
+                note_start_task "2" "Checking if docker exists..."
+                set +e
+                systemctl is-active --quiet service docker
+                case "$?" in
+                    0) succeeded "2" "Checking if docker service is started..." ;;
+                    *) 
+                        error "docker service is not started"
+                        error "Start the service with 'sudo systemctl start docker'"
+                        exit 1
+                    ;;
+                esac
+                set -e
+            ;;
+        esac;
+    elif [ "${CRI_PROVIDER}" == 'podman' ]; then
+        note_start_task "2" "Checking if podman exists..."
+        if ! command -v podman &> /dev/null; then
+            error "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+            error "podman is not installed"
+            error "Use a package manager (i.e. 'brew install podman') or visit the official site either https://podman.io/ or https://podman-desktop.io/"
+            exit 1
+        fi
+        succeeded "2" "Checking if docker exists..."
+    fi
 
     if [ ${COMMAND} == "install" ]; then
         note_start_task "2" "Checking if kubectl exists... "
@@ -247,28 +284,34 @@ subjectAltName          = @alt_names
 [alt_names]
 DNS.1 = kind-registry
 DNS.2 = localhost
-DNS.3 = registry.local
-DNS.4 = ${SERVER_IP}.sslip.io
+DNS.3 = ${REGISTRY_NAME}
 EOF
 )
 echo "$CFG"
 }
 
+# REMOVE
+
 delete_kind_cluster() {
-    existing_kind_cluster=''
-    get_kind_cluster existing_kind_cluster
-    note_start_task "1" "Removing kind cluster (${existing_kind_cluster})..."
-    if [ ! "${existing_kind_cluster}" == "" ]; then
-        ${KIND_COMMAND} delete cluster -n ${CLUSTER_NAME}
-        succeeded "1" "Removing kind cluster (${existing_kind_cluster})..."
-    else
-        warn "Removing kind cluster (${existing_kind_cluster})... no cluster to be removed"
-    fi
+    # existing_kind_cluster=''
+    # get_kind_cluster existing_kind_cluster
+    note_start_task "1" "Removing kind cluster (${CLUSTER_NAME})..."
+    set +e
+    ${KIND_COMMAND} delete cluster -n ${CLUSTER_NAME} -q
+    case "$?" in
+        0) succeeded "1" "Removing kind cluster (${CLUSTER_NAME})..." ;;
+        130) warn "Removing kind cluster (${CLUSTER_NAME})... no cluster to be removed" ;;
+        *) 
+            error "Removing kind cluster (${CLUSTER_NAME})... unsuccessful, try removing the cluster manually executing '${KIND_COMMAND} delete cluster -n ${CLUSTER_NAME}'" 
+            exit 1
+        ;;
+    esac
+    set -e
     note_start_task "1" "Removing kind registry container..."
     #docker_container_id=$(docker container ls --filter name=^kind-registry$ --all --quiet)
     docker_container_id=$(${CRI_COMMAND} container ls --filter name=^${CLUSTER_NAME}-registry$ --all --quiet)
     if [ ! ${docker_container_id} == "" ]; then
-        ${CRI_COMMAND} container rm ${CLUSTER_NAME}-registry -f
+        ${CRI_COMMAND} container rm ${CLUSTER_NAME}-registry -f 1> /dev/null
         succeeded "1" "Removing kind registry container..."
     else 
         warn "Removing kind registry container... no container to be removed."
@@ -286,10 +329,22 @@ delete_kind_cluster() {
             warn "Delete Podman Control Plane container... nothing to be done."
         fi
     fi
-
-
 }
 
+function delete_cri_resources(){
+    note_start_task "1" "Removing ${CRI_COMMAND} network..."
+    docker_network_id=$(${CRI_COMMAND} network ls --filter name=^kind$ --quiet)
+    if [ ! ${docker_network_id} == "" ]; then
+        NETWORK_RM_RES=eval ${NETWORK_RM_CMD} 1> /dev/null
+        succeeded "1" "Removing ${CRI_COMMAND} network..."
+    else 
+        warn "Removing ${CRI_COMMAND} network... nothing to be done!"
+    fi
+}
+
+# /REMOVE
+
+# INSTALL
 deploy_ingress_kourier() {
   note "1" "Deploying KNative Ingress"
   echo "Install the required custom resources of knative"
@@ -351,7 +406,7 @@ EOF"
 }
 
 deploy_ingress_nginx() {
-  note "1" "Deploy nginx Ingress..."
+  note "1" "Deploying nginx Ingress..."
   #
   # Install the ingress nginx controller using helm
   # Set the Service type as: NodePort (needed for kind)
@@ -362,7 +417,7 @@ deploy_ingress_nginx() {
     --set controller.service.type=NodePort \
     --set controller.hostPort.enabled=true \
     --set controller.watchIngressWithoutClass=true
-  succeeded "1" "Deploy nginx Ingress..."
+  succeeded "1" "Deploying nginx Ingress..."
   note "2" "Ingress controller installed within the namespace: ingress"
 }
 
@@ -383,27 +438,30 @@ EOF
 
     if [ "${SECURE_REGISTRY}" == 'y' ]; then
         note "1" "Securing registry..."
-        note "1" "==== Create the htpasswd file where user: ${REGISTRY_USER} and password: ${REGISTRY_PASSWORD}"
-        mkdir -p auth
-        ${CRI_COMMAND} run --entrypoint htpasswd registry:2.7.0 -Bbn ${REGISTRY_USER} ${REGISTRY_PASSWORD} > auth/htpasswd
+        note "2" "==== Create the htpasswd file where user: ${REGISTRY_USER} and password: ${REGISTRY_PASSWORD}"
+        mkdir -p $HOME/.registry/auth
+        ${CRI_COMMAND} run --entrypoint htpasswd registry:2.7.0 -Bbn ${REGISTRY_USER} ${REGISTRY_PASSWORD} > $HOME/.registry/auth/htpasswd
 
-        note "1" "==== Creating a docker registry"
+        note_start_task "2" "Creating a docker registry..."
         ${CRI_COMMAND} run -d \
-            -p 5000:5000 \
+            -p ${REGISTRY_PORT}:5000 \
             --restart=always \
-            --name ${registry_name} \
-            -v $(pwd)/auth:/auth \
-            -v $(pwd)/certs/${registry_server}:/certs \
+            --name ${REGISTRY_NAME} \
+            -v $HOME/.registry/auth:/auth \
+            -v $HOME/.registry/certs/${REGISTRY_NAME}:/certs \
             -e REGISTRY_AUTH=htpasswd \
             -e REGISTRY_AUTH_HTPASSWD_REALM="Registry Realm" \
             -e REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd \
             -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/client.crt \
             -e REGISTRY_HTTP_TLS_KEY=/certs/client.key \
             registry:${REGISTRY_IMAGE_VERSION}
+        succeeded "2" "Creating a docker registry.  "
 
         # connect the container registry to the cluster network
         # (the network may already be connected)
-        ${CRI_COMMAND} network connect kind "${registry_name}" --alias registry.local || true
+        note_start_task "2" "Connect the container registry to the cluster network..."
+        ${CRI_COMMAND} network connect kind "${REGISTRY_NAME}" || true
+        succeeded "2" "Connect the container registry to the cluster network.  "
 
         # Upload the self-signed certificate to the kind container
         name="${name:-"kind"}"
@@ -414,59 +472,79 @@ EOF
         fi
 
         CERT_DIR=/usr/local/share/ca-certificates
-        certfile="certs/${registry_server}/client.crt"
+        certfile="$HOME/.registry/certs/${REGISTRY_NAME}/client.crt"
 
         while IFS= read -r container; do
-            log_message "1" "==== Copying ${certfile} to ${container}:${CERT_DIR}"
-            docker cp "$certfile" "${container}:${CERT_DIR}"
+            note_start_task "1" "Copying ${certfile} to ${container}:${CERT_DIR}"
+            ${CRI_COMMAND} cp "$certfile" "${container}:${CERT_DIR}"
+            succeeded "1" "Copying ${certfile} to ${container}:${CERT_DIR}"
 
-            log_message "1" "==== Updating CA certificates in ${container}..."
-            docker exec "$container" update-ca-certificates
+            note_start_task "1" "Updating CA certificates in ${container}..."
+            ${CRI_COMMAND} exec "$container" update-ca-certificates
+            succeeded "1" "Updating CA certificates in ${container}..."
 
-            log_message "1" "==== Restarting containerd"
-            docker exec "$container" systemctl restart containerd
+            note_start_task "1" "Restarting containerd..."
+            ${CRI_COMMAND} exec "$container" systemctl restart containerd
+            succeeded "1" "Restarting containerd..."
         done <<< "$containers"
 
         log_message "1" "Copy the client.crt to the docker cert.d folder"
-        sudo mkdir -p /etc/docker/certs.d/${SERVER_IP}.sslip.io:5000
-        sudo cp $certfile /etc/docker/certs.d/${SERVER_IP}.sslip.io:5000/ca.crt
-        sudo service docker restart
+        mkdir -p $HOME/.docker/certs.d/${REGISTRY_NAME}:${REGISTRY_PORT}
+        cp $certfile $HOME/.docker/certs.d/${REGISTRY_NAME}:${REGISTRY_PORT}/client.crt
+        cp $HOME/.registry/certs/${REGISTRY_NAME}/client.key $HOME/.docker/certs.d/${REGISTRY_NAME}:${REGISTRY_PORT}/client.key
+        eval ${DOCKER_RESTART_COMMAND}
 
-        log_message "1" "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-        log_message "1" "Log on to the docker registry using the address and user/password"
-        log_message "1" "docker login ${SERVER_IP}.sslip.io:5000 -u ${REGISTRY_USER} -p ${REGISTRY_PASSWORD}"
-        log_message "1" "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+        SCRIPT_RESULT_MESSAGE+="\n"
+        SCRIPT_RESULT_MESSAGE+="  * Log on to the container registry using the address and user/password\n"
+        SCRIPT_RESULT_MESSAGE+="    ${CRI_COMMAND} login ${REGISTRY_NAME}:${REGISTRY_PORT} -u ${REGISTRY_USER} -p ${REGISTRY_PASSWORD}\n"
 
         popd
     else
-        note "1" "1-------------> ${registry_name}"
-        note_start_task "1" "Start local Container registry ${registry_name}..."
-        # Start a local Docker registry (unless it already exists)
-        running="$(${CRI_COMMAND} inspect -f '{{.State.Running}}' "${registry_name}" 2>/dev/null || true)"
+        note "5" "1-------------> ${REGISTRY_NAME}"
+        note_start_task "1" "Starting local Container registry ${REGISTRY_NAME}..."
+        running="$(${CRI_COMMAND} inspect -f '{{.State.Running}}' "${REGISTRY_NAME}" 2>/dev/null || true)"
         if [ "${running}" != 'true' ]; then
             ${CRI_COMMAND} run -d --restart=always -p "${REGISTRY_PORT}:5000" \
-              --name "${registry_name}" registry:2
-            succeeded "1" "Start a local Container registry ${registry_name}..."
+              --name "${REGISTRY_NAME}" registry:2
+            succeeded "1" "Starting a local Container registry ${REGISTRY_NAME}..."
         else   
-            warn "Start a local Container registry ${registry_name}... already running."
+            warn "Starting a local Container registry ${REGISTRY_NAME}... already running."
         fi
 
         # Connect the local Container registry with the kind network
-        note_start_task "1" "Connect the local Container registry with the kind network ${registry_name}..."
-        if [ "$(${CRI_COMMAND} inspect -f='{{json .NetworkSettings.Networks.kind}}' ${registry_name})" = 'null' ]; then
-            ${CRI_COMMAND} network connect "kind" "${registry_name}" > /dev/null 2>&1 &
-            succeeded "1" "Connect the local Container registry with the kind network ${registry_name}..."
+        note_start_task "1" "Connecting the local Container registry with the kind network ${REGISTRY_NAME}..."
+        if [ "$(${CRI_COMMAND} inspect -f='{{json .NetworkSettings.Networks.kind}}' ${REGISTRY_NAME})" = 'null' ]; then
+            ${CRI_COMMAND} network connect "kind" "${REGISTRY_NAME}" > /dev/null 2>&1 &
+            succeeded "1" "Connecting the local Container registry with the kind network ${REGISTRY_NAME}..."
         else   
-            warn "Connect the local Container registry with the kind network ${registry_name}... already connected."
+            warn "Connecting the local Container registry with the kind network ${REGISTRY_NAME}... already connected."
         fi
-        if [ "${CRI_COMMAND}" == 'podman' ]; then
-            warn "Set the kind registry as an insecure registry by adding the following configuration to the /etc/containers/registries.conf.d/kind-registry.conf file"
-            log_message "0" ""
-            log_message "0" '[[registry]]'
-            log_message "0" 'location = "localhost:5000"'
-            log_message "0" 'insecure = true'
-            log_message "0" ""
-        fi
+
+        SCRIPT_REQUIRED_STEPS+="\n"
+        case "$CRI_PROVIDER" in
+            "docker") 
+                case "$OSTYPE" in
+                    "linux-gnu"*) 
+                        SCRIPT_REQUIRED_STEPS+="\n"
+                        SCRIPT_REQUIRED_STEPS+="  * Edit the daemon.json file, whose default location is /etc/docker/daemon.json on Linux, and restart the docker service  \n"
+                    ;;
+                    "darwin"*) 
+                        SCRIPT_REQUIRED_STEPS+="\n"
+                        SCRIPT_REQUIRED_STEPS+="  * Edit the daemon.json file. If you use Docker Desktop for Mac or Docker Desktop for Windows, click the Docker icon, choose Settings and then choose Docker Engine.\n"
+                    ;;
+                esac
+                SCRIPT_REQUIRED_STEPS+='    {"insecure-registries" : ["${REGISTRY_NAME}:${REGISTRY_PORT}"]}\n'
+            ;;
+            "podman") 
+                SCRIPT_REQUIRED_STEPS+="  * Set the kind registry as an insecure registry by adding the following configuration to the /etc/containers/registries.conf.d/kind-registry.conf file\n"
+                SCRIPT_REQUIRED_STEPS+='[[registry]]\n'
+                SCRIPT_REQUIRED_STEPS+='location = "localhost:${REGISTRY_PORT}"\n'
+                SCRIPT_REQUIRED_STEPS+='insecure = true\n'
+            ;;
+        esac
+        SCRIPT_RESULT_MESSAGE+="\n"
+        SCRIPT_RESULT_MESSAGE+="  * Log on to the container registry using the address\n"
+        SCRIPT_RESULT_MESSAGE+="    ${CRI_COMMAND} login ${REGISTRY_NAME}:${REGISTRY_PORT}\n"
     fi
 
 }
@@ -483,7 +561,7 @@ deploy_kind_cluster() {
         fi
         # Generate the Self signed certificate using openssl
         pushd $temp_cert_dir
-        mkdir -p certs/${registry_server}
+        mkdir -p $HOME/.registry/certs/${REGISTRY_NAME}
 
         note "1" "==== Generate the openssl config"
         create_openssl_cfg > req.cnf
@@ -493,33 +571,31 @@ deploy_kind_cluster() {
             -nodes \
             -days 365 \
             -newkey rsa:4096 \
-            -keyout certs/${registry_server}/client.key \
-            -out certs/${registry_server}/client.crt \
+            -keyout $HOME/.registry/certs/${REGISTRY_NAME}/client.key \
+            -out $HOME/.registry/certs/${REGISTRY_NAME}/client.crt \
             -config req.cnf \
             -sha256
         kindCfgContainerdConfigPatches=$(cat <<EOF
 - |-
-  [plugins."io.containerd.grpc.v1.cri".registry.mirrors."registry.local:${REGISTRY_PORT}"]
-    endpoint = ["https://registry.local:${REGISTRY_PORT}"]
-  [plugins."io.containerd.grpc.v1.cri".registry.mirrors."${SERVER_IP}.sslip.io:${REGISTRY_PORT}"]
-    endpoint = ["https://${SERVER_IP}.sslip.io:${REGISTRY_PORT}"]
-  [plugins."io.containerd.grpc.v1.cri".registry.configs."registry.local:${REGISTRY_PORT}".tls]
-    cert_file = "/etc/docker/certs.d/${registry_server}/client.crt"
-    key_file  = "/etc/docker/certs.d/${registry_server}/client.key"
+  [plugins."io.containerd.grpc.v1.cri".registry.mirrors."${REGISTRY_NAME}:${REGISTRY_PORT}"]
+    endpoint = ["https://${REGISTRY_NAME}:${REGISTRY_PORT}"]
+  [plugins."io.containerd.grpc.v1.cri".registry.configs."${REGISTRY_NAME}:${REGISTRY_PORT}".tls]
+    cert_file = "/etc/docker/certs.d/${REGISTRY_NAME}/client.crt"
+    key_file  = "/etc/docker/certs.d/${REGISTRY_NAME}/client.key"
 EOF
 )
 
         kindCfgExtraMounts=$(cat <<EOF
 extraMounts:
-  - containerPath: /etc/docker/certs.d/${registry_server}
-    hostPath: $(pwd)/certs/${registry_server}
+  - containerPath: /etc/docker/certs.d/${REGISTRY_NAME}
+    hostPath: $HOME/.registry/certs/${REGISTRY_NAME}
 EOF
 )
     else
         kindCfgContainerdConfigPatches=$(cat <<EOF
 - |-
   [plugins."io.containerd.grpc.v1.cri".registry.mirrors."localhost:${REGISTRY_PORT}"]
-    endpoint = ["http://${registry_name}:${REGISTRY_PORT}"]
+    endpoint = ["http://${REGISTRY_NAME}:${REGISTRY_PORT}"]
 EOF
 )
     fi
@@ -593,7 +669,7 @@ EOF
             exit 1
         fi
     else 
-        note "1" "=== Get the tag version of the image to be installed for the kubernetes version: ${KUBERNETES_VERSION} ..."
+        note "5" "=== Get the tag version of the image to be installed for the kubernetes version: ${KUBERNETES_VERSION} ..."
         if [ ${KUBERNETES_VERSION} == "latest" ]; then
             kindCmd+=""
         else
@@ -601,7 +677,7 @@ EOF
             jq -r --arg VERSION "$KUBERNETES_VERSION" '.[] | select(.k8s == $VERSION).sha')
             kindCmd+=" --image ${kind_image_sha}"
         fi
-        note "1" "Creating a Kind cluster using kindest/node: ${KUBERNETES_VERSION} and logging verbosity: ${LOGGING_VERBOSITY}"
+        note "5" "Creating a Kind cluster using kindest/node: ${KUBERNETES_VERSION} and logging verbosity: ${LOGGING_VERBOSITY}"
         echo "${kindCfg}" | ${kindCmd} --config=-
 
         if [ "${CRI_PROVIDER}" == 'podman' ]; then
@@ -609,6 +685,12 @@ EOF
         fi
         
     fi
+    SCRIPT_RESULT_MESSAGE+="\n"
+    SCRIPT_RESULT_MESSAGE+="  * ${CLUSTER_NAME} kind cluster has been deployed\n"
+    SCRIPT_RESULT_MESSAGE+="\n"
+    SCRIPT_RESULT_MESSAGE+="  * Cluster configuration has been copied to ${HOME}/.kube/config\n"
+    SCRIPT_RESULT_MESSAGE+="\n"
+    SCRIPT_RESULT_MESSAGE+="  * Execute 'kind get kubeconfig --name ${CLUSTER_NAME}' to obtain the cluster configuration\n"
 }
 
 function install() {
@@ -616,23 +698,18 @@ function install() {
 
     deploy_docker_registry
 
-    if [ "${INGRESS}" == 'kourier' ]; then
-        deploy_ingress_kourier
-    elif [ "${INGRESS}" == 'nginx' ]; then
-        deploy_ingress_nginx
+    if [ "${SKIP_INGRESS_INSTALLATION}" == 'n' ]; then
+        if [ "${INGRESS}" == 'kourier' ]; then
+            deploy_ingress_kourier
+        elif [ "${INGRESS}" == 'nginx' ]; then
+            deploy_ingress_nginx
+        fi
     fi
 }
 
 function remove() {
     delete_kind_cluster
-    note_start_task "1" "Removing ${CRI_COMMAND} network..."
-    docker_network_id=$(${CRI_COMMAND} network ls --filter name=^kind$ --quiet)
-    if [ ! ${docker_network_id} == "" ]; then
-        NETWORK_RM=$(${CRI_COMMAND} network rm -f kind)
-        succeeded "1" "Removing ${CRI_COMMAND} network..."
-    else 
-        warn "Removing ${CRI_COMMAND} network... nothing to be done!"
-    fi
+    delete_cri_resources
 }
 
 function validate_ingress() {
@@ -670,6 +747,39 @@ function validate_cri() {
         exit 1  
     fi
 }
+
+function check_os() {
+    case "$OSTYPE" in
+        "linux-gnu"*) 
+            DOCKER_RESTART_COMMAND="sudo systemctl restart docker" 
+            NETWORK_RM_CMD="${CRI_COMMAND} network rm -f kind"
+        ;;
+        "darwin"*) 
+            # DOCKER_RESTART_COMMAND='echo -e "${YELLOW}\xE2\x9A\xA0 : Script paused to Restart the Docker service manually. ${NC}" ; read -n1 -s -r -p $"Press any key to continue..." key' 
+            DOCKER_RESTART_COMMAND='echo ""' 
+            NETWORK_RM_CMD="${CRI_COMMAND} network rm kind"
+        ;;
+        *) error "Unknown OS"; exit 1 ;;
+    esac;
+    note "5" "${DOCKER_RESTART_COMMAND}"
+    # if [ "$OSTYPE" == "linux-gnu"* ]; then
+    #     # DOCKER_RESTART_COMMAND="sudo systemctl restart docker"
+    #     DOCKER_RESTART_COMMAND="read -n1 -s -r -p $'${YELLOW}\xE2\x9A\xA0: script paused to Restart the Docker service manually, press any key to continue...!${NC}' key"
+    # elif [ "$OSTYPE" == "darwin"* ]; then
+    #     # Mac OSX
+    #     DOCKER_RESTART_COMMAND="read -n1 -s -r -p $'${YELLOW}\xE2\x9A\xA0: script paused to Restart the Docker service manually, press any key to continue...!${NC}' key"
+    # # elif [ "$OSTYPE" == "cygwin" ]; then
+    # #         # POSIX compatibility layer and Linux environment emulation for Windows
+    # # elif [ "$OSTYPE" == "msys" ]; then
+    # #         # Lightweight shell and GNU utilities compiled for Windows (part of MinGW)
+    # # elif [ "$OSTYPE" == "win32" ]; then
+    # #         # I'm not sure this can happen.
+    # elif [ "$OSTYPE" == "freebsd"* ]; then
+    #         # ...
+    # else
+    #         # Unknown.
+    # fi
+}
 ##### /Functions
 
 ###### Command Line Parser
@@ -686,6 +796,9 @@ REGISTRY_IMAGE_VERSION="2.6.2"
 REGISTRY_PASSWORD="snowdrop"
 REGISTRY_PORT="5000"
 REGISTRY_USER="admin"
+SCRIPT_RESULT_MESSAGE=""
+SCRIPT_REQUIRED_STEPS="# Required Steps:\n"
+SKIP_INGRESS_INSTALLATION="n"
 SECURE_REGISTRY="n"
 SERVER_IP="127.0.0.1"
 SHOW_HELP="n"
@@ -711,6 +824,7 @@ while [ $# -gt 0 ]; do
         --registry-port) REGISTRY_PORT="$2"; shift ;;
         --registry-user) REGISTRY_USER="$2"; shift ;;
         --secure-registry) SECURE_REGISTRY="y" ;;
+        --skip-ingress-installation) SKIP_INGRESS_INSTALLATION="y" ;;
         --server-ip) SERVER_IP="$2"; shift ;;
         --use-existing-cluster) USE_EXISTING_CLUSTER="y"; ;;
         --verbosity) LOGGING_VERBOSITY="$2"; shift ;;
@@ -765,6 +879,8 @@ esac;
 
 ###### Execution
 
+check_os
+
 print_logo
 
 check_pre_requisites
@@ -772,11 +888,25 @@ check_pre_requisites
 validate_cri
 
 kindCfgExtraMounts=""
-registry_name="${CLUSTER_NAME}-registry"
-registry_server='localhost'
+REGISTRY_NAME="${CLUSTER_NAME}-registry"
 temp_cert_dir="_tmp"
 
 case ${COMMAND} in
-    install) validate_ingress ; install ;;
-    remove) remove ;;
+    install) 
+        validate_ingress
+        install
+        log_message "0" ""
+        log_message "0" ""
+        succeeded "0" " ################### Installation completed! ###################"
+        SCRIPT_REQUIRED_STEPS+="\n"
+        SCRIPT_REQUIRED_STEPS+="  * Add to your /etc/hosts file: 127.0.0.1 localhost ${REGISTRY_NAME}\n"
+        SCRIPT_REQUIRED_STEPS+="\n"
+        SCRIPT_REQUIRED_STEPS+="  * To avoid to get a permission denied on the mounted volume /certs, disable SELINUX=disabled within the file /etc/selinux/config and reboot !\n"
+        succeeded "0" "${SCRIPT_RESULT_MESSAGE}"
+        succeeded "0" "${SCRIPT_REQUIRED_STEPS}"
+    ;;
+    remove) 
+        remove 
+        succeeded "0" "Removal completed!"
+    ;;
 esac;

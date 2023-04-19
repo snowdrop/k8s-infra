@@ -60,8 +60,8 @@ The available commands are:
 
 Other relevant parameters are the following.
 
-.Script commands
-[%header,cols="2,5"]
+.Script options
+[%header,cols="2,4"]
 |===
 | Command | Description
 
@@ -91,7 +91,9 @@ _e.g._: `ContainerPort1:HostPort1,...`
 
 [WARNING]
 ====
-The ports required to be accessed from outside the kind cluster must be mapped between the host and the kind container using this parameter.
+The ports required to be accessed from outside the kind cluster 
+must be mapped between the host and the kind container using this 
+parameter.
 ====
 
 | `--provider`
