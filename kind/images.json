@@ -11,6 +11,16 @@
     "sha": "kindest/node:v1.26.3@sha256:61b92f38dff6ccc29969e7aa154d34e38b89443af1a2c14e6cfbd2df6419c66f"
   },
   {
+    "k8s": "1.27",
+    "version": "1.27.1",
+    "sha": "kindest/node:v1.27.1@sha256:9915f5629ef4d29f35b478e819249e89cfaffcbfeebda4324e5c01d53d937b09"
+  },
+  {
+    "k8s": "1.26",
+    "version": "1.26.3",
+    "sha": "kindest/node:v1.26.3@sha256:61b92f38dff6ccc29969e7aa154d34e38b89443af1a2c14e6cfbd2df6419c66f"
+  },
+  {
     "k8s": "1.25",
     "version": "1.25.8",
     "sha": "kindest/node:v1.25.8@sha256:b5ce984f5651f44457edf263c1fe93459df8d5d63db7f108ccf5ea4b8d4d9820"
