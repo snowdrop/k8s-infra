@@ -9,7 +9,8 @@ This role installs an OCP cluster on a RHOS cloud.
 
 == Requirements
 
-TODO
+* OpenShift Pull Secret that can be obtained from https://console.redhat.com/openshift/install/pull-secret
+* `openstack.cloud` Ansible module installed: `ansible-galaxy collection install openstack.cloud`
 
 == Role Variables
 
