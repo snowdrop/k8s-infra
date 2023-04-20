@@ -1,0 +1,5 @@
+server ns1.quarkus
+zone {{ snowdrop_domain }}
+update delete api.{{ ocp_cluster_name }}.{{ snowdrop_domain }} A
+update add api.{{ ocp_cluster_name }}.{{ snowdrop_domain }} 300 A {{ openstack_floating_ip }}
+send

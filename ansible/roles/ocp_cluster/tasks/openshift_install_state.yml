@@ -1,0 +1,19 @@
+---
+- name: "Read server state file"
+  ansible.builtin.set_fact:
+    openshift_install_state: "{{ lookup('file', installation_dir + '/.openshift_install_state.json') | from_json }}"
+
+- name: "Print server details"
+  debug:
+    msg: "openshift_install_state: {{ openshift_install_state }}"
+    verbosity: 0
+
+- name: "Set clusterid fact"
+  ansible.builtin.set_fact:
+    ocp_cluster_id: "{{ openshift_install_state['*installconfig.ClusterID'].InfraID }}"
+
+- name: "Print server details"
+  debug:
+    msg: "ocp_cluster_id: {{ ocp_cluster_id }}"
+    verbosity: 0
+...

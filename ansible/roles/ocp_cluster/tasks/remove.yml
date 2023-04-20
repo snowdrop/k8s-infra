@@ -1,0 +1,8 @@
+---
+- name: "Destroy the OCP cluster"
+  ansible.builtin.shell:
+    cmd: |
+      ./openshift-install destroy cluster --dir={{ installation_dir }} --log-level=info
+  args:
+    chdir: "{{ work_directory }}"
+...

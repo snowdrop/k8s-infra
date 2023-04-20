@@ -1,0 +1,94 @@
+= OCP on OpenStack
+Antonio Costa
+:revdate: {docdate}
+:icons: font
+:toc: left
+:toclevels: 3
+:description: This document describes the installation procedure to deploy an OCP cluster on RHOS.
+
+== Introduction
+
+Using the Ansible OCP Cluster role, this document describes the procedure to deploy an OCP cluster on RHOS.
+
+[glossary]
+== Terminology
+
+[glossary]
+OCP:: OpenShift Container Platform
+RHOS:: RedHat OpenStack
+
+== Overview
+
+The Ansible playbook and role used to install an OCP cluster on a RHOS cloud use the link:https://docs.openshift.com/container-platform/4.12/installing/index.html[OpenShift install] procedure for OpenStack. 
+
+[NOTE]
+====
+More detailed information on the installation procedure is available in the link:https://docs.openshift.com/container-platform/4.12/installing/installing_openstack/preparing-to-install-on-openstack.html[RedHat OpenShift / Installing on OpenStack] page.
+====
+
+The early stages of the deployment process create an `install-config.yaml` file that is fed to the `openshift-install` process which then generates the RHOS VMs and deploys the OCP cluster on them.
+
+.OpenShift Install installation folder
+[WARNING]
+====
+The installation process generates an installation folder on the host machine
+(by default is the same machine executing the Ansible playbooks) that must be
+kept for maintenance purposes, e.g. removing the OCP cluster.
+
+The 
+====
+
+== Prerequisites
+
+The prerequisites for using RHOS Ansible Playbooks are the following.
+
+._Click to open the details_
+[%collapsible]
+====
+
+[]
+======
+include::../openstack/README.adoc[tag=rhos_prerequisites]
+======
+
+====
+
+More information on the link:../openstack/README.adoc[OpenStack README] for this project.
+
+== Deploy OCP cluster on RHOS
+
+include::../ansible/playbook/ocp/README.adoc[tag=deploy_ocp_on_rhos]
+
+=== Backup the installation directory
+
+Generate the base64 codification of the `.tar.gz` file containing the backup of the `openshift-install` directory.
+
+[source,bash]
+----
+base64  ocp-sscpc-data.tar.gz > ocp-sscpc-data.tar.gz.base64
+----
+
+Copy the contents of the file to the clipboard.
+
+[source,bash]
+----
+xclip -sel c < /opt/ocp/ocp-sscpc-data.tar.gz.base64
+----
+
+Insert the previously copied contents as a `pass` entry.
+
+[source,bash]
+----
+pass insert openstack/ocp-sscpc/install_dir -m
+----
+
+Push the `pass` changes to the git repository.
+
+[source,bash]
+----
+git push
+----
+
+== Remove existing OCP cluster on RHOS
+
+include::../ansible/playbook/ocp/README.adoc[tag=undeploy_ocp_on_rhos]
