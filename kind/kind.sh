@@ -600,7 +600,7 @@ EOF
     else
         kindCfgContainerdConfigPatches=$(cat <<EOF
 - |-
-  [plugins."io.containerd.grpc.v1.cri".registry.mirrors."localhost:${REGISTRY_PORT}"]
+  [plugins."io.containerd.grpc.v1.cri".registry.mirrors."${REGISTRY_NAME}:${REGISTRY_PORT}"]
     endpoint = ["http://${REGISTRY_NAME}:${REGISTRY_PORT}"]
 EOF
 )
