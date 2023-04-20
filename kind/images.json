@@ -3,16 +3,6 @@
   {
     "k8s": "1.27",
     "version": "1.27.1",
-    "sha": "kindest/node:v1.27.1@sha256:c1fea3acc2b38dd39ad2cb2ab0aa012720283e03364e314b715c395624476c74"
-  },
-  {
-    "k8s": "1.26",
-    "version": "1.26.3",
-    "sha": "kindest/node:v1.26.3@sha256:61b92f38dff6ccc29969e7aa154d34e38b89443af1a2c14e6cfbd2df6419c66f"
-  },
-  {
-    "k8s": "1.27",
-    "version": "1.27.1",
     "sha": "kindest/node:v1.27.1@sha256:9915f5629ef4d29f35b478e819249e89cfaffcbfeebda4324e5c01d53d937b09"
   },
   {
