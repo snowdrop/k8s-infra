@@ -1,4 +1,5 @@
 [
+
   {
     "k8s": "1.27",
     "version": "1.27.1",
@@ -12,7 +13,7 @@
   {
     "k8s": "1.25",
     "version": "1.25.8",
-    "sha": "kindest/node:v1.25.8@sha256:00d3f5314cc35327706776e95b2f8e504198ce59ac545d0200a89e69fce10b7f"
+    "sha": "kindest/node:v1.25.8@sha256:b5ce984f5651f44457edf263c1fe93459df8d5d63db7f108ccf5ea4b8d4d9820"
   },
   {
     "k8s": "1.24",

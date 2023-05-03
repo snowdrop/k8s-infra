@@ -162,6 +162,7 @@ show_usage() {
     log_message "0" "\t--provider <provider>\t\t\tContainer Runtime [docker,podman]. Default: docker"
     log_message "0" "\t--port-map <port map list>\t\tList of ports to map on kind config. e.g. 'ContainerPort1:HostPort1,ContainerPort2:HostPort2,...'"
     log_message "0" "\t--registry-image-version <version>\tVersion of the registry container to be used. Default: 2.6.2"
+    log_message "0" "\t--registry-name <name>\t\t\tName of the registry. Default: <cluster_name>-registry"
     log_message "0" "\t--registry-password <password>\t\tRegistry user password. Default: snowdrop"
     log_message "0" "\t--registry-port <port>\t\t\tPort of the registry. Default: 5000"
     log_message "0" "\t--registry-user <user>\t\t\tRegistry user. Default: admin"
@@ -310,6 +311,9 @@ delete_kind_cluster() {
         ;;
     esac
     set -e
+    SCRIPT_RESULT_MESSAGE+="\n"
+    SCRIPT_RESULT_MESSAGE+="  * Kind cluster has been deleted \n"
+
     note_start_task "1" "Removing kind registry container..."
     #docker_container_id=$(docker container ls --filter name=^kind-registry$ --all --quiet)
     docker_container_id=$(${CRI_COMMAND} container ls --filter name=^${CLUSTER_NAME}-registry$ --all --quiet)
@@ -319,6 +323,8 @@ delete_kind_cluster() {
     else 
         warn "Removing kind registry container... no container to be removed."
     fi
+    SCRIPT_RESULT_MESSAGE+="\n"
+    SCRIPT_RESULT_MESSAGE+="  * kind registry container has been deleted \n"
 
     if [ "${CRI_COMMAND}" == 'podman' ]; then
         note_start_task "1" "Delete Podman Control Plane container..."
@@ -331,6 +337,8 @@ delete_kind_cluster() {
         else
             warn "Delete Podman Control Plane container... nothing to be done."
         fi
+        SCRIPT_RESULT_MESSAGE+="\n"
+        SCRIPT_RESULT_MESSAGE+="  * Podman Control Plane container has been deleted \n"
     fi
 }
 
@@ -349,44 +357,44 @@ function delete_cri_resources(){
 
 # INSTALL
 deploy_ingress_kourier() {
-  note "1" "Deploying KNative Ingress"
-  echo "Install the required custom resources of knative"
-  kubectl apply -f https://github.com/knative/serving/releases/download/knative-v${KNATIVE_VERSION}/serving-crds.yaml
+    note "1" "Deploying KNative Ingress"
+    echo "Install the required custom resources of knative"
+    kubectl apply -f https://github.com/knative/serving/releases/download/knative-v${KNATIVE_VERSION}/serving-crds.yaml
 
-  note "1" "Install the core components of Knative Serving"
-  kubectl apply -f https://github.com/knative/serving/releases/download/knative-v${KNATIVE_VERSION}/serving-core.yaml
-  kubectl -n knative-serving rollout status deployment activator
-  kubectl -n knative-serving rollout status deployment autoscaler
-  kubectl -n knative-serving rollout status deployment controller
-  kubectl -n knative-serving rollout status deployment domain-mapping
-  kubectl -n knative-serving rollout status deployment domainmapping-webhook
-  kubectl -n knative-serving rollout status deployment webhook
+    note "1" "Install the core components of Knative Serving"
+    kubectl apply -f https://github.com/knative/serving/releases/download/knative-v${KNATIVE_VERSION}/serving-core.yaml
+    kubectl -n knative-serving rollout status deployment activator
+    kubectl -n knative-serving rollout status deployment autoscaler
+    kubectl -n knative-serving rollout status deployment controller
+    kubectl -n knative-serving rollout status deployment domain-mapping
+    kubectl -n knative-serving rollout status deployment domainmapping-webhook
+    kubectl -n knative-serving rollout status deployment webhook
 
-  note "1" "Install the Knative Kourier controller"
-  kubectl apply -f https://github.com/knative/net-kourier/releases/download/knative-v${KNATIVE_VERSION}/kourier.yaml
-  kubectl -n knative-serving rollout status deployment net-kourier-controller
-  kubectl -n kourier-system rollout status deployment 3scale-kourier-gateway
+    note "1" "Install the Knative Kourier controller"
+    kubectl apply -f https://github.com/knative/net-kourier/releases/download/knative-v${KNATIVE_VERSION}/kourier.yaml
+    kubectl -n knative-serving rollout status deployment net-kourier-controller
+    kubectl -n kourier-system rollout status deployment 3scale-kourier-gateway
 
-  note "1" "Configure Knative Serving to use Kourier by default"
-  kubectl patch configmap/config-network \
-    -n knative-serving \
-    --type merge \
-    -p '{"data":{"ingress-class":"kourier.ingress.networking.knative.dev"}}'
+    note "1" "Configure Knative Serving to use Kourier by default"
+    kubectl patch configmap/config-network \
+        -n knative-serving \
+        --type merge \
+        -p '{"data":{"ingress-class":"kourier.ingress.networking.knative.dev"}}'
 
-  note "1" "Configure the Knative domain to: $SERVER_IP.nip.io"
-  KNATIVE_DOMAIN="${SERVER_IP}.nip.io"
-  kubectl patch configmap/config-domain \
-    -n knative-serving \
-    -p "{\"data\": {\"$KNATIVE_DOMAIN\": \"\"}}"
+    note "1" "Configure the Knative domain to: $SERVER_IP.nip.io"
+    KNATIVE_DOMAIN="${SERVER_IP}.nip.io"
+    kubectl patch configmap/config-domain \
+        -n knative-serving \
+        -p "{\"data\": {\"$KNATIVE_DOMAIN\": \"\"}}"
 
-  note "1" "Patching the kourier service to use the nodePort 31080 and type nodePort"
-  kubectl patch -n kourier-system svc kourier --type='json' -p='[{"op": "replace", "path": "/spec/ports/0/nodePort", "value": 31080}]'
-  kubectl patch -n kourier-system svc kourier --type='json' -p='[{"op": "replace", "path": "/spec/ports/1/nodePort", "value": 31443}]'
-  kubectl patch -n kourier-system svc kourier --type='json' -p='[{"op": "replace", "path": "/spec/type", "value": "NodePort"}]'
+    note "1" "Patching the kourier service to use the nodePort 31080 and type nodePort"
+    kubectl patch -n kourier-system svc kourier --type='json' -p='[{"op": "replace", "path": "/spec/ports/0/nodePort", "value": 31080}]'
+    kubectl patch -n kourier-system svc kourier --type='json' -p='[{"op": "replace", "path": "/spec/ports/1/nodePort", "value": 31443}]'
+    kubectl patch -n kourier-system svc kourier --type='json' -p='[{"op": "replace", "path": "/spec/type", "value": "NodePort"}]'
 
-  note "0" "####### TO TEST ########"
-  note "0" "Execute the following commands: "
-  knCmd="cat <<-EOF | kubectl apply -f -
+    note "0" "####### TO TEST ########"
+    note "0" "Execute the following commands: "
+    knCmd="cat <<-EOF | kubectl apply -f -
   apiVersion: serving.knative.dev/v1
   kind: Service
   metadata:
@@ -401,27 +409,31 @@ deploy_ingress_kourier() {
             value: Go Hello example
 EOF"
 
-  note "0" "$knCmd"
-  note "0" "Then wait till the pods are created before to curl it: http://hello.default.${SERVER_IP}.nip.io"
-  note "0" "Sometimes the revision hangs as deployment has been modified, then do"
-  note "0" "kubectl scale --replicas=0 deployment/hello-00001-deployment"
-  note "0" "kubectl scale --replicas=1 deployment/hello-00001-deployment"
+    note "0" "$knCmd"
+    note "0" "Then wait till the pods are created before to curl it: http://hello.default.${SERVER_IP}.nip.io"
+    note "0" "Sometimes the revision hangs as deployment has been modified, then do"
+    note "0" "kubectl scale --replicas=0 deployment/hello-00001-deployment"
+    note "0" "kubectl scale --replicas=1 deployment/hello-00001-deployment"
+    SCRIPT_RESULT_MESSAGE+="\n"
+    SCRIPT_RESULT_MESSAGE+="  * Kourier Ingress has been deployed \n"
 }
 
 deploy_ingress_nginx() {
-  note "1" "Deploying nginx Ingress..."
-  #
-  # Install the ingress nginx controller using helm
-  # Set the Service type as: NodePort (needed for kind)
-  #
-  helm upgrade --install ingress-nginx ingress-nginx \
-    --repo https://kubernetes.github.io/ingress-nginx \
-    --namespace ingress --create-namespace \
-    --set controller.service.type=NodePort \
-    --set controller.hostPort.enabled=true \
-    --set controller.watchIngressWithoutClass=true
-  succeeded "1" "Deploying nginx Ingress..."
-  note "2" "Ingress controller installed within the namespace: ingress"
+    note "1" "Deploying nginx Ingress..."
+    #
+    # Install the ingress nginx controller using helm
+    # Set the Service type as: NodePort (needed for kind)
+    #
+    helm upgrade --install ingress-nginx ingress-nginx \
+        --repo https://kubernetes.github.io/ingress-nginx \
+        --namespace ingress --create-namespace \
+        --set controller.service.type=NodePort \
+        --set controller.hostPort.enabled=true \
+        --set controller.watchIngressWithoutClass=true
+    succeeded "1" "Deploying nginx Ingress..."
+    note "2" "Ingress controller installed within the namespace: ingress"
+    SCRIPT_RESULT_MESSAGE+="\n"
+    SCRIPT_RESULT_MESSAGE+="  * nginx Ingress has been deployed \n"
 }
 
 deploy_docker_registry() {
@@ -444,6 +456,9 @@ EOF
         note "2" "==== Create the htpasswd file where user: ${REGISTRY_USER} and password: ${REGISTRY_PASSWORD}"
         mkdir -p $HOME/.registry/auth
         ${CRI_COMMAND} run --entrypoint htpasswd registry:2.7.0 -Bbn ${REGISTRY_USER} ${REGISTRY_PASSWORD} > $HOME/.registry/auth/htpasswd
+
+        SCRIPT_RESULT_MESSAGE+="\n"
+        SCRIPT_RESULT_MESSAGE+="  * The htpasswd file is located at $HOME/.registry/auth/htpasswd\n"
 
         note_start_task "2" "Creating a docker registry..."
         ${CRI_COMMAND} run -d \
@@ -498,8 +513,10 @@ EOF
         eval ${DOCKER_RESTART_COMMAND}
 
         SCRIPT_RESULT_MESSAGE+="\n"
-        SCRIPT_RESULT_MESSAGE+="  * Log on to the container registry using the address and user/password\n"
-        SCRIPT_RESULT_MESSAGE+="    ${CRI_COMMAND} login ${REGISTRY_NAME}:${REGISTRY_PORT} -u ${REGISTRY_USER} -p ${REGISTRY_PASSWORD}\n"
+        SCRIPT_RESULT_MESSAGE+="  * Secured container registry has been deployed \n"
+        SCRIPT_RESULT_MESSAGE+="\n"
+        SCRIPT_RESULT_MESSAGE+="    * Log on to the container registry using the address and user/password\n"
+        SCRIPT_RESULT_MESSAGE+="      ${CRI_COMMAND} login ${REGISTRY_NAME}:${REGISTRY_PORT} -u ${REGISTRY_USER} -p ${REGISTRY_PASSWORD}\n"
 
         popd
     else
@@ -523,31 +540,32 @@ EOF
             warn "Connecting the local Container registry with the kind network ${REGISTRY_NAME}... already connected."
         fi
 
-        SCRIPT_REQUIRED_STEPS+="\n"
+        SCRIPT_RESULT_MESSAGE+="\n"
+        SCRIPT_RESULT_MESSAGE+="  * Insecure container registry has been deployed \n"
         case "$CRI_PROVIDER" in
             "docker") 
                 case "$OSTYPE" in
                     "linux-gnu"*) 
                         SCRIPT_REQUIRED_STEPS+="\n"
-                        SCRIPT_REQUIRED_STEPS+="  * Edit the daemon.json file, whose default location is /etc/docker/daemon.json on Linux, and restart the docker service  \n"
+                        SCRIPT_REQUIRED_STEPS+="    * Edit the daemon.json file, whose default location is /etc/docker/daemon.json on Linux, and restart the docker service  \n"
                     ;;
                     "darwin"*) 
                         SCRIPT_REQUIRED_STEPS+="\n"
-                        SCRIPT_REQUIRED_STEPS+="  * Edit the daemon.json file. If you use Docker Desktop for Mac or Docker Desktop for Windows, click the Docker icon, choose Settings and then choose Docker Engine.\n"
+                        SCRIPT_REQUIRED_STEPS+="    * Edit the daemon.json file. If you use Docker Desktop for Mac or Docker Desktop for Windows, click the Docker icon, choose Settings and then choose Docker Engine.\n"
                     ;;
                 esac
-                SCRIPT_REQUIRED_STEPS+='    {"insecure-registries" : ["${REGISTRY_NAME}:${REGISTRY_PORT}"]}\n'
+                SCRIPT_REQUIRED_STEPS+="      {\"insecure-registries\" : [\"${REGISTRY_NAME}:${REGISTRY_PORT}\"]}\n"
             ;;
             "podman") 
-                SCRIPT_REQUIRED_STEPS+="  * Set the kind registry as an insecure registry by adding the following configuration to the /etc/containers/registries.conf.d/kind-registry.conf file\n"
+                SCRIPT_REQUIRED_STEPS+="    * Set the kind registry as an insecure registry by adding the following configuration to the /etc/containers/registries.conf.d/kind-registry.conf file\n"
                 SCRIPT_REQUIRED_STEPS+='[[registry]]\n'
                 SCRIPT_REQUIRED_STEPS+='location = "localhost:${REGISTRY_PORT}"\n'
                 SCRIPT_REQUIRED_STEPS+='insecure = true\n'
             ;;
         esac
         SCRIPT_RESULT_MESSAGE+="\n"
-        SCRIPT_RESULT_MESSAGE+="  * Log on to the container registry using the address\n"
-        SCRIPT_RESULT_MESSAGE+="    ${CRI_COMMAND} login ${REGISTRY_NAME}:${REGISTRY_PORT}\n"
+        SCRIPT_RESULT_MESSAGE+="    * Log on to the container registry using the address\n"
+        SCRIPT_RESULT_MESSAGE+="      ${CRI_COMMAND} login ${REGISTRY_NAME}:${REGISTRY_PORT}\n"
     fi
 
 }
@@ -800,7 +818,7 @@ REGISTRY_PASSWORD="snowdrop"
 REGISTRY_PORT="5000"
 REGISTRY_USER="admin"
 SCRIPT_RESULT_MESSAGE=""
-SCRIPT_REQUIRED_STEPS="# Required Steps:\n"
+SCRIPT_REQUIRED_STEPS=""
 SKIP_INGRESS_INSTALLATION="n"
 SECURE_REGISTRY="n"
 SERVER_IP="127.0.0.1"
@@ -822,6 +840,7 @@ while [ $# -gt 0 ]; do
         --kubernetes-version) KUBERNETES_VERSION="$2"; shift ;;
         --provider) CRI_PROVIDER="$2"; shift ;;
         --port-map) PORT_MAP="$2"; shift ;;
+        --registry-name) REGISTRY_NAME="$2"; shift ;;
         --registry-image-version) REGISTRY_IMAGE_VERSION="$2"; shift ;;
         --registry-password) REGISTRY_PASSWORD="$2"; shift ;;
         --registry-port) REGISTRY_PORT="$2"; shift ;;
@@ -878,6 +897,12 @@ case ${COMMAND} in
 esac;
 
 
+if [ "$REGISTRY_NAME" == "" ]; then
+    REGISTRY_NAME="${CLUSTER_NAME}-registry"
+fi
+
+note "5" "REGISTRY_NAME: ${REGISTRY_NAME}"
+
 ###### /Command Line Parser
 
 ###### Execution
@@ -891,12 +916,12 @@ check_pre_requisites
 validate_cri
 
 kindCfgExtraMounts=""
-REGISTRY_NAME="${CLUSTER_NAME}-registry"
 temp_cert_dir="_tmp"
 
 case ${COMMAND} in
     install) 
         validate_ingress
+        note "5" "PORT_MAP: ${PORT_MAP}"
         install
         log_message "0" ""
         log_message "0" ""
@@ -905,11 +930,23 @@ case ${COMMAND} in
         SCRIPT_REQUIRED_STEPS+="  * Add to your /etc/hosts file: 127.0.0.1 localhost ${REGISTRY_NAME}\n"
         SCRIPT_REQUIRED_STEPS+="\n"
         SCRIPT_REQUIRED_STEPS+="  * To avoid to get a permission denied on the mounted volume /certs, disable SELINUX=disabled within the file /etc/selinux/config and reboot !\n"
-        succeeded "0" "${SCRIPT_RESULT_MESSAGE}"
-        succeeded "0" "${SCRIPT_REQUIRED_STEPS}"
+        SCRIPT_RESULT_MESSAGE+="\n"
+        SCRIPT_RESULT_MESSAGE+="  * You can test the container registry using the instructions from: https://github.com/snowdrop/k8s-infra/blob/main/kind/README.adoc#container-registry\n"
+        log_message "0" " ### Installation resume: "
+        log_message "0" "${SCRIPT_RESULT_MESSAGE}"
+        log_message "0" " ### Required steps: "
+        log_message "0" "${SCRIPT_REQUIRED_STEPS}"
     ;;
     remove) 
         remove 
-        succeeded "0" "Removal completed!"
+        SCRIPT_REQUIRED_STEPS+="\n"
+        SCRIPT_REQUIRED_STEPS+="  * Check your /etc/hosts file and remove references to the ${REGISTRY_NAME} container registry container.\n"
+        log_message "0" ""
+        log_message "0" ""
+        succeeded "0" " ################### Removal completed! ###################"
+        log_message "0" " ### Removal resume: "
+        log_message "0" "${SCRIPT_RESULT_MESSAGE}"
+        log_message "0" "  ### Required steps: "
+        log_message "0" "${SCRIPT_REQUIRED_STEPS}"
     ;;
 esac;
