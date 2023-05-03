@@ -553,7 +553,7 @@ EOF
                         SCRIPT_REQUIRED_STEPS+="    * Edit the daemon.json file. If you use Docker Desktop for Mac or Docker Desktop for Windows, click the Docker icon, choose Settings and then choose Docker Engine.\n"
                     ;;
                 esac
-                SCRIPT_REQUIRED_STEPS+='      {"insecure-registries" : ["${REGISTRY_NAME}:${REGISTRY_PORT}"]}\n'
+                SCRIPT_REQUIRED_STEPS+="      {\"insecure-registries\" : [\"${REGISTRY_NAME}:${REGISTRY_PORT}\"]}\n"
             ;;
             "podman") 
                 SCRIPT_REQUIRED_STEPS+="    * Set the kind registry as an insecure registry by adding the following configuration to the /etc/containers/registries.conf.d/kind-registry.conf file\n"
