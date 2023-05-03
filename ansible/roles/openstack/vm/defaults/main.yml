@@ -36,7 +36,12 @@ openstack:
     flavor: m1.small
     network: default_network
     security_group: default_security_group
-    # volumes: []
+    # Array of items with 2 attributes, name and size
+    volumes: []
+      # - name: "volume1"
+      #   size: 10
+      # - name: "volume2"
+      #   size: 20
     boot_from_volume: false
 
 # login_username: centos

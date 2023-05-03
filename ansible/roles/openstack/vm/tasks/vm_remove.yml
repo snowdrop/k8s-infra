@@ -57,12 +57,12 @@
     name: "{{ vm_name }}"
   ignore_errors: true
 
-# - name: "Remove the host from the known_hosts file"
-#   known_hosts:
-#     name: "{{ openstack_vm_ipv4 }}"
-#     state: absent
-#   when: openstack_vm_ipv4 is defined
-#   ignore_errors: true
+- name: "Remove the host from the known_hosts file"
+  known_hosts:
+    name: "{{ openstack_vm_ipv4 }}"
+    state: absent
+  when: openstack_vm_ipv4 is defined
+  ignore_errors: true
 
 # - name: "Remove existing SSH key to use with instance"
 #   file:

@@ -26,7 +26,7 @@ NOTE: The list of flavors is identified on the link:../../../openstack/README.ad
 
 Create OpenStack instance based on passwordstore
 
-.openstack_vm_create_paswordstore parameters
+.openstack_vm_create_passwordstore parameters
 [cols="2m,1m,5"]
 |===
 |Field name |Mandatory |Description
@@ -67,7 +67,7 @@ $ VM_NAME=vm20210221-t01
 
 [source,bash]
 ----
-$ ansible-playbook playbook/openstack/openstack_vm_create_paswordstore.yml -e k8s_type=masters -e k8s_version=123 -e '{"openstack": {"vm": {"network": "provider_net_shared","image": "Fedora-Cloud-Base-35", "flavor": "m1.medium"}}}' -e key_name=test-adm-key -e vm_name=${VM_NAME} 
+$ ansible-playbook playbook/openstack/openstack_vm_create_passwordstore.yml -e k8s_type=masters -e k8s_version=123 -e '{"openstack": {"vm": {"network": "provider_net_shared","image": "Fedora-Cloud-Base-35", "flavor": "m1.medium"}}}' -e key_name=test-adm-key -e vm_name=${VM_NAME} 
 ----
 
 This playbook should finish with something like:
