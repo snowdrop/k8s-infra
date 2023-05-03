@@ -156,7 +156,6 @@ show_usage() {
     log_message "0" ""
     log_message "0" "\t--cluster-name <name>\t\t\tName of the cluster. Default: kind"
     log_message "0" "\t--delete-kind-cluster\t\t\tDeletes the Kind cluster prior to creating a new one. Default: No"
-    log_message "0" "\t--deploy-sample-application\t\tDeploys a sample application based on nginx. Default: No"
     log_message "0" "\t--ingress [nginx,kourier]\t\tIngress to be deployed. One of nginx,kourier. Default: nginx"
     log_message "0" "\t--knative-version <version>\t\tKNative version to be used. Default: 1.9.0"
     log_message "0" "\t--kubernetes-version <version>\t\tKubernetes version to be install. Default: latest"
@@ -808,7 +807,6 @@ CLUSTER_NAME="kind"
 CRI_PROVIDER=docker
 CRI_COMMAND=docker
 DELETE_KIND_CLUSTER="n"
-DEPLOY_SAMPLE_APPLICATION="n"
 INGRESS="nginx"
 KIND_COMMAND=kind
 KNATIVE_VERSION="1.9.0"
@@ -836,7 +834,6 @@ while [ $# -gt 0 ]; do
         --help) SHOW_HELP="y"; break 2 ;;
         --cluster-name) CLUSTER_NAME="$2"; shift ;;
         --delete-kind-cluster) DELETE_KIND_CLUSTER="y" ;;
-        --deploy-sample-application) DEPLOY_SAMPLE_APPLICATION="y" ;;
         --ingress) INGRESS="$2"; shift ;;
         --knative-version) KNATIVE_VERSION="$2"; shift ;;
         --kubernetes-version) KUBERNETES_VERSION="$2"; shift ;;
@@ -917,26 +914,8 @@ temp_cert_dir="_tmp"
 case ${COMMAND} in
     install) 
         validate_ingress
-        if [ ${DEPLOY_SAMPLE_APPLICATION} == "y" ]; then
-            if [ ! "${PORT_MAP}" == "" ]; then
-                PORT_MAP+=","
-            fi
-            PORT_MAP+="30081:30081"
-        fi
         note "5" "PORT_MAP: ${PORT_MAP}"
         install
-        note_start_task "1" "Deploying the sample application..."
-        kubectl apply -f kind/samples/http-server.yaml
-        succeeded "1" "Deploying the sample application..."
-        if [ ${DEPLOY_SAMPLE_APPLICATION} == "y" ]; then
-            SCRIPT_RESULT_MESSAGE+="\n"
-            SCRIPT_RESULT_MESSAGE+="  * Sample application has been deployed. You can check it at http://localhost:30081/ \n"
-            SCRIPT_RESULT_MESSAGE+="    You can check it at http://localhost:30081/ \n"
-            SCRIPT_RESULT_MESSAGE+="    Or check the deployment status by using: kubectl -n snowdrop-sample get all\n"
-        else
-            SCRIPT_RESULT_MESSAGE+="\n"
-            SCRIPT_RESULT_MESSAGE+="  * You can test the installation by deploying the sample http server: kubectl apply -f kind/samples/http-server.yaml\n"
-        fi
         log_message "0" ""
         log_message "0" ""
         succeeded "0" " ################### Installation completed! ###################"
