@@ -162,6 +162,7 @@ show_usage() {
     log_message "0" "\t--provider <provider>\t\t\tContainer Runtime [docker,podman]. Default: docker"
     log_message "0" "\t--port-map <port map list>\t\tList of ports to map on kind config. e.g. 'ContainerPort1:HostPort1,ContainerPort2:HostPort2,...'"
     log_message "0" "\t--registry-image-version <version>\tVersion of the registry container to be used. Default: 2.6.2"
+    log_message "0" "\t--registry-name <name>\t\t\tName of the registry. Default: <cluster_name>-registry"
     log_message "0" "\t--registry-password <password>\t\tRegistry user password. Default: snowdrop"
     log_message "0" "\t--registry-port <port>\t\t\tPort of the registry. Default: 5000"
     log_message "0" "\t--registry-user <user>\t\t\tRegistry user. Default: admin"
@@ -839,6 +840,7 @@ while [ $# -gt 0 ]; do
         --kubernetes-version) KUBERNETES_VERSION="$2"; shift ;;
         --provider) CRI_PROVIDER="$2"; shift ;;
         --port-map) PORT_MAP="$2"; shift ;;
+        --registry-name) REGISTRY_NAME="$2"; shift ;;
         --registry-image-version) REGISTRY_IMAGE_VERSION="$2"; shift ;;
         --registry-password) REGISTRY_PASSWORD="$2"; shift ;;
         --registry-port) REGISTRY_PORT="$2"; shift ;;
@@ -895,6 +897,12 @@ case ${COMMAND} in
 esac;
 
 
+if [ "$REGISTRY_NAME" == "" ]; then
+    REGISTRY_NAME="${CLUSTER_NAME}-registry"
+fi
+
+note "5" "REGISTRY_NAME: ${REGISTRY_NAME}"
+
 ###### /Command Line Parser
 
 ###### Execution
@@ -908,7 +916,6 @@ check_pre_requisites
 validate_cri
 
 kindCfgExtraMounts=""
-REGISTRY_NAME="${CLUSTER_NAME}-registry"
 temp_cert_dir="_tmp"
 
 case ${COMMAND} in
