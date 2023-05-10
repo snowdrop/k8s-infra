@@ -118,13 +118,67 @@ Choices:
 
 == Install
 
+This script allows creating both a kind cluster with associated ingress controller and a container registry in separate commands.
+
+=== Container Registry
+
+The first (optional) step is creating a container registry.
+
+.Container Registry creation most relevant options
+[%header,cols="2,4"]
+|===
+| parameter | Description
+
+| `--registry-name`
+
+[.fuchsia]#string# 
+a| Name to be given to the registry.
+
+Default: kind-registry
+
+| `--registry-port`
+
+[.fuchsia]#string#
+a| Port to be assigned to the Container Registry.
+
+Default: 5000
+|===
+
+.Container registry creation statement
+[source,bash]
+----
+curl -s -L "https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/kind.sh" | bash -s install-registry --registry-name kind-registry.local
+----
+
+=== Kind Cluster
+
 Creating a kubernetes cluster is as simple as executing the following command.
 
 .kind deploy statement
 [source,bash]
 ----
-curl -s -L "https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/kind.sh" | bash -s install --cluster-name snowdrop --provider podman --port-map "30000:30000,31000:31000"
+curl -s -L "https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/kind.sh" | bash -s install-cluster --cluster-name snowdrop --provider podman --port-map "30000:30000,31000:31000"
 ----
+
+.kind cluster creation most relevant options
+[%header,cols="2,4"]
+|===
+| parameter | Description
+
+| `--registry-name`
+
+[.fuchsia]#string# 
+a| Name of the registry to use.
+
+Default: kind-registry
+
+| `--registry-port`
+
+[.fuchsia]#string#
+a| Port to be assigned to the Container Registry.
+
+Default: 5000
+|===
 
 === Post deployment steps
 
@@ -151,8 +205,7 @@ insecure = true
 
 *Using Docker*
 
-Check the link:https://docs.docker.com/registry/insecure/[Test an insecure registry
-]
+Check the link:https://docs.docker.com/registry/insecure/[Test an insecure registry] 
 Docker document.
 
 .Instructions for Docker
@@ -274,3 +327,39 @@ https://github.com/kubernetes-sigs/kind/releases[supported images]. The
 list of the `kind - kubernetes` images and their version (1.14.x,
 1.15.y,…) can be consulted
 https://registry.hub.docker.com/v1/repositories/kindest/node/tags[here]
+
+== Multiple Clusters
+
+The kind bash script now supports deploying multiple cluster. Simply 
+execute the script passing as para meter a new cluster name and
+
+.Get list of clusters from kubeconfig
+[source,bash]
+----
+curl -s -L "https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/kind.sh" | bash -s install-cluster --cluster-name snowdrop2 --registry-name kind-registry.local --ingress-ports '10080:10443'
+----
+
+[WARNING]
+====
+Check the `--ingress-ports` to make sure there are no conflicts with 
+the ports of the different ingress controlers of each cluster.
+Each set of ports must be happed with the host ports.
+====
+
+Check the list of clusters defined in the kube configuration file.
+
+.Get list of clusters from kubeconfig
+[source,bash]
+----
+kubectl config get-clusters
+----
+
+As a result the different clusters will be shown.
+
+.Cluster list with multiple clusters
+[source,]
+----
+NAME
+snowdrop2
+snowdrop
+----
