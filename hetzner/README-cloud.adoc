@@ -142,7 +142,7 @@ It's used so Ansible can connect to the server without requiring password.
 
 == Create Server
 
-Several playbooks exist to create VM, check the link:ansible.adoc#_the_playbooks[Playbook List] section.
+Several playbooks exist to create VM, check the link:ansible.adoc#vm-playbooks[Playbook List] section.
 
 === Next steps
 
