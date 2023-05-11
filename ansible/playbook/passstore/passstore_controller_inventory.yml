@@ -39,7 +39,7 @@
       when: "k8s_version | length > 0 and not k8s_version in ['119', '121', '123', '124'] "
 
   tasks:
-    - name: "Execute create inventory, if tagged as so"
+    - name: "Create inventory"
       include_role:
         name: "passstore/ansible_inventory"
       vars:
@@ -47,6 +47,7 @@
         pass_l2: "{{ pass_provider | default('hetzner') }}"
         pass_l3: "{{ vm_name }}"
         operation: "create"
+      when: "operation is defined and operation == 'create'"
 
     - name: "Build inventory"
       include_role:
@@ -55,6 +56,7 @@
         pass_l1: "{{ pass_db_name | default('snowdrop') }}"
         pass_l2: "{{ pass_provider | default('hetzner') }}"
         pass_l3: "{{ vm_name }}"
+      when: "operation is undefined or operation != 'create'"
 
     - name: "Add to k8s version"
       include_role:
