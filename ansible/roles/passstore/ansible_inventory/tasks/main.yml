@@ -1,11 +1,11 @@
 ---
 # Tasks for get_provider_host_keys
-- name: "Get passwordstore work folder"
+- name: "Get passwordstore work folder from password_store_dir override variable"
   set_fact:
     my_passwordstore_folder: "{{ password_store_dir }}"
   when: "password_store_dir is defined and password_store_dir | length > 0"
 
-- name: "Get passwordstore work folder"
+- name: "Get passwordstore work folder from PASSWORD_STORE_DIR env variable"
   set_fact:
     my_passwordstore_folder: "{{ lookup('env', 'PASSWORD_STORE_DIR') | default('~/.password-store') }}"
   when: "password_store_dir is not defined or password_store_dir | length <= 0"
@@ -18,7 +18,7 @@
   vars:
     username: "{{ vm_user | default('snowdrop') }}"
     custom_ssh_port_number: "{{ vm_custom_ssh_port | default('47286') }}"
-  when: "operation is defined and operation == 'create'"
+  when: "operation is defined and operation == 'create' and (use_generic_ssh_key is not defined or ( use_generic_ssh_key | bool ))"
 
 - name: "Generate pass ssh structure"
   include_tasks: "generate_pass_structure_ssh.yml"
