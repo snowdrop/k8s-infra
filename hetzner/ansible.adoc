@@ -12,48 +12,135 @@ Describe the steps to install the hetzner client and provision hetzner cloud VMs
 
 == Requirements
 
-Read the link:README.adoc[] and README-cloud documents.
+Read the link:README.adoc[] and link:README-cloud.adoc[] documents.
 
-==  Playbooks
+== Playbooks
 
-.Playbook list
-[%header,cols="2m,1,3"]
+Although there are several playbooks available, for creating and deleting hetzner VMs 2 of them should be used. Other playbooks are used as dependencies for these main playbooks
+
+=== Create Passstore VM 
+
+The playbook for creating a passwordstore based VM is `hetzner_vm_create_passwordstore.yml` which is located at `ansible/playbook/hetzner/`.
+
+To create a new VM execute the following command
+
+.Create passwordstore VM on Hetzner
+[source,bash]
+----
+ansible-playbook ansible/playbook/hetzner/hetzner_vm_create_passwordstore.yml -e vm_name=snowdrop-vm -e k8s_type=masters -e k8s_version=123 -e salt_text=$(gpg --gen-random --armor 1 20) -e vm_image=fedora-37 -e server_type=cx21
+----
+
+The parameters are the following.
+
+.Script options
+[%header,cols="2,4"]
 |===
-| Playbook file | Type | Description
+| Parameter | Description
 
-| <<hetzner-init-context>>
-| Configuration
-| Initializes the Hetzner Context on a host.
+| `vm_name`
 
-| hetzner_ssh_key_create.yml
-| VM (Optional)
-| Creates an new SSH key on Hetzner.
+[.fuchsia]#string# 
 
-| hetzner_ssh_key_delete.yml
-| VM (Optional)
-| Deletes a Hetzner SSH key.
+[.red]#required# 
+a| Name to be given to the VM.
 
-| hetzner-start-server.yml
-| VM
-| Start Hetzner VM
+| `k8s_type`
 
-| hetzner-stop-server.yml
-| VM
-| Stop Hetzner VM
+[.fuchsia]#string#
+a| Type of k8s node
 
-| hetzner_vars.yml
-| N/A
-| Internal playbook to define Hetzner variables.
+Choices: 
 
-| <<hetzner_vm_create>>
-| VM
-| Playbooks for creating VMs on Hetzner.
+* `master`
+* `node`
 
-| <<hetzner_vm_delete>>
-| VM
-| Playbooks for deletong Hetnzer VMs.
+| `k8s_version`
+
+[.fuchsia]#string#
+a| Kubernetes version
+
+Choices: 
+
+* 124: Kubernetes 1.24
+* 123: Kubernetes 1.23
+* 121: Kubernetes 1.21
+* 119: Kubernetes 1.19
+
+[WARNING]
+====
+The kubernetes version must be mapped at Ansible Inventory level, 
+on the `hosts.yaml` file located at the `ansible/inventory` subfolder.
+====
+
+| `salt_text`
+
+[.fuchsia]#string#
+a| Salt to be used on the generation of the host user password. 
+
+Usually the following script is used: `$(gpg --gen-random --armor 1 20)`.
+
+| `vm_image`
+
+[.fuchsia]#string#
+a| The base image to generate the VM from (OS). 
+
+More information at:
+
+* https://docs.hetzner.com/robot/dedicated-server/operating-systems/standard-images/.
+* https://docs.hetzner.com/cloud/servers/overview/#operating-systems
+
+| `server_type`
+
+[.fuchsia]#string#
+
+a| The flavor of the servier in terms of CPU and RAM.
+
+More information at: https://docs.hetzner.com/cloud/servers/overview/#shared-vcpu
 
 |===
+
+
+[NOTE]
+====
+
+More information on the `k8s_type`
+
+.Click to see the sample `yaml` file contents
+[%collapsible]
+======
+[source,yaml]
+----
+include::../ansible/inventory/hosts.yml[tag=k8s_type]
+----
+======
+====
+
+[NOTE]
+====
+
+More information on the `k8s_version`
+
+.Click to see the sample `yaml` file contents
+[%collapsible]
+======
+[source,yaml]
+----
+include::../ansible/inventory/hosts.yml[tag=k8s_version]
+----
+======
+====
+
+=== Delete Passstore VM 
+
+The playbook for deleting a passwordstore based VM is `hetzner_vm_delete_passwordstore.yml` which is located at `ansible/playbook/hetzner/`.
+
+To delete a new VM execute the following command.
+
+.Delete a passwordstore VM on Hetzner
+[source,bash]
+----
+ansible-playbook ansible/playbook/hetzner/hetzner_vm_delete_passwordstore.yml
+----
 
 == Configuration Playbooks
 
