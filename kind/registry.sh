@@ -1,11 +1,9 @@
 #!/usr/bin/env bash
 
 #
-# Script creating a Kubernetes cluster using kind tool
-# deploying a (private) docker registry
-# ingress contoller (nginx, kourier)
+# Script creating a (private) container registry
 #
-# Creation: April - 2023
+# Creation: May - 2023
 #
 # Add hereafter changes done post creation date as backlog
 #

@@ -2,16 +2,15 @@
 
 #
 # Script creating a Kubernetes cluster using kind tool
-# deploying a (private) docker registry
-# ingress contoller (nginx, kourier)
+# and deploying an ingress contoller (nginx, kourier)
 #
 # Creation: April - 2023
 #
 # Add hereafter changes done post creation date as backlog
 #
-# MMM dd YYYY:
+# May 18th 2023:
 #
-# -
+# - Remove the deployment of a container registry into an independent script (registry.sh)
 #
 
 set -o errexit
