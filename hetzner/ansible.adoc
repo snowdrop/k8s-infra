@@ -147,7 +147,7 @@ To delete a new VM execute the following command.
 .Delete a passwordstore VM on Hetzner
 [source,bash]
 ----
-ansible-playbook ansible/playbook/hetzner/hetzner_vm_delete_passwordstore.yml
+ansible-playbook ansible/playbook/hetzner/hetzner_vm_delete_passwordstore.yml -e vm_name=snowdrop-vm
 ----
 
 == Configuration Playbooks
