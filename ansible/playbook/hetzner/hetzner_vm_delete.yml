@@ -12,6 +12,12 @@
           - "vm_name is defined"
         fail_msg: "'vm_name' must be defined"
 
+    - name: "Validate that there's a passwordstore host for this VM"
+      assert:
+        that:
+          - "hostvars[vm_name] is defined"
+        fail_msg: "Cannot delete a VM that doesn't exist on the passwordstore. Missing hetzner/{{ vm_name }} passwordstore folder."
+
     - name: Get vm host vars
       set_fact:
         my_hostvars: "{{ hostvars[vm_name] }}"
@@ -39,7 +45,7 @@
       known_hosts:
         name: "{{ hostvars[vm_name]['ansible_ssh_host'] }}"
         state: absent
-      when: "hostvars[vm_name]['ansible_ssh_host'] is defined"
+      when: "hostvars[vm_name] is defined and hostvars[vm_name]['ansible_ssh_host'] is defined"
       failed_when: false
 
     - name: "Push changes to the pass git database"
