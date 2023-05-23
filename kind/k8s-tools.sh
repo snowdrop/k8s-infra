@@ -212,5 +212,5 @@ init
 case $1 in
     docker)     docker; exit;;
     others)     others; exit;;
-    *)          kubetools; exit;;
+    *)          kubeTools; exit;;
 esac
