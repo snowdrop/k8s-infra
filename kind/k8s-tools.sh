@@ -208,7 +208,6 @@ EOF
 case $1 in
     docker)     docker; exit;;
     others)     others; exit;;
-    *)          exit;;
 esac
 
 kubeTools
