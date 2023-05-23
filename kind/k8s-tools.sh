@@ -92,7 +92,7 @@ docker() {
 others() {
    if ! command -v pv &> /dev/null; then
      log "CYAN" "Installing Pipe viewer"
-     yum install pv
+     sudo yum install pv
    fi
 }
 
