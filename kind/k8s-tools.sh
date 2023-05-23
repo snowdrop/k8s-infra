@@ -88,6 +88,14 @@ docker() {
     sudo usermod -aG docker $USER
     echo "Please reboot the VM !!"
 }
+
+others() {
+   if ! command -v pv &> /dev/null; then
+     log "CYAN" "Installing Pipe viewer"
+     yum install pv
+   fi
+}
+
 kubeTools() {
   K9S_VERSION=$(curl -s "https://api.github.com/repos/derailed/k9s/releases/latest" | grep -Po '"tag_name": "\K.*?(?=")')
   KIND_VERSION=$(curl -s "https://api.github.com/repos/kubernetes-sigs/kind/releases/latest" | grep -Po '"tag_name": "\K.*?(?=")')
@@ -199,3 +207,4 @@ EOF
 
 docker
 kubeTools
+others
