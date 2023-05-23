@@ -77,6 +77,13 @@ check_arch() {
     log "CYAN" "Detected Arch: $ARCH"
 }
 
+init() {
+      # Check OS TYPE and/or linux distro
+      check_os
+      check_distro
+      check_arch
+}
+
 docker() {
     sudo yum install -y yum-utils
     sudo yum-config-manager --add-repo https://download.docker.com/linux/${DISTRO}/docker-ce.repo
@@ -102,11 +109,6 @@ kubeTools() {
 
   REMOTE_HOME_DIR=${REMOTE_HOME_DIR:-$HOME}
   DEST_DIR="/usr/local/bin"
-
-  # Check OS TYPE and/or linux distro
-  check_os
-  check_distro
-  check_arch
 
   log "CYAN" "Install useful tools: k9s, unzip, wget, jq,..."
   if [[ $DISTRO == 'fedora' ]]; then
@@ -205,9 +207,10 @@ EOF
   fi
 }
 
+init
+
 case $1 in
     docker)     docker; exit;;
     others)     others; exit;;
+    *)          kubetools; exit;;
 esac
-
-kubeTools
