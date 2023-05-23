@@ -79,9 +79,9 @@ check_arch() {
 
 docker() {
     sudo yum install -y yum-utils
-    sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-    # sudo yum install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-    sudo yum install -y docker
+    sudo yum-config-manager --add-repo https://download.docker.com/linux/${DISTRO}/docker-ce.repo
+    sudo yum install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+    #sudo yum install -y docker
     sudo systemctl start docker
     sudo systemctl enable docker
     sudo groupadd docker
@@ -205,6 +205,10 @@ EOF
   fi
 }
 
-docker
+case $1 in
+    docker)     docker; exit;;
+    others)     others; exit;;
+    *)          exit;;
+esac
+
 kubeTools
-others
