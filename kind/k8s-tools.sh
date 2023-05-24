@@ -92,6 +92,7 @@ docker() {
     sudo systemctl enable docker
     sudo groupadd docker
     sudo usermod -aG docker $USER
+    sudo chown $USER /var/run/docker.sock
     sudo systemctl restart docker
     echo "Please reboot the VM !!"
 }
