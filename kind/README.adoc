@@ -48,8 +48,8 @@ The container registry is started as a `container`, its network shared with the 
 To be able to use the bash script, the following tools are required:
 
 * A container runtime (one of):
-** Podman: https://podman.io/
 ** Docker: https://docs.docker.com/get-docker/
+** Podman: https://podman.io/
 * kind: https://github.com/kubernetes-sigs/kind/releases
 * kubectl: https://kubernetes.io/docs/tasks/tools/
 * helm: https://helm.sh/
@@ -173,21 +173,29 @@ a| Registry user.
 Default: `admin`
 |===
 
+[]
+====
+
 .Container registry creation statement
 [source,bash]
 ----
-curl -s -L "https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/kind.sh" | bash -s install-registry --registry-name kind-registry.local
+curl -s -L "https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/registry.sh" | bash -s install --registry-name kind-registry.local
 ----
+
+====
 
 === Kind Cluster
 
 Creating a kubernetes cluster is as simple as executing the following command.
 
+[]
+====
 .kind deploy statement
 [source,bash]
 ----
-curl -s -L "https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/kind.sh" | bash -s install-cluster --cluster-name snowdrop --provider podman --port-map "30000:30000,31000:31000 --registry-name kind-registry.local"
+curl -s -L "https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/kind.sh" | bash -s install --cluster-name snowdrop --port-map "30000:30000,31000:31000" --registry-name kind-registry.local
 ----
+====
 
 .kind cluster creation most relevant options
 [%header,cols="2,4"]
@@ -213,25 +221,6 @@ Default: 5000
 
 ==== Allow using an insecure container registry
 
-*Using Podman*
-
-Check the link:https://podman.io/getting-started/installation.html[Podman installation]
- document.
-
-.Instructions for Podman
-[%collapsible]
-====
-Add the `kind-registry.conf` file to the `/etc/containers/registries.conf.d/` folder having the following contents.
-
-.Allow using the newly created insecure registry 
-[source]
-----
-[[registry]]
-location = "localhost:5000"
-insecure = true
-----
-====
-
 *Using Docker*
 
 Check the link:https://docs.docker.com/registry/insecure/[Test an insecure registry] 
@@ -251,7 +240,28 @@ Add the following contents to the `/etc/docker/daemon.json` file.
 
 ====
 
+*Using Podman*
+
+Check the link:https://podman.io/getting-started/installation.html[Podman installation]
+ document.
+
+.Instructions for Podman
+[%collapsible]
+====
+Add the `kind-registry.conf` file to the `/etc/containers/registries.conf.d/` folder having the following contents.
+
+.Allow using the newly created insecure registry 
+[source]
+----
+[[registry]]
+location = "localhost:5000"
+insecure = true
+----
+====
+
 == Remove
+
+=== Kind Cluster
 
 To undeploying a previousy deployed kind cluster use the `remove` action on the kind deploy script.
 
@@ -260,6 +270,15 @@ To undeploying a previousy deployed kind cluster use the `remove` action on the 
 ----
 curl -s -L "https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/kind.sh" | bash -s remove --cluster-name snowdrop
 ----
+
+=== Container Registry
+
+.container registry removal statement
+[source,bash]
+----
+curl -s -L "https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/registry.sh" | bash -s remove --registry-name kind-registry.local
+----
+
 
 == Secured docker registry
 
