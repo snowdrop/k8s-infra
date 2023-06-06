@@ -459,7 +459,6 @@ By default, the kubernetes cluster don't install [Web UI - Dashboard](https://ku
   in order to request to sign a certificate for a domain with the godaddy DNS provider
   
   The resources created corresponds to the domains that w currently owns:
-  - `snowdrop.me`
   - `snowdrop.dev`
   - `halkyion.io`
   
