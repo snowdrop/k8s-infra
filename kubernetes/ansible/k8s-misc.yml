@@ -13,9 +13,8 @@
     - { role: 'k8s_dashboard',   tags: 'k8s_dashboard'}
     - { role: 'docker_registry',   tags: 'docker_registry'}
     - { role: 'cert_manager', tags: 'cert_manager' }
-    # Team web site: snowdrop.dev, halkyon.io -> redirect to github.io
+    # Team web site: halkyon.io -> redirect to github.io
     - { role: 'k8s_halkyon_site',       tags: 'k8s_halkyon_site'}
-    - { role: 'k8s_snowdrop_site',      tags: 'k8s_snowdrop_site'}
     # Halkyon related technology
     - { role: 'kubedb',   tags: 'kubedb'}
     - { role: 'tekton_pipelines',   tags: 'tekton_pipelines'}
