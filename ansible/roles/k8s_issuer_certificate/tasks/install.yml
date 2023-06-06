@@ -35,7 +35,6 @@
     dest: "{{ tempPath }}/{{ item.namespace }}-{{ item.name }}-certificate.yml"
   with_items:
     - { name: snowdrop-dev,          namespace: snowdrop-site,  names: "snowdrop.dev,www.snowdrop.dev,start.snowdrop.dev,generator.snowdrop.dev,*.apps.ocp.snowdrop.dev" ,          secretname: www-snowdrop-dev-tls}
-    - { name: snowdrop-me,           namespace: snowdrop-site,  names: "snowdrop.me,www.snowdrop.me,start.snowdrop.me,generator.snowdrop.me",           secretname: www-snowdrop-me-tls}
     - { name: halkyon-io,            namespace: halkyon-site,   names: "halkyon.io,www.halkyon.io",            secretname: www-halkyon-io-tls}
 
 - name: Generate issuer yml files for the different domains
@@ -44,7 +43,6 @@
     dest: "{{ tempPath }}/{{ item.namespace }}-{{ item.name }}-issuer.yml"
   with_items:
     - { name: snowdrop-dev,          namespace: snowdrop-site,  names: "snowdrop.dev,www.snowdrop.dev,start.snowdrop.dev,generator.snowdrop.dev,*.apps.ocp.snowdrop.dev"}
-    - { name: snowdrop-me,           namespace: snowdrop-site,  names: "snowdrop.me,www.snowdrop.me,start.snowdrop.me,generator.snowdrop.me"}
     - { name: halkyon-io,            namespace: halkyon-site,   names: "halkyon.io,www.halkyon.io"}
 
 - name: Deploy the Godaddy secrets, Issuers resources containing the API Token
