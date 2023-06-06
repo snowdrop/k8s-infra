@@ -584,6 +584,11 @@ EOF
         fi
         
     fi
+    
+    note_start_task "2" "Connect the container registry to the kind network..."
+     ${CRI_COMMAND} network connect "kind" ${REGISTRY_NAME}
+    succeeded "2" "Connect the container registry to the kind network... done."
+    
     SCRIPT_RESULT_MESSAGE+="\n"
     SCRIPT_RESULT_MESSAGE+="  * ${CLUSTER_NAME} kind cluster has been deployed\n"
     SCRIPT_RESULT_MESSAGE+="\n"
