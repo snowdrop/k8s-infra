@@ -440,25 +440,14 @@ By default, the kubernetes cluster don't install [Web UI - Dashboard](https://ku
   To uninstall the `Certificate Manager`, execute this command where you pass the parameter `remove=true`
   ```bash
   ansible-playbook -i inventory/simple_host playbook/post_installation.yml --tags cert_manager -e remove=true -e isOpenshift=false
-  ```  
-
-### Command : Install Snowdrop Site K8s
-
-  The Snowdrop web site can be installed using the following role and command on Kubernetes
-  
-  ```bash
-  ansible-playbook -i inventory/cloud_host playbook/post_installation.yml \
-    --tags k8s_snowdrop_site
   ```
-  
-  To remove the kubernetes resources of the Snowdrop web site, pass then the following variable `-e remove=true`
 
 ### Command : Issuer and certificate for the Cert Manager
 
   The role `k8s_issuer_certificate` allows to install the `Issuer` and `Certificate` CRD resources which are used by the certificate manager operator
   in order to request to sign a certificate for a domain with the godaddy DNS provider
   
-  The resources created corresponds to the domains that w currently owns:
+  The resources created corresponds to the domains that we currently owns:
   - `snowdrop.dev`
   - `halkyion.io`
   
