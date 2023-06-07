@@ -146,11 +146,48 @@ openstack/vm : include_tasks ---------------------------------------------------
 
 === Connect to the new instance
 
-Since all the information related to the host will be managed by our ansible passwordstore roles, which also stores the ssh public and secret keys locally on the `~/.ssh` folder, to login to the newly created VM is as simple as launching the following command.
+All the information related to the host will be managed by our ansible passwordstore roles, which also stores the ssh public and secret keys locally on the `~/.ssh` folder. On the other hand a _bash_ script has been created to make it easier to perform this connection.
 
+To SSH connect to a VM use the `tools/passstore-vm-ssh.sh` bas script.
+
+The 3 arguments to pass to the script are the following.
+
+.Script options
+[%header,cols="2,4"]
+|===
+| Command | Description
+
+| 1: `VM_PROVIDER`
+
+[.fuchsia]#string# / [.red]#required# 
+a| Cloud provider
+
+Choices: 
+
+* `hetzner`
+* `openstack`
+
+| 2: `VM_NAME`
+
+[.fuchsia]#string# / [.red]#required# 
+a| Name of the VM to connect to. 
+
+This is the inventory name of the VM.
+
+| 3: `PASSWORD_STORE_DIR`
+
+[.fuchsia]#string#
+a| Folder where the PASSWORDSTORE database is located
+
+*Default*: `PASSWORD_STORE_DIR`` environment variable, if set.
+
+|===
+
+
+.Connect to a passwordstore VM
 [source,bash]
 ----
-$ ssh -i ~/.ssh/id_rsa_snowdrop_openstack_${VM_NAME} `pass show openstack/${VM_NAME}/os_user | head -n 1`@`pass show openstack/${VM_NAME}/ansible_ssh_host | head -n 1` -p `pass show openstack/${VM_NAME}/ansible_ssh_port | head -n 1`
+./tools/passstore-vm-ssh.sh openstack ${VM_NAME}
 ----
 
 This should connect ot the newly created VM.
