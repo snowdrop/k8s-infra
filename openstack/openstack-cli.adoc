@@ -20,13 +20,13 @@ pip install --upgrade python-openstackclient
 
 === Login
 
-Login can be made using Environment Variables.
+To access the OpenStack platform using the client, different `Environment Variables` must be set as described https://docs.openstack.org/newton/user-guide/common/cli-set-environment-variables-using-openstack-rc.html[here].
 
-To configure the login process connect to the OpenStack interface and go to the `Project > API Access`` option. From there, `OpenStack RC` file.
+So, connect to your RHOS instance (e.g https://rhos-d.infra.prod.upshift.rdu2.redhat.com/) and select within the menu: `Project > API Access`.
+From there, download the `OpenStack RC file` bash file by clicking on the button.
 
-Copy the file to a path directory, for instance `~/bin` (or `~/.local/bin`) and give it execution permission.
-
-Execute the script file and give provide the password when requested.
+Copy the file to a path directory, for instance `~/bin` (or `~/.local/bin` or `/usr/local/bin`) and give it execution permission.
+Source the bash script and give provide the password when requested.
 
 [source,bash]
 ----
@@ -37,14 +37,11 @@ That's it, you're now logged in.
 
 === Flavor
 
-List flavors.
+.Get the list of the flavors
 
 [source,bash]
 ----
 $ openstack flavor list
-
-The flavors with more than 32GB are the following...
-
 ```
 +--------------------------------------+------------------------------------+--------+------+-----------+-------+-----------+
 | ID                                   | Name                               |    RAM | Disk | Ephemeral | VCPUs | Is Public |
@@ -58,8 +55,6 @@ The flavors with more than 32GB are the following...
 +--------------------------------------+------------------------------------+--------+------+-----------+-------+-----------+
 ```
 ----
-
-Other list commands
 
 .Filter list by RAM
 [source,bash]
