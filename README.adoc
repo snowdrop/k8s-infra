@@ -31,9 +31,20 @@ all of them and the following chapters will mention which ones are needed.
 
 * https://kind.sigs.k8s.io/docs/user/quick-start/#installation[kind]
 * https://docs.docker.com/engine/install/[Docker] or https://podman.io/docs/installation[podman]
-* https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#installing-and-upgrading-ansible[Ansible]
+* https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#installing-and-upgrading-ansible[Ansible]. Version >= 2.14
+* https://www.python.org/downloads/[Python]. Version >= 3.11
 * https://www.passwordstore.org/[passwordstore]
 * https://github.com/hetznercloud/cli[hcloud] (optional)
+
+TIP: Check the Ansible https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html#ansible-core-support-matrix[requirement] page for Python compatibility !
+
+TIP: To use ansible, we recommend to use pip3 and virtualenv
+[,console]
+----
+virtualenv ansible2.14
+source ansible2.14/bin/activate
+pip3 install ansible==7.6.0
+----
 
 == Locally
 
@@ -80,7 +91,7 @@ NOTE: Optionally, we could also install different kubernetes tools if we would l
 
 This section details how to provision an Openshift 4 cluster using one of Red Hat environments available such as:
 
-==== OpenStack - RHOS
+==== OpenStack - RHOS PSI
 
 _Tools: password store, ansible_
 
