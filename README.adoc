@@ -58,6 +58,23 @@ See the https://kubernetes.io/docs/tasks/tools/install-minikube/[official docume
 
 == Cloud provider
 
+The provisioning process towards the cloud providers relies on the following assumptions:
+
+- password store is installed/configured and needed k/v created
+- flavor, volume, capacity (cpu/ram/volume) and OS can be mapped with the playbook of the target cloud provider
+- permissions have been set to allow to provision a VM top of the target cloud provider
+- ssh key exist and has been imported (or could be created during provisioning process)
+
+and will include the following basic steps:
+
+- Create a VM, mount a volume and import the SSH key
+- Execute a pos installation script to install some needed services
+- Register the Hostnames against the domain name (using Lets'encrypt and DNS provider)
+- Deploy an ocp4 cluster and configure the different ingress routes to access the console, API, registry, etc
+
+Optionally, we could also install different kubernetes tools if we would like to access/use the VM
+(e.g. kubectl, oc, helm, k9s, konfig, ect - see tooling section).
+
 === Red Hat
 
 ==== OpenStack - RHOS
