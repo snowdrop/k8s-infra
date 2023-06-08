@@ -16,7 +16,7 @@ toc::[]
 
 This project details the `prerequisites` and `steps` necessary to automate the installation of a Kubernetes (aka k8s) cluster or Openshift 4 top of one of the following cloud provider:
 
-* Red Hat OpenStack (RHOS-PSI)
+* Red Hat https://access.redhat.com/documentation/en-us/red_hat_openstack_platform/[OpenStack] (RHOS-PSI)
 * Red Hat https://github.com/resource-hub-dev[ResourceHub] - Work in progress
 * IBM Cloud
 * Hetzner
@@ -78,13 +78,13 @@ NOTE: Optionally, we could also install different kubernetes tools if we would l
 
 === Red Hat
 
-This section details how to provision an Openshift cluster using one of red hat environements available such as:
+This section details how to provision an Openshift 4 cluster using one of Red Hat environments available such as:
 
 ==== OpenStack - RHOS
 
 _Tools: password store, ansible_
 
-See xref:openstack/README.adoc[OpenStack] page explaining how to create an OpenStack cloud vm.
+The xref:openstack/README.adoc[OpenStack] page explains how to create an OpenStack cloud vm using
 
 ==== https://resourcehub.redhat.com/[Resource Hub]
 

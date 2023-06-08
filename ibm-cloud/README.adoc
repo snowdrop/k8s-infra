@@ -1,115 +1,133 @@
-# IBM Cloud VPC
+= IBM Cloud VPC
 
-## Table of Contents
+== Table of Contents
 
-   * [References](#references)
-   * [Install](#install)
-      * [Create API Key](#create-api-key)
-   * [Usage Guide](#usage-guide)
-      * [VPC - Virtual Private Cloud](#vpc---virtual-private-cloud)
-         * [Create a new VPC](#create-a-new-vpc)
-         * [Destroy an existing VPC](#destroy-an-existing-vpc)
-      * [VSI - Virtual Server Instance](#vsi---virtual-server-instance)
+* <<references,References>>
+* <<install,Install>>
+ ** <<create-api-key,Create API Key>>
+* <<usage-guide,Usage Guide>>
+ ** <<vpc---virtual-private-cloud,VPC - Virtual Private Cloud>>
+  *** <<create-a-new-vpc,Create a new VPC>>
+  *** <<destroy-an-existing-vpc,Destroy an existing VPC>>
+ ** <<vsi---virtual-server-instance,VSI - Virtual Server Instance>>
 
-## Introduction
+== Introduction
 
 The goal of this project is to manage IBM Cloud VPC (Virtual Private cloud)
 
-## References
+== References
 
 * https://www.ibm.com/cloud/blog/announcements/ibm-cloud-collection-for-ansible
 * https://github.com/IBM-Cloud/ansible-collection-ibm
 * https://registry.terraform.io/providers/IBM-Cloud/ibm/latest/docs/resources/is_subnet
 
-## Install 
+== Install
 
 Download and install the IBM Ansible collection.
 
-```bash
+[,bash]
+----
 $ ansible-galaxy collection install ibm.cloudcollection
-```
+----
 
-### Create API Key
+=== Create API Key
 
 These playbooks require that an IBM Cloud API key exists.
 
-Using the [API Keys section](https://cloud.ibm.com/iam/apikeys) of the IBM Cloud web site, create a new API key.
+Using the https://cloud.ibm.com/iam/apikeys[API Keys section] of the IBM Cloud web site, create a new API key.
 
-## Usage Guide
+== Usage Guide
 
 Before using these playbooks, make sure that the following environment variables are defined.
 
 Export the API key using the `IC_API_KEY` environment variable:
 
-```bash
+[,bash]
+----
 export IC_API_KEY=<YOUR_API_KEY_HERE>
-```
+----
 
 e.g.
 
-```bash
+[,bash]
+----
 export IC_API_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-```
+----
 
 Export the IBM Cloud region using the `IC_REGION` environment variable:
 
-```bash
+[,bash]
+----
 export IC_REGION=<REGION_NAME_HERE>
-```
+----
 
 e.g.
 
-```bash
+[,bash]
+----
 export IC_REGION=eu-de
-```
+----
 
-### VPC - Virtual Private Cloud
+=== VPC - Virtual Private Cloud
 
 The VPC playbooks gather the information from the `vpc-vars.yml` variables file. The variables used are the following:
 
-| Variable | Value | Description |
-| --- | --- | --- |
-| **name_prefix** | `snowdrop` | Prefix used to name the different resources. |
-| **zone** | `eu-de-1` | Zone where the resources will be created. |
-| **ipv4_cidr_block** | `10.243.0.0/24` | The IPv4 range of the subnet. |
+|===
+| Variable | Value | Description
 
-#### Create a new VPC
+| *name_prefix*
+| `snowdrop`
+| Prefix used to name the different resources.
+
+| *zone*
+| `eu-de-1`
+| Zone where the resources will be created.
+
+| *ipv4_cidr_block*
+| `10.243.0.0/24`
+| The IPv4 range of the subnet.
+|===
+
+==== Create a new VPC
 
 Create a new VPC.
 
-```bash
+[,bash]
+----
 $ ansible-playbook vpc-create.yml
-```
+----
 
 This command will also create:
+
 * a VPC Subnet
 * a Public Gateway
 
-#### Get VPC information
+==== Get VPC information
 
 To get the VPC information use the `vpc-info` playbook.
 
 e.g.
 
-```bash
-$ ansible-playbook vpc-info.yml 
+[,bash]
+----
+$ ansible-playbook vpc-info.yml
 
 PLAY [Describe IBM Cloud VPC information] **************************************
 
 TASK [Gathering Facts] *********************************************************
-Thursday 21 October 2021  12:47:08 +0200 (0:00:00.011)       0:00:00.011 ****** 
+Thursday 21 October 2021  12:47:08 +0200 (0:00:00.011)       0:00:00.011 ******
 ok: [localhost]
 
 TASK [Fetch the variables from var file] ***************************************
-Thursday 21 October 2021  12:47:09 +0200 (0:00:01.010)       0:00:01.021 ****** 
+Thursday 21 October 2021  12:47:09 +0200 (0:00:01.010)       0:00:01.021 ******
 ok: [localhost]
 
 TASK [Get the vpc details] *****************************************************
-Thursday 21 October 2021  12:47:09 +0200 (0:00:00.020)       0:00:01.042 ****** 
+Thursday 21 October 2021  12:47:09 +0200 (0:00:00.020)       0:00:01.042 ******
 ok: [localhost]
 
 TASK [Print VPC facts] *********************************************************
-Thursday 21 October 2021  12:47:20 +0200 (0:00:10.187)       0:00:11.230 ****** 
+Thursday 21 October 2021  12:47:20 +0200 (0:00:10.187)       0:00:11.230 ******
 ok: [localhost] => {
     "msg": {
         "classic_access": false,
@@ -190,27 +208,29 @@ ok: [localhost] => {
 }
 
 PLAY RECAP ***************************************************************************
-localhost                  : ok=4    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+localhost                  : ok=4    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 
-Thursday 21 October 2021  12:47:20 +0200 (0:00:00.047)       0:00:11.277 ****** 
-=============================================================================== 
+Thursday 21 October 2021  12:47:20 +0200 (0:00:00.047)       0:00:11.277 ******
+===============================================================================
 Get the vpc details ------------------------------------------ 10.19s
 Gathering Facts ----------------------------------------------- 1.01s
 Print VPC facts ----------------------------------------------- 0.05s
 Fetch the variables from var file ----------------------------- 0.02s
+----
 
-```
-#### Destroy an existing VPC
+==== Destroy an existing VPC
 
 Destroy an existing VPC. This instruction also destroys:
+
 * VPC subnets
 * public gateway
 
-```bash
+[,bash]
+----
 $ ansible-playbook vpc-destroy.yml
-```
+----
 
-### Public Gateway
+=== Public Gateway
 
 The VPC Create and VPC Destroy playbooks also create the related public gateway and attach it to the VPC subnet.
 
@@ -218,29 +238,30 @@ To get information on a Public Gateway use the `pg-info.yml` playbook.
 
 e.g.
 
-```bash
+[,bash]
+----
 $ ansible-playbook pg-info.yml
 
 PLAY [Display IBM Cloud Public Gateway information] *******************************************
 
 TASK [Gathering Facts] ************************************************************************
-Thursday 28 October 2021  10:45:10 +0200 (0:00:00.012)       0:00:00.012 ****** 
+Thursday 28 October 2021  10:45:10 +0200 (0:00:00.012)       0:00:00.012 ******
 ok: [localhost]
 
 TASK [Fetch the variables from var file] ******************************************************
-Thursday 28 October 2021  10:45:11 +0200 (0:00:00.897)       0:00:00.909 ****** 
+Thursday 28 October 2021  10:45:11 +0200 (0:00:00.897)       0:00:00.909 ******
 ok: [localhost]
 
 TASK [Set static facts] ***********************************************************************
-Thursday 28 October 2021  10:45:11 +0200 (0:00:00.020)       0:00:00.929 ****** 
+Thursday 28 October 2021  10:45:11 +0200 (0:00:00.020)       0:00:00.929 ******
 ok: [localhost]
 
 TASK [Get Public Gateway facts] ***************************************************************
-Thursday 28 October 2021  10:45:11 +0200 (0:00:00.036)       0:00:00.965 ****** 
+Thursday 28 October 2021  10:45:11 +0200 (0:00:00.036)       0:00:00.965 ******
 ok: [localhost]
 
 TASK [Print Public Gateway facts] *************************************************************
-Thursday 28 October 2021  10:45:17 +0200 (0:00:05.825)       0:00:06.791 ****** 
+Thursday 28 October 2021  10:45:17 +0200 (0:00:05.825)       0:00:06.791 ******
 
 ok: [localhost] => {
     "msg": {
@@ -282,10 +303,8 @@ ok: [localhost] => {
         ]
     }
 }
+----
 
-```
-
-### VSI - Virtual Server Instance
+=== VSI - Virtual Server Instance
 
 TODO
-
