@@ -33,6 +33,7 @@ all of them and the following chapters will mention which ones are needed.
 * https://docs.docker.com/engine/install/[Docker] or https://podman.io/docs/installation[podman]
 * https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#installing-and-upgrading-ansible[Ansible]
 * https://www.passwordstore.org/[passwordstore]
+* https://github.com/hetznercloud/cli[hcloud] (optional)
 
 == Locally
 
@@ -77,6 +78,8 @@ NOTE: Optionally, we could also install different kubernetes tools if we would l
 
 === Red Hat
 
+This section details how to provision an Openshift cluster using one of red hat environements available such as:
+
 ==== OpenStack - RHOS
 
 _Tools: password store, ansible_
@@ -95,15 +98,17 @@ _Tools: password store, ansible_
 
 See xref:ibm-cloud/README.adoc[ibm-cloud]
 
-=== Hetzner - bare metal
+=== Hetzner
 
-_Tools: password store, ansible_
+==== Bare metal
+
+_Tools: password store, ansible, hcloud_
 
 See xref:hetzner/README.adoc[hetzner] page explaining how to create a vm.
 
-=== Hetzner Cloud - virtualized
+==== Virtualized machine
 
-_Tools: password store, ansible_
+_Tools: password store, ansible, hcloud_
 
 See xref:hetzner/README-cloud.adoc[hetzner-cloud] page explaining how to create a cloud vm.
 
