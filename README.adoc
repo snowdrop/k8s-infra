@@ -1,5 +1,7 @@
-= Table of Contents
-:doctype: book
+:icons: font
+:revdate: {docdate}
+:toc: left
+:toclevels: 2
 ifdef::env-github[]
 :tip-caption: :bulb:
 :note-caption: :information_source:
@@ -7,29 +9,6 @@ ifdef::env-github[]
 :caution-caption: :fire:
 :warning-caption: :warning:
 endif::[]
-
-* <<table-of-contents,Table of Contents>>
-* <<introduction,Introduction>>
- ** <<prerequisites,Prerequisites>>
-  *** <<locally,Locally>>
-   **** <<kind,Kind>>
-   **** <<minikube,Minikube>>
-  *** <<public-cloud-provider,Public Cloud provider>>
-   **** <<hetzner---bare-metal,Hetzner - bare metal>>
-   **** <<hetzner-cloud---virtualized,Hetzner Cloud - virtualized>>
-  *** <<ibm-cloud,IBM Cloud>>
-  *** <<red-hat-openstack---rhos,Red Hat OpenStack - RHOS>>
- ** <<cluster-deployment,Cluster Deployment>>
-  *** <<kubernetes,Kubernetes>>
-  *** <<openshift,OpenShift>>
- ** <<sandbox,Sandbox>>
-  *** <<become-a-docker-machine,Become a Docker Machine>>
-  *** <<turn-on-your-machine-into-a-cloud-native-dev-environment,Turn on your machine into a Cloud Native Dev environment>>
-  *** <<microk8s,Microk8s>>
-  *** <<vagrant,Vagrant>>
-  *** <<virtualbox,Virtualbox>>
-   **** <<create-vdi-file-from-cloud-iso,Create vdi file from Cloud ISO>>
-   **** <<create-vm-on-virtualbox,Create VM on VirtualBox>>
 
 = Introduction
 
