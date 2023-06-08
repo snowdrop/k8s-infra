@@ -1,7 +1,7 @@
 :icons: font
 :revdate: {docdate}
 :toc: macro
-:toclevels: 2
+:toclevels: 3
 ifdef::env-github[]
 :tip-caption: :bulb:
 :note-caption: :information_source:
