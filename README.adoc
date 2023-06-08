@@ -43,6 +43,8 @@ We recommend to use 2 tools to run locally a kubernetes cluster: kind or minikub
 
 === Kind
 
+#Tools:# docker (or podman), kind
+
 To automate the installation of a k8s "kind" cluster locally like also to set up an ingress controller or a docker container registry,
 use our opinionated xref:kind/README.adoc[bash scripts] we created :-).
 
