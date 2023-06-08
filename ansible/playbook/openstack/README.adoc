@@ -146,7 +146,7 @@ openstack/vm : include_tasks ---------------------------------------------------
 
 === Connect to the new instance
 
-All the information related to the host will be managed by our ansible passwordstore link:../../roles/passstore[roles] and link:../passstore[playbooks]. The current implementation also stores the ssh public and secret keys locally on each `~/.ssh` folder. To improve usability a link:../../../tools/passstore-vm-ssh.sh[_bash_ script] has been created to make it easier to perform this connection.
+All the information related to the host will be managed by our ansible passwordstore link:../../roles/passstore[roles] and link:../passstore[playbooks]. The current implementation also stores the ssh public and secret keys locally on each `~/.ssh` folder. To improve usability link:../../../tools/passstore-vm-ssh.sh[this] bash script has been created to make it easier to perform this connection. More documentation on the bash script can be found link:../../../tools/README.md[here].
 
 To SSH connect to a VM use the `tools/passstore-vm-ssh.sh` bash script.
 
