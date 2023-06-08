@@ -28,26 +28,26 @@ NOTE: kind is not a cloud provider but a tool able to run a k8s cluster on a con
 * https://docs.docker.com/engine/install/[Docker] or https://podman.io/docs/installation[podman]
 * https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#installing-and-upgrading-ansible[Ansible]
 
-=== Locally
+== Locally
 
 We recommend to use 2 tools to run locally a kubernetes cluster: kind or minikube
 
-==== Kind
+=== Kind
 
 See the official documentation - https://kind.sigs.k8s.io/docs/user/quick-start/ and xref:kind/README.adoc[the bash scripts] we created to simplify the creation of the cluster
 like also to setup an ingress controller or a docker container registry
 
-==== Minikube
+=== Minikube
 
 See the https://kubernetes.io/docs/tasks/tools/install-minikube/[official documentation] to install `minikube` on Macos, Linux or Windows
 
-=== Public Cloud provider
+== Public Cloud provider
 
-==== Hetzner - bare metal
+=== Hetzner - bare metal
 
 * See xref:hetzner/README.adoc[hetzner] page explaining how to create a vm.
 
-==== Hetzner Cloud - virtualized
+=== Hetzner Cloud - virtualized
 
 * See xref:hetzner/README-cloud.adoc[hetzner-cloud] page explaining how to create a cloud vm.
 
