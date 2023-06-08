@@ -2,7 +2,13 @@
 :icons: font
 :toc: left
 :description: This document describes the requirements and the process to execute the provisioning of a Cloud VM on Openstack.
-
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
 
 == Prerequisites
 // tag::rhos_prerequisites[]
