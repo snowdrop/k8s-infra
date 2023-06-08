@@ -28,6 +28,7 @@ Table of Contents
 
 This project details the `prerequisites` and `steps` necessary to automate the installation of a Kubernetes (aka k8s) cluster or Openshift 4 top of one of the following cloud provider:
 - Red Hat OpenStack (RHOS-PSI)
+- Red Hat [ResourceHub](https://github.com/resource-hub-dev) - Work in progress
 - IBM Cloud
 - Hetzner
 - Kind**
