@@ -29,6 +29,7 @@ NOTE: kind is not a cloud provider but a tool able to run a k8s cluster on a con
 * https://kind.sigs.k8s.io/docs/user/quick-start/#installation[kind]
 * https://docs.docker.com/engine/install/[Docker] or https://podman.io/docs/installation[podman]
 * https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#installing-and-upgrading-ansible[Ansible]
+* https://www.passwordstore.org/[passwordstore]
 
 == Locally
 
@@ -36,10 +37,10 @@ We recommend to use 2 tools to run locally a kubernetes cluster: kind or minikub
 
 === Kind
 
-See the official documentation - https://kind.sigs.k8s.io/docs/user/quick-start/
-
 To automate the installation of a k8s "kind" cluster locally like also to set up an ingress controller or a docker container registry,
 use our opinionated xref:kind/README.adoc[bash scripts] we created :-).
+
+You can find more information about kind tool using the official documentation - https://kind.sigs.k8s.io/docs/user/quick-start/
 
 === Minikube
 
@@ -51,7 +52,7 @@ See the https://kubernetes.io/docs/tasks/tools/install-minikube/[official docume
 
 ==== OpenStack - RHOS
 
-* See xref:openstack/README.adoc[OpenStack] page explaining how to create an OpenStack cloud vm.
+See xref:openstack/README.adoc[OpenStack] page explaining how to create an OpenStack cloud vm.
 
 ==== https://resourcehub.redhat.com/[Resource Hub]
 
@@ -59,15 +60,15 @@ Work in progress
 
 === IBM Cloud
 
-* See xref:ibm-cloud/README.adoc[ibm-cloud]
+See xref:ibm-cloud/README.adoc[ibm-cloud]
 
 === Hetzner - bare metal
 
-* See xref:hetzner/README.adoc[hetzner] page explaining how to create a vm.
+See xref:hetzner/README.adoc[hetzner] page explaining how to create a vm.
 
 === Hetzner Cloud - virtualized
 
-* See xref:hetzner/README-cloud.adoc[hetzner-cloud] page explaining how to create a cloud vm.
+See xref:hetzner/README-cloud.adoc[hetzner-cloud] page explaining how to create a cloud vm.
 
 == Cluster Deployment
 
