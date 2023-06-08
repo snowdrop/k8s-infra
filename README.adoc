@@ -43,7 +43,7 @@ We recommend to use 2 tools to run locally a kubernetes cluster: kind or minikub
 
 === Kind
 
-#Tools:# docker (or podman), kind
+_Tools: docker (or podman), kind_
 
 To automate the installation of a k8s "kind" cluster locally like also to set up an ingress controller or a docker container registry,
 use our opinionated xref:kind/README.adoc[bash scripts] we created :-).
@@ -51,6 +51,8 @@ use our opinionated xref:kind/README.adoc[bash scripts] we created :-).
 You can find more information about kind tool using the official documentation - https://kind.sigs.k8s.io/docs/user/quick-start/
 
 === Minikube
+
+_Tools: docker (or podman), minikube_
 
 See the https://kubernetes.io/docs/tasks/tools/install-minikube/[official documentation] to install `minikube` on Macos, Linux or Windows
 
@@ -60,21 +62,31 @@ See the https://kubernetes.io/docs/tasks/tools/install-minikube/[official docume
 
 ==== OpenStack - RHOS
 
+_Tools: password store, ansible_
+
 See xref:openstack/README.adoc[OpenStack] page explaining how to create an OpenStack cloud vm.
 
 ==== https://resourcehub.redhat.com/[Resource Hub]
+
+_Tools: password store, ansible_
 
 Work in progress
 
 === IBM Cloud
 
+_Tools: password store, ansible_
+
 See xref:ibm-cloud/README.adoc[ibm-cloud]
 
 === Hetzner - bare metal
 
+_Tools: password store, ansible_
+
 See xref:hetzner/README.adoc[hetzner] page explaining how to create a vm.
 
 === Hetzner Cloud - virtualized
+
+_Tools: password store, ansible_
 
 See xref:hetzner/README-cloud.adoc[hetzner-cloud] page explaining how to create a cloud vm.
 
