@@ -26,7 +26,7 @@ So, connect to your RHOS instance (e.g https://rhos-d.infra.prod.upshift.rdu2.re
 From there, download the `OpenStack RC file` bash file by clicking on the button.
 
 Copy the file to a path directory, for instance `~/bin` (or `~/.local/bin` or `/usr/local/bin`) and give it execution permission.
-Source the bash script and give provide the password when requested.
+Source the bash script and enter your password as requested.
 
 [source,bash]
 ----
@@ -42,7 +42,6 @@ That's it, you're now logged in.
 [source,bash]
 ----
 $ openstack flavor list
-```
 +--------------------------------------+------------------------------------+--------+------+-----------+-------+-----------+
 | ID                                   | Name                               |    RAM | Disk | Ephemeral | VCPUs | Is Public |
 +--------------------------------------+------------------------------------+--------+------+-----------+-------+-----------+
@@ -53,7 +52,6 @@ $ openstack flavor list
 | 8cc169d5-184a-4392-bc27-6eac97735d62 | ocp-master-xxl                     |  49152 |   45 |         0 |    32 | True      |
 ...
 +--------------------------------------+------------------------------------+--------+------+-----------+-------+-----------+
-```
 ----
 
 .Filter list by RAM
