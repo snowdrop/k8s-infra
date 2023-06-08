@@ -1,6 +1,6 @@
 :icons: font
 :revdate: {docdate}
-:toc: preamble
+:toc: macro
 :toclevels: 2
 ifdef::env-github[]
 :tip-caption: :bulb:
@@ -9,6 +9,8 @@ ifdef::env-github[]
 :caution-caption: :fire:
 :warning-caption: :warning:
 endif::[]
+
+toc::[]
 
 = Introduction
 
