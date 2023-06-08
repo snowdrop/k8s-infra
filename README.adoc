@@ -36,7 +36,7 @@ all of them and the following chapters will mention which ones are needed.
 * https://www.passwordstore.org/[passwordstore]
 * https://github.com/hetznercloud/cli[hcloud] (optional)
 
-TIP: Check the Ansible https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html#ansible-core-support-matrix[requirement] page for Python compatibility !
+NOTE: Check the Ansible https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html#ansible-core-support-matrix[requirement] page for Python compatibility !
 
 TIP: To use ansible, we recommend to use pip3 and virtualenv
 [,console]
