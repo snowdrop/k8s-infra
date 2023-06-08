@@ -6,7 +6,7 @@
 brew install kind
 ```
 
-- Add the IP Address of your VM running docker as it will be used to register the K8s Api server. If you don't specify it, then
+- Add the IP Address of your VM running docker as it will be used to register the k8s Api server. If you don't specify it, then
   Kind will use as ApiServer - `0.0.0.0`
 ```bash
 echo '
@@ -105,7 +105,7 @@ secretname=$(kubectl get serviceaccount admin-user --namespace=kubernetes-dashbo
 kubectl get secret "$secretname" --namespace=kubernetes-dashboard -o template --template='{{.data.token}}' | base64 --decode
 ```  
 - Open your browser at this address `http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/#/login`, copy/paste the token
-  and enjoy your K8s experience
+  and enjoy your k8s experience
 
 ## Issue
 

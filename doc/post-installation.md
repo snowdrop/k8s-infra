@@ -26,15 +26,15 @@ The table hereafter summarizes the roles available that you can call using the `
 | [Tekton_pipelines](#command--tekton-pipelines) | k8s,okd |  Install Tekton Pipelines |
 | [Component_crd_operator](#component--crd-operator)| okd | Install the Component CRD and Operator processing them | 
 | [Halkyon](#command--halkyon)| k8s,okd | Halkyon |
-| [Create K8s Config file](#command--create-k8s-config-yml) | k8s | Create K8s Config file |
+| [Create k8s Config file](#command--create-k8s-config-yml) | k8s | Create k8s Config file |
 | [Ingress router](#command--ingress-router) | k8s | Ingress Router |
-| [K8s dashboard](#command--install-k8s-dashboard) | k8s | K8s Dashboard |
+| [k8s dashboard](#command--install-k8s-dashboard) | k8s | k8s Dashboard |
 | [Helm](#command--install-helm-optional) | k8s | Deploy Helm Tool |
 | [Docker Registry](#command--docker-registry-optional) | k8s | Docker Registry |
 | [okd4 console](#command--new-ocp4-console-optional) | k8s | New OCP4 console |
-| [K8s Service Broker](#command--k8s-service-catalog-and-oabroker) | k8s | K8s Service Broker |
+| [k8s Service Broker](#command--k8s-service-catalog-and-oabroker) | k8s | k8s Service Broker |
 | [Certificate Manager](#command--certificate-manager) | k8s | Certificate Manager |
-| [Install Snowdrop Site K8s](#command--install-snowdrop-site-k8s) | k8s | Install Snowdrop web site on Kubernetes |
+| [Install Snowdrop Site k8s](#command--install-snowdrop-site-k8s) | k8s | Install Snowdrop web site on Kubernetes |
 
 ## Prerequisite
 
@@ -351,7 +351,7 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
   
   You can specify the version to be installed. If not defined, the latest release will be installed using the parameter `-e tekton_release_version=v0.3.1`  
 
-### Command : Create K8s Config Yml
+### Command : Create k8s Config Yml
 
   ```bash
   ansible-playbook -i inventory/simple_host playbook/post_installation.yml --tags k8s_config
@@ -380,7 +380,7 @@ ansible-playbook -i inventory/cloud_host playbook/post_installation.yml -e opens
   ansible-playbook -i inventory/simple_host playbook/post_installation.yml --tags ingress
   ```  
 
-### Command : Install K8s Dashboard
+### Command : Install k8s Dashboard
 
 By default, the kubernetes cluster don't install [Web UI - Dashboard](https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/) to manage, access the Kubernetes resources.
 
@@ -416,7 +416,7 @@ By default, the kubernetes cluster don't install [Web UI - Dashboard](https://ku
   
   To uninstall the `ocp4 console`, execute this command where you pass the parameter `-e remove=true`
   
-### Command : K8s Service Catalog and OABroker
+### Command : k8s Service Catalog and OABroker
 
   ```bash
   ansible-playbook -i inventory/simple_host playbook/post_installation.yml --tags k8s_service_broker

@@ -6,10 +6,10 @@ Table of Contents
   * [Prerequisite](#prerequisite)
   * [Instructions](#instructions)
   * [Post installations steps](#post-installations-steps)
-     * [Create K8s Config Yml](#create-k8s-config-yml)
+     * [Create k8s Config Yml](#create-k8s-config-yml)
      * [Install Ingress Router](#install-ingress-router)
      * [Install Helm](#install-helm)
-     * [Install K8s Dashboard](#install-k8s-dashboard)
+     * [Install k8s Dashboard](#install-k8s-dashboard)
      * [Docker Registry](#docker-registry)
      * [New ocp4 console](#new-ocp4-console)
 
@@ -40,7 +40,7 @@ If you need to use the sudo root user on the target vm, then pass the parameter 
 If you want to configure your cluster with additional features, then you can install them using the following
 roles :
 
-### Create K8s Config Yml
+### Create k8s Config Yml
 
   ```bash
   ansible-playbook -i inventory/simple_host playbook/post_installation.yml --tags k8s_config
@@ -69,7 +69,7 @@ roles :
   ansible-playbook -i inventory/simple_host playbook/post_installation.yml --tags ingress
   ```  
 
-### Install K8s Dashboard
+### Install k8s Dashboard
 
 **Prerequisite**: The `k8s_issuer_certificate` role must be installed previously as we will generate TLS Certificates needed to access the console and to be authenticated 
 

@@ -41,7 +41,7 @@ Prereq: https://kind.sigs.k8s.io/docs/user/rootless/#host-requirements
   ```
   CLUSTER_NAME="kind-kind"
   K8S_PORT=$(kubectl config view -o json | jq '.clusters[] | select(.name=="'$CLUSTER_NAME'").cluster.server' | sed -e 's,^.*:,:,g' -e 's,.*:\([0-9]*\).*,\1,g')
-  echo "K8s cluster port: $K8S_PORT"
+  echo "k8s cluster port: $K8S_PORT"
   ```
 - Find the vm port
   ```

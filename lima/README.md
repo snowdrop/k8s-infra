@@ -53,7 +53,7 @@ limactl stop -f kind
 limactl delete kind
 ```
 
-Next you can ssh to access the K8s cluster 
+Next you can ssh to access the k8s cluster 
 ```bash
 
 ```

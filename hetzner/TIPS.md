@@ -4,7 +4,7 @@ This document contains the commands to be used to:
 - Clean the password store from VM's keys created previously
 - Update the inventory used by ansible to access the VM or the k8s cluster 
 - Create/delete a VM on hetzner,
-- Install/remove a K8s cluster on the VM
+- Install/remove a k8s cluster on the VM
 - Remote SSH or access using yourkubectl client the cluster
 
 **WARNING**: Be sure that you are using the proper password store within your terminal before to execute the commands hereafter

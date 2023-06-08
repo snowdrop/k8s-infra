@@ -1,62 +1,53 @@
 Table of Contents
 =================
 
+* [Table of Contents](#table-of-contents)
 * [Introduction](#introduction)
-    * [Provision the Cluster](#provision-the-cluster)
-        * [Locally](#locally)
-            * [Kind](#kind)
-            * [Minikube](#minikube)
-        * [Public Cloud provider](#public-cloud-provider)
-            * [Hetzner - bare metal](#hetzner---bare-metal)
-            * [Hetzner Cloud - virtualized](#hetzner-cloud---virtualized)
-        * [IBM Cloud](#ibm-cloud)
-        * [Red Hat OpenStack - RHOS](#red-hat-openstack---rhos)
-    * [Cluster Deployment](#cluster-deployment)
-        * [Kubernetes](#kubernetes)
-        * [OpenShift](#openshift)
-    * [Sandbox](#sandbox)
-        * [Become a Docker Machine](#become-a-docker-machine)
-        * [Turn on your machine into a Cloud Native Dev environment](#turn-on-your-machine-into-a-cloud-native-dev-environment)
-        * [Microk8s](#microk8s)
-        * [Vagrant](#vagrant)
-        * [Virtualbox](#virtualbox)
-            * [Create vdi file from Cloud ISO](#create-vdi-file-from-cloud-iso)
-            * [Create VM on VirtualBox](#create-vm-on-virtualbox)
+  * [Prerequisites](#prerequisites)
+    * [Locally](#locally)
+      * [Kind](#kind)
+      * [Minikube](#minikube)
+    * [Public Cloud provider](#public-cloud-provider)
+      * [Hetzner - bare metal](#hetzner---bare-metal)
+      * [Hetzner Cloud - virtualized](#hetzner-cloud---virtualized)
+    * [IBM Cloud](#ibm-cloud)
+    * [Red Hat OpenStack - RHOS](#red-hat-openstack---rhos)
+  * [Cluster Deployment](#cluster-deployment)
+    * [Kubernetes](#kubernetes)
+    * [OpenShift](#openshift)
+  * [Sandbox](#sandbox)
+    * [Become a Docker Machine](#become-a-docker-machine)
+    * [Turn on your machine into a Cloud Native Dev environment](#turn-on-your-machine-into-a-cloud-native-dev-environment)
+    * [Microk8s](#microk8s)
+    * [Vagrant](#vagrant)
+    * [Virtualbox](#virtualbox)
+      * [Create vdi file from Cloud ISO](#create-vdi-file-from-cloud-iso)
+      * [Create VM on VirtualBox](#create-vm-on-virtualbox)
 
 # Introduction
 
-This project details the `prerequisites` and `steps` necessary to run a Kubernetes (aka k8s) cluster, Openshift locally, on a public or private cloud provider.
+This project details the `prerequisites` and `steps` necessary to automate the installation of a Kubernetes (aka k8s) cluster or Openshift 4 top of one of the following cloud provider:
+- Red Hat OpenStack (RHOS-PSI)
+- IBM Cloud
+- Hetzner
+- Kind**
 
-## Provision the Cluster
+>**Note**: kind is not a cloud provider but a tool able to run a k8s cluster on a container engine
 
-As different tools / bootstrapping methods are available and serve different purposes to install a cluster, the following table 
-summarizes and presents the possibilities offered:
+## Prerequisites
 
-| Cloud Provider             | Purpose                                              | Tool               | ISO                   |         Hypervisor          |
-|----------------------------|------------------------------------------------------|--------------------|-----------------------|:---------------------------:|
-| Local Machine              | Local dvlpt                                          | Kind, Microk8s     | -                     |      Hyperkit, native       |
-| Local Machine              | Local dvlpt                                          | Minishift/Minikube | CentOS or boot2docker | Xhyve, Hyperkit, Virtualbox |
-| Local Machine              | Local dvlpt, test new oc release, validate playbooks | Ansible            | CentOS                |         Virtualbox          |
-| Remote Public  - Hetzner   | Demo, Hands On Lab machine                           | Ansible            | CentOS, Fedora, RHEL  |              -              |
-| Remote Public - IBM Cloud  | Testing                                              | Ansible            | CentOS, Fedora, RHEL  |              -              |
-| Remote Private - OpenStack | Testing, Productization                              | Ansible            | CentOS, Fedora, RHEL  |              -              |
-
-
-**NOTE**: 
-- `Kind, microk8s` tools needs a local `Docker daemon` running on your laptop
-- `Minishift/Minikube` tools manages the whole process to create the vm, next to install Docker
-- For `Ansible` tool, the Linux VM must be accessible using `ssh`
+- [kind](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)
+- [Docker](https://docs.docker.com/engine/install/) or [podman](https://podman.io/docs/installation)
+- [Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#installing-and-upgrading-ansible)
 
 ### Locally
 
-For local development on your machine, you can install a `K8s` cluster using `kind`, `minikube` or `microk8s`.
-
-`minishift` should only be used for ocp3
+We recommend to use 2 tools to run locally a kubernetes cluster: kind or minikube
 
 #### Kind
 
 See the official documentation - https://kind.sigs.k8s.io/docs/user/quick-start/ and [the bash scripts](kind/README.md) we created to simplify the creation of the cluster
-like also to setup ingress or a private container registry
+like also to setup an ingress controller or a docker container registry
 
 #### Minikube
 
