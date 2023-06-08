@@ -26,7 +26,7 @@ NOTE: kind is not a cloud provider but a tool able to run a k8s cluster on a con
 
 == Prerequisites
 
-To use the scripts, playbooks, part of this prject, some prerequisites are needed. It is not mandatory to install
+To use the scripts, playbooks, part of this project, some prerequisites are needed. It is not mandatory to install
 all of them and the following chapters will mention which ones are needed.
 
 * https://kind.sigs.k8s.io/docs/user/quick-start/#installation[kind]
@@ -35,6 +35,9 @@ all of them and the following chapters will mention which ones are needed.
 * https://www.passwordstore.org/[passwordstore]
 
 == Locally
+
+The word `locally` should be understood as the process to run on your developer laptop the cluster, using also a CI/CD platform
+such as GitHub Actions, etc.
 
 We recommend to use 2 tools to run locally a kubernetes cluster: kind or minikube
 
