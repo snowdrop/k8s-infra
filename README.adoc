@@ -47,6 +47,18 @@ See the https://kubernetes.io/docs/tasks/tools/install-minikube/[official docume
 
 == Public Cloud provider
 
+=== Red Hat OpenStack - RHOS
+
+* See xref:openstack/README.adoc[OpenStack] page explaining how to create an OpenStack cloud vm.
+
+=== Red Hat Resource Hub
+
+Work in progress
+
+=== IBM Cloud
+
+* See xref:ibm-cloud/README.adoc[ibm-cloud]
+
 === Hetzner - bare metal
 
 * See xref:hetzner/README.adoc[hetzner] page explaining how to create a vm.
@@ -54,14 +66,6 @@ See the https://kubernetes.io/docs/tasks/tools/install-minikube/[official docume
 === Hetzner Cloud - virtualized
 
 * See xref:hetzner/README-cloud.adoc[hetzner-cloud] page explaining how to create a cloud vm.
-
-=== IBM Cloud
-
-* See xref:ibm-cloud/README.adoc[ibm-cloud]
-
-=== Red Hat OpenStack - RHOS
-
-* See xref:openstack/README.adoc[OpenStack] page explaining how to create an OpenStack cloud vm.
 
 == Cluster Deployment
 
