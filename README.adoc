@@ -26,6 +26,9 @@ NOTE: kind is not a cloud provider but a tool able to run a k8s cluster on a con
 
 == Prerequisites
 
+To use the scripts, playbooks, part of this prject, some prerequisites are needed. It is not mandatory to install
+all of them and the following chapters will mention which ones are needed.
+
 * https://kind.sigs.k8s.io/docs/user/quick-start/#installation[kind]
 * https://docs.docker.com/engine/install/[Docker] or https://podman.io/docs/installation[podman]
 * https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#installing-and-upgrading-ansible[Ansible]
