@@ -45,13 +45,15 @@ use our opinionated xref:kind/README.adoc[bash scripts] we created :-).
 
 See the https://kubernetes.io/docs/tasks/tools/install-minikube/[official documentation] to install `minikube` on Macos, Linux or Windows
 
-== Public Cloud provider
+== Cloud provider
 
-=== Red Hat OpenStack - RHOS
+=== Red Hat
+
+==== OpenStack - RHOS
 
 * See xref:openstack/README.adoc[OpenStack] page explaining how to create an OpenStack cloud vm.
 
-=== Red Hat Resource Hub
+==== https://resourcehub.redhat.com/[Resource Hub]
 
 Work in progress
 
