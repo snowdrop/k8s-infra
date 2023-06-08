@@ -1,6 +1,6 @@
 :icons: font
 :revdate: {docdate}
-:toc: left
+:toc: preamble
 :toclevels: 2
 ifdef::env-github[]
 :tip-caption: :bulb:
