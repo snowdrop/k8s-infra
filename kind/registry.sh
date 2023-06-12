@@ -122,20 +122,13 @@ print_logo() {
     log_message "1" ""
     note "5" "Variables used:"
     note "5" ""
-    note "5" "CLUSTER_NAME: ${CLUSTER_NAME}"
-    note "5" "DELETE_KIND_CLUSTER: ${DELETE_KIND_CLUSTER}"
-    note "5" "INGRESS: ${INGRESS}"
-    note "5" "KNATIVE_VERSION: ${KNATIVE_VERSION}"
-    note "5" "KUBERNETES_VERSION: ${KUBERNETES_VERSION}"
     note "5" "LOGGING_VERBOSITY: ${LOGGING_VERBOSITY}"
     note "5" "REGISTRY_IMAGE_VERSION: ${REGISTRY_IMAGE_VERSION}"
     note "5" "REGISTRY_PASSWORD: ${REGISTRY_PASSWORD}"
     note "5" "REGISTRY_PORT: ${REGISTRY_PORT}"
     note "5" "REGISTRY_USER: ${REGISTRY_USER}"
     note "5" "SECURE_REGISTRY: ${SECURE_REGISTRY}"
-    note "5" "SERVER_IP: ${SERVER_IP}"
     note "5" "SHOW_HELP: ${SHOW_HELP}"
-    note "5" "USE_EXISTING_CLUSTER: ${USE_EXISTING_CLUSTER}"
 }
 
 show_usage() {
@@ -144,31 +137,19 @@ show_usage() {
     log_message "0" "\t./registry.sh command [parameters,...]"
     log_message "0" ""
     log_message "0" "Available commands: "
-    log_message "0" "\tinstall\t\t\t\t\tInstall the kind cluster"
-    log_message "0" "\tremove\t\t\t\t\tRemove the kind cluster"
+    log_message "0" "\tinstall\t\t\t\t\tInstall the container registry"
+    log_message "0" "\tremove\t\t\t\t\tRemove the container registry"
     log_message "0" ""
     log_message "0" "Parameters: "
     log_message "0" "\t-h, --help\t\t\t\tThis help message"
     log_message "0" ""
-#    log_message "0" "\t--cluster-name <name>\t\t\tName of the cluster. Default: kind"
-#    log_message "0" "\t--delete-kind-cluster\t\t\tDeletes the Kind cluster prior to creating a new one. Default: No"
-#    log_message "0" "\t--ingress [nginx,kourier]\t\tIngress to be deployed. One of nginx,kourier. Default: nginx"
-#    log_message "0" "\t--ingress-ports httpPort:httpsPort\tIngress ports to be mapped.  e.g. 'HttpPort:HttpsPort '"
-#    log_message "0" "\t\t\t\t\t\tngninx default: 80:443."
-#    log_message "0" "\t\t\t\t\t\tkourier default: 31080:31443."
-#    log_message "0" "\t--knative-version <version>\t\tKNative version to be used. Default: 1.9.0"
-#    log_message "0" "\t--kubernetes-version <version>\t\tKubernetes version to be install. Default: latest"
     log_message "0" "\t--provider <provider>\t\t\tContainer Runtime [docker,podman]. Default: docker"
-#    log_message "0" "\t--port-map <port map list>\t\tList of ports to map on kind config. e.g. 'ContainerPort1:HostPort1,ContainerPort2:HostPort2,...'"
     log_message "0" "\t--registry-image-version <version>\tVersion of the registry container to be used. Default: 2.6.2"
-    log_message "0" "\t--registry-name <name>\t\t\tName of the registry. Default: <cluster_name>-registry"
+    log_message "0" "\t--registry-name <name>\t\t\tName of the registry. Default: kind-registry"
     log_message "0" "\t--registry-password <password>\t\tRegistry user password. Default: snowdrop"
     log_message "0" "\t--registry-port <port>\t\t\tPort of the registry. Default: 5000"
     log_message "0" "\t--registry-user <user>\t\t\tRegistry user. Default: admin"
     log_message "0" "\t--secure-registry\t\t\tSecure the docker registry. Default: No"
-#    log_message "0" "\t--server-ip <ip-address>\t\tIP address to be used. Default: 127.0.0.1"
-#    log_message "0" "\t--skip-ingress-installation \t\tSkip the installation of an ingress. Default: No"
-#    log_message "0" "\t--use-existing-cluster\t\t\tUses existing kind cluster if it already exists. Default: No"
     log_message "0" "\t-v, --verbosity <value>\t\t\tLogging verbosity (0..9). Default: 1"
     log_message "0" "\t\t\t\t\t\tA verbosity setting of 0 logs only critical events."
 }
@@ -273,16 +254,16 @@ echo "$CFG"
 
 # REMOVE
 function remove_container_registry() {
-    note_start_task "1" "Removing kind registry container..."
+    note_start_task "1" "Removing container registry container..."
     docker_container_id=$(${CRI_COMMAND} container ls --filter name=^${REGISTRY_NAME}$ --all --quiet)
     if [ ! ${docker_container_id} == "" ]; then
         ${CRI_COMMAND} container rm ${REGISTRY_NAME} -f 1> /dev/null
-        succeeded "1" "Removing kind registry container..."
+        succeeded "1" "Removing container registry container..."
     else 
-        warn "Removing kind registry container... no container to be removed."
+        warn "Removing container registry container... no container to be removed."
     fi
     SCRIPT_RESULT_MESSAGE+="\n"
-    SCRIPT_RESULT_MESSAGE+="  * kind registry container has been deleted \n"
+    SCRIPT_RESULT_MESSAGE+="  * container registry container has been deleted \n"
 }
 # /REMOVE
 
@@ -395,7 +376,7 @@ function install_container_registry() {
                 SCRIPT_REQUIRED_STEPS+="      {\"insecure-registries\" : [\"${REGISTRY_NAME}:${REGISTRY_PORT}\"]}\n"
             ;;
             "podman") 
-                SCRIPT_REQUIRED_STEPS+="    * Set the kind registry as an insecure registry by adding the following configuration to the /etc/containers/registries.conf.d/kind-registry.conf file\n"
+                SCRIPT_REQUIRED_STEPS+="    * Set the container registry as an insecure registry by adding the following configuration to the /etc/containers/registries.conf.d/kind-registry.conf file\n"
                 SCRIPT_REQUIRED_STEPS+='[[registry]]\n'
                 SCRIPT_REQUIRED_STEPS+='location = "localhost:${REGISTRY_PORT}"\n'
                 SCRIPT_REQUIRED_STEPS+='insecure = true\n'
@@ -411,15 +392,11 @@ function validate_cri() {
     note "2" "CRI Provider: ${CRI_PROVIDER}"
     if [ "${CRI_PROVIDER}" == 'docker' ]; then
         CRI_COMMAND="docker"
-        KIND_COMMAND=kind
-        unset KIND_EXPERIMENTAL_PROVIDER
         HOST_80_PORT=80
         HOST_443_PORT=443
     elif [ "${CRI_PROVIDER}" == 'podman' ]; then
         CRI_COMMAND="sudo podman"
         # WARN: NO SUPPORT FOR ROOTLESS PODMAN CONTAINERS YET
-        KIND_COMMAND="sudo --preserve-env kind"
-        export KIND_EXPERIMENTAL_PROVIDER=podman
         HOST_80_PORT=30080
         HOST_443_PORT=30443
     else
@@ -464,14 +441,8 @@ function check_os() {
 ##### /Functions
 
 ###### Command Line Parser
-CLUSTER_NAME="kind"
 CRI_PROVIDER=docker
 CRI_COMMAND=docker
-DELETE_KIND_CLUSTER="n"
-INGRESS="nginx"
-KIND_COMMAND=kind
-KNATIVE_VERSION="1.9.0"
-KUBERNETES_VERSION="latest"
 LOGGING_VERBOSITY="1"
 REGISTRY_IMAGE_VERSION="2.6.2"
 REGISTRY_PASSWORD="snowdrop"
@@ -479,12 +450,9 @@ REGISTRY_PORT="5000"
 REGISTRY_USER="admin"
 SCRIPT_RESULT_MESSAGE=""
 SCRIPT_REQUIRED_STEPS=""
-SKIP_INGRESS_INSTALLATION="n"
 SECURE_REGISTRY="n"
-SERVER_IP="127.0.0.1"
 SHOW_HELP="n"
 USE_EXISTING_CLUSTER="n"
-PORT_MAP=""
 
 set +e
 while [ $# -gt 0 ]; do
@@ -493,23 +461,13 @@ while [ $# -gt 0 ]; do
         param="${1/--/}";
         case $1 in
         --help) SHOW_HELP="y"; break 2 ;;
-        #--cluster-name) CLUSTER_NAME="$2"; shift ;;
-        #--delete-kind-cluster) DELETE_KIND_CLUSTER="y" ;;
-        #--ingress) INGRESS="$2"; shift ;;
-        #--ingress-ports) INGRESS_PORTS="$2"; shift ;;
-        #--knative-version) KNATIVE_VERSION="$2"; shift ;;
-        #--kubernetes-version) KUBERNETES_VERSION="$2"; shift ;;
         --provider) CRI_PROVIDER="$2"; shift ;;
-        #--port-map) PORT_MAP="$2"; shift ;;
         --registry-name) REGISTRY_NAME="$2"; shift ;;
         --registry-image-version) REGISTRY_IMAGE_VERSION="$2"; shift ;;
         --registry-password) REGISTRY_PASSWORD="$2"; shift ;;
         --registry-port) REGISTRY_PORT="$2"; shift ;;
         --registry-user) REGISTRY_USER="$2"; shift ;;
         --secure-registry) SECURE_REGISTRY="y" ;;
-        #--skip-ingress-installation) SKIP_INGRESS_INSTALLATION="y" ;;
-        #--server-ip) SERVER_IP="$2"; shift ;;
-        #--use-existing-cluster) USE_EXISTING_CLUSTER="y"; ;;
         --verbosity) LOGGING_VERBOSITY="$2"; shift ;;
         *) INVALID_SWITCH="${INVALID_SWITCH} $1" ; break 2 ;;
         esac;
@@ -550,7 +508,7 @@ elif [ -z ${COMMAND+x} ]; then
 fi
 
 if [ "$REGISTRY_NAME" == "" ]; then
-    REGISTRY_NAME="${CLUSTER_NAME}-registry"
+    REGISTRY_NAME="kind-registry"
 fi
 
 note "5" "REGISTRY_NAME: ${REGISTRY_NAME}"
