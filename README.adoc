@@ -38,11 +38,10 @@ all of them and the following chapters will mention which ones are needed.
 
 NOTE: Check the Ansible https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html#ansible-core-support-matrix[requirement] page for Python compatibility !
 
-TIP: To use ansible, we recommend to use pip3 and virtualenv
+TIP: To install ansible, we recommend to use pip3
 [,console]
 ----
-virtualenv ansible2.14
-source ansible2.14/bin/activate
+# Ansible 7.6 corresponds to Ansible community version: 2.14.6
 pip3 install ansible==7.6.0
 ----
 

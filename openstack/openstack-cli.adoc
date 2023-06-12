@@ -13,7 +13,7 @@ Install OpenStack client.
 
 [source,bash]
 ----
-pip install --upgrade python-openstackclient
+pip3 install python-openstackclient
 ----
 
 == CLI commands
@@ -23,10 +23,10 @@ pip install --upgrade python-openstackclient
 To access the OpenStack platform using the client, different `Environment Variables` must be set as described https://docs.openstack.org/newton/user-guide/common/cli-set-environment-variables-using-openstack-rc.html[here].
 
 So, connect to your RHOS instance (e.g https://rhos-d.infra.prod.upshift.rdu2.redhat.com/) and select within the menu: `Project > API Access`.
-From there, download the `OpenStack RC file` bash file by clicking on the button.
+From there, download the `OpenStack RC file` bash file by clicking on the button and store somwhere (e.g ./rhos-openrc.sh).
 
 Copy the file to a path directory, for instance `~/bin` (or `~/.local/bin` or `/usr/local/bin`) and give it execution permission.
-Source the bash script and enter your password as requested.
+Source the bash script `source /usr/local/bin/rhos-openrc.sh` and enter your password as requested.
 
 [source,bash]
 ----
@@ -75,7 +75,6 @@ List servers.
 [source,bash]
 ----
 $ openstack server list
-
 +--------------------------------------+----------------------------+---------+---------------------------------+----------------------------------------------+-----------------+
 | ID                                   | Name                       | Status  | Networks                        | Image                                        | Flavor          |
 +--------------------------------------+----------------------------+---------+---------------------------------+----------------------------------------------+-----------------+
@@ -83,7 +82,6 @@ $ openstack server list
 | xxxxxx-xxxx-xxxx-xxxx-xxxxxx | 20220425-k121-centos8-test | ACTIVE  | provider_net_shared=x.x.x.x  | CentOS-8-x86_64-GenericCloud-released-latest | ci.m5.large     |
 | xxxxxx-xxxx-xxxx-xxxx-xxxxxx | n119-test                  | ACTIVE  | provider_net_shared=x.x.x.x  | CentOS-7-x86_64-GenericCloud-released-latest | ci.m5.large     |
 +--------------------------------------+----------------------------+---------+---------------------------------+----------------------------------------------+-----------------+
-
 ----
 
 ==== Resize server
@@ -130,8 +128,6 @@ Positional arguments:
 $ nova resize-confirm k123-fedora35-01
 ----
 
-
-
 Typical errors.
 
 [source,bash]
@@ -151,7 +147,18 @@ ERROR (ClientException): Unexpected API Error. Please report this at http://bugs
 
 === Images
 
-Different OS images are available on Openstack.
+Different OS images are available on Openstack and can be discovered using the command `openstack image list`.
+Filter them according to the target OS that you are interested in:
+
+```
+openstack image list | grep -ni "Fedora-Cloud-Base.*"
+openstack image list | grep -ni "RHEL-9.*"
+```
+
+To get the detail about an image you will use the command `openstack image show`
+```
+openstack image show 8b8ab2a1-e349-4313-9a38-a800f42ffe99 -f shell
+```
 
 .OpenStack Image information
 [%header,cols="2m,1,1,1"]
@@ -166,20 +173,16 @@ Different OS images are available on Openstack.
 
 === Flavors
 
-
 .OpenStack Flavor information
 [%header,cols="2m,1,1,1,1,1"]
 |===
-| Flavor | VCPUS | RAM | Total Disks | Root Disk | Ephmeral Disk
+| Flavor | VCPUS | RAM | Total Disks | Root Disk | Ephemeral Disk
 
 | m1.medium | 2 | 4 GB | 40 GB | 40 GB | 0 GB 
 | ci.m1.medium | 2 | 4 GB | 40 GB | 40 GB | 0 GB 
 | ci.m1.medium.large	| 4| 4 GB | 16 GB | 16 GB | 0 GB 
 | ci.m5.large | 16 | 32GB | 40GB | 40GB | 0GB 
 |===
-
-
-
 
 :leveloffset: +1
 
