@@ -1,5 +1,7 @@
 # Instructions to install OpenShift using the Cluster Ansible role
 
+**Deprecated !**
+
 ## Prerequisite
 
   - Linux VM (CentOS7, ...) running, that you can ssh on port 22 and where your public key has been imported
@@ -8,15 +10,15 @@
   
 ## Instructions
 
-- To create an all in one cluster using the oc cluster role, then it is required to first generate an inventory file.
-  If the the IP address of the VM is `192.168.99.50`, then the command to be executed is
+- To create an all-in-one cluster using the oc cluster role, then it is required to first generate an inventory file.
+  If the IP address of the VM is `192.168.99.50`, then the command to be executed is
   
   ```bash
   cd ansible/
   ansible-playbook playbook/generate_inventory.yml -e ip_address=192.168.99.50 -e type=simple
   ```
   
-**NOTE**: This step is not needed if the target VM was created using the [create-vm.sh](../virtualbox/create-vm.sh) script
+**NOTE**: This step is not needed if the target VM was created using the [create-vm.sh](../sandbox/virtualbox/create-vm.sh) script
 since the script automatically invokes said command once the VM has been created  
 
 - Next you can execute one of these tags to `up`, `down` or `clean` the cluster created

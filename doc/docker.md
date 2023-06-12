@@ -4,7 +4,6 @@ Table of Contents
  * [Mac OSX](#mac-osx)
     * [Docker Desktop](#docker-desktop)
     * [Docker machine](#docker-machine)
-    * [Vagrant](#vagrant)
  * [Linux](#linux)
 
 ## Mac OSX
@@ -65,6 +64,8 @@ Using docker-machine commands, you can start, inspect, stop, and restart a manag
   ```
 
 ### Vagrant
+
+**Deprecated !**
 
 Vagrant is a Ruby tool for building and managing Linux virtual machine environments. It offers more flexibility than `docker machine` as you can select the Linux OS that you would like to run locally, 
 can work with different hypervisors and can better automate the process to bootstrap a Linux vm, configure it and execute post installations tasks. 
