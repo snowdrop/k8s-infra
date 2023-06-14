@@ -13,16 +13,20 @@ endif::[]
 == Prerequisites
 // tag::rhos_prerequisites[]
 
-You need to have both the `decorator` and `openstacksdk` pip packages installed.
-Depending on the existing state of your machine, you might need to do:
+The following python packages are needed:
+
+- https://github.com/micheles/decorator/blob/master/docs/documentation.md#usefulness-of-decorators[decorator]
+- https://pypi.org/project/openstacksdk/[openstacksdk] (Version: 1.2.0)
+
+and can be installed using pip
 
 [source,bash]
 ----
-[sudo] pip install [--upgrade] decorator
-[sudo] pip install [--upgrade] openstacksdk
+$ [sudo] pip3 install decorator
+$ [sudo] pip3 install openstacksdk
 ----
 
-Install openstack.cloud Ansible collection.
+like also the `openstack.cloud` Ansible collection.
 
 [source,bash]
 ----
