@@ -8,10 +8,6 @@
     volume_name: "{{ vm_name }}-volume"
   no_log: True
 
-- name: "DEBUG openstack_auth"
-  debug:
-    msg: "openstack_auth: {{ openstack_auth }}"
-      
 - name: "Gather information about a previously created VM"
   openstack.cloud.server_info:
     auth:
@@ -121,7 +117,7 @@
           shell: /bin/bash
           sudo: ['ALL=(ALL) NOPASSWD:ALL']
           ssh_authorized_keys:
-            - {{ keypair_info['openstack_keypairs'][0]['public_key'] }}
+            - {{ keypair_info['keypairs'][0]['public_key'] }}
     register: openstack_output
 
   - name: "Print Openstack output"
@@ -130,11 +126,11 @@
 
   - name: "Store host IP on passwordstore"
     set_fact:
-      openstack_vm_ipv4: "{{ openstack_output.server.accessIPv4 }}"
+      openstack_vm_ipv4: "{{ openstack_output.server.addresses[ openstack.vm.network ][0].addr }}"
 
   - name: "Show IP addresses"
     debug:
-      msg: "VM IP : {{ openstack_output.server.accessIPv4 }}"
+      msg: "VM IP : {{ openstack_vm_ipv4 }}"
 
   # - name: "Store host IP on passwordstore"
   #   set_fact:
