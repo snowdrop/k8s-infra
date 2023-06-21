@@ -1,0 +1,58 @@
+---
+- name: "Set key path if not set"
+  set_fact: 
+    key_path: "{{ admin_home.stdout }}/.ssh/id_rsa_snowdrop_openstack_{{ vm_name }}"
+
+- stat:
+    path: "{{ key_path }}"
+  register: st
+
+- name: "Generate SSH keys"
+  shell: ssh-keygen -b 2048 -t rsa -f {{ key_path }} -q -N ""
+  when: "st.stat.exists == false"
+
+- name: "Set key name"
+  set_fact:
+    key_name: "{{ vm_name }}"
+
+# - name: "Change RSA public key permission"
+#   file:
+#     path: "{{ item }}"
+#     mode: "0600"
+#   loop:
+#     - "{{ key_path }}"
+#     - "{{ key_path }}.pub"
+
+# - name: "Load key information"
+#   set_fact:
+#     rsa_key: "{{lookup('file', key_path) }}"
+#     rsa_key_pub: "{{lookup('file', key_path + '.pub') }}"
+
+# - name: "Remove existing SSH key to use with instance {{ vm_name }}"
+#   os_keypair:
+#     auth:
+#       project_name: "{{ openstack_auth.openstack_project_name }}"
+#       username: "{{ openstack_auth.openstack_console_user }}"
+#       password: "{{ openstack_auth.openstack_console_password }}"
+#       user_domain_name: "{{ openstack_auth.openstack_user_domain }}"
+#       project_domain_name: "{{ openstack_auth.openstack_project_domain }}"
+#       auth_url: "{{ openstack_auth.openstack_os_auth_url }}"
+#     name: "{{ vm_name }}"
+#     state: absent
+#   ignore_errors: true
+
+- name: "Create SSH key to use with instance {{ vm_name }}"
+  os_keypair:
+    auth:
+      project_name: "{{ openstack_auth.openstack_project_name }}"
+      username: "{{ openstack_auth.openstack_console_user }}"
+      password: "{{ openstack_auth.openstack_console_password }}"
+      user_domain_name: "{{ openstack_auth.openstack_user_domain }}"
+      project_domain_name: "{{ openstack_auth.openstack_project_domain }}"
+      auth_url: "{{ openstack_auth.openstack_os_auth_url }}"
+    name: "{{ vm_name }}"
+    public_key_file: "{{ key_path }}.pub"
+    state: present
+  # ignore_errors: true
+
+...

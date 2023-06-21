@@ -27,6 +27,7 @@ _tmp
 
 # Testing purposes
 sandbox/cluster_up/test.sh
+.snowdrop-venv/
 
 #######
 # IDE #
