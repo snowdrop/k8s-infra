@@ -1,0 +1,10 @@
+{
+    "docs": "https://docs.ansible.com/ansible-core/2.15/dev_guide/testing/sanity/runtime-metadata.html", 
+    "results": [
+        {
+            "message": "The test `ansible-test sanity --test runtime-metadata` [[explain](https://docs.ansible.com/ansible-core/2.15/dev_guide/testing/sanity/runtime-metadata.html)] failed with 1 error:", 
+            "output": "meta/runtime.yml:0:0: expected a dictionary. Got None"
+        }
+    ], 
+    "verified": false
+}

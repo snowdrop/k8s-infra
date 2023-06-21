@@ -2,6 +2,13 @@
 :icons: font
 :toc: left
 :description: This document introduces some of the key concepts that you should be aware when you play with Ansible in order to configure the environment to let Ansible to access the different machines.
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
 
 == Conventions
 
@@ -14,26 +21,117 @@ The exception goes to the playbooks that are executed against `localhost`. This 
 
 In order to play with the playbooks/roles of this project, it is needed to:
 
-* Install Ansible version 2.8 or later
-  * For more installation check the [Ansible Installation Guide](https://docs.ansible.com/ansible/latest/installation_guide/index.html)
-  * Ansible uses Python, so check the Ansible [Python 3 Support](https://docs.ansible.com/ansible/latest/reference_appendices/python_3_support.html) page for more information.
-* Install `passwordstore`
-  * This project uses [pass](https://www.passwordstore.org/) to store passwords and certificates related to the project itself.
-  * More information on installing pass in the Download section of the [passwordstore web page](https://www.passwordstore.org/)
+* Install Ansible 
+** Preferrably by using the <<Python Virtual Environments>> method
+** For more installation check the https://docs.ansible.com/ansible/latest/installation_guide/index.html[Ansible Installation Guide]
+** Ansible uses Python, so check the Ansible https://docs.ansible.com/ansible/latest/reference_appendices/python_3_support.html[Python 3 Support] page for more information.
+* Install https://www.passwordstore.org/[`passwordstore`]
+** This project uses [pass](https://www.passwordstore.org/) to store passwords and certificates related to the project itself.
+** More information on installing pass in the Download section of the [passwordstore web page](https://www.passwordstore.org/)
 * Clone the `passstore` project from GitLab.
+* Install the `snowdrop/cloud_infra`` Ansible Collection
+
 
 > **NOTE**: Since passwordstore is integrated with [git](https://git-scm.com/), all changes made locally to a pass repository are automatically committed to the local git repo.
 > Don't forget to `git push` and `git pull` often in order to have your local repository synchronized with other team members as well as publishing to the team your changes. 
+
+=== Python Virtual Environments
+
+This project suggests using a link:https://docs.python.org/3/library/venv.html[python virtual environment] to manage all the 
+python dependencies.
+
+From the `k8s-infra` root folder create a virtual environment. This 
+section describes the procedure to create a virtual environment for using with the project.
+
+First create the `.snowdrop-venv` virtual environment.
+
+[NOTE]
+====
+This command only needs to be executed the first time. After
+being created the virtual environment status will be stored at 
+the `.snowdrop-venv` folder at the root of the project. This
+folder has been excluded from git.
+====
+
+.Create the `.snowdrop-venv` virtual environment
+[source,bash]
+----
+python3 -m venv .snowdrop-venv
+----
+
+Then activate the virtual environment to be able to use it. Activating is done by executing the following command.
+
+.Activate `.snowdrop-venv` virtual environment
+[source,bash]
+----
+source .snowdrop-venv/bin/activate
+----
+
+After this the virtual environment name will show up on the bash prompt (e.g. `(.snowdrop-venv) [janedoe@mycomputer k8s-infra]$`).
+
+Once using the python virtual environment install the requirements.
+
+[NOTE]
+====
+This command only needs to be executed the first time. 
+====
+
+.Install the python requirements
+[source,bash]
+----
+python3 -m pip install -r requirements.txt
+----
+
+To deactivate the python virtual environment execute the following command.
+
+[source,bash]
+----
+deactivate
+----
+
+As a result the `.snowdrop-venv` reference on the bash prompt will disappear.
+
+References:
+
+* https://www.ansible.com/blog/developing-and-testing-ansible-roles-with-molecule-and-podman-part-1
+* https://www.ansible.com/blog/developing-and-testing-ansible-roles-with-molecule-and-podman-part-2
+
+=== Install the snowdrop.cloud_infra Ansible Collection
+
+Requires: Python Virtual Environment active.
+
+Go to the `snowdrop.cloud_infra` collection folder.
+
+[source,bash]
+----
+cd ansible/ansible_collections/snowdrop/cloud_infra
+----
+
+Build the collection.
+
+[source,bash]
+----
+ansible-galaxy collection build
+----
+
+This will generate a `.tar.gz` file with name `snowdrop-cloud_infra-<version>.tar.gz`.
+
+Finally install the collection.
+
+[source,bash]
+----
+ansible-galaxy collection install ./snowdrop-cloud_infra-1.0.0.tar.gz --upgrade
+----
 
 == User Guide
 
 Provisioning and accessing a server requires several steps, each of which will be covered in this section.
 
-1. Manage Ansible Inventory groups [...](#group-management-in-ansible)
+1. Manage Ansible Inventory groups [...](<<Group management in ansible>>)
 1. Manage Ansible Inventory host records [...](#host-management-in-ansible)
-1. Create Server in Cloud Provider [...](#create-server)
-1. Secure Host [...](#secure-host)
-1. Install Software [...](#install-software)
+1. Create Server in Cloud Provider [...](<<Create server>>)
+1. Secure Host [...](<<Secure host>>)
+1. Install Software [...](<<Install software>>)
 
 === Group management in ansible
 
@@ -162,6 +260,21 @@ For information on k8s playbooks and roles check ../../kubernetes/README.md[here
 
 == Folders
 
-include::ansible-inventory.adoc[leveloffset=+2]
+link:ansible_collections.adoc[Ansible Collections]: `ansible_collections`
 
-include::playbook/README.adoc[leveloffset=+2]
+link:ansible-inventory.adoc[Ansible Inventory]: `inventory`
+
+link:playbook/README.adoc[Ansible Playbooks]: `playbook`
+
+link:roles[Ansible Roles]: `roles`
+
+== Development Guide
+
+=== Testing
+
+Testing 
+
+[source,bash]
+----
+molecule test
+----

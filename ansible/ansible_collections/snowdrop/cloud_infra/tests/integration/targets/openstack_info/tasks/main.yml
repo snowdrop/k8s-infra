@@ -1,0 +1,65 @@
+---
+- name: "Set openstack_auth facts"
+  set_fact:
+    openstack_auth: 
+      openstack_project_name: "{{ query('passwordstore', 'openstack/host/project_name')[0] }}"
+      openstack_console_user:  "{{ query('passwordstore', 'openstack/host/console_user')[0] }}"
+      openstack_console_password: "{{ query('passwordstore', 'openstack/host/console_pw')[0] }}"
+      openstack_user_domain:  "{{ query('passwordstore', 'openstack/host/console_domain')[0] }}"
+      openstack_project_domain: "{{ query('passwordstore', 'openstack/host/os_domain')[0] }}"
+      openstack_os_auth_url: "{{ query('passwordstore', 'openstack/host/os_auth_url')[0] }}"
+
+- name: "Execute create inventory, if tagged as so"
+  include_role:
+    name: "openstack/vm"
+    apply:
+      tags:
+        - always
+  vars: 
+    state: "present"
+
+- name: "Store host IP on passwordstore"
+  set_fact:
+    openstack_vm_ipv4: "{{ query('passwordstore', 'openstack/' + vm_name + '/ansible_ssh_host create=True userpass=' + openstack_vm_ipv4 )[0] }}"
+
+- name: Refresh the inventory so the newly added host is available
+  meta: refresh_inventory
+
+- name: "Add host to known hosts {{ hostvars[vm_name]['ansible_ssh_host'] }}"
+  known_hosts:
+    name: "{{ hostvars[vm_name]['ansible_ssh_host'] }}"
+    key: "{{ lookup('pipe', 'ssh-keyscan {{ hostvars[vm_name].ansible_ssh_host }}') }}"
+    hash_host: true
+
+- name: "Show 'Wait for connection to host' output"
+  debug:
+    msg: 
+      - "ip : {{ query('passwordstore', 'openstack/' + vm_name + '/ansible_ssh_host')[0] }}"
+      - "port : {{ query('passwordstore', 'openstack/' + vm_name + '/ansible_ssh_port')[0] }}"
+
+- name: "Wait for connection to host"
+  ansible.builtin.wait_for:
+    host: "{{ query('passwordstore', 'openstack/' + vm_name + '/ansible_ssh_host')[0] }}"
+    port: "{{ query('passwordstore', 'openstack/' + vm_name + '/ansible_ssh_port')[0] }}"
+    timeout: 120
+  register: wait_for_connection_reg
+
+- name: "Execute create inventory, if tagged as so"
+  include_role:
+    name: "openstack/vm"
+  vars: 
+    state: "absent"
+    
+- name: "Delete OpenStack VM"
+  include_role:
+    name: "openstack/vm"
+  vars: 
+    state: "absent"
+
+- name: "Delete host from known hosts"
+  ansible.builtin.known_hosts:
+    name: "{{ hostvars[vm_name]['ansible_ssh_host'] }}"
+    state: absent
+  when: "hostvars[vm_name]['ansible_ssh_host'] is defined"
+  failed_when: false
+...

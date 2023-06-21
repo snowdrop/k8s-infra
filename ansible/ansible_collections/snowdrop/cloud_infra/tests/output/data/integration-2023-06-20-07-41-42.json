@@ -1,0 +1,28 @@
+{
+    "targets": {
+        "localhost": {
+            "aliases": [
+                "context//", 
+                "context//localhost", 
+                "context/target/", 
+                "context/target/localhost", 
+                "context/unknown/", 
+                "context/unknown/localhost", 
+                "localhost", 
+                "non_destructive/", 
+                "non_destructive/localhost", 
+                "non_module/", 
+                "non_module/localhost", 
+                "posix/", 
+                "role/", 
+                "role/localhost"
+            ], 
+            "modules": [], 
+            "name": "localhost", 
+            "run_time_seconds": 2, 
+            "setup_always": [], 
+            "setup_once": [], 
+            "type": "role"
+        }
+    }
+}

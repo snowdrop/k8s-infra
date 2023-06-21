@@ -5,9 +5,9 @@
 
   tasks:
 
-    - name: "Execute create inventory, if tagged as so"
+    - name: "Delete VM"
       include_role:
-        name: "openstack/vm"
+        name: "snowdrop.cloud_infra.openstack_vm"
       vars: 
         state: "absent"
         

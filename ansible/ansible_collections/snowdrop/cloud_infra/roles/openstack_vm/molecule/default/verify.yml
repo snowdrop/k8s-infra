@@ -1,0 +1,81 @@
+---
+# This is an example playbook to execute Ansible tests.
+
+- name: Verify
+  hosts: localhost
+  gather_facts: false
+
+  pre_tasks:
+    - name: "Set test facts"
+      ansible.builtin.set_fact:
+        vm_name: ansible_molecule_snowdrop_openstack_test
+
+    - name: "Set openstack_auth facts"
+      ansible.builtin.set_fact:
+        openstack_auth: 
+          openstack_project_name: "{{ query('passwordstore', 'openstack/host/project_name')[0] }}"
+          openstack_console_user:  "{{ query('passwordstore', 'openstack/host/console_user')[0] }}"
+          openstack_console_password: "{{ query('passwordstore', 'openstack/host/console_pw')[0] }}"
+          openstack_user_domain:  "{{ query('passwordstore', 'openstack/host/console_domain')[0] }}"
+          openstack_project_domain: "{{ query('passwordstore', 'openstack/host/os_domain')[0] }}"
+          openstack_os_auth_url: "{{ query('passwordstore', 'openstack/host/os_auth_url')[0] }}"
+
+    - name: Include default vars
+      ansible.builtin.include_vars:
+        file: defaults/main.yml
+        # name: role_defaults
+
+  tasks:
+
+    - name: "Get VM information"
+      openstack.cloud.server_info:
+        auth:
+          project_name: "{{ openstack_auth.openstack_project_name }}"
+          username: "{{ openstack_auth.openstack_console_user }}"
+          password: "{{ openstack_auth.openstack_console_password }}"
+          user_domain_name: "{{ openstack_auth.openstack_user_domain }}"
+          project_domain_name: "{{ openstack_auth.openstack_project_domain }}"
+          auth_url: "{{ openstack_auth.openstack_os_auth_url }}"
+        name: "{{ vm_name }}"
+      register: openstack_server_info_output
+
+    - name: "Print OpenStack server information"
+      ansible.builtin.debug:
+        var: openstack_server_info_output
+
+    # - name: "Validate OpenStack server info"
+    #   ansible.builtin.assert:
+    #     that:
+    #       - openstack_server_info_output.servers | length == 1
+    #       - openstack_server_info_output.servers[0].access_ipv4 is defined and openstack_server_info_output.servers[0].access_ipv4 | length > 0
+    #       - openstack_server_info_output.servers[0].flavor.name == openstack_defaults.vm.flavor
+    #       - openstack_server_info_output.servers[0].key_name == default_generic_key_name
+
+    - name: "Validate server list"
+      ansible.builtin.assert:
+        that:
+          - openstack_server_info_output.servers | length == 1
+        msg: "Openstack must output 1 and only 1 server. The result was {{ openstack_server_info_output.servers | length }} ({{ openstack_server_info_output.servers }}). "
+
+    - name: "Validate server IPV4"
+      ansible.builtin.assert:
+        that:
+          - openstack_server_info_output.servers[0].access_ipv4 is defined and openstack_server_info_output.servers[0].access_ipv4 | length > 0
+        msg: "Openstack server must have an IPV4. "
+
+    - name: "Validate server flavor"
+      ansible.builtin.assert:
+        that:
+          - openstack_server_info_output.servers[0].flavor.name == openstack_defaults.vm.flavor
+        msg: "Server flavor must be the one requested. Obtained {{ openstack_server_info_output.servers[0].flavor.name }} but requested {{ openstack_defaults.vm.flavor }}."
+
+    - name: "Validate server key"
+      ansible.builtin.assert:
+        that:
+          - openstack_server_info_output.servers[0].key_name == default_generic_key_name
+        msg: "Server key must be the one requested. Obtained {{ openstack_server_info_output.servers[0].key_name }} but requested {{ default_generic_key_name }}."
+
+    # - name: Example assertion
+    #   ansible.builtin.assert:
+    #     that: true
+...

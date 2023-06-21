@@ -1,0 +1,6 @@
+molecule[docker,lint]
+openstacksdk >= 1.2.0
+#python-openstackclient >= 6.2.0
+yq
+ansible >= 2.9.10
+
