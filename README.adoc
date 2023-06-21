@@ -1,6 +1,8 @@
+= Automating the deployment of a kubernetes/ocp cluster
+Snowdrop Team (Charles Moulliard, Antonio Costa)
 :icons: font
 :revdate: {docdate}
-:toc: macro
+:toc: left
 :toclevels: 3
 ifdef::env-github[]
 :tip-caption: :bulb:
@@ -10,9 +12,7 @@ ifdef::env-github[]
 :warning-caption: :warning:
 endif::[]
 
-toc::[]
-
-= Automating the deployment of a kubernetes/ocp cluster
+== Introduction
 
 This project details the `prerequisites` and `steps` necessary to automate the installation of a Kubernetes (aka k8s) cluster or Openshift 4 top of one of the following cloud provider:
 
@@ -23,6 +23,16 @@ This project details the `prerequisites` and `steps` necessary to automate the i
 * Kind**
 
 NOTE: kind is not a cloud provider but a tool able to run a k8s cluster on a container engine
+
+== Before you start
+
+[WARNING]
+====
+All the commands mentioned on this project are to be executed at the root folder of the repository, except if stated otherwise.
+====
+
+This project uses Ansible. Check the link:ansible/README.adoc[Ansible Document] for the
+installation and usage instrutions.
 
 == Prerequisites
 
@@ -36,14 +46,6 @@ all of them and the following chapters will mention which ones are needed.
 * https://www.passwordstore.org/[passwordstore]
 * https://github.com/hetznercloud/cli[hcloud] (optional)
 
-NOTE: Check the Ansible https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html#ansible-core-support-matrix[requirement] page for Python compatibility !
-
-TIP: To install ansible, we recommend to use pip3
-[,console]
-----
-# Ansible 7.6 corresponds to Ansible community version: 2.14.6
-pip3 install ansible==7.6.0
-----
 
 == Locally
 
@@ -94,7 +96,7 @@ This section details how to provision an Openshift 4 cluster using one of Red Ha
 
 _Tools: password store, ansible_
 
-The xref:openstack/README.adoc[OpenStack] page explains how to create an OpenStack cloud vm using
+The link:openstack/README.adoc[OpenStack] page explains how to create an OpenStack cloud vm using
 
 ==== https://resourcehub.redhat.com/[Resource Hub]
 

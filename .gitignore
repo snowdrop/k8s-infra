@@ -23,10 +23,15 @@ ansible/roles/test/
 ansible/remote-k8s-config.yml
 
 **/test.sh
+**/tests/
 _tmp
+*.tar.gz
+output/**
+
 
 # Testing purposes
 sandbox/cluster_up/test.sh
+.snowdrop-venv/
 
 #######
 # IDE #

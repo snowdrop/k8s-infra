@@ -1,0 +1,37 @@
+---
+# Init ansible controller
+#
+# Tasks performed:
+#  . Import snowdrop generic key
+#
+# Required variables:
+#  . pass_provider: provider in the passstore project [hetzner,openstack]
+- name: "Init controller"
+  hosts: localhost
+  gather_facts: no
+
+  pre_tasks:
+    - name: "Validate required variables"
+      assert:
+        that:
+          - "pass_provider is defined"
+          - "pass_provider == 'hetzner' or pass_provider == 'openstack'"
+        fail_msg: 
+          - "Required parameters:"
+          - "  pass_provider: provider in the passstore project [hetzner,openstack]"
+
+    - name: "Pull pass git database"
+      shell: "git pull"
+      args:
+        chdir: "{{ lookup('env', 'PASSWORD_STORE_DIR') }}"
+
+  tasks:
+
+    - name: "Import generic key"
+      include_role:
+        name: "passstore/ansible_inventory"
+        tasks_from: "init_ssh_controller"
+      vars:
+        pass_l3_route: "{{ pass_provider }}"
+        pass_l3_name: "snowdrop_{{ pass_provider }}"
+...

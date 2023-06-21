@@ -5,8 +5,8 @@ remove: false
 remote: true
 
 ingress_host: "{{ ansible_ssh_host }}.nip.io"
-install_docker: false
-install_containerd: true
+# install_docker: false
+# install_containerd: true
 
 firewalld_public_ports:
   - 6443/tcp
@@ -24,3 +24,6 @@ pod_subnet: 10.244.0.0/16
 service_subnet: 10.96.0.0/12
 
 coreos_flannel_sha_commit: 2140ac876ef134e0ed5af15c65e414cf26827915
+
+calico_version: v3.26.1
+cp_name: control-plane

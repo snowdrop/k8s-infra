@@ -1,5 +1,4 @@
 - set_fact:
-    k8s_config: "--kubeconfig '/etc/kubernetes/admin.conf'"
     client_tool: kubectl
   when: not isOpenshift | bool
 
@@ -7,7 +6,7 @@
     var: k8s_config
 
 - include_tasks: install.yml
-  when: not remove | bool
+  when: state == 'present'
 
 - include_tasks: remove.yml
-  when: remove | bool
+  when: state == 'absent'

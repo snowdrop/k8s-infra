@@ -1,0 +1,42 @@
+---
+name: Pull Request Test
+on:
+  push:
+  workflow_dispatch:
+  pull_request:
+
+jobs:
+  test-openstack-roles:
+    name: Test Collection Openstack Roles
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        openstack_version: ["master"]
+        # python: [ pypy3.8 ]
+        python: [ 3.11 ]
+        roles: [openstack_vm]
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v3
+      - name: Deploy devstack
+        uses: EmilienM/devstack-action@v0.11
+        with:
+          branch: ${{ matrix.openstack_version }}
+          enabled_services: 'ir-api,s-account,s-container,s-object,s-proxy,swift'
+          cache: devstack
+      - name: Install Python
+        uses: actions/setup-python@v4 
+        with:
+          python-version:  ${{ matrix.python }}
+          cache: pip
+      - name: Install python requirements
+        run: pip install -r requirements.txt
+      - name: Build Ansible Collection
+        run: ansible-galaxy collection build ansible/ansible_collections/snowdrop/cloud_infra --output build/ --force
+      - name: Install Ansible Collection
+        run: ansible-galaxy collection install build/snowdrop-cloud_infra-$(yq -r .version ansible/ansible_collections/snowdrop/cloud_infra/galaxy.yml).tar.gz --upgrade
+      - name: Run tests
+        run: |
+          molecule test --scenario-name github
+        working-directory: ansible/ansible_collections/snowdrop/cloud_infra/roles/${{ matrix.roles }}
+...

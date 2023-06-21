@@ -1,5 +1,7 @@
 = OpenStack
+Snowdrop Team (Antonio Costa)
 :icons: font
+:revdate: {docdate}
 :toc: left
 :description: This document describes the requirements and the process to execute the provisioning of a Cloud VM on Openstack.
 ifdef::env-github[]
@@ -53,7 +55,6 @@ Different OS images are available on Openstack.
 
 === Flavors
 
-
 .OpenStack Flavor information
 [%header,cols="2m,1,1,1,1,1"]
 |===
@@ -67,9 +68,7 @@ Different OS images are available on Openstack.
 | ci.m5.large | 16 | 32GB | 40GB | 40GB | 0GB 
 |===
 
-:leveloffset: +1
+== Available Ansible Playbooks
 
-include::../ansible/playbook/openstack/README.adoc[]
-
-:leveloffset: -1
-
+More information on the available OpenStack Ansible Playbooks on the 
+link:../ansible/playbook/openstack/README.adoc[Playbook README].

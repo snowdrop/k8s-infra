@@ -1,0 +1,11 @@
+---
+- name: "GoDaddy Required Facts"
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: "Set GoDaddy environment to use"
+      ansible.builtin.set_fact:
+        godaddy_environment: "{{ override_environment | default('ote') }}"
+
+...

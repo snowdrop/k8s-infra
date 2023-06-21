@@ -1,0 +1,18 @@
+{
+  "consent": {
+    "agreedAt": "{{ ansible_date_time.iso8601 }}",
+    "agreedBy": "{{ domain.consent.agreedBy }}",
+    "agreementKeys": {{ domain.consent.agreementKeys }}
+  },
+  "contactAdmin": {{ domain.contactAdmin }},
+  "contactBilling": {{ domain.contactAdmin }},
+  "contactRegistrant": {{ domain.contactAdmin }},
+  "contactTech": {{ domain.contactAdmin }},
+  "domain": "{{ domain_name }}",
+#  "nameServers": [
+#    "(domain_name | split('.') )[0]"
+#  ],
+  "period": 1,
+  "privacy": false,
+  "renewAuto": false
+}

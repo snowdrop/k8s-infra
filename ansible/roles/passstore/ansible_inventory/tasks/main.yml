@@ -1,5 +1,4 @@
 ---
-# Tasks for get_provider_host_keys
 - name: "Get passwordstore work folder from password_store_dir override variable"
   set_fact:
     my_passwordstore_folder: "{{ password_store_dir }}"

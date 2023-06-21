@@ -1,0 +1,19 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: delegated
+  # name: docker
+platforms:
+  - name: instance
+    image: docker.io/pycontribs/centos:8
+    pre_build_image: true
+provisioner:
+  name: ansible
+verifier:
+  name: ansible
+lint: |
+  set -e
+  yamllint .
+  ansible-lint .
+...

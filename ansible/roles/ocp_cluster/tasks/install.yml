@@ -84,21 +84,8 @@
   loop_control:
     loop_var: floating_ip_addresses
 
-- name: "Add API Floating IP to /etc/hosts"
-  ansible.builtin.lineinfile:
-    dest: /etc/hosts
-    regexp: '.*api.{{ ocp_cluster_name }}.{{ snowdrop_domain }}.*$'
-    line: "{{ rhos_floating_ip_api_address }} api.{{ ocp_cluster_name }}.{{ snowdrop_domain }}"
-    state: present
-  become: true
-
-- name: "Add Ingress Floating IP to /etc/hosts"
-  ansible.builtin.lineinfile:
-    dest: /etc/hosts
-    regexp: '.*console-openshift-console.apps.{{ ocp_cluster_name }}.{{ snowdrop_domain }}.*$'
-    line: "{{ rhos_floating_ip_ingress_address }} console-openshift-console.apps.{{ ocp_cluster_name }}.{{ snowdrop_domain }} oauth-openshift.apps.{{ ocp_cluster_name }}.{{ snowdrop_domain }} integrated-oauth-server-openshift-authentication.apps.{{ ocp_cluster_name }}.{{ snowdrop_domain }} prometheus-k8s-openshift-monitoring.apps.{{ ocp_cluster_name }}.{{ snowdrop_domain }} grafana-openshift-monitoring.apps.{{ ocp_cluster_name }}.{{ snowdrop_domain }}"
-    state: present
-  become: true
+- name: "Set DNS records"
+  include_tasks: dns.yml
 
 # https://docs.openshift.com/container-platform/4.3/installing/installing_openstack/installing-openstack-installer-custom.html#installation-osp-accessing-api-floating_installing-openstack-installer-custom
 # openstack floating ip create --description "API {{ ocp_cluster_name }}.{{ snowdrop_domain }}" -f value -c floating_ip_address {{ openstack_network_provider }}
@@ -123,22 +110,10 @@
 #   ansible.builtin.set_fact:
 #     openstack_floating_ip_api: "{{ openstack_floating_ip_res.stdout }}"
 
-- name: "Template nsupdate"
-  ansible.builtin.template:
-    src: "templates/nsupdate-api.txt.j2"
-    dest: "{{ work_directory }}/nsupdate-api.txt"
-    mode: '0644'
-  when: use_dns
-
-- name: "Run nsupdate"
-  ansible.builtin.shell: 
-    cmd: nsupdate -v -k xpaasqe.dnskey nsupdate-api.txt
-  args:
-    chdir: "{{ work_directory }}"
-  when: use_dns
 
 # https://docs.openshift.com/container-platform/4.3/installing/installing_openstack/installing-openstack-installer-custom.html#installation-configuration-parameters_installing-openstack-installer-custom
-# https://docs.openshift.com/container-platform/4.12/installing/installing_bare_metal_ipi/ipi-install-installation-workflow.html
+# install-config.yaml (...teaches the installation program and the resulting cluster...): 
+#   . https://docs.openshift.com/container-platform/4.13/installing/installing_bare_metal_ipi/ipi-install-installation-workflow.html
 # https://console.redhat.com/openshift/install/pull-secret
 - name: "Template OpenShift installation config file"
   ansible.builtin.template:
@@ -174,6 +149,14 @@
     src: "templates/50_chrony-masters.yaml.j2"
     dest: "{{ installation_dir }}/openshift/50_chrony-masters.yaml"
     mode: '0644'
+
+# TODO: apply patch to certificate:
+# . if a wildcard one exists for the domains *.apps.<ocp_cluster_name>.<snowdrop_domain> and api.<ocp_cluster_name>.<snowdrop_domain> 
+# . or simply to *.<ocp_cluster_name>.<snowdrop_domain>, (e.g.) *.ocp.snowdrop.dev.
+# Secret containing the TLS certificate and the TLS key
+# manifests/machine-config-server-tls-secret.yaml
+# . tls.crt: certificate chain
+# . tls.key: private key associated with the certificate
 
 # https://docs.openshift.com/container-platform/4.3/installing/installing_openstack/installing-openstack-installer-custom.html#installation-launching-installer_installing-openstack-installer-custom
 - name: "Run OpenShift installer"
