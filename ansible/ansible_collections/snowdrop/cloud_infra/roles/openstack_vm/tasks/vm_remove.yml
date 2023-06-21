@@ -1,0 +1,94 @@
+---
+- name: "Get VM information"
+  openstack.cloud.server_info:
+    auth:
+      project_name: "{{ openstack_auth.openstack_project_name }}"
+      username: "{{ openstack_auth.openstack_console_user }}"
+      password: "{{ openstack_auth.openstack_console_password }}"
+      user_domain_name: "{{ openstack_auth.openstack_user_domain }}"
+      project_domain_name: "{{ openstack_auth.openstack_project_domain }}"
+      auth_url: "{{ openstack_auth.openstack_os_auth_url }}"
+    name: "{{ vm_name }}"
+  register: openstack_server_info_output
+  ignore_errors: true
+
+- name: "Print Openstack output"
+  debug:
+    var: openstack_server_info_output
+    verbosity: 2
+
+- name: "Delete VM {{ vm_name }}"
+  os_server:
+    auth:
+      project_name: "{{ openstack_auth.openstack_project_name }}"
+      username: "{{ openstack_auth.openstack_console_user }}"
+      password: "{{ openstack_auth.openstack_console_password }}"
+      user_domain_name: "{{ openstack_auth.openstack_user_domain }}"
+      project_domain_name: "{{ openstack_auth.openstack_project_domain }}"
+      auth_url: "{{ openstack_auth.openstack_os_auth_url }}"
+    name: "{{ vm_name }}"
+    state: "absent"
+  register: openstack_output
+  ignore_errors: true
+  when: not openstack_server_info_output.failed and (openstack_server_info_output.servers | length > 0)
+
+- name: "Delete VM volume"
+  openstack.cloud.volume:
+    auth:
+      project_name: "{{ openstack_auth.openstack_project_name }}"
+      username: "{{ openstack_auth.openstack_console_user }}"
+      password: "{{ openstack_auth.openstack_console_password }}"
+      user_domain_name: "{{ openstack_auth.openstack_user_domain }}"
+      project_domain_name: "{{ openstack_auth.openstack_project_domain }}"
+      auth_url: "{{ openstack_auth.openstack_os_auth_url }}"
+    display_name: "{{ volume_name_iterator }}"
+    state: absent
+  ignore_errors: true
+  loop: openstack_server_info_output.servers[0].volumes
+  loop_control:
+    loop_var: volume_name_iterator
+  when: not openstack_server_info_output.failed and (openstack_server_info_output.servers | length > 0) and (openstack_server_info_output.servers[0].volumes | length > 0)
+
+- name: "Delete key {{ vm_name }} from server"
+  os_keypair:
+    state: absent
+    auth:
+      project_name: "{{ openstack_auth.openstack_project_name }}"
+      username: "{{ openstack_auth.openstack_console_user }}"
+      password: "{{ openstack_auth.openstack_console_password }}"
+      user_domain_name: "{{ openstack_auth.openstack_user_domain }}"
+      project_domain_name: "{{ openstack_auth.openstack_project_domain }}"
+      auth_url: "{{ openstack_auth.openstack_os_auth_url }}"
+    name: "{{ vm_name }}"
+  ignore_errors: true
+
+- name: "Remove the host from the known_hosts file"
+  known_hosts:
+    name: "{{ openstack_server_info_output.servers[0].access_ipv4 }}"
+    state: absent
+  when:  not openstack_server_info_output.failed and (openstack_server_info_output.servers | length > 0)
+  ignore_errors: true
+
+- name: "Check if private key file exists"
+  ansible.builtin.stat:
+    path: "~/.ssh/id_rsa_snowdrop_openstack_{{ vm_name }}"
+  register: private_key_stat
+
+- name: Delete private key
+  ansible.builtin.file:
+    path: "~/.ssh/id_rsa_snowdrop_openstack_{{ vm_name }}"
+    state: absent
+  when: private_key_stat.stat.exists
+
+- name: "Check if public key file exists"
+  ansible.builtin.stat:
+    path: "~/.ssh/id_rsa_snowdrop_openstack_{{ vm_name }}.pub"
+  register: public_key_stat
+
+- name: Delete private key
+  ansible.builtin.file:
+    path: "~/.ssh/id_rsa_snowdrop_openstack_{{ vm_name }}.pub"
+    state: absent
+  when: public_key_stat.stat.exists
+
+...

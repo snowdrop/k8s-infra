@@ -1,5 +1,7 @@
 = OpenStack Ansible Playbooks
+Snowdrop Team (Antonio Costa)
 :icons: font
+:revdate: {docdate}
 :toc: left
 :description: This document describes OpenStack specific playbooks.
 ifdef::env-github[]
@@ -11,11 +13,6 @@ ifdef::env-github[]
 endif::[]
 
 == Before you start
-
-[IMPORTANT]
-====
-The Ansible commands should be executed within the ansible folder !
-====
 
 === Choose an image
 
@@ -29,55 +26,90 @@ NOTE: The list of flavors is identified on the link:../../../openstack/README.ad
 
 == Playbooks
 
-=== PasswordStore
+=== Create a VM
 
 Create OpenStack instance based on passwordstore
 
 .openstack_vm_create_passwordstore parameters
-[cols="2m,1m,5"]
+[cols="2,5"]
 |===
-|Field name |Mandatory |Description
+| Parameter | Description
 
-| vm_name
-| x
-| Name of the VM being created. Will be used both as hostname as well as Ansible Inventory name.
+| `openstack.vm.flavor`
 
-| openstack.vm.network
-| x
-| Value for the OpenStack provider network. `provider_net_shared`
+[.fuchsia]#string#
 
-| openstack.vm.image
-| x
-| OpenStack VM image, e.g. `Fedora-Cloud-Base-35`.
+[.red]#required# 
 
-| openstack.vm.flavor"
-| x
-| OpenStack VM flavor (size), e.g. `m1.medium`.
+a| OpenStack VM flavor (size)
 
-| key_name
-| -
-| Use an existing SSH key (value) instead of creating one for the VM.
+_e.g._ `m1.medium`.
 
-| k8s_type
-| *for k8s hosts.*
-| Kubernetes host type [master,worker].
+| `openstack.vm.image`
 
-| k8s_version
-| *for k8s hosts.*
-| Kubernetes version to be associated with the host, e.g. for version `1.23` use `123`. This is actually an Ansible Inventory group having definitions associated with each of the Kubernetes version.
+[.fuchsia]#string#
+
+[.red]#required# 
+
+a| OpenStack VM image
+
+_e.g._ `Fedora-Cloud-Base-35`.
+
+| `openstack.vm.network`
+
+[.fuchsia]#string#
+
+[.red]#required# 
+
+a| Value for the OpenStack provider network.
+
+_e.g._ `provider_net_shared`
+
+// | k8s_type
+
+// [.fuchsia]#string#
+
+// a| *for k8s hosts.*
+
+// Kubernetes host type [master,worker].
+
+// | k8s_version
+
+// [.fuchsia]#string#
+
+// a| *for k8s hosts.*
+
+// Kubernetes version to be associated with the host, e.g. for version `1.23` use `123`. This is actually an Ansible Inventory group having definitions associated with each of the Kubernetes version.
+
+// | key_name
+
+// [.fuchsia]#string#
+
+// a| Use an existing SSH key (value) instead of creating one for the VM.
+
+| `vm_name`
+
+[.fuchsia]#string#
+
+[.red]#required# 
+
+a| Name of the VM being created. 
+
+This name will be used both as hostname as well as Ansible Inventory name.
+
 |===
 
 [source,bash]
 ----
-$ VM_NAME=vm20210221-t01
+$ VM_NAME=vm20230627-t01
 ----
 
 [source,bash]
 ----
-$ ansible-playbook playbook/openstack/openstack_vm_create_passwordstore.yml -e k8s_type=masters -e k8s_version=123 -e '{"openstack": {"vm": {"network": "provider_net_shared","image": "Fedora-Cloud-Base-35", "flavor": "m1.medium"}}}' -e key_name=test-adm-key -e vm_name=${VM_NAME} 
+$ ansible-playbook ansible/playbook/openstack/openstack_vm_create_passwordstore.yml -e '{"openstack": {"vm": {"network": "provider_net_shared","image": "Fedora-Cloud-Base-35", "flavor": "m1.medium"}}}' -e vm_name=${VM_NAME} 
 ----
 
-This playbook should finish with something like:
+Although some failures might occur some might be ignored which shouldn't affect thhe process. This playbook should finish with no failed tasks.
 
 [source]
 ....
@@ -85,36 +117,9 @@ PLAY RECAP *********************************************************************
 localhost                  : ok=68   changed=20   unreachable=0    failed=0    skipped=13   rescued=0    ignored=1   
 vm20210221-t01             : ok=32   changed=20   unreachable=0    failed=0    skipped=1    rescued=0    ignored=0   
 
-Monday 21 February 2022  13:01:53 +0100 (0:00:05.011)       0:12:51.042 ******* 
-=============================================================================== 
-openstack/init_vm : Upgrade all packages ------------------------------------------------- 305.39s
-openstack/vm : Create VM instance -------------------------------------------------------- 121.94s
-sec/firewalld : Install firewalld --------------------------------------------------------- 47.60s
-openstack/init_vm : Install packages ------------------------------------------------------ 47.22s
-openstack/init_vm : Reboot instance ------------------------------------------------------- 32.76s
-Refresh the inventory so the newly added host is available -------------------------------- 21.10s
-sec/sshd_port : Change SELINUX settings to allow connections to the new port --------------- 9.14s
-sec/motd : Config | Install custom `/etc/motd` file ---------------------------------------- 8.24s
-sec/audit : Apply auditd configuration ----------------------------------------------------- 8.06s
-openstack/vm : Gather information about a previously created image with same name ---------- 7.85s
-Wait for connection to host ---------------------------------------------------------------- 7.02s
-openstack/vm : Wait for boot --------------------------------------------------------------- 6.55s
-Gathering Facts ---------------------------------------------------------------------------- 5.77s
-sec/firewalld : Enable and start firewalld ------------------------------------------------- 5.53s
-Gathering Facts ---------------------------------------------------------------------------- 5.08s
-sec/update : Update all packages ----------------------------------------------------------- 5.01s
-sec/firewalld : firewalld - Manage firewall ports ------------------------------------------ 4.96s
-sec/sshd_port : Change the ssh port number ------------------------------------------------- 4.60s
-sec/firewalld : firewalld - Manage firewall services --------------------------------------- 4.58s
-sec/firewalld : Restart firewalld ---------------------------------------------------------- 4.51s
 ....
 
 The playbook also uses the variables defined in `roles/openstack/vm/defaults/main.yml`. Those variables can also be overridden using the syntax above.
-
-[source,yaml]
-----
-include::../../roles/openstack/vm/defaults/main.yml[]
-----
 
 === Delete a VM
 
@@ -122,33 +127,16 @@ To delete a VM, simply execute the `openstack_vm_remove_aggregate` playbook.
 
 [source,bash]
 ----
-$ ansible-playbook playbook/openstack/openstack_vm_remove_passwordstore.yml -e vm_name=${VM_NAME}
+$ ansible-playbook ansible/playbook/openstack/openstack_vm_remove_passwordstore.yml -e vm_name=${VM_NAME}
 ----
+
+Although some failures might occur some might be ignored which shouldn't affect thhe process. This playbook should finish with no failed tasks.
 
 [source]
 ....
 PLAY RECAP **********************************************************************************************************************************************************************************************************************
 localhost                  : ok=17   changed=5    unreachable=0    failed=0    skipped=1    rescued=0    ignored=2   
 
-Monday 21 February 2022  13:07:58 +0100 (0:00:02.485)       0:00:30.900 ******* 
-=============================================================================== 
-openstack/vm : Gather information about a previously created image named  ------------------ 8.16s
-openstack/vm : Delete  --------------------------------------------------------------------- 3.91s
-openstack/vm : Delete VM volume ------------------------------------------------------------ 3.41s
-openstack/vm : Delete key  from server ----------------------------------------------------- 2.93s
-Push changes to the pass git database ------------------------------------------------------ 2.49s
-Pull pass git database --------------------------------------------------------------------- 2.16s
-openstack/vm : Set pass facts from passwordstore ------------------------------------------- 1.70s
-openstack/vm : Remove existing SSH key to use with instance -------------------------------- 1.55s
-openstack/vm : Find admin user home folder ------------------------------------------------- 0.98s
-openstack/vm : Remove the host from the known_hosts file ----------------------------------- 0.95s
-openstack/vm : stat ------------------------------------------------------------------------ 0.88s
-Remove passstore entries ------------------------------------------------------------------- 0.74s
-Remove local ssh keys ---------------------------------------------------------------------- 0.57s
-openstack/vm : include_tasks --------------------------------------------------------------- 0.14s
-Validate required variables ---------------------------------------------------------------- 0.08s
-openstack/vm : Print Openstack output ------------------------------------------------------ 0.07s
-openstack/vm : include_tasks --------------------------------------------------------------- 0.07s
 ....
 
 === Connect to the new instance
@@ -202,8 +190,8 @@ of the passwordstore project.
 
 This should connect ot the newly created VM.
 
-[source]
-====
+[source,bash]
+======
 Last login: Thu Jan 1 00:00:00 1970 from x.x.x.x
 ------------------
 
@@ -212,5 +200,5 @@ Access is forbidden to all unauthorized person.
 All activity is being monitored.
 
 Welcome to vm20210221-t01..
-====
+======
 

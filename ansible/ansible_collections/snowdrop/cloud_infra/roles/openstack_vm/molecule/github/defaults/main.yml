@@ -1,0 +1,31 @@
+use_generic_ssh_key: false
+
+openstack_defaults:
+  os_project_name: spring-boot-jenkins
+  sshkey_name: "{{ hostname }}"
+  timeout: 60000
+  vm:
+    title: Fedora 35 Cloud Base
+    name: "{{ hostname }}"
+    image: Fedora-Cloud-Base-35
+    key_name: "{{ hostname }}"
+    flavor: m1.medium
+    network: default_network
+    security_group: default_security_group
+    # Array of items with 2 attributes, name and size
+    # volumes: []
+      # - name: "volume1"
+      #   size: 10
+      # - name: "volume2"
+      #   size: 20
+    boot_from_volume: false
+
+openstack_auth: 
+  openstack_project_name: "admin"
+  openstack_console_user:  "admin"
+  openstack_console_password: "secret"
+  openstack_user_domain:  "default"
+  openstack_project_domain: "default"
+  openstack_os_auth_url: "http://localhost/identity/"
+
+openstack_vm_flavor: m1.small

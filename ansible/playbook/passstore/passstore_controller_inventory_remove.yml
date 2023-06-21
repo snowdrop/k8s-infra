@@ -29,11 +29,6 @@
       changed_when: "pass_rm_res.rc == 0"
       failed_when: "pass_rm_res.rc != 0 and 'is not in the password store' not in pass_rm_res.stderr"
 
-    - name: Remove local ssh keys
-      shell: "rm -f ~/.ssh/id_rsa_snowdrop_{{ pass_provider }}_{{ vm_name }}*"
-      changed_when: "pass_rm_res.rc == 0"
-      failed_when: "false"
-
   post_tasks:
     - name: "Push changes to the pass git database"
       shell: "git push"

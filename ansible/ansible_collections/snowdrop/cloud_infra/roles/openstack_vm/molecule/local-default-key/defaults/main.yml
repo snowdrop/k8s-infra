@@ -1,3 +1,5 @@
+default_generic_key_name: test-adm-key
+
 hostname: openstackVM
 type: cloude
 
@@ -24,16 +26,16 @@ flavours:
     name: "g.standard.xxxl"
     disk_size: 160
 
-openstack:
+openstack_defaults:
   os_project_name: spring-boot-jenkins
   sshkey_name: "{{ hostname }}"
   timeout: 60000
   vm:
-    title: CentOS 8 Generic Cloud Latest
+    title: Fedora 35 Cloud Base
     name: "{{ hostname }}"
-    image: CentOS-8-x86_64-GenericCloud-released-latest
+    image: Fedora-Cloud-Base-35
     key_name: "{{ hostname }}"
-    flavor: m1.small
+    flavor: m1.medium
     network: default_network
     security_group: default_security_group
     # Array of items with 2 attributes, name and size

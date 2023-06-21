@@ -1,9 +1,18 @@
 ---
-- name: "Set key path if not set"
-  set_fact: 
-    key_path: "{{ admin_home.stdout }}/.ssh/id_rsa_snowdrop_openstack_{{ vm_name }}"
+- name: "Set home"
+  ansible.builtin.set_fact:
+    user_home: "{{ ansible_env.HOME | default(lookup('env','HOME') ) }}"
 
-- stat:
+- name: "Print user home"
+  ansible.builtin.debug:
+    var: user_home
+
+- name: "Set key path if not set"
+  ansible.builtin.set_fact: 
+    key_path: "{{ user_home }}/.ssh/id_rsa_snowdrop_openstack_{{ vm_name }}"
+
+- name: Check key
+  ansible.builtin.stat:
     path: "{{ key_path }}"
   register: st
 
@@ -12,7 +21,7 @@
   when: "st.stat.exists == false"
 
 - name: "Set key name"
-  set_fact:
+  ansible.builtin.set_fact:
     key_name: "{{ vm_name }}"
 
 # - name: "Change RSA public key permission"

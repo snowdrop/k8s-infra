@@ -1,0 +1,9 @@
+---
+openstack_auth: 
+  openstack_project_name: "spring-boot-jenkins"
+  openstack_console_user:  "psi-spring-boot-jenkins"
+  openstack_console_password: "Eing6zeimoPh1wae"
+  openstack_user_domain:  "redhat.com"
+  openstack_project_domain: "redhat.com"
+  openstack_os_auth_url: "https://rhos-d.infra.prod.upshift.rdu2.redhat.com:13000/v3/"
+...
