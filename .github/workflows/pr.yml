@@ -29,8 +29,7 @@ jobs:
         run: ansible-galaxy collection build ansible/ansible_collections/snowdrop/cloud_infra --output build/ --force
       - name: Install Ansible Collection
         run: ansible-galaxy collection install ./build/snowdrop-cloud_infra-1.0.0.tar.gz --upgrade
-      - name: Open role folder
-        run: cd ansible/ansible_collections/snowdrop/cloud_infra/roles/${{ matrix.roles }}
       - name: Run tests
         run: molecule test
+        working-directory: ansible/ansible_collections/snowdrop/cloud_infra/roles/${{ matrix.roles }}
 ...
