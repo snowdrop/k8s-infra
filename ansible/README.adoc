@@ -113,16 +113,16 @@ Build the collection.
 
 [source,bash]
 ----
-ansible-galaxy collection build
+ansible-galaxy collection build ansible/ansible_collections/snowdrop/cloud_infra --output build/ --force
 ----
 
-This will generate a `.tar.gz` file with name `snowdrop-cloud_infra-<version>.tar.gz`.
+This will generate a `.tar.gz` file with name `snowdrop-cloud_infra-<version>.tar.gz` on the link:./build/[] subfolder of the `k8s-infra` repository.
 
 Finally install the collection.
 
 [source,bash]
 ----
-ansible-galaxy collection install ./snowdrop-cloud_infra-1.0.0.tar.gz --upgrade
+ansible-galaxy collection install ./build/snowdrop-cloud_infra-1.0.0.tar.gz --upgrade
 ----
 
 == User Guide
