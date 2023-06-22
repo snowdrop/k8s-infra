@@ -82,6 +82,8 @@ This command only needs to be executed the first time.
 python3 -m pip install -r requirements.txt
 ----
 
+ansible-galaxy install -r requirements.yml
+
 To deactivate the python virtual environment execute the following command.
 
 [source,bash]
