@@ -1,5 +1,8 @@
 ---
 collections:
+  # - name: snowdrop.cloud_infra
+  #   version: 1.0.0
+
   - name: openstack.cloud
     version: 2.1.0
   
