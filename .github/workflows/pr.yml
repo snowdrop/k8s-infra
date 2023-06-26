@@ -18,18 +18,6 @@ jobs:
         python: [ pypy3.8 ]
         roles: [openstack_vm]
     steps:
-      - name: Checkout project
-        uses: actions/checkout@v3
-      - uses: actions/setup-python@v4 
-        with:
-          python-version:  ${{ matrix.python }}
-          cache: pip
-      - name: Install python requirements
-        run: pip install -r requirements.txt
-      - name: Build Ansible Collection
-        run: ansible-galaxy collection build ansible/ansible_collections/snowdrop/cloud_infra --output build/ --force
-      - name: Install Ansible Collection
-        run: ansible-galaxy collection install ./build/snowdrop-cloud_infra-1.0.0.tar.gz --upgrade
       - name: Deploy devstack
         uses: EmilienM/devstack-action@v0.11
         with:
@@ -71,6 +59,18 @@ jobs:
           enabled_services: 's-account,s-container,s-object,s-proxy'
       # - name: Create stack user
         # run: tools/create-stack-user.sh
+      - name: Checkout project
+        uses: actions/checkout@v3
+      - uses: actions/setup-python@v4 
+        with:
+          python-version:  ${{ matrix.python }}
+          cache: pip
+      - name: Install python requirements
+        run: pip install -r requirements.txt
+      - name: Build Ansible Collection
+        run: ansible-galaxy collection build ansible/ansible_collections/snowdrop/cloud_infra --output build/ --force
+      - name: Install Ansible Collection
+        run: ansible-galaxy collection install ./build/snowdrop-cloud_infra-1.0.0.tar.gz --upgrade
       - name: Run tests
         run: molecule test --scenario-name github
         working-directory: ansible/ansible_collections/snowdrop/cloud_infra/roles/${{ matrix.roles }}
