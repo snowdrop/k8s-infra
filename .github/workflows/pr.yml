@@ -18,12 +18,6 @@ jobs:
         python: [ pypy3.8 ]
         roles: [openstack_vm]
     steps:
-      - name: Deploy devstack
-        uses: EmilienM/devstack-action@v0.11
-        with:
-          enabled_services: 's-account,s-container,s-object,s-proxy'
-          working-directory: ../devstack/
-          cache: devstack
       # - name: Create stack user
         # run: tools/create-stack-user.sh
       - name: Checkout project
@@ -32,6 +26,11 @@ jobs:
         with:
           python-version:  ${{ matrix.python }}
           cache: pip
+      - name: Deploy devstack
+        uses: EmilienM/devstack-action@v0.11
+        with:
+          enabled_services: 's-account,s-container,s-object,s-proxy'
+          cache: devstack
       - name: Install python requirements
         run: pip install -r requirements.txt
       - name: Build Ansible Collection
