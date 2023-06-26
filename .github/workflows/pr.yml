@@ -14,6 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
+        openstack_version: ["master"]
         # python: [ pypy3.8 ]
         python: [ 3.11 ]
         roles: [openstack_vm]
@@ -23,7 +24,9 @@ jobs:
       - name: Deploy devstack
         uses: EmilienM/devstack-action@v0.11
         with:
+          branch: ${{ matrix.openstack_version }}
           enabled_services: 's-account,s-container,s-object,s-proxy'
+# 'ir-api,ir-cond,s-account,s-container,s-object,s-proxy,q-svc,q-agt,q-dhcp,q-l3,q-meta,-cinder,-c-sch,-c-api,-c-vol,-c-bak,-ovn,-ovn-controller,-ovn-northd,-q-ovn-metadata-agent'
           cache: devstack
       - name: Install Python
         uses: actions/setup-python@v4 
