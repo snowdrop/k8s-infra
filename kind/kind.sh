@@ -340,8 +340,10 @@ function delete_cri_resources(){
     note_start_task "1" "Removing ${CRI_COMMAND} network..."
     docker_network_id=$(${CRI_COMMAND} network ls --filter name=^kind$ --quiet)
     if [ ! ${docker_network_id} == "" ]; then
+        set +e
         NETWORK_RM_RES=eval ${NETWORK_RM_CMD} 1> /dev/null
         succeeded "1" "Removing ${CRI_COMMAND} network..."
+        set -e
     else 
         warn "Removing ${CRI_COMMAND} network... nothing to be done!"
     fi
@@ -585,9 +587,11 @@ EOF
         
     fi
     
+    set +e
     note_start_task "2" "Connect the container registry to the kind network..."
      ${CRI_COMMAND} network connect "kind" ${REGISTRY_NAME}
     succeeded "2" "Connect the container registry to the kind network... done."
+    set -e
     
     SCRIPT_RESULT_MESSAGE+="\n"
     SCRIPT_RESULT_MESSAGE+="  * ${CLUSTER_NAME} kind cluster has been deployed\n"
