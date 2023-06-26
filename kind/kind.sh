@@ -635,7 +635,7 @@ function validate_ingress() {
     fi
 
     note "5" "Ingress ports: ${INGRESS_PORTS}"
-    if [ -v INGRESS_PORTS ]; then
+    if [ "${INGRESS_PORTS}" == "" ]; then
         IFS=':' read -ra PORT_MAP <<< "${INGRESS_PORTS}"
         INGRESS_80_CONTAINER_PORT=${PORT_MAP[0]}
         INGRESS_443_CONTAINER_PORT=${PORT_MAP[1]}
