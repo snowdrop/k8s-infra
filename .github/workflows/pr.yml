@@ -22,15 +22,15 @@ jobs:
         # run: tools/create-stack-user.sh
       - name: Checkout project
         uses: actions/checkout@v3
-      - uses: actions/setup-python@v4 
-        with:
-          python-version:  ${{ matrix.python }}
-          cache: pip
       - name: Deploy devstack
         uses: EmilienM/devstack-action@v0.11
         with:
           enabled_services: 's-account,s-container,s-object,s-proxy'
           cache: devstack
+      - uses: actions/setup-python@v4 
+        with:
+          python-version:  ${{ matrix.python }}
+          cache: pip
       - name: Install python requirements
         run: pip install -r requirements.txt
       - name: Build Ansible Collection
