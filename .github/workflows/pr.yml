@@ -14,7 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python: [ pypy3.11 ]
+        # python: [ pypy3.8 ]
+        python: [ 3.11 ]
         roles: [openstack_vm]
     steps:
       - name: Checkout project
