@@ -50,9 +50,87 @@ openstack_defaults:
 openstack_security_group: spring-boot
 
 openstack_auth: 
-  openstack_project_name: "default"
+  openstack_project_name: "admin"
   openstack_console_user:  "admin"
-  openstack_console_password: "admin"
+  openstack_console_password: "secret"
   openstack_user_domain:  "default"
   openstack_project_domain: "default"
-  openstack_os_auth_url: "https://localhost:13000/"
+  openstack_os_auth_url: "http://localhost:5000/v3/"
+# get_or_create_project demo default
+# user: 
+#   - get_or_create_user demo secret default demo@example.com
+#   - alt_demo: get_or_create_user alt_demo secret default alt_demo@example.com
+#   - alt_demo_member
+#   - alt_demo_reader
+
+# [5179 Async create_flavors:72060]: finished create_flavors with result 0 in 32 seconds
+# + inc/async:async_wait:197                 :   return 0
+# + ./stack.sh:main:1386                     :   is_service_enabled horizon
+# + functions-common:is_service_enabled:2043 :   return 1
+# + ./stack.sh:main:1400                     :   is_service_enabled nova
+# + functions-common:is_service_enabled:2043 :   return 0
+# + ./stack.sh:main:1400                     :   is_service_enabled keystone
+# + functions-common:is_service_enabled:2043 :   return 0
+# + ./stack.sh:main:1401                     :   USERRC_PARAMS='-PA --target-dir /home/runner/work/k8s-infra/k8s-infra/devstack/accrc --os***'
+# + ./stack.sh:main:1403                     :   '[' -f /opt/stack/data/ca-bundle.pem ']'
+# + ./stack.sh:main:1407                     :   /home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh -PA --target-dir /home/runner/work/k8s-infra/k8s-infra/devstack/accrc --os***
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:31 :   ACCOUNT_DIR=./accrc
+# ++ home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:80 :   getopt -o hPAp:u:r:C: -l os-username:,os-password:,os-tenant-id:,os-tenant-name:,os-project-name:,os-project-id:,os-project-domain-id:,os-project-domain-name:,os-user-domain-id:,os-user-domain-name:,os-auth-url:,target-dir:,heat-url:,skip-project:,os-cacert:,help,debug -- -PA --target-dir /home/runner/work/k8s-infra/k8s-infra/devstack/accrc --os***
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:80 :   options=' -P -A --target-dir '\''/home/runner/work/k8s-infra/k8s-infra/devstack/accrc'\'' --os-password '\''secret'\'' --'
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:84 :   eval set -- -P -A --target-dir ''\''/home/runner/work/k8s-infra/k8s-infra/devstack/accrc'\''' --os-password ''\''secret'\''' --
+# ++ home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:84 :   set -- -P -A --target-dir /home/runner/work/k8s-infra/k8s-infra/devstack/accrc --os*** --
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:85 :   ADDPASS=
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:86 :   HEAT_URL=
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:91 :   SKIP_PROJECT=service
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:92 :   MODE=
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:93 :   ROLE=Member
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:94 :   USER_NAME=
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:95 :   USER_PASS=
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:96 :   '[' 7 -gt 0 ']'
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:97 :   case "$1" in
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:119 :   ADDPASS=yes
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:126 :   shift
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:96 :   '[' 6 -gt 0 ']'
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:97 :   case "$1" in
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:118 :   MODE=all
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:126 :   shift
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:96 :   '[' 5 -gt 0 ']'
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:97 :   case "$1" in
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:113 :   ACCOUNT_DIR=/home/runner/work/k8s-infra/k8s-infra/devstack/accrc
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:113 :   shift
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:126 :   shift
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:96 :   '[' 3 -gt 0 ']'
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:97 :   case "$1" in
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:100 :   export OS_PASSWORD=secret
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:100 :   OS_PASSWORD=secret
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:100 :   shift
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:126 :   shift
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:96 :   '[' 1 -gt 0 ']'
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:97 :   case "$1" in
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:122 :   shift
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:122 :   break
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:129 :   '[' -z secret ']'
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:138 :   '[' -z '' -a '' ']'
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:142 :   '[' -z '' -a '' ']'
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:146 :   '[' -z '' -a -z '' ']'
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:147 :   export OS_PROJECT_NAME=admin
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:147 :   OS_PROJECT_NAME=admin
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:150 :   '[' -z '' ']'
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:151 :   export OS_USERNAME=admin
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:151 :   OS_USERNAME=admin
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:154 :   '[' -z '' ']'
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:155 :   export OS_AUTH_URL=http://localhost:5000/v3/
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:155 :   OS_AUTH_URL=http://localhost:5000/v3/
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:158 :   '[' -z '' -a -z '' ']'
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:160 :   OS_USER_DOMAIN_ID=default
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:163 :   '[' -z '' -a -z '' ']'
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:165 :   OS_PROJECT_DOMAIN_ID=default
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:168 :   USER_PASS=secret
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:169 :   USER_NAME=admin
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:171 :   '[' -z all ']'
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:239 :   '[' all '!=' create ']'
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:241 :   IFS=,
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:241 :   grep ,True
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:241 :   openstack project list --long --quote none -f csv
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:241 :   grep -v service
+# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:241 :   read project_id project_name desc enabled

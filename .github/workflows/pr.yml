@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        openstack_version: ["master"]
+        # openstack_version: ["master"]
         python: [ pypy3.8 ]
         roles: [openstack_vm]
     steps:
@@ -57,6 +57,7 @@ jobs:
         #     SWIFT_TEMPURL_KEY=secretkey
         #   enabled_services: 'ir-api,ir-cond,s-account,s-container,s-object,s-proxy,q-svc,q-agt,q-dhcp,q-l3,q-meta,-cinder,-c-sch,-c-api,-c-vol,-c-bak,-ovn,-ovn-controller,-ovn-northd,-q-ovn-metadata-agent'
           enabled_services: 's-account,s-container,s-object,s-proxy'
+          working-directory: ..
       # - name: Create stack user
         # run: tools/create-stack-user.sh
       - name: Checkout project
