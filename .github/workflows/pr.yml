@@ -22,7 +22,7 @@ jobs:
         uses: EmilienM/devstack-action@v0.11
         with:
           branch: ${{ matrix.openstack_version }}
-          enabled_services: 's-account,s-container,s-object,s-proxy,swift'
+          enabled_services: 'ir-api,s-account,s-container,s-object,s-proxy,swift'
 # 'ir-api,ir-cond,s-account,s-container,s-object,s-proxy,q-svc,q-agt,q-dhcp,q-l3,q-meta,-cinder,-c-sch,-c-api,-c-vol,-c-bak,-ovn,-ovn-controller,-ovn-northd,-q-ovn-metadata-agent'
           cache: devstack
       - name: Install Python
@@ -35,7 +35,7 @@ jobs:
       - name: Build Ansible Collection
         run: ansible-galaxy collection build ansible/ansible_collections/snowdrop/cloud_infra --output build/ --force
       - name: Install Ansible Collection
-        run: ansible-galaxy collection install ./build/snowdrop-cloud_infra-1.0.0.tar.gz --upgrade
+        run: ansible-galaxy collection install $(find . -name snowdrop-cloud_infra-*.tar.gz) --upgrade
       - name: Run tests
         run: |
           # python3 -m venv .snowdrop-venv
@@ -45,6 +45,3 @@ jobs:
           molecule test --scenario-name github
         working-directory: ansible/ansible_collections/snowdrop/cloud_infra/roles/${{ matrix.roles }}
 ...
-# + home/runner/work/k8s-infra/k8s-infra/devstack/tools/create_userrc.sh:main:241 :   read project_id project_name desc enabled
-# Failed to discover available identity versions when contacting http://localhost:5000/v3/. Attempting to parse version from URL.
-# Unable to establish connection to http://localhost:5000/v3/auth/tokens: HTTPConnectionPool(host='localhost', port=5000): Max retries exceeded with url: /v3/auth/tokens (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fdfe0ee6d70>: Failed to establish a new connection: [Errno 111] Connection refused'))
