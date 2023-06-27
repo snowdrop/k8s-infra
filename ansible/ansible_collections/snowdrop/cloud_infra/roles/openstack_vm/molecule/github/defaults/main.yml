@@ -55,7 +55,8 @@ openstack_auth:
   openstack_console_password: "secret"
   openstack_user_domain:  "default"
   openstack_project_domain: "default"
-  openstack_os_auth_url: "http://localhost:5000/v3/"
+  # openstack_os_auth_url: "http://localhost:5000/v3/"
+  openstack_os_auth_url: "http://localhost/identity/"
 # get_or_create_project demo default
 # user: 
 #   - get_or_create_user demo secret default demo@example.com

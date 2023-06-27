@@ -40,6 +40,9 @@ jobs:
         run: |
           echo "KEYSTONE_SERVICE_URI: $KEYSTONE_SERVICE_URI"
           ls -la
+          pwd
+          ls -la ..
+          echo "STACK_ENV_VARS: $STACK_ENV_VARS"
           # python3 -m venv .snowdrop-venv
           # source .snowdrop-venv/bin/activate
           # pip install -r requirements.txt
