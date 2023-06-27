@@ -15,7 +15,6 @@
 - name: "Print Openstack output"
   debug:
     var: openstack_server_info_output
-    verbosity: 2
 
 - name: "Delete VM {{ vm_name }}"
   os_server:
