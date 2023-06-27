@@ -22,7 +22,7 @@ jobs:
         uses: EmilienM/devstack-action@v0.11
         with:
           branch: ${{ matrix.openstack_version }}
-          enabled_services: 's-account,s-container,s-object,s-proxy'
+          enabled_services: 's-account,s-container,s-object,s-proxy,swift'
 # 'ir-api,ir-cond,s-account,s-container,s-object,s-proxy,q-svc,q-agt,q-dhcp,q-l3,q-meta,-cinder,-c-sch,-c-api,-c-vol,-c-bak,-ovn,-ovn-controller,-ovn-northd,-q-ovn-metadata-agent'
           cache: devstack
       - name: Install Python
