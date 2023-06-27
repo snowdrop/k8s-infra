@@ -12,11 +12,6 @@ endif::[]
 
 == Before you start
 
-[IMPORTANT]
-====
-The Ansible commands should be executed within the ansible folder !
-====
-
 === Choose an image
 
 NOTE: The list of images is identified on the link:../../../openstack/README.adoc#Images[OpenStack README file].
@@ -29,52 +24,87 @@ NOTE: The list of flavors is identified on the link:../../../openstack/README.ad
 
 == Playbooks
 
-=== PasswordStore
+=== Create a VM
 
 Create OpenStack instance based on passwordstore
 
 .openstack_vm_create_passwordstore parameters
-[cols="2m,1m,5"]
+[cols="2,5"]
 |===
-|Field name |Mandatory |Description
+| Parameter | Description
 
-| vm_name
-| x
-| Name of the VM being created. Will be used both as hostname as well as Ansible Inventory name.
+| `openstack.vm.flavor`
 
-| openstack.vm.network
-| x
-| Value for the OpenStack provider network. `provider_net_shared`
+[.fuchsia]#string#
 
-| openstack.vm.image
-| x
-| OpenStack VM image, e.g. `Fedora-Cloud-Base-35`.
+[.red]#required# 
 
-| openstack.vm.flavor"
-| x
-| OpenStack VM flavor (size), e.g. `m1.medium`.
+a| OpenStack VM flavor (size)
 
-| key_name
-| -
-| Use an existing SSH key (value) instead of creating one for the VM.
+_e.g._ `m1.medium`.
 
-| k8s_type
-| *for k8s hosts.*
-| Kubernetes host type [master,worker].
+| `openstack.vm.image`
 
-| k8s_version
-| *for k8s hosts.*
-| Kubernetes version to be associated with the host, e.g. for version `1.23` use `123`. This is actually an Ansible Inventory group having definitions associated with each of the Kubernetes version.
+[.fuchsia]#string#
+
+[.red]#required# 
+
+a| OpenStack VM image
+
+_e.g._ `Fedora-Cloud-Base-35`.
+
+| `openstack.vm.network`
+
+[.fuchsia]#string#
+
+[.red]#required# 
+
+a| Value for the OpenStack provider network.
+
+_e.g._ `provider_net_shared`
+
+// | k8s_type
+
+// [.fuchsia]#string#
+
+// a| *for k8s hosts.*
+
+// Kubernetes host type [master,worker].
+
+// | k8s_version
+
+// [.fuchsia]#string#
+
+// a| *for k8s hosts.*
+
+// Kubernetes version to be associated with the host, e.g. for version `1.23` use `123`. This is actually an Ansible Inventory group having definitions associated with each of the Kubernetes version.
+
+// | key_name
+
+// [.fuchsia]#string#
+
+// a| Use an existing SSH key (value) instead of creating one for the VM.
+
+| `vm_name`
+
+[.fuchsia]#string#
+
+[.red]#required# 
+
+a| Name of the VM being created. 
+
+This name will be used both as hostname as well as Ansible Inventory name.
+
 |===
 
 [source,bash]
 ----
-$ VM_NAME=vm20210221-t01
+$ VM_NAME=vm20230627-t01
 ----
 
 [source,bash]
 ----
-$ ansible-playbook playbook/openstack/openstack_vm_create_passwordstore.yml -e k8s_type=masters -e k8s_version=123 -e '{"openstack": {"vm": {"network": "provider_net_shared","image": "Fedora-Cloud-Base-35", "flavor": "m1.medium"}}}' -e key_name=test-adm-key -e vm_name=${VM_NAME} 
+$ ansible-playbook ansible/playbook/openstack/openstack_vm_create_passwordstore.yml -e '{"openstack": {"vm": {"network": "provider_net_shared","image": "Fedora-Cloud-Base-35", "flavor": "m1.medium"}}}' -e vm_name=${VM_NAME} 
 ----
 
 This playbook should finish with something like:
@@ -122,7 +152,7 @@ To delete a VM, simply execute the `openstack_vm_remove_aggregate` playbook.
 
 [source,bash]
 ----
-$ ansible-playbook playbook/openstack/openstack_vm_remove_passwordstore.yml -e vm_name=${VM_NAME}
+$ ansible-playbook ansible/playbook/openstack/openstack_vm_remove_passwordstore.yml -e vm_name=${VM_NAME}
 ----
 
 [source]
