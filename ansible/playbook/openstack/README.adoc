@@ -107,7 +107,7 @@ $ VM_NAME=vm20230627-t01
 $ ansible-playbook ansible/playbook/openstack/openstack_vm_create_passwordstore.yml -e '{"openstack": {"vm": {"network": "provider_net_shared","image": "Fedora-Cloud-Base-35", "flavor": "m1.medium"}}}' -e vm_name=${VM_NAME} 
 ----
 
-This playbook should finish with something like:
+Although some failures might occur some might be ignored which shouldn't affect thhe process. This playbook should finish with no failed tasks.
 
 [source]
 ....
@@ -115,36 +115,9 @@ PLAY RECAP *********************************************************************
 localhost                  : ok=68   changed=20   unreachable=0    failed=0    skipped=13   rescued=0    ignored=1   
 vm20210221-t01             : ok=32   changed=20   unreachable=0    failed=0    skipped=1    rescued=0    ignored=0   
 
-Monday 21 February 2022  13:01:53 +0100 (0:00:05.011)       0:12:51.042 ******* 
-=============================================================================== 
-openstack/init_vm : Upgrade all packages ------------------------------------------------- 305.39s
-openstack/vm : Create VM instance -------------------------------------------------------- 121.94s
-sec/firewalld : Install firewalld --------------------------------------------------------- 47.60s
-openstack/init_vm : Install packages ------------------------------------------------------ 47.22s
-openstack/init_vm : Reboot instance ------------------------------------------------------- 32.76s
-Refresh the inventory so the newly added host is available -------------------------------- 21.10s
-sec/sshd_port : Change SELINUX settings to allow connections to the new port --------------- 9.14s
-sec/motd : Config | Install custom `/etc/motd` file ---------------------------------------- 8.24s
-sec/audit : Apply auditd configuration ----------------------------------------------------- 8.06s
-openstack/vm : Gather information about a previously created image with same name ---------- 7.85s
-Wait for connection to host ---------------------------------------------------------------- 7.02s
-openstack/vm : Wait for boot --------------------------------------------------------------- 6.55s
-Gathering Facts ---------------------------------------------------------------------------- 5.77s
-sec/firewalld : Enable and start firewalld ------------------------------------------------- 5.53s
-Gathering Facts ---------------------------------------------------------------------------- 5.08s
-sec/update : Update all packages ----------------------------------------------------------- 5.01s
-sec/firewalld : firewalld - Manage firewall ports ------------------------------------------ 4.96s
-sec/sshd_port : Change the ssh port number ------------------------------------------------- 4.60s
-sec/firewalld : firewalld - Manage firewall services --------------------------------------- 4.58s
-sec/firewalld : Restart firewalld ---------------------------------------------------------- 4.51s
 ....
 
 The playbook also uses the variables defined in `roles/openstack/vm/defaults/main.yml`. Those variables can also be overridden using the syntax above.
-
-[source,yaml]
-----
-include::../../roles/openstack/vm/defaults/main.yml[]
-----
 
 === Delete a VM
 
@@ -155,30 +128,13 @@ To delete a VM, simply execute the `openstack_vm_remove_aggregate` playbook.
 $ ansible-playbook ansible/playbook/openstack/openstack_vm_remove_passwordstore.yml -e vm_name=${VM_NAME}
 ----
 
+Although some failures might occur some might be ignored which shouldn't affect thhe process. This playbook should finish with no failed tasks.
+
 [source]
 ....
 PLAY RECAP **********************************************************************************************************************************************************************************************************************
 localhost                  : ok=17   changed=5    unreachable=0    failed=0    skipped=1    rescued=0    ignored=2   
 
-Monday 21 February 2022  13:07:58 +0100 (0:00:02.485)       0:00:30.900 ******* 
-=============================================================================== 
-openstack/vm : Gather information about a previously created image named  ------------------ 8.16s
-openstack/vm : Delete  --------------------------------------------------------------------- 3.91s
-openstack/vm : Delete VM volume ------------------------------------------------------------ 3.41s
-openstack/vm : Delete key  from server ----------------------------------------------------- 2.93s
-Push changes to the pass git database ------------------------------------------------------ 2.49s
-Pull pass git database --------------------------------------------------------------------- 2.16s
-openstack/vm : Set pass facts from passwordstore ------------------------------------------- 1.70s
-openstack/vm : Remove existing SSH key to use with instance -------------------------------- 1.55s
-openstack/vm : Find admin user home folder ------------------------------------------------- 0.98s
-openstack/vm : Remove the host from the known_hosts file ----------------------------------- 0.95s
-openstack/vm : stat ------------------------------------------------------------------------ 0.88s
-Remove passstore entries ------------------------------------------------------------------- 0.74s
-Remove local ssh keys ---------------------------------------------------------------------- 0.57s
-openstack/vm : include_tasks --------------------------------------------------------------- 0.14s
-Validate required variables ---------------------------------------------------------------- 0.08s
-openstack/vm : Print Openstack output ------------------------------------------------------ 0.07s
-openstack/vm : include_tasks --------------------------------------------------------------- 0.07s
 ....
 
 === Connect to the new instance
