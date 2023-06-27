@@ -23,7 +23,7 @@ jobs:
         with:
           branch: ${{ matrix.openstack_version }}
           enabled_services: 'ir-api,s-account,s-container,s-object,s-proxy,swift'
-# 'ir-api,ir-cond,s-account,s-container,s-object,s-proxy,q-svc,q-agt,q-dhcp,q-l3,q-meta,-cinder,-c-sch,-c-api,-c-vol,-c-bak,-ovn,-ovn-controller,-ovn-northd,-q-ovn-metadata-agent'
+          # 'ir-api,ir-cond,s-account,s-container,s-object,s-proxy,q-svc,q-agt,q-dhcp,q-l3,q-meta,-cinder,-c-sch,-c-api,-c-vol,-c-bak,-ovn,-ovn-controller,-ovn-northd,-q-ovn-metadata-agent'
           cache: devstack
       - name: Install Python
         uses: actions/setup-python@v4 
@@ -38,6 +38,8 @@ jobs:
         run: ansible-galaxy collection install $(find . -name snowdrop-cloud_infra-*.tar.gz) --upgrade
       - name: Run tests
         run: |
+          echo "KEYSTONE_SERVICE_URI: $KEYSTONE_SERVICE_URI"
+          ls -la
           # python3 -m venv .snowdrop-venv
           # source .snowdrop-venv/bin/activate
           # pip install -r requirements.txt
