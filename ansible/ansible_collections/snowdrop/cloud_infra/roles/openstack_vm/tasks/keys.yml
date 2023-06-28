@@ -1,8 +1,9 @@
 ---
 - name: "Set home"
   ansible.builtin.set_fact:
-    user_home: "{{ ansible_env.HOME | default(lookup('env','HOME') | default()) }}"
-    
+    user_home: "{{ ansible_env.HOME | default(lookup('env','HOME') ) }}"
+    user_home_2: "{% if openstack.vm.volumes is defined %}{{ ansible_env.HOME }}{% else %}{{ lookup('env','HOME') }}{% endif %}"
+
 - name: "Set key path if not set"
   set_fact: 
     key_path: "{{ ansible_env.HOME }}/.ssh/id_rsa_snowdrop_openstack_{{ vm_name }}"
