@@ -2,7 +2,7 @@
 - name: "Set home"
   ansible.builtin.set_fact:
     user_home: "{{ ansible_env.HOME | default(lookup('env','HOME') ) }}"
-    user_home_2: "{% if ansible_env is defined && ansible_env.HOME is defined %}{{ ansible_env.HOME }}{% else %}{{ lookup('env','HOME') }}{% endif %}"
+    # user_home_2: "{% if ans3ible_env is defined && ansible_env.HOME is defined %}{{ ansible_env.HOME }}{% else %}{{ lookup('env','HOME') }}{% endif %}"
 
 - name: "Set key path if not set"
   ansible.builtin.set_fact: 
