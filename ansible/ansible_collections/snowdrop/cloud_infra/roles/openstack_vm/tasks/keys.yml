@@ -1,7 +1,7 @@
 ---
 - name: "Set key path if not set"
   set_fact: 
-    key_path: "{{ admin_home.stdout }}/.ssh/id_rsa_snowdrop_openstack_{{ vm_name }}"
+    key_path: "{{ ansible_env.HOME }}/.ssh/id_rsa_snowdrop_openstack_{{ vm_name }}"
 
 - stat:
     path: "{{ key_path }}"
