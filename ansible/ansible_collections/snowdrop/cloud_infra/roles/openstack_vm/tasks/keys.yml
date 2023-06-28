@@ -2,11 +2,15 @@
 - name: "Set home"
   ansible.builtin.set_fact:
     user_home: "{{ ansible_env.HOME | default(lookup('env','HOME') ) }}"
-    # user_home_2: "{% if ans3ible_env is defined && ansible_env.HOME is defined %}{{ ansible_env.HOME }}{% else %}{{ lookup('env','HOME') }}{% endif %}"
+    # user_home_2: "{% if ans3ible_env is defined and ansible_env.HOME is defined %}{{ ansible_env.HOME }}{% else %}{{ lookup('env','HOME') }}{% endif %}"
+
+- name: "Print user home"
+  ansible.builtin.debug:
+    var: user_home
 
 - name: "Set key path if not set"
   ansible.builtin.set_fact: 
-    key_path: "{{ ansible_env.HOME }}/.ssh/id_rsa_snowdrop_openstack_{{ vm_name }}"
+    key_path: "{{ user_home }}/.ssh/id_rsa_snowdrop_openstack_{{ vm_name }}"
 
 - name: Check key
   ansible.builtin.stat:
