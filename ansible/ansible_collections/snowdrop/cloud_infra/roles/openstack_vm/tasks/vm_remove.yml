@@ -15,6 +15,7 @@
 - name: "Print Openstack output"
   debug:
     var: openstack_server_info_output
+    verbosity: 2
 
 - name: "Delete VM {{ vm_name }}"
   os_server:
@@ -65,7 +66,7 @@
   known_hosts:
     name: "{{ openstack_server_info_output.servers[0].access_ipv4 }}"
     state: absent
-  when:  not openstack_server_info_output.failed
+  when:  not openstack_server_info_output.failed and (openstack_server_info_output.servers | length > 0)
   ignore_errors: true
 
 - name: "Check if private key file exists"
