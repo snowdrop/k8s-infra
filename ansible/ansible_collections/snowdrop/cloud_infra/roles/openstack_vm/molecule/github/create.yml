@@ -60,6 +60,21 @@
       ansible.builtin.debug:
         var: rhos_network_list
 
+    - name: List all security groups
+      openstack.cloud.security_group_info:
+        auth:
+          project_name: "{{ openstack_auth.openstack_project_name }}"
+          username: "{{ openstack_auth.openstack_console_user }}"
+          password: "{{ openstack_auth.openstack_console_password }}"
+          user_domain_name: "{{ openstack_auth.openstack_user_domain }}"
+          project_domain_name: "{{ openstack_auth.openstack_project_domain }}"
+          auth_url: "{{ openstack_auth.openstack_os_auth_url }}"
+      register: rhos_security_group_list
+
+    - name: Print RHOS security groups
+      ansible.builtin.debug:
+        var: rhos_security_group_list
+
     - name: "Set openstack VM required facts"
       ansible.builtin.set_fact:
         openstack: 
@@ -67,6 +82,7 @@
             network: "{{ rhos_network_list.networks[0].name | default('') }}"
             image: "{{ rhos_image_list.images[0].name | default(openstack_defaults.vm.image) }}"
             flavor: "{{ rhos_flavor_list.flavors[0].name | default(openstack_defaults.vm.flavor) }}"
+        openstack_security_group: "{{ rhos_security_group_list.security_groups[0].name | default('') }}"
 
   tasks:
 
