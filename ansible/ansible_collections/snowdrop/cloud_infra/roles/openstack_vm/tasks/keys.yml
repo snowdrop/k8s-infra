@@ -2,7 +2,6 @@
 - name: "Set home"
   ansible.builtin.set_fact:
     user_home: "{{ ansible_env.HOME | default(lookup('env','HOME') ) }}"
-    # user_home_2: "{% if ans3ible_env is defined and ansible_env.HOME is defined %}{{ ansible_env.HOME }}{% else %}{{ lookup('env','HOME') }}{% endif %}"
 
 - name: "Print user home"
   ansible.builtin.debug:

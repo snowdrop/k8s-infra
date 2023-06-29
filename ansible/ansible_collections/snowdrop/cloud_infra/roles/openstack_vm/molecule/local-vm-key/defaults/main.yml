@@ -1,0 +1,50 @@
+default_generic_key_name: test-adm-key
+
+hostname: openstackVM
+type: cloude
+
+flavours:
+  m1.small:
+    name: "m1.small"
+    disk_size: 20
+  m1.medium:
+    name: "m1.medium"
+    disk_size: 40
+  ci.m1.medium:
+    name: "ci.m1.medium"
+    disk_size: 40
+  m1.large:
+    name: "m1.large"
+    disk_size: 60
+  m1.xlarge:
+    name: "m1.xlarge"
+    disk_size: 80
+  g.standard.xxl:
+    name: "g.standard.xxl"
+    disk_size: 120
+  g.standard.xxxl:
+    name: "g.standard.xxxl"
+    disk_size: 160
+
+openstack_defaults:
+  os_project_name: spring-boot-jenkins
+  sshkey_name: "{{ hostname }}"
+  timeout: 60000
+  vm:
+    title: Fedora 35 Cloud Base
+    name: "{{ hostname }}"
+    image: Fedora-Cloud-Base-35
+    key_name: "{{ hostname }}"
+    flavor: m1.medium
+    network: default_network
+    security_group: default_security_group
+    # Array of items with 2 attributes, name and size
+    volumes: []
+      # - name: "volume1"
+      #   size: 10
+      # - name: "volume2"
+      #   size: 20
+    boot_from_volume: false
+
+# login_username: centos
+openstack_security_group: spring-boot

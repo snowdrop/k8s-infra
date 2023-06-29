@@ -38,13 +38,14 @@ jobs:
         run: ansible-galaxy collection install $(find . -name snowdrop-cloud_infra-*.tar.gz) --upgrade
       - name: Run tests
         run: |
-          echo "GITHUB_WORKSPACE: $GITHUB_WORKSPACE"
+          ls -la /opt/stack/data/glance/images/
+          # echo "GITHUB_WORKSPACE: $GITHUB_WORKSPACE"
           ls -la $GITHUB_WORKSPACE
-          echo "KEYSTONE_SERVICE_URI: $KEYSTONE_SERVICE_URI"
-          ls -la
+          # echo "KEYSTONE_SERVICE_URI: $KEYSTONE_SERVICE_URI"
           pwd
+          ls -la
           ls -la ..
-          echo "STACK_ENV_VARS: $STACK_ENV_VARS"
+          # echo "STACK_ENV_VARS: $STACK_ENV_VARS"
           echo "HOME: $HOME"
           env
           export

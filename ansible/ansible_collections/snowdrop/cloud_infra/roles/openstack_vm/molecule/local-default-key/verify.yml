@@ -10,6 +10,16 @@
       ansible.builtin.set_fact:
         vm_name: ansible_molecule_snowdrop_openstack_test
 
+    - name: "Set openstack_auth facts"
+      ansible.builtin.set_fact:
+        openstack_auth: 
+          openstack_project_name: "{{ query('passwordstore', 'openstack/host/project_name')[0] }}"
+          openstack_console_user:  "{{ query('passwordstore', 'openstack/host/console_user')[0] }}"
+          openstack_console_password: "{{ query('passwordstore', 'openstack/host/console_pw')[0] }}"
+          openstack_user_domain:  "{{ query('passwordstore', 'openstack/host/console_domain')[0] }}"
+          openstack_project_domain: "{{ query('passwordstore', 'openstack/host/os_domain')[0] }}"
+          openstack_os_auth_url: "{{ query('passwordstore', 'openstack/host/os_auth_url')[0] }}"
+
     - name: Include default vars
       ansible.builtin.include_vars:
         file: defaults/main.yml
@@ -56,4 +66,8 @@
         that:
           - openstack_server_info_output.servers[0].key_name == default_generic_key_name
         msg: "Server key must be the one requested. Obtained {{ openstack_server_info_output.servers[0].key_name }} but requested {{ default_generic_key_name }}."
+
+    # - name: Example assertion
+    #   ansible.builtin.assert:
+    #     that: true
 ...
