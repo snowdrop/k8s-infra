@@ -53,7 +53,7 @@
     loop: "{{ openstack.vm.volumes }}"
     loop_control:
       loop_var: ocp_vm_volume_item
-    when: openstack.vm.volumes is defined
+    when: openstack.vm.volumes is defined and (openstack.vm.volumes | length > 0)
 
   - name: "Get information about keypairs using optional parameters"
     openstack.cloud.keypair_info:
@@ -89,8 +89,7 @@
       auto_floating_ip: yes
       network: "{{ openstack.vm.network | default('') }}"
       security_groups: "{{ openstack_security_group }}"
-      volumes: "{% if openstack.vm.volumes is defined %}{{ openstack.vm.volumes | map(attribute='name') }}{% else %}{{ [] }}{% endif %}"
-      boot_from_volume: "{{ openstack.vm.boot_from_volume  | default(openstack_defaults.vm.boot_from_volume) }}"
+      boot_from_volume: "{{ openstack.vm.boot_from_volume | default(false) }}"
       userdata: |
         #cloud-config
         users:
@@ -102,6 +101,23 @@
           ssh_authorized_keys:
             - {{ keypair_info['keypairs'][0]['public_key'] }}
     register: openstack_output
+
+  - name: Attaches a volumes to server
+    openstack.cloud.server_volume:
+      auth:
+        project_name: "{{ openstack_auth.openstack_project_name }}"
+        username: "{{ openstack_auth.openstack_console_user }}"
+        password: "{{ openstack_auth.openstack_console_password }}"
+        user_domain_name: "{{ openstack_auth.openstack_user_domain }}"
+        project_domain_name: "{{ openstack_auth.openstack_project_domain }}"
+        auth_url: "{{ openstack_auth.openstack_os_auth_url }}"
+      state: present
+      server: "{{ vm_name }}"
+      volume: "{{ volume_to_add }}"
+    loop: "{{ openstack.vm.volumes }}"
+    loop_control:
+      loop_var: volume_to_add
+    when: openstack.vm.volumes is defined and (openstack.vm.volumes | length > 0)
 
   - name: "Print Openstack output"
     ansible.builtin.debug:
