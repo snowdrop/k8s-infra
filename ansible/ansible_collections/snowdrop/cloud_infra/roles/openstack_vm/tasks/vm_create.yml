@@ -103,7 +103,7 @@
             - {{ keypair_info['keypairs'][0]['public_key'] }}
     register: openstack_output
 
-  - name: Attaches volumes to server
+  - name: Attach volumes to server
     openstack.cloud.server_volume:
       auth:
         project_name: "{{ openstack_auth.openstack_project_name }}"

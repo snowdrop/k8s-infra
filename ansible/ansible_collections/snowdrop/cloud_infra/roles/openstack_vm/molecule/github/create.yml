@@ -81,7 +81,8 @@
           vm: 
             network: "{{ rhos_network_list.networks[0].name | default('') }}"
             image: "{{ rhos_image_list.images[0].name | default(openstack_defaults.vm.image) }}"
-            flavor: "{{ rhos_flavor_list.flavors[0].name | default(openstack_defaults.vm.flavor) }}"
+            # flavor: "{{ rhos_flavor_list.flavors[0].name | default(openstack_defaults.vm.flavor) }}"
+            flavor: "m1.small"
         openstack_security_group: "{{ rhos_security_group_list.security_groups[0].id | default('') }}"
 
   tasks:
