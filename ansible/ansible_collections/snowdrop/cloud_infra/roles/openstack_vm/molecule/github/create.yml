@@ -81,26 +81,16 @@
           vm: 
             network: "{{ rhos_network_list.networks[0].name | default('') }}"
             image: "{{ rhos_image_list.images[0].name | default(openstack_defaults.vm.image) }}"
-            # flavor: "{{ rhos_flavor_list.flavors[0].name | default(openstack_defaults.vm.flavor) }}"
-            flavor: "m1.small"
+            flavor: "{{ openstack_vm_flavor }}"
         openstack_security_group: "{{ rhos_security_group_list.security_groups[0].id | default('') }}"
 
   tasks:
-
-    # TODO: Developer must implement and populate 'server' variable
 
     - name: "Create VM"
       ansible.builtin.include_role:
         name: "openstack_vm"
       vars: 
         state: "present"
-
-    # - name: "Wait for connection to host"
-    #   ansible.builtin.wait_for:
-    #     host: "{{ openstack_vm_ipv4 }}"
-    #     port: "22"
-    #     timeout: 120
-    #   register: wait_for_connection_reg
     
     - name: "Set server changed"
       ansible.builtin.set_fact:
