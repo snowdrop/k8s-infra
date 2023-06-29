@@ -44,7 +44,6 @@ openstack_defaults:
       #   size: 10
       # - name: "volume2"
       #   size: 20
-    boot_from_volume: false
 
 # login_username: centos
 openstack_security_group: spring-boot
