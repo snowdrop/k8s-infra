@@ -89,7 +89,7 @@
       auto_floating_ip: yes
       network: "{{ openstack.vm.network | default('') }}"
       security_groups: "{{ openstack_security_group }}"
-      # volumes: "{% if openstack.vm.volumes is defined %}{{ openstack.vm.volumes | map(attribute='name') }}{% else %}{{ [] }}{% endif %}"
+      #volumes: "{% if openstack.vm.volumes is defined and (openstack.vm.volumes | length > 0)  %}{{ openstack.vm.volumes | map(attribute='name') }}{% else %}[]{% endif %}"
       boot_from_volume: "{{ openstack.vm.boot_from_volume | default(false) }}"
       userdata: |
         #cloud-config
@@ -124,12 +124,16 @@
     ansible.builtin.debug:
       var: openstack_output
 
+  - name: "Show VM network"
+    ansible.builtin.debug:
+      msg: "VM network: {{ openstack_output.server.addresses[ openstack.vm.network ][0] }}"
+
   - name: "Collect host IP"
     ansible.builtin.set_fact:
       openstack_vm_ipv4: "{{ openstack_output.server.addresses[ openstack.vm.network ][0].addr }}"
 
   - name: "Show IP addresses"
     ansible.builtin.debug:
-      msg: "VM IP : {{ openstack_vm_ipv4 }}"
+      msg: "VM IP V4: {{ openstack_vm_ipv4 }}"
 
 ...
