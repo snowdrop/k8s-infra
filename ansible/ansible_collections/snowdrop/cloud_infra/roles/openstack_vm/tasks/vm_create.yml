@@ -89,6 +89,7 @@
       auto_floating_ip: yes
       network: "{{ openstack.vm.network | default('') }}"
       security_groups: "{{ openstack_security_group }}"
+      # volumes: "{% if openstack.vm.volumes is defined %}{{ openstack.vm.volumes | map(attribute='name') }}{% else %}{{ [] }}{% endif %}"
       boot_from_volume: "{{ openstack.vm.boot_from_volume | default(false) }}"
       userdata: |
         #cloud-config
@@ -102,7 +103,7 @@
             - {{ keypair_info['keypairs'][0]['public_key'] }}
     register: openstack_output
 
-  - name: Attaches a volumes to server
+  - name: Attaches volumes to server
     openstack.cloud.server_volume:
       auth:
         project_name: "{{ openstack_auth.openstack_project_name }}"
