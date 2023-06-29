@@ -54,6 +54,6 @@
     - name: "Validate server key"
       ansible.builtin.assert:
         that:
-          - openstack_server_info_output.servers[0].key_name == default_generic_key_name
+          - openstack_server_info_output.servers[0].key_name == vm_name
         msg: "Server key must be the one requested. Obtained {{ openstack_server_info_output.servers[0].key_name }} but requested {{ vm_name }}."
 ...
