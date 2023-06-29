@@ -95,12 +95,12 @@
       vars: 
         state: "present"
 
-    - name: "Wait for connection to host"
-      ansible.builtin.wait_for:
-        host: "{{ openstack_vm_ipv4 }}"
-        port: "22"
-        timeout: 120
-      register: wait_for_connection_reg
+    # - name: "Wait for connection to host"
+    #   ansible.builtin.wait_for:
+    #     host: "{{ openstack_vm_ipv4 }}"
+    #     port: "22"
+    #     timeout: 120
+    #   register: wait_for_connection_reg
     
     - name: "Set server changed"
       ansible.builtin.set_fact:
