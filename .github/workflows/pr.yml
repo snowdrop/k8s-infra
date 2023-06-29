@@ -23,7 +23,6 @@ jobs:
         with:
           branch: ${{ matrix.openstack_version }}
           enabled_services: 'ir-api,s-account,s-container,s-object,s-proxy,swift'
-          # 'ir-api,ir-cond,s-account,s-container,s-object,s-proxy,q-svc,q-agt,q-dhcp,q-l3,q-meta,-cinder,-c-sch,-c-api,-c-vol,-c-bak,-ovn,-ovn-controller,-ovn-northd,-q-ovn-metadata-agent'
           cache: devstack
       - name: Install Python
         uses: actions/setup-python@v4 
@@ -35,24 +34,9 @@ jobs:
       - name: Build Ansible Collection
         run: ansible-galaxy collection build ansible/ansible_collections/snowdrop/cloud_infra --output build/ --force
       - name: Install Ansible Collection
-        run: ansible-galaxy collection install $(find . -name snowdrop-cloud_infra-*.tar.gz) --upgrade
+        run: ansible-galaxy collection install build/snowdrop-cloud_infra-$(yq -r .version ansible/ansible_collections/snowdrop/cloud_infra/galaxy.yml).tar.gz --upgrade
       - name: Run tests
         run: |
-          ls -la /opt/stack/data/glance/images/
-          # echo "GITHUB_WORKSPACE: $GITHUB_WORKSPACE"
-          ls -la $GITHUB_WORKSPACE
-          # echo "KEYSTONE_SERVICE_URI: $KEYSTONE_SERVICE_URI"
-          pwd
-          ls -la
-          ls -la ..
-          # echo "STACK_ENV_VARS: $STACK_ENV_VARS"
-          echo "HOME: $HOME"
-          env
-          export
-          # python3 -m venv .snowdrop-venv
-          # source .snowdrop-venv/bin/activate
-          # pip install -r requirements.txt
-          # python3 -m pip install -r requirements.txt
           molecule test --scenario-name github
         working-directory: ansible/ansible_collections/snowdrop/cloud_infra/roles/${{ matrix.roles }}
 ...
