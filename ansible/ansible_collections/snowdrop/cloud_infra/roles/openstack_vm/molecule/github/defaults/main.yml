@@ -46,9 +46,6 @@ openstack_defaults:
       #   size: 20
     boot_from_volume: false
 
-# login_username: centos
-openstack_security_group: spring-boot
-
 openstack_auth: 
   openstack_project_name: "admin"
   openstack_console_user:  "admin"
