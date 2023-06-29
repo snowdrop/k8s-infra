@@ -48,12 +48,12 @@
     - name: "Validate server flavor"
       ansible.builtin.assert:
         that:
-          - openstack_server_info_output.servers[0].flavor.name == openstack_defaults.vm.flavor
-        msg: "Server flavor must be the one requested. Obtained {{ openstack_server_info_output.servers[0].flavor.name }} but requested {{ openstack_defaults.vm.flavor }}."
+          - openstack_server_info_output.servers[0].flavor.name == openstack_vm_flavor
+        msg: "Server flavor must be the one requested. Obtained {{ openstack_server_info_output.servers[0].flavor.name }} but requested {{ openstack_vm_flavor }}."
 
     - name: "Validate server key"
       ansible.builtin.assert:
         that:
           - openstack_server_info_output.servers[0].key_name == default_generic_key_name
-        msg: "Server key must be the one requested. Obtained {{ openstack_server_info_output.servers[0].key_name }} but requested {{ default_generic_key_name }}."
+        msg: "Server key must be the one requested. Obtained {{ openstack_server_info_output.servers[0].key_name }} but requested {{ vm_name }}."
 ...
