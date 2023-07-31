@@ -1,5 +1,7 @@
 = OpenStack Ansible Playbooks
+Snowdrop Team (Antonio Costa)
 :icons: font
+:revdate: {docdate}
 :toc: left
 :description: This document describes OpenStack specific playbooks.
 ifdef::env-github[]
@@ -188,8 +190,8 @@ of the passwordstore project.
 
 This should connect ot the newly created VM.
 
-[source]
-====
+[source,bash]
+======
 Last login: Thu Jan 1 00:00:00 1970 from x.x.x.x
 ------------------
 
@@ -198,5 +200,5 @@ Access is forbidden to all unauthorized person.
 All activity is being monitored.
 
 Welcome to vm20210221-t01..
-====
+======
 
