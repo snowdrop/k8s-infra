@@ -6,6 +6,10 @@
 
 List, description and usage of the implemented playbooks.
 
+=== Init Controller
+
+ansible-playbook ansible/playbook/passstore/passstore_controller_init.yml -e pass_provider=openstack
+
 === `passstore_controller_inventory`
 
 This playbook generates the local inventory for the host.
