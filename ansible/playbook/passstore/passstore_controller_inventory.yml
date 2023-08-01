@@ -9,34 +9,24 @@
   gather_facts: no
 
   pre_tasks:
-    - name: "Validate required variables"
-      assert:
-        that:
-          - "vm_name is defined"
-          - "pass_provider is defined"
-          - "k8s_type is defined"
-          - "k8s_version is defined"
-        fail_msg: 
-          - "Required parameters:"
-          - "  vm_name: Name of the vm"
-          - "  pass_provider: provider in the passstore project [hetzner]"
-          - "  k8s_type: Kubernetes host type [masters,nodes], empty for no k8s installation"
-          - "  k8s_version: Kubernetes version [115,116], empty for no k8s installation"
+    # - name: "Validate required variables"
+    #   assert:
+    #     that:
+    #       - "vm_name is defined"
+    #       - "pass_provider is defined"
+    #       - "k8s_type is defined"
+    #       - "k8s_version is defined"
+    #     fail_msg: 
+    #       - "Required parameters:"
+    #       - "  vm_name: Name of the vm"
+    #       - "  pass_provider: provider in the passstore project [hetzner]"
+    #       - "  k8s_type: Kubernetes host type [masters,nodes], empty for no k8s installation"
+    #       - "  k8s_version: Kubernetes version [115,116], empty for no k8s installation"
 
     - name: "Pull pass git database"
       shell: "git pull"
       args:
         chdir: "{{ lookup('env', 'PASSWORD_STORE_DIR') }}"
-
-    - name: Check k8s_type value
-      fail:
-        msg: "Invalid k8s type {{ k8s_type }}. Should be in [masters,nodes]"
-      when: "k8s_type != 'masters' and k8s_type != 'nodes' and k8s_type | length > 0"
-
-    - name: Check k8s_version value
-      fail:
-        msg: "Invalid k8s version {{ k8s_version }}. Should be in [119 ... 124]"
-      when: "k8s_version | length > 0 and not k8s_version in ['119', '121', '123', '124'] "
 
   tasks:
     - name: "Create inventory"
@@ -47,7 +37,7 @@
         pass_l2: "{{ pass_provider | default('hetzner') }}"
         pass_l3: "{{ vm_name }}"
         operation: "create"
-      when: "operation is defined and operation == 'create'"
+      when: "operation is defined and operation == 'create' "
 
     - name: "Build inventory"
       include_role:
