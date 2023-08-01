@@ -89,7 +89,7 @@
       auto_floating_ip: yes
       network: "{{ openstack.vm.network | default('') }}"
       security_groups: "{{ openstack_security_group }}"
-      #volumes: "{% if openstack.vm.volumes is defined and (openstack.vm.volumes | length > 0)  %}{{ openstack.vm.volumes | map(attribute='name') }}{% else %}[]{% endif %}"
+      volumes: "{% if openstack.vm.volumes is defined and (openstack.vm.volumes | length > 0)  %}{{ openstack.vm.volumes | map(attribute='name') }}{% else %}[]{% endif %}"
       boot_from_volume: "{{ openstack.vm.boot_from_volume | default(false) }}"
       userdata: |
         #cloud-config
