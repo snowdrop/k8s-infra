@@ -1,29 +1,73 @@
+# Requires:
+# . pass_l3_route: Route on the passwordstore to the folder containing the RSA key.
+# .. e.g.: openstack for using the generic ssh key, or openstack/vmname
+# . pass_l3_name: name of the file that will contain the ssh key. The files will have the snowdrop prefix.
+# .. e.g.: snowdrop_openstack or snowdrop_openstack_vmname
 ---
-- name: "Set pass facts for RSA keys"
-  set_fact:
+- name: "Check if private key exists"
+  ansible.builtin.stat:
+    path: "{{ '~/.ssh/id_rsa_'+ pass_l3_name }}"
+  register: rsa_private_file_stats
+
+- name: "Debug rsa_private_file_stats"
+  ansible.builtin.debug:
+    msg: "rsa_private_file_stats: {{ rsa_private_file_stats }}"
+
+- name: "Set pass facts for RSA private key"
+  ansible.builtin.set_fact:
     pass_rsa_private_key: "{{ query('passwordstore', pass_l3_route + '/id_rsa returnall=true')[0] }}"
-    pass_rsa_public_key: "{{ query('passwordstore', pass_l3_route + '/id_rsa.pub returnall=true')[0] }}"
   register: res_set_fact
 
 - name: "Create RSA private key from pass - Private key found in pass"
-  copy:
+  ansible.builtin.copy:
     dest: "{{ '~/.ssh/id_rsa_'+ pass_l3_name }}"
     content: "{{ pass_rsa_private_key }}"
-  when: "pass_rsa_private_key is defined and pass_rsa_private_key | length > 0"
+  when: "not rsa_private_file_stats.stat.exists and pass_rsa_private_key is defined and pass_rsa_private_key | length > 0"
+
+- name: "Add newline to the end of the file"
+  ansible.builtin.lineinfile:
+    dest: "{{ '~/.ssh/id_rsa_'+ pass_l3_name }}"
+    line: "{{ item }}"
+    insertbefore: EOF
+  when: "not rsa_private_file_stats.stat.exists and pass_rsa_private_key is defined and pass_rsa_private_key | length > 0"
+  with_items:
+  - ""
 
 - name: "Change RSA private key permission"
-  file:
+  ansible.builtin.file:
     path: "~/.ssh/id_rsa_{{ pass_l3_name }}"
     mode: "0600"
 
+- name: "Check if public key exists"
+  ansible.builtin.stat:
+    path: "{{ '~/.ssh/id_rsa_' + pass_l3_name + '.pub' }}"
+  register: rsa_public_file_stats
+
+- name: "Set pass facts for RSA public key"
+  ansible.builtin.set_fact:
+    pass_rsa_public_key: "{{ query('passwordstore', pass_l3_route + '/id_rsa.pub returnall=true')[0] }}"
+  ignore_errors: true
+  register: pub_key_query_res
+
+- name: "Debug pub_key_query_res"
+  ansible.builtin.debug:
+    msg: "pub_key_query_res: {{ pub_key_query_res }}"
+
 - name: "Create RSA public key from pass - Public key found in pass"
-  copy:
+  ansible.builtin.copy:
     dest: "{{ '~/.ssh/id_rsa_'+ pass_l3_name + '.pub'}}"
     content: "{{ pass_rsa_public_key }}"
-  when: "pass_rsa_public_key is defined and pass_rsa_public_key | length > 0"
+  when: "not rsa_public_file_stats.stat.exists and not pub_key_query_res.failed and pass_rsa_public_key is defined and pass_rsa_public_key | length > 0"
+
+- name: "Create RSA public key from private key - Public key not found in pass"
+  ansible.builtin.shell: 
+    cmd: |
+      ssh-keygen -y -f "id_rsa_{{ pass_l3_name }}" > "id_rsa_{{ pass_l3_name }}.pub"
+    chdir: "{{ lookup('env','HOME') }}/.ssh"
+  when: "not rsa_public_file_stats.stat.exists and pub_key_query_res.failed or (pass_rsa_public_key is defined and pass_rsa_public_key | length == 0)"
 
 - name: "Change RSA public key permission"
-  file:
+  ansible.builtin.file:
     path: "~/.ssh/id_rsa_{{ pass_l3_name }}.pub"
     mode: "0600"
 ...
