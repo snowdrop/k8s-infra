@@ -359,6 +359,22 @@ link:playbook/README.adoc[Ansible Playbooks]: `playbook`
 
 link:roles[Ansible Roles]: `roles`
 
+== Collections
+
+Build a collection
+
+[source,bash]
+----
+ansible-galaxy collection build ansible/ansible_collections/snowdrop/godaddy --output build/ --force
+----
+
+Install a collection
+
+[source,bash]
+----
+ansible-galaxy collection install build/snowdrop-godaddy-$(yq -r .version ansible/ansible_collections/snowdrop/godaddy/galaxy.yml).tar.gz --upgrade
+----
+
 == Development Guide
 
 === Testing

@@ -1,0 +1,11 @@
+[
+  {
+    "data": "{{ dns.data }}"
+    {% if dns.port is defined %}, port: {{ dns.port }}{% endif %}
+    {% if dns.priority is defined %}, "priority": {{ dns.priority }}{% endif %}
+    {% if dns.protocol is defined %}, "protocol": "{{ dns.protocol }}"{% endif %}
+    {% if dns.service is defined %}, "service": "{{ dns.service }}"{% endif %}
+    {% if dns.ttl is defined %}, "ttl": {{ dns.ttl }}{% endif %}
+    {% if dns.weight is defined %}, "weight": {{ dns.weight }}{% endif %}
+  }
+]
