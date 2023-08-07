@@ -1,38 +1,120 @@
 Role Name
 =========
 
-A brief description of the role goes here.
+CRUD operations for GoDaddy DNS records.
 
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+N/A
 
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+**Variables** defined at `defaults/main.yml`.
+
+| Variable | Description
+| --- | ---
+| `pro_api_url` | URL for the GoDaddy production API
+| `ote_api_url` | URL for the GoDaddy OTE (Open Transaction Environment) API
+| `domains_folder` | API URI folder for the domains
+| `dns_records_folder` | API URI folder for the DNS records
+
+**Parameters**
+
+| Parameter | DNS Description
+| --- | ---
+| `api_environment`<br/><span style="color:fuchsia">string</span> | GoDaddy API environment to use:<ul><li>_Empty/Default_: OTE</li><li>`production` or `prod`: Production</li></ul>
+| `state`<br/><span style="color:fuchsia">string</span><br/><span style="color:red">required</span> | State of the record: <ul><li>`present`</li><li>`absent`</li></ul>
+| `domain_name`<br/><span style="color:fuchsia">string</span><br/><span style="color:red">required</span> | GoDaddy domain to associate the DNS record with. 
+| `record_type`<br/><span style="color:fuchsia">string</span><br/><span style="color:red">required</span> | DNS type of the record
+| `record_name`<br/><span style="color:fuchsia">string</span><br/><span style="color:red">required</span> | Name of the DNS record
+| `dns`<br/><span style="color:fuchsia">json</span><br/><span style="color:red">required</span> | DNS data
+
+The contents of the `dns` variable are the following.
+
+```json
+[
+  {
+    "data": "string",
+    "port": 65535,
+    "priority": 0,
+    "protocol": "string",
+    "service": "string",
+    "ttl": 0,
+    "weight": 0
+  }
+]
+```
+
+| Parameter | Description
+| --- | ---
+| `data`<br/><span style="color:fuchsia">string</span><br/><span style="color:red">required</span> | GoDaddy API environment to use:<ul><li>_Empty/Default_: OTE</li><li>`production` or `prod`: Production</li></ul>
+| `priority`<br/><span style="color:fuchsia">integer</span> | Check the GoDaddy API documentation
+| `priority`<br/><span style="color:fuchsia">integer</span> | Check the GoDaddy API documentation
+| `protocol`<br/><span style="color:fuchsia">string</span> | Check the GoDaddy API documentation
+| `service`<br/><span style="color:fuchsia">string</span> | Check the GoDaddy API documentation
+  `ttl`<br/><span style="color:fuchsia">json</span> | Check the GoDaddy API documentation
+| `weight`<br/><span style="color:fuchsia">integer</span> | Check the GoDaddy API documentation
+  `ttl`<br/><span style="color:fuchsia">integer</span> | Check the GoDaddy API documentation
+
+**Authentication information**
+
+| Parameter | DNS Description
+| --- | ---
+| `api_key`<br/><span style="color:fuchsia">string</span><br/><span style="color:red">required</span> | GoDaddy API key.
+| `api_secret`<br/><span style="color:fuchsia">string</span><br/><span style="color:red">required</span> | GoDaddy API secretkey.
+The role returns the `godaddy_dns` variable with the results of the process.
 
 Dependencies
 ------------
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+N/A.
 
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+Create a DNS record.
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+```yaml
+- name: "GoDaddy DNS create"
+  hosts: localhost
+  gather_facts: True
+    
+  tasks:
+    - name: "Create DNS record"
+      include_role:
+        name: "snowdrop.godaddy.dns"
+      vars: 
+        state: "present"
+```
+
+```bash
+ansible-playbook ansible/playbook/godaddy/godaddy_dns_create_passwordstore.yml \ 
+  -e domain_name="<existing_domain>" \ 
+  -e record_type="<dns_record_type>" \ 
+  -e record_name="<dns_record_name" \ 
+  -e '{"dns": {"data": "<ip_address>"}}' \ 
+  -e api_environment=prod
+```
+
+Example for adding a `A` record for `mydomain` at `snowdrop.dev`.
+
+```bash
+ansible-playbook ansible/playbook/godaddy/godaddy_dns_create_passwordstore.yml \ 
+  -e domain_name="snowdrop.dev" \ 
+  -e record_type="A" \ 
+  -e record_name="mydomain" \ 
+  -e '{"dns": {"data": "127.0.0.1"}}' \ 
+  -e api_environment=prod
+```
 
 License
 -------
 
-BSD
+[Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0)
 
 Author Information
 ------------------
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+RedHat Snowdrop team.

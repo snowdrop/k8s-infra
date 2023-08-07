@@ -7,9 +7,5 @@ agreements_folder: agreements
 domains_folder: domains
 purchase_folder: purchase
 
-# domain:
-#   consent:
-#     agreedBy: JohnDoe
-#     agreedAt:
 ...
 

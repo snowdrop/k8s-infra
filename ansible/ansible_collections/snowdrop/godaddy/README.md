@@ -1,3 +1,4 @@
 # Ansible Collection - snowdrop.godaddy
 
-Documentation for the collection.
+Collection for managing GoDaddy API functions.
+

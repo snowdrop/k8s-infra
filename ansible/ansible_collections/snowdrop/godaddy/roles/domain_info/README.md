@@ -1,38 +1,73 @@
 Role Name
 =========
 
-A brief description of the role goes here.
+Collects information related to a domain.
 
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+N/A
 
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+**Parameters**
+
+| Parameter | DNS Description
+| --- | ---
+| `api_environment`<br/><span style="color:fuchsia">string</span> | GoDaddy API environment to use:<ul><li>_Empty/Default_: OTE</li><li>`production` or `prod`: Production</li></ul>
+| `domain_name`<br/><span style="color:fuchsia">string</span><br/><span style="color:red">required</span> | GoDaddy domain to associate the DNS record with. 
+
+**Authentication information**
+
+| Parameter | DNS Description
+| --- | ---
+| `api_key`<br/><span style="color:fuchsia">string</span><br/><span style="color:red">required</span> | GoDaddy API key.
+| `api_secret`<br/><span style="color:fuchsia">string</span><br/><span style="color:red">required</span> | GoDaddy API secretkey.
+
+The role returns the `godaddy_domain_info` variable with the information obtained from GoDaddy.
 
 Dependencies
 ------------
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+N/A
 
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+Get information from a Domain.
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+```yaml
+- name: "GoDaddy Domain information"
+  hosts: localhost
+  gather_facts: True
+    
+  tasks:
+    - name: "Get domain information"
+      include_role:
+        name: "snowdrop.godaddy.domain_info"
+
+    - name: "Print domain information"
+      debug:
+        var: godaddy_domain_info
+```
+
+Example call of this playbook requesting domain information.
+
+```bash
+ansible-playbook ansible/playbook/godaddy/godaddy_domain_info_passwordstore.yml \ 
+  -e domain_name="snowdrop.dev" \ 
+  -e api_environment=prod
+```
+
+
 
 License
 -------
 
-BSD
+[Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0)
 
 Author Information
 ------------------
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+RedHat Snowdrop team.
