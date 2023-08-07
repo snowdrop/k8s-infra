@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -ex
+set -e
 ###################
 # Global parameters
 ###################
@@ -167,7 +167,7 @@ kubeTools() {
     log "CYAN" "Install kubectl krew tool - https://krew.sigs.k8s.io/docs/user-guide/setup/install/"
     (
       set -x; cd "$(mktemp -d)" &&
-      KREW="krew-${OS}_${ARCH}" &&
+      KREW="krew-${DISTRO}_${ARCH}" &&
       curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/latest/download/${KREW}.tar.gz" &&
       tar zxvf "${KREW}.tar.gz" &&
       ./"${KREW}" install krew
@@ -182,6 +182,9 @@ kubeTools() {
 
     log "CYAN" "Install kubectl-konfig - https://github.com/corneliusweig/konfig"
     ${KREW_ROOT:-$HOME/.krew}/bin/kubectl-krew install konfig
+
+    log "CYAN" "Install kubectl-oidc-login - https://github.com/int128/kubelogin"
+    ${KREW_ROOT:-$HOME/.krew}/bin/kubectl-krew install oidc-login
 
     BASHRC_D_DIR="$HOME/.bashrc.d"
     if [ ! -d ${BASHRC_D_DIR} ]; then
