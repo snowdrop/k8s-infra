@@ -50,19 +50,18 @@ log() {
   echo; generate_eyecatcher ${1} '#'; log_msg ${1} ${MSG}; generate_eyecatcher ${1} '#'; echo
 }
 
-check_os() {
+check_os_distro() {
   PLATFORM='unknown'
-  unamestr=$(uname)
-  if [[ "$unamestr" == 'Linux' ]]; then
+  unamestr=$(uname | tr '[:upper:]' '[:lower:]')
+  if [[ "$unamestr" == 'linux' ]]; then
      PLATFORM='linux'
-  elif [[ "$unamestr" == 'Darwin' ]]; then
-     PLATFORM='darwin'
+     DISTRO=$( cat /etc/*-release | tr [:upper:] [:lower:] | grep -Poi '(debian|ubuntu|red hat|centos|fedora)' | uniq )
+  elif [[ "$unamestr" == 'darwin' ]]; then
+     PLATFORM='linux'
+     DISTRO='darwin'
   fi
   log "CYAN" "OS type: $PLATFORM"
-}
 
-check_distro() {
-  DISTRO=$( cat /etc/*-release | tr [:upper:] [:lower:] | grep -Poi '(debian|ubuntu|red hat|centos|fedora)' | uniq )
   if [ -z $DISTRO ]; then
       DISTRO='unknown'
   fi
@@ -77,10 +76,9 @@ check_arch() {
     log "CYAN" "Detected Arch: $ARCH"
 }
 
-init() {
+check() {
       # Check OS TYPE and/or linux distro
-      check_os
-      check_distro
+      check_os_distro
       check_arch
 }
 
@@ -152,8 +150,6 @@ kubeTools() {
     log "CYAN" "Install kubectl krew tool - https://krew.sigs.k8s.io/docs/user-guide/setup/install/"
     (
       set -x; cd "$(mktemp -d)" &&
-      OS="$(uname | tr '[:upper:]' '[:lower:]')" &&
-      ARCH="$(uname -m | sed -e 's/x86_64/amd64/' -e 's/\(arm\)\(64\)\?.*/\1\2/' -e 's/aarch64$/arm64/')" &&
       KREW="krew-${OS}_${ARCH}" &&
       curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/latest/download/${KREW}.tar.gz" &&
       tar zxvf "${KREW}.tar.gz" &&
@@ -210,6 +206,7 @@ EOF
 init
 
 case $1 in
+    check)      check;   exit;;
     docker)     docker; exit;;
     others)     others; exit;;
     *)          kubeTools; exit;;
