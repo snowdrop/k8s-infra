@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+set -ex
 ###################
 # Global parameters
 ###################
@@ -55,7 +56,7 @@ check_os_distro() {
   unamestr=$(uname | tr '[:upper:]' '[:lower:]')
   if [[ "$unamestr" == 'linux' ]]; then
      PLATFORM='linux'
-     DISTRO=$( cat /etc/*-release | tr [:upper:] [:lower:] | grep -Poi '(debian|ubuntu|red hat|centos|fedora)' | uniq )
+     DISTRO=$(cat /etc/*-release | tr [:upper:] [:lower:] | grep -Poi '(debian|ubuntu|red hat|centos|fedora)' | uniq )
   elif [[ "$unamestr" == 'darwin' ]]; then
      PLATFORM='linux'
      DISTRO='darwin'
@@ -76,10 +77,33 @@ check_arch() {
     log "CYAN" "Detected Arch: $ARCH"
 }
 
-check() {
-      # Check OS TYPE and/or linux distro
-      check_os_distro
-      check_arch
+init() {
+  # Check OS TYPE and/or linux distro
+  check_os_distro
+  check_arch
+
+  # Define the destination directory according to distro and arch
+  if [ "$DISTRO" = "darwin" ] && [ "$ARCH" = "arm64" ]; then
+    DEST_DIR="/opt/bin"
+    log_msg "BLUE" $(printf "Destination dir: %s" $DEST_DIR)
+  else
+    DEST_DIR="/usr/local/bin"
+    log_msg "BLUE" $(printf "Destination dir: %s" $DEST_DIR)
+  fi
+
+  # Install pre-req tools
+  log "CYAN" "Installing useful tools: k9s, unzip, wget, jq,..."
+  if [[ $DISTRO == 'fedora' ]]; then
+    sudo yum install git wget unzip bash-completion openssl jq -y
+  elif [[ $DISTRO == 'centos' ]]; then
+    sudo yum install git wget unzip epel-release bash-completion jq -y
+  elif [[ $DISTRO == 'darwin' ]]; then
+    if ! command -v brew &> /dev/null; then
+      log_msg "YELLOW" $(printf "Brew is not installed ! %s" https://brew.sh/)
+    else
+      brew install jq wget
+    fi
+  fi
 }
 
 docker() {
@@ -106,18 +130,8 @@ others() {
 }
 
 kubeTools() {
-  K9S_VERSION=$(curl -s "https://api.github.com/repos/derailed/k9s/releases/latest" | grep -Po '"tag_name": "\K.*?(?=")')
-  KIND_VERSION=$(curl -s "https://api.github.com/repos/kubernetes-sigs/kind/releases/latest" | grep -Po '"tag_name": "\K.*?(?=")')
-
-  REMOTE_HOME_DIR=${REMOTE_HOME_DIR:-$HOME}
-  DEST_DIR="/usr/local/bin"
-
-  log "CYAN" "Install useful tools: k9s, unzip, wget, jq,..."
-  if [[ $DISTRO == 'fedora' ]]; then
-    sudo yum install git wget unzip bash-completion openssl -y
-  else
-    sudo yum install git wget unzip epel-release bash-completion -y
-  fi
+  K9S_VERSION=$(wget -qO- https://api.github.com/repos/derailed/k9s/releases/latest | jq -r '.tag_name')
+  KIND_VERSION=$(wget -qO- https://api.github.com/repos/kubernetes-sigs/kind/releases/latest | jq -r '.tag_name')
 
   if ! command -v helm &> /dev/null; then
     log "CYAN" "Installing Helm"
@@ -144,7 +158,6 @@ kubeTools() {
 
   log "CYAN" "Checking if k9s exists..."
   if ! command -v k9s &> /dev/null; then
-    sudo yum install jq -y
     wget -q https://github.com/derailed/k9s/releases/download/${K9S_VERSION}/k9s_Linux_${ARCH}.tar.gz && tar -vxf k9s_Linux_${ARCH}.tar.gz
     sudo cp k9s ${DEST_DIR}
   fi
@@ -207,20 +220,21 @@ EOF
   fi
 }
 
-init
-
 case $1 in
-    check)      check;   exit;;
-    docker)
-        check
-        docker;
-        exit;;
-    others)
-        check
-        others;
-        exit;;
-    *)
-        check
-        kubeTools;
-        exit;;
+  check)
+      check_os_distro
+      check_arch
+      exit;;
+  docker)
+      init
+      docker
+      exit;;
+  others)
+      init
+      others
+      exit;;
+  *)
+      init
+      kubeTools
+      exit;;
 esac
