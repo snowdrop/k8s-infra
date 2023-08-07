@@ -83,15 +83,19 @@ check() {
 }
 
 docker() {
-    sudo yum install -y yum-utils
-    sudo yum-config-manager --add-repo https://download.docker.com/linux/${DISTRO}/docker-ce.repo
-    sudo yum install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-    sudo systemctl start docker
-    sudo systemctl enable docker
-    sudo groupadd docker
-    sudo usermod -aG docker $USER
-    sudo chown $USER /var/run/docker.sock
-    sudo systemctl restart docker
+    if [ "$DISTRO" -eq "darwin" ]; then
+        echo "Darwin installation is not supported."
+    else
+        sudo yum install -y yum-utils
+        sudo yum-config-manager --add-repo https://download.docker.com/linux/${DISTRO}/docker-ce.repo
+        sudo yum install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+        sudo systemctl start docker
+        sudo systemctl enable docker
+        sudo groupadd docker
+        sudo usermod -aG docker $USER
+        sudo chown $USER /var/run/docker.sock
+        sudo systemctl restart docker
+    fi
 }
 
 others() {
@@ -207,7 +211,16 @@ init
 
 case $1 in
     check)      check;   exit;;
-    docker)     docker; exit;;
-    others)     others; exit;;
-    *)          kubeTools; exit;;
+    docker)
+        check
+        docker;
+        exit;;
+    others)
+        check
+        others;
+        exit;;
+    *)
+        check
+        kubeTools;
+        exit;;
 esac
