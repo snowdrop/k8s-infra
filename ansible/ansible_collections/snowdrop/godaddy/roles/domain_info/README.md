@@ -60,8 +60,6 @@ ansible-playbook ansible/playbook/godaddy/godaddy_domain_info_passwordstore.yml 
   -e api_environment=prod
 ```
 
-
-
 License
 -------
 
