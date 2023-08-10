@@ -6,6 +6,21 @@ on:
   pull_request:
 
 jobs:
+  kind-test:
+    name: Test Kind Deployment
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        kind_version: [v0.20.0]
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v3
+      - name: Deploy kind
+        run: |
+          curl -Lo ./kind https://kind.sigs.k8s.io/dl/${{ matrix.kind_version }}/kind-linux-amd64
+          chmod 755 kind
+          ./kind/registry.sh install --registry-name kind-registry.local
+          ./kind/kind.sh install --registry-name kind-registry.local
   test-openstack-roles:
     name: Test Collection Openstack Roles
     runs-on: ubuntu-latest
