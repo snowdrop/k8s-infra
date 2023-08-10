@@ -500,7 +500,8 @@ EOF
 EOF
 )
     fi
-
+    note "5" "1 INGRESS_80_CONTAINER_PORT: ${INGRESS_80_CONTAINER_PORT}"
+    note "5" "1 INGRESS_443_CONTAINER_PORT: ${INGRESS_443_CONTAINER_PORT}"
     kindCmd="${KIND_COMMAND} -v ${LOGGING_VERBOSITY} create cluster  -n ${CLUSTER_NAME}"
     kindExtraPortMappings=$(cat <<EOF
   - containerPort: ${INGRESS_80_CONTAINER_PORT}
@@ -513,6 +514,7 @@ EOF
     listenAddress: "0.0.0.0"
 EOF
 )
+    note "5" "extraPortMappings: ${kindExtraPortMappings}"
     IFS=',' read -ra ADDR <<< "${PORT_MAP}"
     for i in "${ADDR[@]}"; do
         IFS=':' read -ra PORTS <<< "${i}"
@@ -525,7 +527,7 @@ EOF
 EOF
 )
     done
-
+    note "5" "extraPortMappings: ${kindExtraPortMappings}"
 # Kind cluster config template
     kindCfg=$(cat <<EOF
 kind: Cluster
@@ -633,13 +635,10 @@ function validate_ingress() {
         show_usage
         exit 1  
     fi
-
+    note "5" "INGRESS_80_CONTAINER_PORT: ${INGRESS_80_CONTAINER_PORT}"
+    note "5" "INGRESS_443_CONTAINER_PORT: ${INGRESS_443_CONTAINER_PORT}"
     note "5" "Ingress ports: ${INGRESS_PORTS}"
     if [ "${INGRESS_PORTS}" == "" ]; then
-        IFS=':' read -ra PORT_MAP <<< "${INGRESS_PORTS}"
-        INGRESS_80_CONTAINER_PORT=${PORT_MAP[0]}
-        INGRESS_443_CONTAINER_PORT=${PORT_MAP[1]}
-    else 
         if [ "${INGRESS}" == 'kourier' ]; then
             INGRESS_80_CONTAINER_PORT=31080
             INGRESS_443_CONTAINER_PORT=31443
@@ -647,6 +646,10 @@ function validate_ingress() {
             INGRESS_80_CONTAINER_PORT=80
             INGRESS_443_CONTAINER_PORT=443
         fi
+    else 
+        IFS=':' read -ra PORT_MAP <<< "${INGRESS_PORTS}"
+        INGRESS_80_CONTAINER_PORT=${PORT_MAP[0]}
+        INGRESS_443_CONTAINER_PORT=${PORT_MAP[1]}
     fi
     note "5" "Ingress ports: ${INGRESS_80_CONTAINER_PORT}:${INGRESS_443_CONTAINER_PORT}"
 }
