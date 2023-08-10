@@ -1,0 +1,81 @@
+---
+# Doesn't work, doesn't return api_key and api_secret variables. 
+# Don't kow why :(
+# - name: "Build GoDaddy authentication, if not provided"
+#   import_playbook: "../godaddy/godaddy_auth_passwordstore.yml"
+#   when: api_key is undefined and api_secret is undefined
+#   tags: [always]
+
+- name: "Install Kubernetes tools"
+  hosts: "{{ vm_name | default('masters') }}"
+  gather_facts: true
+
+  pre_tasks:
+    - name: "Set godaddy auth facts"
+      ansible.builtin.set_fact:
+        api_key: "{{ query('passwordstore', 'godaddy/' ~ api_environment | default('ote') ~ '/api-key')[0] }}"
+        api_secret: "{{ query('passwordstore', 'godaddy/' ~ api_environment | default('ote') ~ '/secret-key')[0] }}"
+      when: api_key is undefined and api_secret is undefined
+      tags: [always]
+
+    - name: "Validate required variables"
+      assert:
+        that:
+          - "vm_name is defined and vm_name | length > 0"
+          - "state is defined and (state == 'present' or state == 'absent')"
+          - "api_key is defined and api_secret is defined"
+        fail_msg: 
+          - "Required parameters:"
+          - "  vm_name: VM to where the tolls will be deployed"
+          - "  state: 'present' to install the tools and 'absent' to remove them"
+      tags: [always]
+
+  tasks:
+    # Requires GoDaddy API Key and Secret Key
+    - name: "Install k8s_issuer_certificate"
+      ansible.builtin.import_role:
+        name: k8s_issuer_certificate
+      # vars:
+      #   api_key: "{{ api_key  }}"
+      #   api_secret: "{{ api_secret  }}"
+      tags: [k8s_issuer_certificate]
+
+#     - role: 'cert_manager'
+#       tags: [always,cert_manager]
+#     - role: 'k8s_dashboard'
+#       tags: [always,k8s_dashboard]
+#     - { role: 'persistence',            tags: 'persistence'}          # When Minishift or oc cluster up is NOT used
+#     - { role: 'identity_provider',      tags: 'identity_provider'}    # Use HTPasswdPasswordIdentityProvider as Identity Provider -> more secure
+#     - { role: 'enable_cluster_role',    tags: 'enable_cluster_role'}
+#     - { role: 'add_extra_users',        tags: 'add_extra_users'}
+#     - { role: 'delete_extra_users',     tags: 'delete_extra_users'}
+#     - { role: 'install_oc',             tags: 'install_oc'}           # Install oc client when cluster role is not used
+#     - { role: 'docker',                 tags: 'docker'}               # Enable to access docker on port 2376
+#     - { role: 'create_projects',        tags: 'create_projects'}
+#     - { role: 'install_nexus',          tags: 'nexus'}
+#     - { role: 'install_jenkins',        tags: 'jenkins'}
+#     - { role: 'install_jaeger',         tags: 'jaeger'}
+#     - { role: 'install_istio',          tags: 'istio'}
+#     - { role: 'install_launcher',       tags: 'install-launcher'}
+#     - { role: 'uninstall_launcher',     tags: 'uninstall-launcher'}
+#     - { role: 'component_crd_operator', tags: 'component_crd_operator'}
+#     - { role: 'snowdrop_site',          tags: 'snowdrop-site'}
+#     - { role: 'tekton_pipelines',       tags: 'tekton_pipelines'}
+#     - { role: 'halkyon',                tags: 'halkyon'}
+# #    - { role: 'k8s_cluster',            tags: 'k8s_cluster'}
+#     - { role: 'k8s_config',             tags: 'k8s_config'}
+# #    - { role: 'k8s_dashboard',          tags: 'k8s_dashboard'}
+#     - { role: 'k8s_service_broker',     tags: 'k8s_service_broker'}
+#     - { role: 'k8s_halkyon_site',       tags: 'k8s_halkyon_site'}
+#     - { role: 'k8s_issuer_certificate', tags: 'k8s_issuer_certificate'}
+#     - { role: 'kind',                   tags: 'kind'}
+# #    - { role: 'ingress',                tags: 'ingress'}
+#     - { role: 'helm',                   tags: 'helm'}
+#     - { role: 'kubedb',                 tags: 'kubedb'}
+#     - { role: 'docker_registry',        tags: 'docker_registry'}
+#     - { role: 'tekton_pipelines',       tags: 'tekton_pipelines'}
+#     - { role: 'component_crd_operator', tags: 'component_crd_operator'}
+#     - { role: 'ocp4_console',           tags: 'ocp4_console'}
+# #    - { role: 'cert_manager',           tags: 'cert_manager'}
+
+...

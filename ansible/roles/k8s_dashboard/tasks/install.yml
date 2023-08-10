@@ -27,14 +27,17 @@
 
 - name: "Collect the dashboard Token"
   shell: |
-    kubectl -n kubernetes-dashboard get secret $(kubectl -n kubernetes-dashboard get sa/admin-user \
-      -o jsonpath='{.secrets[0].name}') {% raw %}-o go-template='{{.data.token | base64decode}}'{% endraw %}
+    kubectl -n kubernetes-dashboard create token admin-user
+    # kubectl -n kubernetes-dashboard get secret $(kubectl -n kubernetes-dashboard get sa/admin-user \
+    #   -o jsonpath='{.secrets[0].name}') {% raw %}-o go-template='{{.data.token | base64decode}}'{% endraw %}
   register: k8s_dashboard_token_res
 
 - name: "Add the dashboard token to the passwordstore"
   set_fact:
     k8s_dashboard_token: "{{ k8s_dashboard_token_res.stdout }}"
 
+# TODO: This should be done at playbook level. T
+# This role should only return variables and not perform these kind of operations
 - name: "Add the dashboard token to the passwordstore"
   set_fact:
     k8s_dashboard_token_pass: "{{ query('passwordstore', pass_provider + '/' + ansible_hostname + '/k8s_dashboard_token overwrite=yes nosymbols=true create=True userpass=' + k8s_dashboard_token_res)[0] | lower }}"

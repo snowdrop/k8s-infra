@@ -15,6 +15,7 @@
       assert:
         that:
           - "pass_provider is defined"
+          - "pass_provider == 'hetzner' or pass_provider == 'openstack'"
         fail_msg: 
           - "Required parameters:"
           - "  pass_provider: provider in the passstore project [hetzner,openstack]"

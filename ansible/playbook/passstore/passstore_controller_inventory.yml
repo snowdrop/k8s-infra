@@ -2,51 +2,55 @@
 # Required variables:
 #  . vm_name: Name of the vm
 #  . pass_provider: provider in the passstore project [hetzner]
-#  . k8s_type: Kubernetes host type [masters,nodes], empty for no k8s installation
-#  . k8s_version: Kubernetes version [117 ... 121], empty for no k8s installation
 - name: "Generate inventory files on the controller"
   hosts: localhost
   gather_facts: no
 
   pre_tasks:
-    # - name: "Validate required variables"
-    #   assert:
-    #     that:
-    #       - "vm_name is defined"
-    #       - "pass_provider is defined"
-    #       - "k8s_type is defined"
-    #       - "k8s_version is defined"
-    #     fail_msg: 
-    #       - "Required parameters:"
-    #       - "  vm_name: Name of the vm"
-    #       - "  pass_provider: provider in the passstore project [hetzner]"
-    #       - "  k8s_type: Kubernetes host type [masters,nodes], empty for no k8s installation"
-    #       - "  k8s_version: Kubernetes version [115,116], empty for no k8s installation"
+    - name: "Validate required variables"
+      assert:
+        that:
+          - "vm_name is defined"
+          - "pass_provider is defined"
+          - "pass_provider == 'hetzner' or pass_provider == 'openstack'"
+        fail_msg: 
+          - "Required parameters:"
+          - "  vm_name: Name of the vm"
+          - "  pass_provider: provider in the passstore project [hetzner,openstack]"
 
     - name: "Pull pass git database"
       shell: "git pull"
       args:
         chdir: "{{ lookup('env', 'PASSWORD_STORE_DIR') }}"
 
-  tasks:
-    - name: "Create inventory"
-      include_role:
-        name: "passstore/ansible_inventory"
-      vars:
-        pass_l1: "{{ pass_db_name | default('snowdrop') }}"
-        pass_l2: "{{ pass_provider | default('hetzner') }}"
-        pass_l3: "{{ vm_name }}"
-        operation: "create"
-      when: "operation is defined and operation == 'create' "
+    - name: "Print operation"
+      ansible.builtin.debug:
+        var: operation
 
-    - name: "Build inventory"
-      include_role:
+  tasks:
+
+    - name: "Print operation 2"
+      ansible.builtin.debug:
+        var: operation
+
+    - name: "Prepare inventory"
+      ansible.builtin.include_role:
         name: "passstore/ansible_inventory"
       vars:
         pass_l1: "{{ pass_db_name | default('snowdrop') }}"
-        pass_l2: "{{ pass_provider | default('hetzner') }}"
+        pass_l2: "{{ pass_provider | default('openstack') }}"
         pass_l3: "{{ vm_name }}"
-      when: "operation is undefined or operation != 'create'"
+    #     operation: "create"
+    #   when: "operation is defined and operation == 'create' "
+
+    # - name: "Build inventory"
+    #   include_role:
+    #     name: "passstore/ansible_inventory"
+    #   vars:
+    #     pass_l1: "{{ pass_db_name | default('snowdrop') }}"
+    #     pass_l2: "{{ pass_provider | default('hetzner') }}"
+    #     pass_l3: "{{ vm_name }}"
+    #   when: "operation is undefined or operation != 'create'"
 
     - name: "Add to k8s version"
       include_role:

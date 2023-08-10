@@ -55,7 +55,6 @@ Different OS images are available on Openstack.
 
 === Flavors
 
-
 .OpenStack Flavor information
 [%header,cols="2m,1,1,1,1,1"]
 |===

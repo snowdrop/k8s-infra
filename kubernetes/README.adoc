@@ -1,0 +1,301 @@
+= Kubernetes
+Snowdrop Team (Antonio costa)
+:icons: font
+:icon-set: fas
+:revdate: {docdate}
+:toc: left
+:toclevels: 3
+:description: This document describes the requirements, and the process to execute to install a k8s cluster on a host. The installation will be done using Ansible.
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
+
+== Introduction
+
+This document describes the requirements, and the process to execute to
+install a k8s cluster on a host. The installation will be done using
+Ansible.
+
+=== Scope
+
+Describe the steps to execute to install k8s on a host.
+
+== Requirements
+
+First of all follow the instructions in the
+link:../ansible/playbook/README.md#installation-guide[Ansible
+Installation Guide section].
+
+=== Ansible Inventory
+
+In order to execute the installation of k8s several variables must be
+provided. To standardize the installation several Ansible Groups have
+been created for different installations.
+
+To populate these variables, some groups, with the corresponding group
+variables, have been created in the
+link:../ansible/inventory/hosts.yml[`hosts.yml`] inventory file.
+
+The following table shows the existing groups for k8s.
+
+[width="100%",cols="25%,25%m,50%",options="header",]
+|===
+|Group Type |Group Name |Description
+|Components |masters |Kubernetes control plane. Includes information
+such as firewall ports and services to be open as well as internal
+subnet information.
+
+|Components |nodes |Kubernetes node. Similar to masters but for k8s
+nodes.
+
+|Versions |k8s_116 |Information v 1.16 specific
+
+|Versions |k8s_115 |Information v 1.15 specific
+|===
+
+Installing kubernetes requires a host to be assigned to 2 groups,
+identified from the previous table as _Group Type_, a k8s component and
+a k8s version.
+
+More information on versions on the link:../ansible/inventory/hosts.yml[`hosts.yml`] Ansible inventory file.
+
+.Click to see the k8s yaml file configuration
+[%collapsible]
+====
+[source,yaml]
+----
+include::../ansible/inventory/hosts.yml[tag=k8s_version]
+----
+====
+
+=== Host provisioning
+
+Provisioning a host is done using the appropriate Ansible Playbooks.
+
+The first step is to generate the inventory. More information in the local
+passwordstore link:../passwordstore/README.adoc[Define host inventory for provisioning] document.
+
+Once the inventory is prepared the host can be created. To provision a RHOS VM check the link:../openstack/README.adoc[OpenStack] documenation. The latest configuration used is the following.
+
+[width="100%",cols="40%,60%m",options="header",]
+|===
+| Attribute | Value
+
+| Flavor | ci.m4.xlarge
+
+| Image | Fedora-Cloud-Base-37
+|===
+
+To remove the host from the inventory check the link:../passwordstore/README.adoc[Remove host from inventory] secion from the passwordstore document.
+
+== Installation
+
+Once the host is defined in the inventory and also provisioned, execute the k8s creation playbook.
+
+Ansible tags are used to manage which components are to be installed. The tags that can be selected are the following.
+
+[width="100%",cols="25%m,10%c,65%",options="header",]
+|===
+| Tag | Always | Description
+
+| containerd | icon:times[] | Installs link:https://containerd.io/[containerd] as CRI
+
+| docker | icon:times[] | Installs Docker as CRI
+
+| ingress | icon:times[] | Installs link:https://kubernetes.io/docs/concepts/services-networking/ingress/[Ingress]
+
+| k8s_cluster | icon:check[] | Installs the Kubernetes cluster
+
+| k8s_dashboard | icon:times[] | Installs the link:https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/[Kubernetes Dashboard]
+|===
+
+.Deploy kubernetes on a host installing docker and the Dashboard
+[source,bash]
+----
+ansible-playbook ansible/playbook/kubernetes/k8s_install_passstore.yml -e vm_name=${VM_NAME} --tags docker,k8s_dashboard
+----
+
+[WARNING]
+====
+Be sure that a host group entry exists for the version you
+want to install within the `inventory/hosts` file
+
+[source,yaml]
+----
+        k8s_121:
+          vars:
+            k8s_version: 1.21.4
+            k8s_dashboard_version: v2.3.1
+----
+====
+
+Example for installing a k8s server from scratch using openstack provider
+where we will create a VM.
+
+[source,bash]
+----
+VM_NAME=snowdrop-vm \
+  && ansible-playbook hetzner/ansible/hetzner-delete-server.yml -e vm_name=${VM_NAME} -e hetzner_context_name=snowdrop \
+   ansible-playbook ansible/playbook/passstore_controller_inventory_remove.yml -e vm_name=${VM_NAME} -e pass_provider=hetzner \
+  && ansible-playbook hetzner/ansible/hetzner-create-ssh-key.yml -e vm_name=${VM_NAME} \
+  && ansible-playbook ansible/playbook/passstore_controller_inventory.yml -e vm_name=${VM_NAME} -e pass_provider=hetzner -e k8s_type=masters -e k8s_version=115 -e operation=create \
+  && ansible-playbook hetzner/ansible/hetzner-create-server.yml -e vm_name=${VM_NAME} -e salt_text=$(gpg --gen-random --armor 1 20) -e hetzner_context_name=snowdrop \
+  && ansible-playbook ansible/playbook/sec_host.yml -e vm_name=${VM_NAME} -e provider=hetzner \
+  && ansible-playbook kubernetes/ansible/k8s.yml --limit ${VM_NAME}
+----
+
+[NOTE]
+====
+Both kubernetes playbooks (`k8s` and `k8s-misc`) can have its host overridden using the `override_host` variable, e.g.,
+`-e override_host=localhost` to launch it on the controller itself.
+====
+
+To uninstall a kubernetes cluster (kubeadmin, kubelet, ..), execute this
+command.
+
+.Delete kubernetes cluster
+[source,bash]
+----
+ansible-playbook ansible/playbook/kubernetes/k8s_remove.yml -e vm_name=${VM_NAME} 
+----
+
+== Other k8s tools
+
+To deploy other k8s tools.
+
+.Common parameters
+[cols="2,5"]
+|===
+| Parameter | Description
+
+| `vm_name`
+
+[.fuchsia]#string#
+
+[.red]#required# 
+
+a| Name of the VM where the tools will be installed.
+
+|===
+
+[source,bash]
+----
+ansible-playbook ansible/playbook/kubernetes/k8s_install_tools.yml -e vm_name=${VM_NAME} -e letsencrypt_env=prod --tags k8s_issuer_certificate
+----
+
+
+.k8s_issuer_certificate parameters
+[cols="2,5"]
+|===
+| Parameter | Description
+
+| `api_key`
+
+[.fuchsia]#string#
+
+[.red]#required# 
+
+a| GoDaddy API key.
+
+| `api_secret`
+
+[.fuchsia]#string#
+
+[.red]#required# 
+
+a| GoDaddy API secretkey.
+
+| `letsencrypt_env`
+
+[.fuchsia]#string#
+
+a| Let's Encrypt environment to use.
+
+* *`staging` <= Default:* Staging environment
+* `prod`: Production environment
+
+|===
+
+== Troubleshooting
+
+=== Expired k8s certificate
+
+==== Problem
+
+* kubelet service shows connection errors.
+* The docker container running the k8s API server cannot be started
+
+==== Cause
+
+[source,bash]
+----
+$ docker logs xxxxxxxxxxxx
+...
+W0121 11:09:31.447982       1 clientconn.go:1251] grpc: addrConn.createTransport failed to connect to {127.0.0.1:2379 0  <nil>}. Err :connection error: desc = "transport: authentication handshake failed: x509: certificate has expired or is not yet valid". Reconnecting...
+----
+
+Check the validity of the kubernetes certificate using the following
+command. If they have been expired, then apply the trick as defined at
+the link:#solution-k8s-cert-sol[Solution] section
+
+[source,bash]
+----
+$ openssl x509 -in /etc/kubernetes/pki/apiserver.crt -noout -text |grep ' Not '
+----
+
+[[k8s-cert-sol]]
+==== Solution
+
+The solution applied was the
+https://stackoverflow.com/questions/56320930/renew-kubernetes-pki-after-expired/56334732#56334732[this
+answer on stackoverflow thread] applied to our k8s 1.14 cluster.
+
+Other references: *
+https://www.ibm.com/support/knowledgecenter/SSCKRH_1.1.0/platform/t_certificate_renewal.html
+
+[source,bash]
+----
+$ cd /etc/kubernetes/pki/
+$ mv {apiserver.crt,apiserver-etcd-client.key,apiserver-kubelet-client.crt,front-proxy-ca.crt,front-proxy-client.crt,front-proxy-client.key,front-proxy-ca.key,apiserver-kubelet-client.key,apiserver.key,apiserver-etcd-client.crt} ~/
+$ kubeadm init phase certs all --apiserver-advertise-address <IP>
+$ cd /etc/kubernetes/
+$ mv {admin.conf,controller-manager.conf,kubelet.conf,scheduler.conf} ~/
+$ kubeadm init phase kubeconfig all
+$ reboot
+----
+
+And then update the user’s kube config.
+
+[source,bash]
+----
+$ cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+----
+
+=== Cannot log in using kubelet
+
+==== Problem
+
+[source,bash]
+----
+$ kubectl get pods
+error: You must be logged in to the server (Unauthorized)
+----
+
+This might happen for instance after renewing the certificates.
+
+==== Cause
+
+The `~/.kube/config` does not contain the client-certificate-data and
+client-key-data updated after renewing the certificate.
+
+[[solution]]
+==== Solution
+
+[source,bash]
+----
+$ cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+----

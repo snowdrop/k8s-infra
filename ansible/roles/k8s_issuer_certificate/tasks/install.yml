@@ -47,4 +47,5 @@
 
 - name: Deploy the Godaddy secrets, Issuers resources containing the API Token
   shell: |
-    {{ client_tool }} {{ k8s_config }} apply -f {{ tempPath }}
+    {{ client_tool }} apply -f {{ tempPath }}
+...
