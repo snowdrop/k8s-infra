@@ -1,0 +1,30 @@
+---
+# Requires:
+#  . api_key: GoDaddy API Key
+#  . api_secret: GoDaddy API Secret
+#  . domain_name: Domain to be purchased
+- name: Set URL
+  ansible.builtin.set_fact:
+    api_url: "{{ ote_api_url }}"
+
+- name: Set URL
+  ansible.builtin.set_fact:
+    api_url: "{{ pro_api_url }}"
+  when: environment is defined and environment == 'production'
+
+- name: Purchase domain
+  ansible.builtin.uri:
+    headers:
+      accept: application/json
+      authorization: "sso-key {{ api_key }}:{{ api_secret }}"
+    method: DELETE
+    return_content: true
+    url: "{{ api_url }}/{{ purchase_folder }}/{{ domain_name }}"
+  register: godaddy_domain
+
+- name: Print result
+  ansible.builtin.debug:
+    var: godaddy_domain
+    verbosity: 2
+
+...

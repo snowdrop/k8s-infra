@@ -1,0 +1,19 @@
+---
+- name: Converge
+  hosts: all
+  gather_facts: false
+
+  pre_tasks:
+    - name: "Set godaddy facts"
+      ansible.builtin.set_fact:
+        api_key: "{{ query('passwordstore', 'godaddy/ote/api-key')[0] }}"
+        api_secret: "{{ query('passwordstore', 'godaddy/ote/secret-key')[0] }}"
+
+  tasks:
+    - name: "Include dns_info"
+      ansible.builtin.include_role:
+        name: "dns_info"
+      vars:
+        domain: 
+        record_type: 
+        record_name: 

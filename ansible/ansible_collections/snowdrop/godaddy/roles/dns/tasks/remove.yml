@@ -1,0 +1,36 @@
+---
+# Requires:
+#  . api_key: GoDaddy API Key
+#  . api_secret: GoDaddy API Secret
+#  . domain_name: Domain to be purchased
+#  . dns_record_type: DNS record type
+#  . dns_record_name: DNS record name
+- name: Set default facts
+  ansible.builtin.set_fact:
+    api_url: "{{ ote_api_url }}/{{ domains_folder }}"
+    authorization: "sso-key {{ api_key }}:{{ api_secret }}"
+
+- name: Set Production URL
+  ansible.builtin.set_fact:
+    api_url: "{{ pro_api_url }}/{{ domains_folder }}"
+  when: api_environment is defined and (api_environment == 'production' or api_environment == 'prod')
+
+- name: Call DELETE record API
+  ansible.builtin.uri:
+    # body: "{{ records_body | to_json }}"
+    headers:
+      accept: application/json
+      authorization: "{{ authorization }}"
+      Content-Type: application/json
+    method: DELETE
+    return_content: true
+    status_code: [200, 204]
+    url: "{{ api_url }}/{{ domain_name }}/records/{{ record_type }}/{{ record_name }}"
+  register: godaddy_dns
+
+- name: Print result
+  ansible.builtin.debug:
+    var: godaddy_dns
+    verbosity: 2
+
+...
