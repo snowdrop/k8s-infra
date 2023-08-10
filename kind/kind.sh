@@ -2,16 +2,15 @@
 
 #
 # Script creating a Kubernetes cluster using kind tool
-# deploying a (private) docker registry
-# ingress contoller (nginx, kourier)
+# and deploying an ingress contoller (nginx, kourier)
 #
 # Creation: April - 2023
 #
 # Add hereafter changes done post creation date as backlog
 #
-# MMM dd YYYY:
+# May 18th 2023:
 #
-# -
+# - Remove the deployment of a container registry into an independent script (registry.sh)
 #
 
 set -o errexit
@@ -121,7 +120,6 @@ print_logo() {
     log_message "1" "                                                            | |    "
     log_message "1" "                                                            |_|    "
     log_message "1" "Script to create/delete a Kubernetes cluster using kind like a : "
-    log_message "1" "- (secured) docker container registry"
     log_message "1" "- ingress controller (nginx, kourier)"
     log_message "1" ""
     note "5" "Variables used:"
@@ -132,10 +130,7 @@ print_logo() {
     note "5" "KNATIVE_VERSION: ${KNATIVE_VERSION}"
     note "5" "KUBERNETES_VERSION: ${KUBERNETES_VERSION}"
     note "5" "LOGGING_VERBOSITY: ${LOGGING_VERBOSITY}"
-    note "5" "REGISTRY_IMAGE_VERSION: ${REGISTRY_IMAGE_VERSION}"
-    note "5" "REGISTRY_PASSWORD: ${REGISTRY_PASSWORD}"
     note "5" "REGISTRY_PORT: ${REGISTRY_PORT}"
-    note "5" "REGISTRY_USER: ${REGISTRY_USER}"
     note "5" "SECURE_REGISTRY: ${SECURE_REGISTRY}"
     note "5" "SERVER_IP: ${SERVER_IP}"
     note "5" "SHOW_HELP: ${SHOW_HELP}"
@@ -148,8 +143,10 @@ show_usage() {
     log_message "0" "\t./kind.sh command [parameters,...]"
     log_message "0" ""
     log_message "0" "Available commands: "
-    log_message "0" "\tinstall\t\t\t\t\tInstall the kind cluster"
-    log_message "0" "\tremove\t\t\t\t\tRemove the kind cluster"
+    log_message "0" "\tinstall-cluster\t\t\t\t\tInstall the kind cluster"
+    log_message "0" "\tremove-cluster\t\t\t\t\tRemove the kind cluster"
+    log_message "0" "\tinstall-registry\t\t\t\tInstall the container registry"
+    log_message "0" "\tremove-registry\t\t\t\t\tRemove the container registry"
     log_message "0" ""
     log_message "0" "Parameters: "
     log_message "0" "\t-h, --help\t\t\t\tThis help message"
@@ -157,6 +154,9 @@ show_usage() {
     log_message "0" "\t--cluster-name <name>\t\t\tName of the cluster. Default: kind"
     log_message "0" "\t--delete-kind-cluster\t\t\tDeletes the Kind cluster prior to creating a new one. Default: No"
     log_message "0" "\t--ingress [nginx,kourier]\t\tIngress to be deployed. One of nginx,kourier. Default: nginx"
+    log_message "0" "\t--ingress-ports httpPort:httpsPort\tIngress ports to be mapped.  e.g. 'HttpPort:HttpsPort '"
+    log_message "0" "\t\t\t\t\t\tngninx default: 80:443."
+    log_message "0" "\t\t\t\t\t\tkourier default: 31080:31443."
     log_message "0" "\t--knative-version <version>\t\tKNative version to be used. Default: 1.9.0"
     log_message "0" "\t--kubernetes-version <version>\t\tKubernetes version to be install. Default: latest"
     log_message "0" "\t--provider <provider>\t\t\tContainer Runtime [docker,podman]. Default: docker"
@@ -176,6 +176,14 @@ show_usage() {
 
 check_pre_requisites() {
     note_start_task "1" "Checking pre requisites..."
+
+    note_start_task "2" "Checking if jq exists..."
+    if ! command -v jq &> /dev/null; then
+        error "Checking if jq exists... jq is not installed !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+        error "Use a package manager to install"
+        exit 1
+    fi
+    succeeded "2" "Checking if jq exists..."
 
     note_start_task "2" "Checking if kind exists..."
     if ! command -v kind &> /dev/null; then
@@ -297,8 +305,6 @@ echo "$CFG"
 # REMOVE
 
 delete_kind_cluster() {
-    # existing_kind_cluster=''
-    # get_kind_cluster existing_kind_cluster
     note_start_task "1" "Removing kind cluster (${CLUSTER_NAME})..."
     set +e
     ${KIND_COMMAND} delete cluster -n ${CLUSTER_NAME} -q
@@ -313,18 +319,6 @@ delete_kind_cluster() {
     set -e
     SCRIPT_RESULT_MESSAGE+="\n"
     SCRIPT_RESULT_MESSAGE+="  * Kind cluster has been deleted \n"
-
-    note_start_task "1" "Removing kind registry container..."
-    #docker_container_id=$(docker container ls --filter name=^kind-registry$ --all --quiet)
-    docker_container_id=$(${CRI_COMMAND} container ls --filter name=^${CLUSTER_NAME}-registry$ --all --quiet)
-    if [ ! ${docker_container_id} == "" ]; then
-        ${CRI_COMMAND} container rm ${CLUSTER_NAME}-registry -f 1> /dev/null
-        succeeded "1" "Removing kind registry container..."
-    else 
-        warn "Removing kind registry container... no container to be removed."
-    fi
-    SCRIPT_RESULT_MESSAGE+="\n"
-    SCRIPT_RESULT_MESSAGE+="  * kind registry container has been deleted \n"
 
     if [ "${CRI_COMMAND}" == 'podman' ]; then
         note_start_task "1" "Delete Podman Control Plane container..."
@@ -346,8 +340,10 @@ function delete_cri_resources(){
     note_start_task "1" "Removing ${CRI_COMMAND} network..."
     docker_network_id=$(${CRI_COMMAND} network ls --filter name=^kind$ --quiet)
     if [ ! ${docker_network_id} == "" ]; then
+        set +e
         NETWORK_RM_RES=eval ${NETWORK_RM_CMD} 1> /dev/null
         succeeded "1" "Removing ${CRI_COMMAND} network..."
+        set -e
     else 
         warn "Removing ${CRI_COMMAND} network... nothing to be done!"
     fi
@@ -388,8 +384,8 @@ deploy_ingress_kourier() {
         -p "{\"data\": {\"$KNATIVE_DOMAIN\": \"\"}}"
 
     note "1" "Patching the kourier service to use the nodePort 31080 and type nodePort"
-    kubectl patch -n kourier-system svc kourier --type='json' -p='[{"op": "replace", "path": "/spec/ports/0/nodePort", "value": 31080}]'
-    kubectl patch -n kourier-system svc kourier --type='json' -p='[{"op": "replace", "path": "/spec/ports/1/nodePort", "value": 31443}]'
+    kubectl patch -n kourier-system svc kourier --type='json' -p="[{\"op\": \"replace\", \"path\": \"/spec/ports/0/nodePort\", \"value\": ${INGRESS_80_CONTAINER_PORT}}]"
+    kubectl patch -n kourier-system svc kourier --type='json' -p="[{\"op\": \"replace\", \"path\": \"/spec/ports/1/nodePort\", \"value\": ${INGRESS_443_CONTAINER_PORT}}]"
     kubectl patch -n kourier-system svc kourier --type='json' -p='[{"op": "replace", "path": "/spec/type", "value": "NodePort"}]'
 
     note "0" "####### TO TEST ########"
@@ -436,7 +432,7 @@ deploy_ingress_nginx() {
     SCRIPT_RESULT_MESSAGE+="  * nginx Ingress has been deployed \n"
 }
 
-deploy_docker_registry() {
+function configure_registry_on_kind() {
     # Document the local registry
     # https://github.com/kubernetes/enhancements/tree/master/keps/sig-cluster-lifecycle/generic/1755-communicating-a-local-registry
     cat <<EOF | kubectl apply -f -
@@ -451,122 +447,6 @@ data:
     help: "https://kind.sigs.k8s.io/docs/user/local-registry/"
 EOF
 
-    if [ "${SECURE_REGISTRY}" == 'y' ]; then
-        note "1" "Securing registry..."
-        note "2" "==== Create the htpasswd file where user: ${REGISTRY_USER} and password: ${REGISTRY_PASSWORD}"
-        mkdir -p $HOME/.registry/auth
-        ${CRI_COMMAND} run --entrypoint htpasswd registry:2.7.0 -Bbn ${REGISTRY_USER} ${REGISTRY_PASSWORD} > $HOME/.registry/auth/htpasswd
-
-        SCRIPT_RESULT_MESSAGE+="\n"
-        SCRIPT_RESULT_MESSAGE+="  * The htpasswd file is located at $HOME/.registry/auth/htpasswd\n"
-
-        note_start_task "2" "Creating a docker registry..."
-        ${CRI_COMMAND} run -d \
-            -p ${REGISTRY_PORT}:5000 \
-            --restart=always \
-            --name ${REGISTRY_NAME} \
-            -v $HOME/.registry/auth:/auth \
-            -v $HOME/.registry/certs/${REGISTRY_NAME}:/certs \
-            -e REGISTRY_AUTH=htpasswd \
-            -e REGISTRY_AUTH_HTPASSWD_REALM="Registry Realm" \
-            -e REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd \
-            -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/client.crt \
-            -e REGISTRY_HTTP_TLS_KEY=/certs/client.key \
-            registry:${REGISTRY_IMAGE_VERSION}
-        succeeded "2" "Creating a docker registry.  "
-
-        # connect the container registry to the cluster network
-        # (the network may already be connected)
-        note_start_task "2" "Connect the container registry to the cluster network..."
-        ${CRI_COMMAND} network connect kind "${REGISTRY_NAME}" || true
-        succeeded "2" "Connect the container registry to the cluster network.  "
-
-        # Upload the self-signed certificate to the kind container
-        name="${name:-"kind"}"
-        containers="$(${KIND_COMMAND} get nodes --name="$name" 2>/dev/null)"
-        if [[ "$containers" == "" ]]; then
-            log_message "1" "No kind nodes found for cluster \"$name\"" >&2
-            exit 1
-        fi
-
-        CERT_DIR=/usr/local/share/ca-certificates
-        certfile="$HOME/.registry/certs/${REGISTRY_NAME}/client.crt"
-
-        while IFS= read -r container; do
-            note_start_task "1" "Copying ${certfile} to ${container}:${CERT_DIR}"
-            ${CRI_COMMAND} cp "$certfile" "${container}:${CERT_DIR}"
-            succeeded "1" "Copying ${certfile} to ${container}:${CERT_DIR}"
-
-            note_start_task "1" "Updating CA certificates in ${container}..."
-            ${CRI_COMMAND} exec "$container" update-ca-certificates
-            succeeded "1" "Updating CA certificates in ${container}..."
-
-            note_start_task "1" "Restarting containerd..."
-            ${CRI_COMMAND} exec "$container" systemctl restart containerd
-            succeeded "1" "Restarting containerd..."
-        done <<< "$containers"
-
-        log_message "1" "Copy the client.crt to the docker cert.d folder"
-        mkdir -p $HOME/.docker/certs.d/${REGISTRY_NAME}:${REGISTRY_PORT}
-        cp $certfile $HOME/.docker/certs.d/${REGISTRY_NAME}:${REGISTRY_PORT}/client.crt
-        cp $HOME/.registry/certs/${REGISTRY_NAME}/client.key $HOME/.docker/certs.d/${REGISTRY_NAME}:${REGISTRY_PORT}/client.key
-        eval ${DOCKER_RESTART_COMMAND}
-
-        SCRIPT_RESULT_MESSAGE+="\n"
-        SCRIPT_RESULT_MESSAGE+="  * Secured container registry has been deployed \n"
-        SCRIPT_RESULT_MESSAGE+="\n"
-        SCRIPT_RESULT_MESSAGE+="    * Log on to the container registry using the address and user/password\n"
-        SCRIPT_RESULT_MESSAGE+="      ${CRI_COMMAND} login ${REGISTRY_NAME}:${REGISTRY_PORT} -u ${REGISTRY_USER} -p ${REGISTRY_PASSWORD}\n"
-
-        popd
-    else
-        note "5" "1-------------> ${REGISTRY_NAME}"
-        note_start_task "1" "Starting local Container registry ${REGISTRY_NAME}..."
-        running="$(${CRI_COMMAND} inspect -f '{{.State.Running}}' "${REGISTRY_NAME}" 2>/dev/null || true)"
-        if [ "${running}" != 'true' ]; then
-            ${CRI_COMMAND} run -d --restart=always -p "${REGISTRY_PORT}:5000" \
-              --name "${REGISTRY_NAME}" registry:2
-            succeeded "1" "Starting a local Container registry ${REGISTRY_NAME}..."
-        else   
-            warn "Starting a local Container registry ${REGISTRY_NAME}... already running."
-        fi
-
-        # Connect the local Container registry with the kind network
-        note_start_task "1" "Connecting the local Container registry with the kind network ${REGISTRY_NAME}..."
-        if [ "$(${CRI_COMMAND} inspect -f='{{json .NetworkSettings.Networks.kind}}' ${REGISTRY_NAME})" = 'null' ]; then
-            ${CRI_COMMAND} network connect "kind" "${REGISTRY_NAME}" > /dev/null 2>&1 &
-            succeeded "1" "Connecting the local Container registry with the kind network ${REGISTRY_NAME}..."
-        else   
-            warn "Connecting the local Container registry with the kind network ${REGISTRY_NAME}... already connected."
-        fi
-
-        SCRIPT_RESULT_MESSAGE+="\n"
-        SCRIPT_RESULT_MESSAGE+="  * Insecure container registry has been deployed \n"
-        case "$CRI_PROVIDER" in
-            "docker") 
-                case "$OSTYPE" in
-                    "linux-gnu"*) 
-                        SCRIPT_REQUIRED_STEPS+="\n"
-                        SCRIPT_REQUIRED_STEPS+="    * Edit the daemon.json file, whose default location is /etc/docker/daemon.json on Linux, and restart the docker service  \n"
-                    ;;
-                    "darwin"*) 
-                        SCRIPT_REQUIRED_STEPS+="\n"
-                        SCRIPT_REQUIRED_STEPS+="    * Edit the daemon.json file. If you use Docker Desktop for Mac or Docker Desktop for Windows, click the Docker icon, choose Settings and then choose Docker Engine.\n"
-                    ;;
-                esac
-                SCRIPT_REQUIRED_STEPS+="      {\"insecure-registries\" : [\"${REGISTRY_NAME}:${REGISTRY_PORT}\"]}\n"
-            ;;
-            "podman") 
-                SCRIPT_REQUIRED_STEPS+="    * Set the kind registry as an insecure registry by adding the following configuration to the /etc/containers/registries.conf.d/kind-registry.conf file\n"
-                SCRIPT_REQUIRED_STEPS+='[[registry]]\n'
-                SCRIPT_REQUIRED_STEPS+='location = "localhost:${REGISTRY_PORT}"\n'
-                SCRIPT_REQUIRED_STEPS+='insecure = true\n'
-            ;;
-        esac
-        SCRIPT_RESULT_MESSAGE+="\n"
-        SCRIPT_RESULT_MESSAGE+="    * Log on to the container registry using the address\n"
-        SCRIPT_RESULT_MESSAGE+="      ${CRI_COMMAND} login ${REGISTRY_NAME}:${REGISTRY_PORT}\n"
-    fi
 
 }
 
@@ -623,12 +503,12 @@ EOF
 
     kindCmd="${KIND_COMMAND} -v ${LOGGING_VERBOSITY} create cluster  -n ${CLUSTER_NAME}"
     kindExtraPortMappings=$(cat <<EOF
-  - containerPort: ${CONTAINER_80_PORT}
-    hostPort: ${HOST_80_PORT}
+  - containerPort: ${INGRESS_80_CONTAINER_PORT}
+    hostPort: ${INGRESS_80_CONTAINER_PORT}
     protocol: TCP
     listenAddress: "0.0.0.0"
-  - containerPort: ${CONTAINER_443_PORT}
-    hostPort: ${HOST_443_PORT}
+  - containerPort: ${INGRESS_443_CONTAINER_PORT}
+    hostPort: ${INGRESS_443_CONTAINER_PORT}
     protocol: TCP
     listenAddress: "0.0.0.0"
 EOF
@@ -706,6 +586,13 @@ EOF
         fi
         
     fi
+    
+    set +e
+    note_start_task "2" "Connect the container registry to the kind network..."
+     ${CRI_COMMAND} network connect "kind" ${REGISTRY_NAME}
+    succeeded "2" "Connect the container registry to the kind network... done."
+    set -e
+    
     SCRIPT_RESULT_MESSAGE+="\n"
     SCRIPT_RESULT_MESSAGE+="  * ${CLUSTER_NAME} kind cluster has been deployed\n"
     SCRIPT_RESULT_MESSAGE+="\n"
@@ -717,8 +604,8 @@ EOF
 function install() {
     deploy_kind_cluster
 
-    deploy_docker_registry
-
+    configure_registry_on_kind
+    
     if [ "${SKIP_INGRESS_INSTALLATION}" == 'n' ]; then
         if [ "${INGRESS}" == 'kourier' ]; then
             deploy_ingress_kourier
@@ -728,6 +615,7 @@ function install() {
     fi
 }
 
+
 function remove() {
     delete_kind_cluster
     delete_cri_resources
@@ -735,16 +623,32 @@ function remove() {
 
 function validate_ingress() {
     if [ "${INGRESS}" == 'kourier' ]; then
-        CONTAINER_80_PORT=31080
-        CONTAINER_443_PORT=31443
+        INGRESS_80_CONTAINER_PORT=31080
+        INGRESS_443_CONTAINER_PORT=31443
     elif [ "${INGRESS}" == 'nginx' ]; then
-        CONTAINER_80_PORT=80
-        CONTAINER_443_PORT=443
+        INGRESS_80_CONTAINER_PORT=80
+        INGRESS_443_CONTAINER_PORT=443
     else
         error "Invalid ingress ${INGRESS}, choose one of nginx or kourier."
         show_usage
         exit 1  
     fi
+
+    note "5" "Ingress ports: ${INGRESS_PORTS}"
+    if [ "${INGRESS_PORTS}" == "" ]; then
+        IFS=':' read -ra PORT_MAP <<< "${INGRESS_PORTS}"
+        INGRESS_80_CONTAINER_PORT=${PORT_MAP[0]}
+        INGRESS_443_CONTAINER_PORT=${PORT_MAP[1]}
+    else 
+        if [ "${INGRESS}" == 'kourier' ]; then
+            INGRESS_80_CONTAINER_PORT=31080
+            INGRESS_443_CONTAINER_PORT=31443
+        elif [ "${INGRESS}" == 'nginx' ]; then
+            INGRESS_80_CONTAINER_PORT=80
+            INGRESS_443_CONTAINER_PORT=443
+        fi
+    fi
+    note "5" "Ingress ports: ${INGRESS_80_CONTAINER_PORT}:${INGRESS_443_CONTAINER_PORT}"
 }
 
 function validate_cri() {
@@ -813,10 +717,7 @@ KIND_COMMAND=kind
 KNATIVE_VERSION="1.9.0"
 KUBERNETES_VERSION="latest"
 LOGGING_VERBOSITY="1"
-REGISTRY_IMAGE_VERSION="2.6.2"
-REGISTRY_PASSWORD="snowdrop"
 REGISTRY_PORT="5000"
-REGISTRY_USER="admin"
 SCRIPT_RESULT_MESSAGE=""
 SCRIPT_REQUIRED_STEPS=""
 SKIP_INGRESS_INSTALLATION="n"
@@ -829,22 +730,20 @@ PORT_MAP=""
 set +e
 while [ $# -gt 0 ]; do
     note "9" "$1"
-    if [[ $1 == *"--"* ]]; then
+    if [[ $1 == "--"* ]]; then
         param="${1/--/}";
         case $1 in
         --help) SHOW_HELP="y"; break 2 ;;
         --cluster-name) CLUSTER_NAME="$2"; shift ;;
         --delete-kind-cluster) DELETE_KIND_CLUSTER="y" ;;
         --ingress) INGRESS="$2"; shift ;;
+        --ingress-ports) INGRESS_PORTS="$2"; shift ;;
         --knative-version) KNATIVE_VERSION="$2"; shift ;;
         --kubernetes-version) KUBERNETES_VERSION="$2"; shift ;;
         --provider) CRI_PROVIDER="$2"; shift ;;
         --port-map) PORT_MAP="$2"; shift ;;
         --registry-name) REGISTRY_NAME="$2"; shift ;;
-        --registry-image-version) REGISTRY_IMAGE_VERSION="$2"; shift ;;
-        --registry-password) REGISTRY_PASSWORD="$2"; shift ;;
         --registry-port) REGISTRY_PORT="$2"; shift ;;
-        --registry-user) REGISTRY_USER="$2"; shift ;;
         --secure-registry) SECURE_REGISTRY="y" ;;
         --skip-ingress-installation) SKIP_INGRESS_INSTALLATION="y" ;;
         --server-ip) SERVER_IP="$2"; shift ;;
@@ -853,7 +752,7 @@ while [ $# -gt 0 ]; do
         *) INVALID_SWITCH="${INVALID_SWITCH} $1" ; break 2 ;;
         esac;
     shift
-    elif [[ $1 == *"-"* ]]; then
+    elif [[ $1 == "-"* ]]; then
         case $1 in
             -h) SHOW_HELP="y"; break 2 ;;
             -v) LOGGING_VERBOSITY="$2"; shift ;;
@@ -864,7 +763,7 @@ while [ $# -gt 0 ]; do
         case $1 in
             install) COMMAND="install" ;;
             remove) COMMAND="remove" ;;
-            *) INVALID_SWITCH="${INVALID_COMMAND} $1" ; break 2 ;;
+            *) INVALID_COMMAND="${INVALID_COMMAND} $1" ; break 2 ;;
         esac;
         shift
   fi
@@ -874,21 +773,21 @@ set -e
 if [ "$SHOW_HELP" == "y" ]; then
     show_usage
     exit 0
-elif [ -v INVALID_COMMAND ]; then
+elif ! [ -z ${INVALID_COMMAND+x} ]; then
     error "Invalid command ${INVALID_COMMAND}"
     show_usage
     exit 1
-elif [ -v INVALID_SWITCH ]; then
+elif ! [ -z ${INVALID_SWITCH+x} ]; then
     error "Invalid switch(es) ${INVALID_SWITCH}"
     show_usage
     exit 1
-elif [ ! -v COMMAND ]; then
+elif [ -z ${COMMAND+x} ]; then
     error "A command must be provided!!!"
     show_usage
     exit 1
-elif [ ${COMMAND} == 'install' ] && [ ! -v INGRESS ]; then
+elif [ ${COMMAND} == 'install' ] && [ -z ${INGRESS+x} ]; then
     error "The Ingress controller to be installed is not defined (nginx, kourier)."
-    show_usage
+    show_usage  
     exit 1
 fi
 
@@ -949,4 +848,5 @@ case ${COMMAND} in
         log_message "0" "  ### Required steps: "
         log_message "0" "${SCRIPT_REQUIRED_STEPS}"
     ;;
+    
 esac;

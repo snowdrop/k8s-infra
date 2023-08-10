@@ -225,7 +225,6 @@ installation for version `1.17` would require adding a new group as child of the
             k8s_dashboard_version: v3.1.2
             coreos_flannel_sha_commit: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ----
-
 ======
 
 ====
@@ -304,7 +303,7 @@ If a host has already been created, it can be imported within the inventory usin
 $ ansible-playbook ansible/playbook/passstore_controller_inventory.yml -e vm_name=<VM_NAME> -e pass_provider=hetzner
 ----
 
-where `<VM_NAME>` corresponds to the host key created under `hetzner`.
+...where `<VM_NAME>` corresponds to the host key created under `hetzner`.
 
 [NOTE]
 ====

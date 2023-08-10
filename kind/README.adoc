@@ -19,13 +19,26 @@ cluster with the following default features:
 * Launch a container registry using the specified port `e.g. localhost:5000`,
 * Set up an Ingress controller to route the external traffic to the cluster.
 
-For that purpose, a bash script has been developed: `./kind.sh`, which can also be used with the command:
+For that purpose, several bash scripts have been developed.
 
-`curl -s -L "https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/kind.sh" | bash -s ...`
+[NOTE]
+====
+These scripts can also be used directly from the https://github.com/snowdrop/k8s-infra/[snowdrop/k8s-infra GitHub repository] using `curl`. 
 
-and will let to create or delete a cluster using the https://kind.sigs.k8s.io/[kind] tool.
+Example: `curl -s -L "https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/kind.sh" | bash -s ...`
 
-The docker registry is started as a `container`, its network shared with the host and can be deployed using the mode:
+`kind.sh` can be replaced by any of the other scripts included in this document.
+====
+
+=== Kind Cluster
+
+To create or delete a cluster using the https://kind.sigs.k8s.io/[kind] use the https://github.com/snowdrop/k8s-infra/blob/main/kind/kind.sh[`kind.sh`] script.
+
+=== Container Registry
+
+To create or delete a container registry use the https://github.com/snowdrop/k8s-infra/blob/main/kind/kind.sh[`registry.sh`] script.
+
+The container registry is started as a `container`, its network shared with the host and can be deployed using the mode:
 
 * Unsecure: plain HTTP without user authentication (default)
 * Secured: HTTP/TLS using https://httpd.apache.org/docs/current/programs/htpasswd.html[htpasswd] to authenticate the users
@@ -34,14 +47,16 @@ The docker registry is started as a `container`, its network shared with the hos
 
 To be able to use the bash script, the following tools are required:
 
-* A container runtime:
-** Podman: https://podman.io/
+* A container runtime (one of):
 ** Docker: https://docs.docker.com/get-docker/
+** Podman: https://podman.io/
 * kind: https://github.com/kubernetes-sigs/kind/releases
 * kubectl: https://kubernetes.io/docs/tasks/tools/
 * helm: https://helm.sh/
-* jq: https://stedolan.github.io/jq/download/ (optional)
-* openssl (optional)
+* jq: https://stedolan.github.io/jq/download/
+** Used for validating the environment
+* openssl: 
+** _optional_, unless a secure container registry is used
 
 == Usage
 
@@ -118,17 +133,112 @@ Choices:
 
 == Install
 
+This script allows creating both a kind cluster with associated ingress controller and a container registry in separate commands.
+
+=== Container Registry
+
+The first (optional) step is creating a container registry.
+
+.Container Registry creation most relevant options
+[%header,cols="2,4"]
+|===
+| parameter | Description
+
+| `--registry-name`
+
+[.fuchsia]#string# 
+a| Name to be given to the registry.
+
+Default: kind-registry
+
+| `--registry-password`
+
+[.fuchsia]#string# 
+a| Registry user password.
+
+Default: `snowdrop`
+
+| `--registry-port`
+
+[.fuchsia]#string#
+a| Port to be assigned to the Container Registry.
+
+Default: 5000
+
+| `--registry-user`
+
+[.fuchsia]#string#
+a| Registry user.
+
+Default: `admin`
+|===
+
+[]
+====
+
+.Container registry creation statement
+[source,bash]
+----
+curl -s -L "https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/registry.sh" | bash -s install --registry-name kind-registry.local
+----
+
+====
+
+=== Kind Cluster
+
 Creating a kubernetes cluster is as simple as executing the following command.
 
+[]
+====
 .kind deploy statement
 [source,bash]
 ----
-curl -s -L "https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/kind.sh" | bash -s install --cluster-name snowdrop --provider podman --port-map "30000:30000,31000:31000"
+curl -s -L "https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/kind.sh" | bash -s install --cluster-name snowdrop --port-map "30000:30000,31000:31000" --registry-name kind-registry.local
 ----
+====
+
+.kind cluster creation most relevant options
+[%header,cols="2,4"]
+|===
+| parameter | Description
+
+| `--registry-name`
+
+[.fuchsia]#string# 
+a| Name of the registry to use.
+
+Default: kind-registry
+
+| `--registry-port`
+
+[.fuchsia]#string#
+a| Port to be assigned to the Container Registry.
+
+Default: 5000
+|===
 
 === Post deployment steps
 
 ==== Allow using an insecure container registry
+
+*Using Docker*
+
+Check the link:https://docs.docker.com/registry/insecure/[Test an insecure registry] 
+Docker document.
+
+.Instructions for Docker
+[%collapsible]
+====
+Add the following contents to the `/etc/docker/daemon.json` file.
+
+[source,json]
+----
+{
+  "insecure-registries" : ["localhost:5000"]
+}
+----
+
+====
 
 *Using Podman*
 
@@ -149,27 +259,9 @@ insecure = true
 ----
 ====
 
-*Using Docker*
-
-Check the link:https://docs.docker.com/registry/insecure/[Test an insecure registry
-]
-Docker document.
-
-.Instructions for Docker
-[%collapsible]
-====
-Add the following contents to the `/etc/docker/daemon.json` file.
-
-[source,json]
-----
-{
-  "insecure-registries" : ["localhost:5000"]
-}
-----
-
-====
-
 == Remove
+
+=== Kind Cluster
 
 To undeploying a previousy deployed kind cluster use the `remove` action on the kind deploy script.
 
@@ -178,6 +270,15 @@ To undeploying a previousy deployed kind cluster use the `remove` action on the 
 ----
 curl -s -L "https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/kind.sh" | bash -s remove --cluster-name snowdrop
 ----
+
+=== Container Registry
+
+.container registry removal statement
+[source,bash]
+----
+curl -s -L "https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/registry.sh" | bash -s remove --registry-name kind-registry.local
+----
+
 
 == Secured docker registry
 
@@ -274,3 +375,39 @@ https://github.com/kubernetes-sigs/kind/releases[supported images]. The
 list of the `kind - kubernetes` images and their version (1.14.x,
 1.15.y,…) can be consulted
 https://registry.hub.docker.com/v1/repositories/kindest/node/tags[here]
+
+== Multiple Clusters
+
+The kind bash script now supports deploying multiple cluster. Simply 
+execute the script passing as para meter a new cluster name and
+
+.Get list of clusters from kubeconfig
+[source,bash]
+----
+curl -s -L "https://raw.githubusercontent.com/snowdrop/k8s-infra/main/kind/kind.sh" | bash -s install-cluster --cluster-name snowdrop2 --registry-name kind-registry.local --ingress-ports '10080:10443'
+----
+
+[WARNING]
+====
+Check the `--ingress-ports` to make sure there are no conflicts with 
+the ports of the different ingress controlers of each cluster.
+Each set of ports must be happed with the host ports.
+====
+
+Check the list of clusters defined in the kube configuration file.
+
+.Get list of clusters from kubeconfig
+[source,bash]
+----
+kubectl config get-clusters
+----
+
+As a result the different clusters will be shown.
+
+.Cluster list with multiple clusters
+[source,]
+----
+NAME
+snowdrop2
+snowdrop
+----
