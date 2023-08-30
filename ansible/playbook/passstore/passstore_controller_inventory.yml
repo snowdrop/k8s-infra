@@ -1,7 +1,7 @@
 ---
 # Required variables:
 #  . vm_name: Name of the vm
-#  . pass_provider: provider in the passstore project [hetzner]
+#  . pass_provider: provider in the passstore project [openstack]
 - name: "Generate inventory files on the controller"
   hosts: localhost
   gather_facts: no
@@ -12,11 +12,11 @@
         that:
           - "vm_name is defined"
           - "pass_provider is defined"
-          - "pass_provider == 'hetzner' or pass_provider == 'openstack'"
+          - "pass_provider == 'openstack'"
         fail_msg: 
           - "Required parameters:"
           - "  vm_name: Name of the vm"
-          - "  pass_provider: provider in the passstore project [hetzner,openstack]"
+          - "  pass_provider: provider in the passstore project [openstack]"
 
     - name: "Pull pass git database"
       shell: "git pull"
@@ -40,17 +40,6 @@
         pass_l1: "{{ pass_db_name | default('snowdrop') }}"
         pass_l2: "{{ pass_provider | default('openstack') }}"
         pass_l3: "{{ vm_name }}"
-    #     operation: "create"
-    #   when: "operation is defined and operation == 'create' "
-
-    # - name: "Build inventory"
-    #   include_role:
-    #     name: "passstore/ansible_inventory"
-    #   vars:
-    #     pass_l1: "{{ pass_db_name | default('snowdrop') }}"
-    #     pass_l2: "{{ pass_provider | default('hetzner') }}"
-    #     pass_l3: "{{ vm_name }}"
-    #   when: "operation is undefined or operation != 'create'"
 
     - name: "Add to k8s version"
       include_role:
