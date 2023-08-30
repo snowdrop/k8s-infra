@@ -1,0 +1,113 @@
+= Passwordstore Ansible Playbooks
+Snowdrop Team (Antonio Costa)
+Snowdrop Team (Antonio Costa)
+:icons: font
+:revdate: {docdate}
+:revdate: {docdate}
+:toc: left
+:description: This document describes the passstore specific playbooks.
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
+
+== Prepare controller
+
+To prepare the controller for existing common keys use the `passstore_controller_init` playbook.
+
+[source,bash]
+----
+ansible-playbook ansible/playbook/passstore/passstore_controller_init.yml -e pass_provider=openstack
+----
+
+== Ansible Inventory
+
+== Define host inventory for provisioning
+
+Provisioning a host is done using the appropriate Ansible Playbooks.
+
+First create the Ansible Inventory records as indicated in the
+link:../ansible/playbook/README.md#create-a-host[Create a host] section
+of the ansible playbook documentation.
+
+In this example we create the inventory for a new vm to be provisioned
+in the hetzner provider.
+
+[source,bash]
+----
+ansible-playbook ansible/playbook/passstore/passstore_controller_inventory.yml \
+  -e vm_name=my-host \
+  -e pass_provider=openstack \
+  -e operation=create
+----
+
+In the pass database we can now see the following structure.
+
+[source]
+----
+├── openstack
+...
+│   ├── snowdrop-k8s
+│   │   ├── ansible_ssh_port
+│   │   ├── groups
+│   │   │   ├── k8s_124
+│   │   │   └── masters
+│   │   ├── os_password
+│   │   ├── os_user
+│   │   └── ssh_port
+----
+
+This host has already been added to the `masters` and `k8s_115` groups
+as parte of the script.
+
+== Remove host from inventory
+
+To remove a host from the passwordstore inventory use the following playbook.
+
+[source,bash]
+----
+ansible-playbook ansible/playbook/passstore/passstore_controller_inventory_remove.yml \
+  -e vm_name=my-host \
+  -e pass_provider=openstack
+----
+
+== Host-Group Association
+
+Once the host is in the inventory it can be associated with groups.
+
+For instance, to install k8s control plane for version 1.15 in a newly
+created host (`my-host` in this example) we have to to add that host to
+the `masters` and `k8s_115` groups. To perform this operation use the
+`passstore_manage_host_groups.yml` playbook, as shown in the following
+example.
+
+Add a host to the `masters` group and to the `k8s_124` group.
+
+[source,bash]
+----
+ansible-playbook ansible/playbook/passstore/passstore_manage_host_groups.yml \
+  -e operation=add \
+  -e group_name=masters \
+  -e vm_name=my-host
+ansible-playbook ansible/playbook/passstore/passstore_manage_host_groups.yml \
+  -e operation=add \
+  -e group_name=k8s_124 \
+  -e vm_name=my-host
+----
+
+To remove a host from the `k8s_124` group.
+
+[source,bash]
+----
+ansible-playbook ansible/playbook/passstore/passstore_manage_host_groups.yml \
+  -e operation=remove \
+  -e group_name=k8s_124 \
+  -e vm_name=my-host
+----
+
+More information on how hosts are assigned to groups and actually adding
+and removing hosts from groups
+link:../ansible/playbook/README.md#groups[here].
