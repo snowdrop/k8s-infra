@@ -26,7 +26,7 @@
           - "api_key is defined and api_secret is defined"
         fail_msg: 
           - "Required parameters:"
-          - "  vm_name: VM to where the tolls will be deployed"
+          - "  vm_name: VM to where the tools will be deployed"
           - "  state: 'present' to install the tools and 'absent' to remove them"
       tags: [always]
 

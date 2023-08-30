@@ -32,6 +32,8 @@ Installation Guide section].
 
 === Ansible Inventory
 
+For information related to the Ansible Inventory check the link:../ansible/README.adoc#user-guide[User guide]
+
 In order to execute the installation of k8s several variables must be
 provided. To standardize the installation several Ansible Groups have
 been created for different installations.
@@ -74,7 +76,7 @@ include::../ansible/inventory/hosts.yml[tag=k8s_version]
 
 === Host provisioning
 
-Provisioning a host is done using the appropriate Ansible Playbooks.
+Provisioning a host is done using the appropriate Ansible Playbooks, depending on the provider and its out of the scope of this document.
 
 The first step is to generate the inventory. More information in the local
 passwordstore link:../passwordstore/README.adoc[Define host inventory for provisioning] document.
@@ -92,133 +94,10 @@ Once the inventory is prepared the host can be created. To provision a RHOS VM c
 
 To remove the host from the inventory check the link:../passwordstore/README.adoc[Remove host from inventory] secion from the passwordstore document.
 
-== Installation
+== Available Ansible Playbooks
 
-Once the host is defined in the inventory and also provisioned, execute the k8s creation playbook.
-
-Ansible tags are used to manage which components are to be installed. The tags that can be selected are the following.
-
-[width="100%",cols="25%m,10%c,65%",options="header",]
-|===
-| Tag | Always | Description
-
-| containerd | icon:times[] | Installs link:https://containerd.io/[containerd] as CRI
-
-| docker | icon:times[] | Installs Docker as CRI
-
-| ingress | icon:times[] | Installs link:https://kubernetes.io/docs/concepts/services-networking/ingress/[Ingress]
-
-| k8s_cluster | icon:check[] | Installs the Kubernetes cluster
-
-| k8s_dashboard | icon:times[] | Installs the link:https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/[Kubernetes Dashboard]
-|===
-
-.Deploy kubernetes on a host installing docker and the Dashboard
-[source,bash]
-----
-ansible-playbook ansible/playbook/kubernetes/k8s_install_passstore.yml -e vm_name=${VM_NAME} --tags docker,k8s_dashboard
-----
-
-[WARNING]
-====
-Be sure that a host group entry exists for the version you
-want to install within the `inventory/hosts` file
-
-[source,yaml]
-----
-        k8s_121:
-          vars:
-            k8s_version: 1.21.4
-            k8s_dashboard_version: v2.3.1
-----
-====
-
-Example for installing a k8s server from scratch using openstack provider
-where we will create a VM.
-
-[source,bash]
-----
-VM_NAME=snowdrop-vm \
-  && ansible-playbook hetzner/ansible/hetzner-delete-server.yml -e vm_name=${VM_NAME} -e hetzner_context_name=snowdrop \
-   ansible-playbook ansible/playbook/passstore_controller_inventory_remove.yml -e vm_name=${VM_NAME} -e pass_provider=hetzner \
-  && ansible-playbook hetzner/ansible/hetzner-create-ssh-key.yml -e vm_name=${VM_NAME} \
-  && ansible-playbook ansible/playbook/passstore_controller_inventory.yml -e vm_name=${VM_NAME} -e pass_provider=hetzner -e k8s_type=masters -e k8s_version=115 -e operation=create \
-  && ansible-playbook hetzner/ansible/hetzner-create-server.yml -e vm_name=${VM_NAME} -e salt_text=$(gpg --gen-random --armor 1 20) -e hetzner_context_name=snowdrop \
-  && ansible-playbook ansible/playbook/sec_host.yml -e vm_name=${VM_NAME} -e provider=hetzner \
-  && ansible-playbook kubernetes/ansible/k8s.yml --limit ${VM_NAME}
-----
-
-[NOTE]
-====
-Both kubernetes playbooks (`k8s` and `k8s-misc`) can have its host overridden using the `override_host` variable, e.g.,
-`-e override_host=localhost` to launch it on the controller itself.
-====
-
-To uninstall a kubernetes cluster (kubeadmin, kubelet, ..), execute this
-command.
-
-.Delete kubernetes cluster
-[source,bash]
-----
-ansible-playbook ansible/playbook/kubernetes/k8s_remove.yml -e vm_name=${VM_NAME} 
-----
-
-== Other k8s tools
-
-To deploy other k8s tools.
-
-.Common parameters
-[cols="2,5"]
-|===
-| Parameter | Description
-
-| `vm_name`
-
-[.fuchsia]#string#
-
-[.red]#required# 
-
-a| Name of the VM where the tools will be installed.
-
-|===
-
-[source,bash]
-----
-ansible-playbook ansible/playbook/kubernetes/k8s_install_tools.yml -e vm_name=${VM_NAME} -e letsencrypt_env=prod --tags k8s_issuer_certificate
-----
-
-
-.k8s_issuer_certificate parameters
-[cols="2,5"]
-|===
-| Parameter | Description
-
-| `api_key`
-
-[.fuchsia]#string#
-
-[.red]#required# 
-
-a| GoDaddy API key.
-
-| `api_secret`
-
-[.fuchsia]#string#
-
-[.red]#required# 
-
-a| GoDaddy API secretkey.
-
-| `letsencrypt_env`
-
-[.fuchsia]#string#
-
-a| Let's Encrypt environment to use.
-
-* *`staging` <= Default:* Staging environment
-* `prod`: Production environment
-
-|===
+More information on the available Kubernetes Ansible Playbooks on the 
+link:../ansible/playbook/kubernetes/README.adoc[Playbook README].
 
 == Troubleshooting
 
