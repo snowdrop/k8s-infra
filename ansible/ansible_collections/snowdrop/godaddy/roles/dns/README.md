@@ -31,7 +31,7 @@ Role Variables
 | `record_name`<br/><span style="color:fuchsia">string</span><br/><span style="color:red">required</span> | Name of the DNS record
 | `dns`<br/><span style="color:fuchsia">json</span><br/><span style="color:red">required</span> | DNS data
 
-The contents of the `dns` variable are the following.
+The contents of the `dns` variables are the following.
 
 ```json
 [
