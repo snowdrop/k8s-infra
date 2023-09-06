@@ -6,20 +6,14 @@ ocp_install_dir: openshift-data
 
 # tag::rhos_default_flavors[]
 # OpenStack flavors
-# ci.m5.xlarge
-# vCPU: 24
-# RAM: 48GB
-# ci.m5.large
-# vCPU: 16
-# RAM: 32GB
-# ci.m1.xlarge
-# vCPU: 8
-# RAM: 16GB
-# ci.m1.large
-# vCPU: 4
-# RAM: 8GB
-openstack_flavor_control_plane: ci.m1.xlarge
-openstack_flavor_compute: ci.m1.large	
+# ci.m1.xlarge: { vCPUs: 8, RAM: 16GB, Disk: ???GB }
+# ci.m1.large: { vCPUs: 4, RAM: 8GB, Disk: ???GB }
+# ocp4.single-node: { vCPUs: 24, RAM: 48GB, Disk: 200GB }
+# ocp4.control: { vCPUs: 4, RAM: 16GB, Disk: 100GB }
+# ocp4.compute: { vCPUs: 2, RAM: 8GB, Disk: 100GB }
+# ocp4.bootstrap: { vCPUs: 4, RAM: 16GB, Disk: 100GB }
+openstack_flavor_control_plane: ocp4.control
+openstack_flavor_compute: ocp4.compute
 # end::rhos_default_flavors[]
 # provider_net_cci_13
 # provider_net_shared
@@ -29,6 +23,9 @@ snowdrop_domain: snowdrop.dev
 project_name: snowdrop
 use_logo: false
 install_operators: false
-use_dns: false
 configure_rh_reg: false
 remove_kubeadmin: false
+
+use_dns: false
+# Values: godaddy, local
+dns_provider: godaddy

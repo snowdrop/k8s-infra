@@ -1,0 +1,8 @@
+---
+# defaults file for dns
+pro_api_url: https://api.godaddy.com/v1
+ote_api_url: https://api.ote-godaddy.com/v1
+
+domains_folder: domains
+dns_records_folder: records
+...

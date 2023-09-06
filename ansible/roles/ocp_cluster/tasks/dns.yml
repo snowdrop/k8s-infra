@@ -1,0 +1,71 @@
+---
+- name: "Add API Floating IP to /etc/hosts"
+  ansible.builtin.lineinfile:
+    dest: /etc/hosts
+    regexp: '.*api.{{ ocp_cluster_name }}.{{ snowdrop_domain }}.*$'
+    line: "{{ rhos_floating_ip_api_address }} api.{{ ocp_cluster_name }}.{{ snowdrop_domain }}"
+    # state: present
+  become: true
+  when: not use_dns
+
+- name: "Add Ingress Floating IP to /etc/hosts"
+  ansible.builtin.lineinfile:
+    dest: /etc/hosts
+    regexp: '.*console-openshift-console.apps.{{ ocp_cluster_name }}.{{ snowdrop_domain }}.*$'
+    line: "{{ rhos_floating_ip_ingress_address }} console-openshift-console.apps.{{ ocp_cluster_name }}.{{ snowdrop_domain }} oauth-openshift.apps.{{ ocp_cluster_name }}.{{ snowdrop_domain }} integrated-oauth-server-openshift-authentication.apps.{{ ocp_cluster_name }}.{{ snowdrop_domain }} prometheus-k8s-openshift-monitoring.apps.{{ ocp_cluster_name }}.{{ snowdrop_domain }} grafana-openshift-monitoring.apps.{{ ocp_cluster_name }}.{{ snowdrop_domain }}"
+    # state: present
+  become: true
+  when: not use_dns
+
+- name: "Template nsupdate"
+  ansible.builtin.template:
+    src: "templates/nsupdate-api.txt.j2"
+    dest: "{{ work_directory }}/nsupdate-api.txt"
+    mode: '0644'
+  when: use_dns and dns_provider == 'local' and state == 'present'
+
+- name: "Run nsupdate"
+  ansible.builtin.shell: 
+    cmd: nsupdate -v -k xpaasqe.dnskey nsupdate-api.txt
+  args:
+    chdir: "{{ work_directory }}"
+  when: use_dns and dns_provider == 'local' and state == 'present'
+
+- name: "Add API Floating IP to GoDaddy"
+  include_role:
+    name: "snowdrop.godaddy.dns"
+  vars: 
+    domain_name: "{{ snowdrop_domain }}"
+    record_type: "A"
+    record_name: "{{ ocp_cluster_name }}_api"
+    dns:
+      data: "{{ rhos_floating_ip_api_address }}"
+    # state: "present"
+  when: use_dns and dns_provider == 'godaddy'
+
+- name: "Add Ingress Floating IP to GoDaddy"
+  include_role:
+    name: "snowdrop.godaddy.dns"
+  vars: 
+    domain_name: "{{ snowdrop_domain }}"
+    record_type: "A"
+    record_name: "{{ ingress_floatip_godaddy }}_ingress"
+    dns:
+      data: "{{ rhos_floating_ip_ingress_address }}"
+    # state: "present"
+  loop:
+    - "*.apps.{{ ocp_cluster_name }}"
+    - "console-openshift-console.apps.{{ ocp_cluster_name }}"
+    - "oauth-openshift.apps.{{ ocp_cluster_name }}"
+    - "integrated-oauth-server-openshift-authentication.apps.{{ ocp_cluster_name }}"
+    - "prometheus-k8s-openshift-monitoring.apps.{{ ocp_cluster_name }}"
+    - "grafana-openshift-monitoring.apps.{{ ocp_cluster_name }}"
+    - "grafana-istio-system.apps.{{ ocp_cluster_name }}"
+    - "istio-ingressgateway-istio-system.apps.{{ ocp_cluster_name }}"
+    - "jaeger-istio-system.apps.{{ ocp_cluster_name }}"
+    - "kiali-istio-system.apps.{{ ocp_cluster_name }}"
+    - "prometheus-istio-system.apps.{{ ocp_cluster_name }}"
+  loop_control:
+    loop_var: ingress_floatip_godaddy
+  when: use_dns and dns_provider == 'godaddy'
+...
