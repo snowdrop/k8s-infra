@@ -54,9 +54,9 @@ subnet information.
 |Components |nodes |Kubernetes node. Similar to masters but for k8s
 nodes.
 
-|Versions |k8s_116 |Information v 1.16 specific
+|Versions |k8s_124 |Information v 1.24 specific
 
-|Versions |k8s_115 |Information v 1.15 specific
+|Versions |k8s_123 |Information v 1.23 specific
 |===
 
 Installing kubernetes requires a host to be assigned to 2 groups,
