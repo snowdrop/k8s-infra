@@ -89,6 +89,83 @@ Push the `pass` changes to the git repository.
 git push
 ----
 
+
+== Post installation steps
+
+To be able to SSH to any of the OCP cluster machines a _jump server_ is required.
+
+=== Install jump server
+
+[source,bash]
+----
+ansible-playbook ansible/playbook/openstack/openstack_vm_create_passwordstore.yml \
+  -e '{"openstack": {"vm": {"network": "ocp-sscpc-openshift","image": "Fedora-Cloud-Base-29", "flavor": "m1.small"}}}' \
+  -e vm_name=ocp-jump-server
+----
+
+Create a floating ip from the external network that your router is connected to, in our case `provider_net_cci_13`.
+
+[NOTE]
+====
+TBD: An ansible playbook that implements this.
+
+For now this needs to be done using the RHOS console.
+====
+
+[source,bash]
+----
+openstack floating ip create provider_net_cci_13
+----
+
+Associate the floating IP with the jump server.
+
+[NOTE]
+====
+TBD: An ansible playbook that implements this.
+
+For now this needs to be done using the RHOS console.
+====
+
+[source,bash]
+----
+openstack server add floating ip <uuid_of_the_create_server> <floating_ip_that_you_got_from_previous_command>
+----
+
+[WARNING]
+====
+Manually add an entry to the passwordstore under `openstack/ocp-jumpserver/floating_ip` with the floating IP. 
+This will allow the `./tools/passstore-vm-ssh.sh` tool
+to catch that variable as the 1st priority server IP address.
+====
+
+Copy to the _jump server_ the ssh key used in the deployment of the OCP cluster.
+
+[source,bash]
+----
+scp -i ${HOME}/.ssh/id_rsa_snowdrop_openstack id_rsa_snowdrop_openstack snowdrop@$(pass show ${VM_PROVIDER}/${VM_NAME}/floating_ip | awk 'NR==1{print $1}'):/home/snowdrop/.ssh/
+----
+
+Connect to the _jump server_ and then connect to the OCP machine.
+
+[source,bash]
+----
+$ ssh -i ${HOME}/.ssh/id_rsa_snowdrop_openstack core@<ocp instance ip address>
+----
+
+This should result in successfull connection.
+
+[source]
+----
+Red Hat Enterprise Linux CoreOS 412.86.202303141242-0
+  Part of OpenShift 4.12, RHCOS is a Kubernetes native operating system
+  managed by the Machine Config Operator (`clusteroperator/machine-config`).
+
+WARNING: Direct SSH access to machines is not recommended; instead,
+make configuration changes via `machineconfig` objects:
+  https://docs.openshift.com/container-platform/4.12/architecture/architecture-rhcos.html
+
+----
+
 == Remove existing OCP cluster on RHOS
 
 include::../ansible/playbook/ocp/README.adoc[tag=undeploy_ocp_on_rhos]
