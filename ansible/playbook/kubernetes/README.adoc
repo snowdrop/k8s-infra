@@ -1,5 +1,132 @@
 = Kubernetes Ansible Playbooks
+Snowdrop Team (Antonio Costa)
+:icons: font
+:revdate: {docdate}
 :toc: left
-:description: This document describes Kubernetes specific playbooks.
+:description: This document describes OpenStack specific playbooks.
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
 
+== Requirements
 
+=== Environment variables
+
+.Environment variables
+[cols="2,5"]
+|===
+| Environment Variable | Description
+
+| `VM_NAME`
+
+[.fuchsia]#string#
+
+[.red]#required# 
+
+a| Name of the VM where the tools will be installed throughout the document
+
+|===
+
+=== Ansible Inventory
+
+[WARNING]
+====
+Be sure that a host group entry exists for the version you
+want to install within the `inventory/hosts` file
+
+[source,yaml]
+----
+        k8s_121:
+          vars:
+            k8s_version: 1.21.4
+            k8s_dashboard_version: v2.3.1
+----
+====
+
+== Playbooks
+
+=== Install a Kubernetes cluster using Passwordstore
+
+Installs a new kubernetes cluster on an existing host using the team 
+passwordstore as Ansible Inventory source.
+
+To select which components are to be installed use the following ansible tags.
+
+[width="100%",cols="25%m,10%c,65%",options="header",]
+|===
+| Tag | Always | Description
+
+| containerd | icon:times[] | Installs link:https://containerd.io/[containerd] as CRI
+
+| docker | icon:times[] | Installs Docker as CRI
+
+| ingress | icon:times[] | Installs link:https://kubernetes.io/docs/concepts/services-networking/ingress/[Ingress]
+
+| k8s_cluster | icon:check[] | Installs the Kubernetes cluster
+
+| k8s_dashboard | icon:times[] | Installs the link:https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/[Kubernetes Dashboard]
+|===
+
+.Deploy kubernetes on a host installing docker and the Dashboard
+[source,bash]
+----
+ansible-playbook ansible/playbook/kubernetes/k8s_install_passstore.yml -e vm_name=${VM_NAME} --tags docker,k8s_dashboard
+----
+
+=== Uninstall a Kubernetes cluster
+
+To uninstall a kubernetes cluster (kubeadmin, kubelet, ..), execute this
+playbook.
+
+.Delete kubernetes cluster
+[source,bash]
+----
+ansible-playbook ansible/playbook/kubernetes/k8s_remove.yml -e vm_name=${VM_NAME} 
+----
+
+== Other k8s tools
+
+Several tools can be installed using the generic install tooks playbook. To deploy other k8s tools.
+
+=== k8s_issuer_certificate
+
+[source,bash]
+----
+ansible-playbook ansible/playbook/kubernetes/k8s_install_tools.yml -e vm_name=${VM_NAME} -e letsencrypt_env=prod --tags k8s_issuer_certificate
+----
+
+.k8s_issuer_certificate parameters
+[cols="2,5"]
+|===
+| Parameter | Description
+
+| `api_key`
+
+[.fuchsia]#string#
+
+[.red]#required# 
+
+a| GoDaddy API key.
+
+| `api_secret`
+
+[.fuchsia]#string#
+
+[.red]#required# 
+
+a| GoDaddy API secretkey.
+
+| `letsencrypt_env`
+
+[.fuchsia]#string#
+
+a| Let's Encrypt environment to use.
+
+* *`staging` <= Default:* Staging environment
+* `prod`: Production environment
+
+|===

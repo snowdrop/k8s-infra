@@ -155,6 +155,7 @@ Finally install the collection.
 ansible-galaxy collection install $(find . -name snowdrop-cloud_infra-*.tar.gz) --upgrade
 ----
 
+[#user-guide]
 == User Guide
 
 Provisioning and accessing a server requires several steps, each of which will be covered in this section.

@@ -1,6 +1,8 @@
 = OpenStack Ansible Playbooks
 Snowdrop Team (Antonio Costa)
+Snowdrop Team (Antonio Costa)
 :icons: font
+:revdate: {docdate}
 :revdate: {docdate}
 :toc: left
 :description: This document describes OpenStack specific playbooks.
@@ -27,63 +29,15 @@ NOTE: The list of flavors is identified on the link:../../../openstack/README.ad
 == Playbooks
 
 === Create a VM
+=== Create a VM
 
 Create OpenStack instance based on passwordstore
 
 .openstack_vm_create_passwordstore parameters
 [cols="2,5"]
+[cols="2,5"]
 |===
-| Parameter | Description
-
-| `openstack.vm.flavor`
-
-[.fuchsia]#string#
-
-[.red]#required# 
-
-a| OpenStack VM flavor (size)
-
-_e.g._ `m1.medium`.
-
-| `openstack.vm.image`
-
-[.fuchsia]#string#
-
-[.red]#required# 
-
-a| OpenStack VM image
-
-_e.g._ `Fedora-Cloud-Base-35`.
-
-| `openstack.vm.network`
-
-[.fuchsia]#string#
-
-[.red]#required# 
-
-a| Value for the OpenStack provider network.
-
-_e.g._ `provider_net_shared`
-
-// | k8s_type
-
-// [.fuchsia]#string#
-
-// a| *for k8s hosts.*
-
-// Kubernetes host type [master,worker].
-
-// | k8s_version
-
-// [.fuchsia]#string#
-
-// a| *for k8s hosts.*
-
-// Kubernetes version to be associated with the host, e.g. for version `1.23` use `123`. This is actually an Ansible Inventory group having definitions associated with each of the Kubernetes version.
-
-// | key_name
-
-// [.fuchsia]#string#
+|Field name |Mandatory |Description
 
 // a| Use an existing SSH key (value) instead of creating one for the VM.
 
@@ -101,12 +55,12 @@ This name will be used both as hostname as well as Ansible Inventory name.
 
 [source,bash]
 ----
-$ VM_NAME=vm20230627-t01
+$ VM_NAME=vm20210221-t01
 ----
 
 [source,bash]
 ----
-$ ansible-playbook ansible/playbook/openstack/openstack_vm_create_passwordstore.yml -e '{"openstack": {"vm": {"network": "provider_net_shared","image": "Fedora-Cloud-Base-35", "flavor": "m1.medium"}}}' -e vm_name=${VM_NAME} 
+$ ansible-playbook playbook/openstack/openstack_vm_create_passwordstore.yml -e k8s_type=masters -e k8s_version=123 -e '{"openstack": {"vm": {"network": "provider_net_shared","image": "Fedora-Cloud-Base-35", "flavor": "m1.medium"}}}' -e key_name=test-adm-key -e vm_name=${VM_NAME} 
 ----
 
 Although some failures might occur some might be ignored which shouldn't affect thhe process. This playbook should finish with no failed tasks.

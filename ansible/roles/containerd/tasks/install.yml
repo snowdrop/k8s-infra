@@ -3,21 +3,21 @@
   template:
     src: "containerd.conf.j2"
     dest: "/etc/modules-load.d/containerd.conf"
-  become: yes
+  become: true
 
 - name: "modprobe overlay"
   shell: "modprobe overlay"
-  become: yes
+  become: true
 
 - name: "modprobe br_netfilter"
   shell: "modprobe br_netfilter"
-  become: yes
+  become: true
 
 - name: Install dependencies needed by containerd
   package:
     name: "{{ containerd_dependencies }}"
     state: present
-  become: yes
+  become: true
 
 - name: "Add docker repository"
   include_role:
@@ -28,17 +28,17 @@
   package:
     name: "{{ containerd_packages }}"
     state: present
-  become: yes
+  become: true
 
 - name: Ensures /etc/containerd dir exists
   file: 
     path: "/etc/containerd"
     state: "directory"
-  become: yes
+  become: true
 
 - name: "Configure containerd"
   shell: "containerd config default > /etc/containerd/config.toml"
-  become: yes
+  become: true
 
 - name: "Set root folder"
   lineinfile:
@@ -46,14 +46,29 @@
     regexp: '^root = "/var/lib/containerd"'
     line: 'root = "{{ containerd_root_dir }}"'
   when: "containerd_root_dir is defined"
-  become: yes
+  become: true
 
-- name: "Set cni folder"
-  lineinfile:
-    path: "/etc/containerd/config.toml"
-    regexp: '^      bin_dir = "/opt/cni/bin"'
-    line: '      bin_dir = "/usr/libexec/cni"'
-  become: yes
+# - name: "Set cni folder"
+#   lineinfile:
+#     path: "/etc/containerd/config.toml"
+#     regexp: '^      bin_dir = "/opt/cni/bin"'
+#     line: '      bin_dir = "/usr/libexec/cni"'
+#   become: true
+
+- name: Create CNI plugin folder
+  ansible.builtin.file:
+    mode: 0755
+    path: /opt/cni/bin
+    state: directory
+  become: true
+
+- name: Get CNI plugin for containerd
+  ansible.builtin.get_url:
+    url: "https://github.com/containernetworking/plugins/releases/download/{{ cni_plugins_version }}/cni-plugins-linux-amd64-{{ cni_plugins_version }}.tgz"
+    dest: /opt/cni/bin
+    mode: 0755
+  become: true
+  
 
 - name: Start containerd
   systemd:
@@ -61,6 +76,6 @@
     name: containerd
     enabled: yes
     daemon_reload: yes
-  become: yes
+  become: true
 
 ...
