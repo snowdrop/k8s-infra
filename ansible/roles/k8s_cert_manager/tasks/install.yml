@@ -1,17 +1,17 @@
 ---
 - name: Install Cert Manager on OpenShift
-  shell: |
+  ansible.builtin.shell: |
     {{ client_tool }} {{ openshift_env.oc_admin_kubeconfig_arg }} apply -f https://github.com/jetstack/cert-manager/releases/download/{{ cert_manager.version }}/cert-manager.yaml --validate=false
   when: isOpenshift | bool
 
 - name: Install Cert Manager on K8s
-  shell: |
+  ansible.builtin.shell: |
     {{ client_tool }} {{ k8s_config }} apply -f https://github.com/jetstack/cert-manager/releases/download/{{ cert_manager.version }}/cert-manager.yaml --validate=false
   when: not isOpenshift | bool
-  become: yes
+  become: true
 
 - name: Wait till the cert manager pods are running
-  shell: |
+  ansible.builtin.shell: |
     while [[ $({{ client_tool }} {{ k8s_config }} get pod -l app=cert-manager -n {{ cert_manager.namespace }} -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]];
     do echo "Waiting for cert manager pod" && sleep 1; done
     while [[ $({{ client_tool }} {{ k8s_config }} get pod -l app=cainjector -n {{ cert_manager.namespace }} -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]];
@@ -19,10 +19,10 @@
     while [[ $({{ client_tool }} {{ k8s_config }} get pod -l app=webhook -n {{ cert_manager.namespace }} -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]];
     do echo "Waiting for cert manager webhook pod" && sleep 1; done
   when: not isOpenshift | bool
-  become: yes
+  become: true
 
 - name: Install GoDaddy Webhook
-  command: "{{ client_tool }} {{ k8s_config }} apply -f https://raw.githubusercontent.com/snowdrop/godaddy-webhook/master/deploy/webhook-all.yml --validate=false"
+  ansible.builtin.command: "{{ client_tool }} {{ k8s_config }} apply -f https://raw.githubusercontent.com/snowdrop/godaddy-webhook/master/deploy/webhook-all.yml --validate=false"
   when: not isOpenshift | bool
-  become: yes
+  become: true
 ...

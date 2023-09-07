@@ -1,16 +1,16 @@
 - name: Set client tool to oc when the cluster is Openshift
-  set_fact:
+  ansible.builtin.set_fact:
     client_tool: oc
   when: isOpenshift | bool
 
 - name: Set client tool to kubectl when the cluster is Kubernetes
-  set_fact:
+  ansible.builtin.set_fact:
     client_tool: kubectl
     k8s_config: "--kubeconfig '/etc/kubernetes/admin.conf'"
   when: not isOpenshift | bool
 
-- include_tasks: install.yml
-  when: not remove | bool
+- ansible.builtin.include_tasks: install.yml
+  when: state == 'present'
 
-- include_tasks: remove.yml
-  when: remove | bool
+- ansible.builtin.include_tasks: remove.yml
+  when: state == 'absent'

@@ -19,7 +19,7 @@
       tags: [always]
 
     - name: "Validate required variables"
-      assert:
+      ansible.builtin.assert:
         that:
           - "vm_name is defined and vm_name | length > 0"
           - "state is defined and (state == 'present' or state == 'absent')"
@@ -28,9 +28,24 @@
           - "Required parameters:"
           - "  vm_name: VM to where the tools will be deployed"
           - "  state: 'present' to install the tools and 'absent' to remove them"
+          - "  api_key and api_secret with the GoDaddy values"
       tags: [always]
 
+    - name: "Validate required variables for k8s_issuer_certificate"
+      ansible.builtin.assert:
+        that:
+          - "api_key is defined and api_secret is defined"
+        fail_msg: 
+          - "Required parameters:"
+          - "  api_key and api_secret with the GoDaddy values"
+      tags: [k8s_issuer_certificate]
+
   tasks:
+    - name: "Install k8s_issuer_certificate"
+      ansible.builtin.import_role:
+        name: k8s_cert_manager
+      tags: [k8s_cert_manager]
+
     # Requires GoDaddy API Key and Secret Key
     - name: "Install k8s_issuer_certificate"
       ansible.builtin.import_role:
