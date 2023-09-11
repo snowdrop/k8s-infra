@@ -18,7 +18,7 @@
     permanent: yes
     state: enabled
   notify: Restart firewalld
-  become: yes
+  become: true
 
 - name: Add source network to trusted sources
   firewalld:
@@ -30,7 +30,7 @@
     - "{{ pod_subnet }}"
     - "{{ service_subnet }}"
   notify: Restart firewalld
-  become: yes
+  become: true
 
 - name: Open k8s known ports
   firewalld:
@@ -40,7 +40,7 @@
     state: enabled
   loop: "{{ firewalld_public_ports }}"
   notify: Restart firewalld
-  become: yes
+  become: true
 
 - name: Open k8s known services
   firewalld:
@@ -50,7 +50,7 @@
     state: enabled
   loop: "{{ firewalld_public_services }}"
   notify: Restart firewalld
-  become: yes
+  become: true
 
 - name: "Flush handlers"
   meta: flush_handlers
@@ -76,7 +76,7 @@
     gpgkey: https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
     exclude: kube*
     state: present
-  become: yes
+  become: true
   register: k8s_add_repo_res
   failed_when: "k8s_add_repo_res.rc is defined and k8s_add_repo_res.rc > 0 and k8s_add_repo_res.stderr is defined and 'signature could not be verified for kubernetes' not in k8s_add_repo_res.stderr"
 
@@ -90,7 +90,7 @@
     gpgkey: https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
     exclude: kube*
     state: present
-  become: yes
+  become: true
   register: k8s_add_repo_alt_res
   when: "k8s_add_repo_res is not defined or (k8s_add_repo_res.rc is defined and k8s_add_repo_res.rc > 0 and k8s_add_repo_res.stderr is defined and 'signature could not be verified for kubernetes' in k8s_add_repo_res.stderr)"
 
@@ -104,14 +104,14 @@
       - kubectl-{{ k8s_version }}
       - kubeadm-{{ k8s_version }}
       - kubelet-{{ k8s_version }}
-  become: yes
+  become: true
 
 - name: Disable selinux
   shell: |
     setenforce 0
     sed -i 's/^SELINUX=.*/SELINUX=disabled/g' /etc/selinux/config
     getenforce
-  become: yes
+  become: true
 
 - name: Start kubelet
   systemd:
@@ -119,34 +119,52 @@
     name: kubelet
     daemon_reload: yes
     enabled: yes
-  become: yes
+  become: true
 
 - name: Create k8s conf file
   template:
     src: "k8s.conf.j2"
     dest: /etc/sysctl.d/k8s.conf
-  become: yes
+  register: k8s_conf_file
+  become: true
 
 - name: Make k8s conf file take effect
   command: "sysctl --system"
-  become: yes
+  become: true
+  when: k8s_conf_file.changed
+
+- name: Remove CRI plugin disable from containerd toml
+  ansible.builtin.replace:
+    path: /etc/containerd/config.toml
+    # regexp: '^disabled_plugins\ =\ \["cri"\]'
+    # replace: '#disabled_plugins = ["cri"]'
+    regexp: '^(disabled_plugins)(.*)("cri")(.*)'
+    replace: '\1\2\4'
+  register: enable_cri_plugin
+  become: true
+
+- name: Restart containerd
+  ansible.builtin.service:
+    name: containerd
+    state: restarted
+  become: true
+  when: enable_cri_plugin.changed
 
 - name: Pull k8s linux images for version {{ k8s_version }}
   command: "kubeadm config images pull --kubernetes-version {{ k8s_version }}"
-  become: yes
+  become: true
 
 - name: "Checks k8s bootstrap status"
   stat: 
     path: "/etc/kubernetes/admin.conf"
   register: k8s_config_file
 
-
 - name: "Initialize cluster for k8s - {{ k8s_version }}"
   command: "kubeadm init --pod-network-cidr={{ pod_subnet }} --apiserver-advertise-address={{ api_server }} --kubernetes-version {{ k8s_version }}"
   register: kubeadm_init_res
   changed_when: "kubeadm_init_res.rc == 0"
   failed_when: "kubeadm_init_res.rc != 0  and 'already exists' not in kubeadm_init_res.stderr"
-  become: yes
+  become: true
   when: "not k8s_config_file.stat.exists"
 
 - name: "Checks k8s bootstrap status"
@@ -161,12 +179,17 @@
     state: "present"
   when: "not home_k8s_config_file.stat.exists"
 
-- name: "Install CNI"
-  include_tasks: install_cni.yml
+- name: "Install CNI < 1.24"
+  ansible.builtin.include_tasks: install_cni_l124.yml
+  when: k8s_version is version('1.24.0', '<')
+
+- name: "Install CNI >= 1.24"
+  ansible.builtin.include_tasks: install_cni.yml
+  when: k8s_version is version('1.24.0', '>=')
 
 - name: "Check if nodes are already tainted"
   shell: |
-    kubectl get nodes -o jsonpath="{.items[].spec.taints[?(@.key=='node-role.kubernetes.io/master')]}"
+    kubectl get nodes -o jsonpath="{.items[].spec.taints[?(@.key=='node-role.kubernetes.io/{{ cp_name }}')]}"
   register: kc_check_tainted_nodes
   ignore_errors: True
 
@@ -175,8 +198,9 @@
     msg: "kc_check_tainted_nodes: {{ kc_check_tainted_nodes }}"
   when: "kc_check_tainted_nodes is defined"
 
-- name: Taint the node
-  command: "kubectl taint nodes --all node-role.kubernetes.io/master-"
+- name: Taint the nodes
+  command: |
+    kubectl taint nodes --all node-role.kubernetes.io/{{ cp_name }}-
   register: kc_taint_node_res
   failed_when: "kc_taint_node_res.rc != 0 and 'not found' not in kc_taint_node_res.stderr"
 

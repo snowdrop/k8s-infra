@@ -1,0 +1,76 @@
+---
+# This is an example playbook to execute Ansible tests.
+
+- name: Verify
+  hosts: localhost
+  gather_facts: true
+  pre_tasks:
+    - name: "Set godaddy facts"
+      ansible.builtin.set_fact:
+        api_key: "{{ query('passwordstore', 'godaddy/ote/api-key')[0] }}"
+        api_secret: "{{ query('passwordstore', 'godaddy/ote/secret-key')[0] }}"
+        domain_name: snowdropansibletest.com
+        environment: ote
+        domain:
+          consent:
+            agreedBy: JohnDoe
+            agreementKeys: 
+              - DNRA
+          contactAdmin:    
+            addressMailing: 
+              address1: Some Street
+              city: Washington
+              country: US
+              postalCode: "20001"
+              state: Washington
+            email: user@example.com
+            nameFirst: John
+            nameLast: Doe
+            phone: "+001.000000000"
+
+  tasks:
+    - name: "Purchase domain"
+      ansible.builtin.include_role:
+        name: "domain"
+      vars:
+        state: present
+
+    - name: Print result
+      ansible.builtin.debug:
+        var: godaddy_domain
+
+    - name: Status must be 200
+      ansible.builtin.assert:
+        that: godaddy_domain_info.status == 200
+        msg: "Status must be 200 but was {{ godaddy_domain_info.status }}"
+
+    - name: Message must be OK
+      ansible.builtin.assert:
+        that: "'OK' in godaddy_domain_info.msg"
+        msg: Message must be OK
+
+    - name: json field must be a list
+      ansible.builtin.assert:
+        that: godaddy_domain_info.json is not mapping
+        msg: json field must be a list
+
+    - name: "Get domains"
+      ansible.builtin.include_role:
+        name: "domain_info"
+      vars:
+        environment: ote
+        domain_name: snowdrop
+
+    - name: Print result
+      ansible.builtin.debug:
+        var: godaddy_domain
+
+    - name: "Cancel purchased domain"
+      ansible.builtin.include_role:
+        name: "domain"
+      vars:
+        # domain_name: "{{ domain_name }}"
+        # environment: ote
+        state: absent
+
+...

@@ -1,6 +1,6 @@
 - name: Delete the Godaddy Secrets, Issuers & Certificates resources
   shell: |
-    {{ client_tool }} {{ k8s_config }} delete issuer,certificate,secret -l app=ca-cert -n {{ item }}
+    {{ client_tool }} delete issuer,certificate,secret -l app=ca-cert -n {{ item }}
   with_items:
   - snowdrop-site
   - generator-site

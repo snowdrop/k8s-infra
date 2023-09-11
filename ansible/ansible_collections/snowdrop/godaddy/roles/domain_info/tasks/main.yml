@@ -1,0 +1,40 @@
+---
+# tasks file for domain_info
+# Requires:
+#  . api_key: GoDaddy API Key
+#  . api_secret: GoDaddy API Secret
+- name: Set URL
+  ansible.builtin.set_fact:
+    api_url: "{{ ote_api_url }}/{{ domains_folder }}"
+
+- name: Set URL
+  ansible.builtin.set_fact:
+    api_url: "{{ pro_api_url }}/{{ domains_folder }}"
+  when: api_environment is defined and (api_environment == 'production' or api_environment == 'prod')
+
+- name: Add domain name if present
+  ansible.builtin.set_fact:
+    api_url: "{{ api_url }}/{{ domain_name }}"
+  when: domain_name is defined and (domain_name | length > 0)
+
+- name: Print Domain URL
+  ansible.builtin.debug:
+    var: api_url
+    verbosity: 2
+
+- name: Query domains
+  ansible.builtin.uri:
+    headers:
+      accept: application/json
+      authorization: "sso-key {{ api_key }}:{{ api_secret }}"
+    method: GET
+    return_content: true
+    url: "{{ api_url }}"
+  register: godaddy_domain_info
+
+- name: Print result
+  ansible.builtin.debug:
+    var: godaddy_domain_info
+    verbosity: 2
+
+...

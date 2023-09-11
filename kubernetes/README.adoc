@@ -1,0 +1,180 @@
+= Kubernetes
+Snowdrop Team (Antonio costa)
+:icons: font
+:icon-set: fas
+:revdate: {docdate}
+:toc: left
+:toclevels: 3
+:description: This document describes the requirements, and the process to execute to install a k8s cluster on a host. The installation will be done using Ansible.
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
+
+== Introduction
+
+This document describes the requirements, and the process to execute to
+install a k8s cluster on a host. The installation will be done using
+Ansible.
+
+=== Scope
+
+Describe the steps to execute to install k8s on a host.
+
+== Requirements
+
+First of all follow the instructions in the
+link:../ansible/playbook/README.md#installation-guide[Ansible
+Installation Guide section].
+
+=== Ansible Inventory
+
+For information related to the Ansible Inventory check the link:../ansible/README.adoc#user-guide[User guide]
+
+In order to execute the installation of k8s several variables must be
+provided. To standardize the installation several Ansible Groups have
+been created for different installations.
+
+To populate these variables, some groups, with the corresponding group
+variables, have been created in the
+link:../ansible/inventory/hosts.yml[`hosts.yml`] inventory file.
+
+The following table shows the existing groups for k8s.
+
+[width="100%",cols="25%,25%m,50%",options="header",]
+|===
+|Group Type |Group Name |Description
+|Components |masters |Kubernetes control plane. Includes information
+such as firewall ports and services to be open as well as internal
+subnet information.
+
+|Components |nodes |Kubernetes node. Similar to masters but for k8s
+nodes.
+
+|Versions |k8s_124 |Information v 1.24 specific
+
+|Versions |k8s_123 |Information v 1.23 specific
+|===
+
+Installing kubernetes requires a host to be assigned to 2 groups,
+identified from the previous table as _Group Type_, a k8s component and
+a k8s version.
+
+More information on versions on the link:../ansible/inventory/hosts.yml[`hosts.yml`] Ansible inventory file.
+
+.Click to see the k8s yaml file configuration
+[%collapsible]
+====
+[source,yaml]
+----
+include::../ansible/inventory/hosts.yml[tag=k8s_version]
+----
+====
+
+=== Host provisioning
+
+Provisioning a host is done using the appropriate Ansible Playbooks, depending on the provider and its out of the scope of this document.
+
+The first step is to generate the inventory. More information in the local
+passwordstore link:../passwordstore/README.adoc[Define host inventory for provisioning] document.
+
+Once the inventory is prepared the host can be created. To provision a RHOS VM check the link:../openstack/README.adoc[OpenStack] documenation. The latest configuration used is the following.
+
+[width="100%",cols="40%,60%m",options="header",]
+|===
+| Attribute | Value
+
+| Flavor | ci.m4.xlarge
+
+| Image | Fedora-Cloud-Base-37
+|===
+
+To remove the host from the inventory check the link:../passwordstore/README.adoc[Remove host from inventory] secion from the passwordstore document.
+
+== Available Ansible Playbooks
+
+More information on the available Kubernetes Ansible Playbooks on the 
+link:../ansible/playbook/kubernetes/README.adoc[Playbook README].
+
+== Troubleshooting
+
+=== Expired k8s certificate
+
+==== Problem
+
+* kubelet service shows connection errors.
+* The docker container running the k8s API server cannot be started
+
+==== Cause
+
+[source,bash]
+----
+$ docker logs xxxxxxxxxxxx
+...
+W0121 11:09:31.447982       1 clientconn.go:1251] grpc: addrConn.createTransport failed to connect to {127.0.0.1:2379 0  <nil>}. Err :connection error: desc = "transport: authentication handshake failed: x509: certificate has expired or is not yet valid". Reconnecting...
+----
+
+Check the validity of the kubernetes certificate using the following
+command. If they have been expired, then apply the trick as defined at
+the link:#solution-k8s-cert-sol[Solution] section
+
+[source,bash]
+----
+$ openssl x509 -in /etc/kubernetes/pki/apiserver.crt -noout -text |grep ' Not '
+----
+
+[[k8s-cert-sol]]
+==== Solution
+
+The solution applied was the
+https://stackoverflow.com/questions/56320930/renew-kubernetes-pki-after-expired/56334732#56334732[this
+answer on stackoverflow thread] applied to our k8s 1.14 cluster.
+
+Other references: *
+https://www.ibm.com/support/knowledgecenter/SSCKRH_1.1.0/platform/t_certificate_renewal.html
+
+[source,bash]
+----
+$ cd /etc/kubernetes/pki/
+$ mv {apiserver.crt,apiserver-etcd-client.key,apiserver-kubelet-client.crt,front-proxy-ca.crt,front-proxy-client.crt,front-proxy-client.key,front-proxy-ca.key,apiserver-kubelet-client.key,apiserver.key,apiserver-etcd-client.crt} ~/
+$ kubeadm init phase certs all --apiserver-advertise-address <IP>
+$ cd /etc/kubernetes/
+$ mv {admin.conf,controller-manager.conf,kubelet.conf,scheduler.conf} ~/
+$ kubeadm init phase kubeconfig all
+$ reboot
+----
+
+And then update the user’s kube config.
+
+[source,bash]
+----
+$ cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+----
+
+=== Cannot log in using kubelet
+
+==== Problem
+
+[source,bash]
+----
+$ kubectl get pods
+error: You must be logged in to the server (Unauthorized)
+----
+
+This might happen for instance after renewing the certificates.
+
+==== Cause
+
+The `~/.kube/config` does not contain the client-certificate-data and
+client-key-data updated after renewing the certificate.
+
+[[solution]]
+==== Solution
+
+[source,bash]
+----
+$ cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+----

@@ -1,0 +1,7 @@
+---
+- include_tasks: create.yml
+  when: "state is defined and state == 'present'"
+
+- include_tasks: remove.yml
+  when: "state is defined and state == 'absent'"
+...

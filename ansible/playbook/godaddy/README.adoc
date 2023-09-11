@@ -1,0 +1,226 @@
+= GoDaddy Playbooks
+Snowdrop Team (Antonio Costa)
+:icons: font
+:revdate: {docdate}
+:toc: left
+:description: This document describes GoDaddy specific playbooks.
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
+
+== Before you start
+
+This playbook uses  the snowdrop/godaddy collection.
+
+To install (build is and install) the collection execute the following command.
+
+[source,bash]
+----
+ansible-galaxy collection build ansible/ansible_collections/snowdrop/godaddy --output build/ --force && ansible-galaxy collection install build/snowdrop-godaddy-$(yq -r .version ansible/ansible_collections/snowdrop/cloud_infra/galaxy.yml).tar.gz --upgrade
+----
+
+== Playbooks
+
+=== Query DNS records
+
+
+..GoDaddy query DNS record parameters
+[cols="2,5"]
+|===
+| Parameter | Description
+
+| `domain_name`
+
+[.fuchsia]#string#
+
+[.red]#required# 
+
+a| Name of the domain to query
+
+_e.g._ `snowdrop.dev`.
+
+| `api_environment`
+
+[.fuchsia]#string#
+
+a| GoDaddy environment to use.
+
+*  => Default: Use the OTE (Test) environment
+* production/prod: Use the production environment
+
+| `record_type`
+
+[.fuchsia]#string#
+
+a| DNS record type
+
+_e.g._ `TXT`
+
+| `record_name`
+
+[.fuchsia]#string#
+
+a| DNS record name
+
+_e.g._ `@`
+
+|===
+
+.Query all records for domain.
+[source,bash]
+----
+ansible-playbook ansible/playbook/godaddy/godaddy_dns_info_passwordstore.yml -e domain_name="snowdrop.dev" -e api_environment=prod
+----
+
+.Query records for type and name
+[source,bash]
+----
+ansible-playbook ansible/playbook/godaddy/godaddy_dns_info_passwordstore.yml -e domain_name="snowdrop.dev" -e api_environment=prod -e record_type=TXT -e record_name="@"
+----
+
+=== Create a DNS record
+
+Create a GoDaddy DNS record based on passwordstore.
+
+.GoDaddy create DNS record parameters
+[cols="2,5"]
+|===
+| Parameter | Description
+
+| `domain_name`
+
+[.fuchsia]#string#
+
+[.red]#required# 
+
+a| Name of the domain to query
+
+_e.g._ `snowdrop.dev`.
+
+| `api_environment`
+
+[.fuchsia]#string#
+
+a| GoDaddy environment to use.
+
+*  => Default: Use the OTE (Test) environment
+* production/prod: Use the production environment
+
+| `record_type`
+
+[.fuchsia]#string#
+
+[.red]#required# 
+
+a| DNS record type
+
+_e.g._ `TXT`
+
+| `record_name`
+
+[.fuchsia]#string#
+
+[.red]#required# 
+
+a| DNS record name
+
+| `dns`
+
+[.fuchsia]#json#
+
+[.red]#required# 
+
+a| DNS record data in JSON format
+
+_e.g._:
+
+.Minimal example
+[source,json]
+----
+{"dns": {"data": "<ip_address_for_host>"}}
+----
+
+.Full example
+[source,json]
+----
+{"dns": 
+  {
+    "data": "<ip_address_for_host>"
+    , "port": 80
+    , "priority": 1
+    , "protocol": "{{ dns.protocol }}"
+    , "service": "{{ dns.service }}"
+    , "ttl": 5
+    , "weight": 99
+  }
+}
+----
+
+|===
+
+[source,bash]
+----
+ansible-playbook ansible/playbook/godaddy/godaddy_dns_create_passwordstore.yml \
+  -e domain_name="snowdrop.dev" \
+  -e record_type=A \
+  -e record_name="apps.ocp" \
+  -e '{"dns": {"data": "<ip_address_for_host>"}}'
+----
+
+
+
+=== Remove a DNS record
+
+
+.GoDaddy remove DNS record parameters
+[cols="2,5"]
+|===
+| Parameter | Description
+
+| `domain_name`
+
+[.fuchsia]#string#
+
+[.red]#required# 
+
+a| Name of the domain to query
+
+_e.g._ `snowdrop.dev`.
+
+| `api_environment`
+
+[.fuchsia]#string#
+
+a| GoDaddy environment to use.
+
+*  => Default: Use the OTE (Test) environment
+* production/prod: Use the production environment
+
+| `record_type`
+
+[.fuchsia]#string#
+
+[.red]#required# 
+
+a| DNS record type
+
+_e.g._ `TXT`
+
+| `record_name`
+
+[.fuchsia]#string#
+
+[.red]#required# 
+
+a| DNS record name
+
+|===
+
+[source,bash]
+----
+ansible-playbook ansible/playbook/godaddy/godaddy_dns_delete_passwordstore.yml -e domain_name="snowdrop.dev" -e record_type=A -e record_name="apps.ocp" -e api_environment=prod
+----

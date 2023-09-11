@@ -1,44 +1,50 @@
 ---
-- name: "Define CNI installation method"
-  set_fact:
-    cni_new: "{{ ansible_distribution == 'Fedora' or ((ansible_distribution == 'CentOS' or ansible_os_family == 'RedHat') and ansible_distribution_major_version != '7') }}"
-
-- name: "Install Flannel Virtual Network for pod communication"
-  shell: |
-    kubectl -n kube-system get deployment coredns -o yaml | sed 's/allowPrivilegeEscalation: false/allowPrivilegeEscalation: true/g' | kubectl apply -f -
-    kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/{{ coreos_flannel_sha_commit }}/Documentation/kube-flannel.yml
-  when: "not cni_new | bool"
-
 - name: "Check if Calico is already deployed"
   shell: "kubectl -n kube-system get daemonset.apps calico-node -o jsonpath='{.metadata.name}'"
   register: kc_calico_ds
   ignore_errors: True
-  when: "cni_new | bool"
 
 - name: "Print calico output"
   debug: 
     msg: "kc_calico_ds: {{ kc_calico_ds }}"
-  when: "(cni_new | bool) and kc_calico_ds is defined"
+  when: "kc_calico_ds is defined"
 
 - name: "Decide if Calico installation is needed"
   set_fact:
-    install_calico: "(cni_new | bool) and (kc_calico_ds is undefined or (kc_calico_ds.rc != 0 and 'NotFound' not in kc_calico_ds.stderr))"
+    install_calico: "(kc_calico_ds is undefined or (kc_calico_ds.rc != 0 and 'NotFound' not in kc_calico_ds.stderr))"
+
+- name: "Pull Calico images"
+  shell: |
+    docker pull docker.io/calico/cni:{{ calico_version }}
+    docker pull docker.io/calico/typha:{{ calico_version }}
+    docker.io/calico/pod2daemon-flexvol:{{ calico_version }}
+  register: kc_tigera_calico
+  failed_when: kc_tigera_calico.rc > 0 and 'already exists' not in kc_tigera_calico.stderr
 
 - name: "Print Decide calico output"
   debug: 
-    msg: "install_calico{{ item}}"
-  with_items:
-    - "install_calico: {{ install_calico }}"
-    - "install_calico: {{ install_calico }}"
+    msg: "install_calico {{ install_calico }}"
 
-- name: "Generate Calico manifest file"
-  template:
-    src: "calico/calico.yaml.j2"
-    dest: "/tmp/calico.yaml"
-  become: yes
-  when: "install_calico"
+# https://docs.tigera.io/calico/latest/getting-started/kubernetes/quickstart
+- name: "Install the Tigera Calico operator and custom resource definitions"
+  shell: "kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/{{ calico_version }}/manifests/tigera-operator.yaml"
+  register: kc_tigera_calico
+  failed_when: kc_tigera_calico.rc > 0 and 'already exists' not in kc_tigera_calico.stderr
 
-- name: "Apply Calico manifest"
-  shell: "kubectl apply -f /tmp/calico.yaml"
-  when: "install_calico"
+# Must use custom custom-resources.yaml due to CIDR address
+# - name: "Install Calico by creating the necessary custom resource"
+#   shell: "kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/{{ calico_version }}/manifests/custom-resources.yaml"
+#   register: kc_calico
+#   failed_when: kc_calico.rc > 0 and 'already exists' not in kc_calico.stderr
+- name: "Template Calico custom resource"
+  ansible.builtin.template:
+    src: calico/custom-resources.yaml.j2
+    dest: /tmp/custom-resources.yaml
+
+- name: "Install Calico by creating the necessary custom resource"
+  shell: |
+    kubectl create -f /tmp/custom-resources.yaml
+  register: kc_calico
+  failed_when: kc_calico.rc > 0 and 'already exists' not in kc_calico.stderr
+
 ...

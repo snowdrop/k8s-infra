@@ -5,7 +5,7 @@
 #  . Import snowdrop generic key
 #
 # Required variables:
-#  . pass_provider: provider in the passstore project [hetzner,openstack]
+#  . pass_provider: provider in the passstore project [openstack]
 - name: "Init controller"
   hosts: localhost
   gather_facts: no
@@ -15,9 +15,12 @@
       assert:
         that:
           - "pass_provider is defined"
+          - "pass_provider == 'openstack'"
         fail_msg: 
           - "Required parameters:"
-          - "  pass_provider: provider in the passstore project [hetzner,openstack]"
+          - "  pass_provider:"
+          - "   - must be defined"
+          - "   - provider in the passstore project [openstack]"
 
     - name: "Pull pass git database"
       shell: "git pull"

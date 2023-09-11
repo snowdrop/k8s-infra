@@ -1,0 +1,46 @@
+---
+# tasks file for dns_info
+# Requires:
+#  . domain
+#  . record_type
+#  . record_name
+#  . api_key: GoDaddy API Key
+#  . api_secret: GoDaddy API Secret
+
+- name: Print Environment
+  ansible.builtin.debug:
+    var: api_environment
+
+- name: Set URL
+  ansible.builtin.set_fact:
+    api_url: "{{ ote_api_url }}"
+
+- name: Set URL
+  ansible.builtin.set_fact:
+    api_url: "{{ pro_api_url }}"
+  when: api_environment is defined and (api_environment == 'production' or api_environment == 'prod')
+
+- name: Set URL
+  ansible.builtin.set_fact:
+    api_url: "{{ api_url }}/{{ domains_folder }}/{{ domain_name }}/{{ dns_records_folder }}/{% if record_type is defined %}{{ record_type }}/{% endif %}{% if record_type is defined and record_name is defined %}{{ record_name }}{% endif %}"
+
+- name: Print API URL
+  ansible.builtin.debug:
+    var: api_url
+
+- name: Query domains
+  ansible.builtin.uri:
+    headers:
+      accept: application/json
+      authorization: "sso-key {{ api_key }}:{{ api_secret }}"
+    method: GET
+    return_content: true
+    url: "{{ api_url }}"
+  register: godaddy_dns_info
+
+- name: Print result
+  ansible.builtin.debug:
+    var: godaddy_dns_info
+    verbosity: 2
+
+...

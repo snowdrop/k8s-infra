@@ -1,4 +1,4 @@
-default_generic_key_name: test-adm-key
+default_generic_key_name: snowdrop-adm-key
 
 hostname: openstackVM
 type: cloude

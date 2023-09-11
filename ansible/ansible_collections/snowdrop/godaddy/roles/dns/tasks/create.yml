@@ -1,0 +1,46 @@
+---
+# Requires:
+#  . api_key: GoDaddy API Key
+#  . api_secret: GoDaddy API Secret
+#  . domain_name: Domain to be purchased
+#  . dns_record_type: DNS record type
+#  . dns_record_name: DNS record name
+#  . dns_data: DNS value
+- name: Set default facts
+  ansible.builtin.set_fact:
+    api_url: "{{ ote_api_url }}/{{ domains_folder }}"
+    authorization: "sso-key {{ api_key }}:{{ api_secret }}"
+
+- name: Set Production URL
+  ansible.builtin.set_fact:
+    api_url: "{{ pro_api_url }}/{{ domains_folder }}"
+  when: api_environment is defined and (api_environment == 'production' or api_environment == 'prod')
+
+- name: "Template DNS body"
+  ansible.builtin.set_fact:
+    records_body: "{{ lookup('template', './dns_body.json.j2') }}"
+  when: override_dns_body is undefined or override_dns_body | length == 0
+
+- name: "Apply override DNS body"
+  ansible.builtin.set_fact:
+    records_body: "{{ override_dns_body }}"
+  when: override_dns_body is defined and override_dns_body | length > 0
+
+- name: Call Replace record API
+  ansible.builtin.uri:
+    body: "{{ records_body | to_json }}"
+    headers:
+      accept: application/json
+      authorization: "{{ authorization }}"
+      Content-Type: application/json
+    method: PUT
+    return_content: true
+    url: "{{ api_url }}/{{ domain_name }}/records/{{ record_type }}/{{ record_name }}"
+  register: godaddy_dns
+
+- name: Print result
+  ansible.builtin.debug:
+    var: godaddy_dns
+    verbosity: 2
+
+...

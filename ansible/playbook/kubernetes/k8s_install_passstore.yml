@@ -1,9 +1,9 @@
 ---
-- name: "Install Kubernetes"
-  import_playbook: "k8s_install.yml"
+- name: "Install Kubernetes using Passwordstore"
+  ansible.builtin.import_playbook: "k8s_install.yml"
 
 - name: "Get k8s configuration"
-  import_playbook: "k8s_get_config.yml"
+  ansible.builtin.import_playbook: "k8s_get_config.yml"
 
 # Requires:
 # . k8s_config
@@ -34,4 +34,8 @@
         pass_l3: "{{ vm_name }}"
         var_name: "k8s_dashboard_token"
         var_value: "{{ k8s_dashboard_token }}"
+
+- name: "Install Kubernetes using Passwordstore"
+  ansible.builtin.import_playbook: "k8s_install_tools.yml"
+
 ...

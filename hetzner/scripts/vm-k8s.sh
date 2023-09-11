@@ -36,7 +36,7 @@ ansible-playbook playbook/generate_inventory.yml \
 ansible-playbook -i inventory/${IP_HETZNER}_host \
     playbook/k8s.yml \
     --tags k8s_cluster \
-    -e k8s_version=1.15.9 \
+    -e k8s_version=1.24.3 \
     -e ip_address=${IP_HETZNER}
 
 ansible-playbook -i inventory/${IP_HETZNER}_host \

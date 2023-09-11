@@ -1,0 +1,117 @@
+---
+# Requires:
+#  . api_key: GoDaddy API Key
+#  . api_secret: GoDaddy API Secret
+#  . domain_name: Domain to be purchased
+- name: Print TLD
+  ansible.builtin.debug:
+    msg: 
+      - "{{ domain_name | replace(\"snowdropansibletest.\",'') }}"
+      - "{{ domain_name | replace('snowdropansibletest.','') }}"
+      - "{{ (domain_name | split('.') )[0] }}"
+      - "{{ (domain_name | split('.') )[0] ~ '.' }}"
+      - "{{ domain_name | replace((domain_name | split('.') )[0] ~ '.','') }}"
+      - "{{ domain_name | replace(\"{{ (domain_name | split('.') )[0] }}\",'') }}"
+
+- name: Set default facts
+  ansible.builtin.set_fact:
+    api_url: "{{ ote_api_url }}/{{ domains_folder }}"
+    authorization: "sso-key {{ api_key }}:{{ api_secret }}"
+    tld: "{{ domain_name | replace((domain_name | split('.') )[0] ~ '.','') }}"
+
+- name: Print TLD
+  ansible.builtin.debug:
+    var: tld
+
+- name: Set URL
+  ansible.builtin.set_fact:
+    api_url: "{{ pro_api_url }}/{{ domains_folder }}"
+  when: environment is defined and environment == 'production'
+
+# - name: Get TLDs
+#   ansible.builtin.uri:
+#     headers:
+#       accept: application/json
+#       authorization: "{{ authorization }}"
+#     method: GET
+#     return_content: true
+#     url: "{{ api_url }}/tlds"
+#   register: godaddy_tlds
+
+# - name: Print TLDs
+#   ansible.builtin.debug:
+#     var: godaddy_tlds
+
+- name: Set URL
+  ansible.builtin.set_fact:
+    agreements_url: "{{ api_url }}/{{ agreements_folder }}?tlds={{ tld }}&privacy=false&forTransfer=false"
+
+- name: Print Agreements URL
+  ansible.builtin.debug:
+    var: agreements_url
+    verbosity: 2
+
+- name: Get agreements
+  ansible.builtin.uri:
+    headers:
+      accept: application/json
+      authorization: "{{ authorization }}"
+    method: GET
+    return_content: true
+    url: "{{ agreements_url }}"
+  register: godaddy_agreements
+
+- name: Print Agreements INFO
+  ansible.builtin.debug:
+    var: godaddy_agreements
+    verbosity: 2
+
+# - name: Print Agreement Keys
+#   ansible.builtin.debug:
+#     msg: "agreement: {{ agreement.agreementKey }}"
+#     verbosity: 2
+#   loop: "{{ godaddy_agreements.json }}"
+#   loop_control: 
+#     loop_var: agreement
+
+- name: "Template purchase body"
+  ansible.builtin.set_fact:
+    purchase_body: "{{ lookup('template', './purchase_body.json.j2') }}"
+  when: override_purchase_body is undefined or override_purchase_body | length == 0
+
+- name: "Apply override purchase body"
+  ansible.builtin.set_fact:
+    purchase_body: "{{ override_purchase_body }}"
+  when: override_purchase_body is defined and override_purchase_body | length > 0
+
+- name: Print Purchase body
+  ansible.builtin.debug:
+    var: purchase_body
+    # verbosity: 2
+
+- name: Print Purchase body
+  ansible.builtin.debug:
+    msg: 
+      # - "{{ purchase_body }}"
+      - "{{ purchase_body | string }}"
+      # - "{{ purchase_body | to_json | tojson }}"
+    # verbosity: 2
+
+- name: Call Purchase and register domain API
+  ansible.builtin.uri:
+    body: "{{ purchase_body | to_json }}"
+    headers:
+      accept: application/json
+      authorization: "{{ authorization }}"
+      Content-Type: application/json
+    method: POST
+    return_content: true
+    url: "{{ api_url }}/{{ purchase_folder }}"
+  register: godaddy_domain_info
+
+- name: Print result
+  ansible.builtin.debug:
+    var: godaddy_domain_info
+    verbosity: 2
+
+...

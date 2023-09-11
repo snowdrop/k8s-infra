@@ -38,7 +38,7 @@
 
     - name: Check vm_pass_provider value
       fail:
-        msg: "Missing or invalid vm_pass_provider {{ vm_pass_provider }}. Should be in [hetzner]"
+        msg: "Missing or invalid vm_pass_provider {{ vm_pass_provider }}. Should be in [openstack]"
       when: "vm_pass_provider is not defined or vm_pass_provider | length == 0"
 
     - name: Check operation value

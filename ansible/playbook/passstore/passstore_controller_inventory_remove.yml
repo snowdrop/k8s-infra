@@ -2,7 +2,7 @@
 # file: passstore_controller_inventory_remove.yml
 # Required variables:
 #  . vm_name: Name of the vm
-#  . pass_provider: provider in the passstore project [hetzner]
+#  . pass_provider: provider in the passstore project [openstack]
 - name: Delete local inventory configuration
   hosts: localhost
   gather_facts: no
@@ -15,7 +15,12 @@
           - "vm_name | length > 0"
           - "pass_provider is defined"
           - "pass_provider | length > 0"
-        fail_msg: "'vm_name' and 'pass_provider' must be defined"
+        fail_msg: 
+          - "Required parameters:"
+          - "  vm_name must be defined"
+          - "  pass_provider:"
+          - "   - must be defined"
+          - "   - provider in the passstore project [openstack]"
 
     - name: "Pull pass git database"
       shell: "git pull"
