@@ -149,8 +149,8 @@ Also, the calculated RHOS internal network name should be
 
 [WARNING]
 ====
-Since each OCP cluster generates it's own network one _jump server_ will be 
- required for each cluster. As a consequence the name of the_jump server_ 
+Since each RHOS OCP cluster installation generates it's own RHOS network,  one _jump server_ will be required for each cluster. 
+ As a consequence the name of the _jump server_ 
  should include the prefix of the cluster (`<clusterName>-<code>`) as identified in the metadata of the OCP cluster.
 ====
 
@@ -161,16 +161,19 @@ ansible-playbook ansible/playbook/openstack/openstack_vm_create_passwordstore.ym
   -e vm_name=ocp-sscpc-jump-server
 ----
 
-Once the host is provisioned create a _Floating IP_ from the external 
- network that one's router is connected to. 
+Once the _jump server_ host is provisioned on RHOS, create a _Floating IP_ 
+ to be able to access that host. This _Floating IP_ must be associated 
+ with the RHOS _External network_ use by the OCP cluster hosts. This 
+ _External network_ can be identified from the RHOS _Router_ genereated 
+ by the RHOS OCP installation.
  
-To collect the name of the 
- _External Network_ go to the `Network > Routers` option of the RHOS console 
- and check the `External Network` column for the OCP cluster router. The 
- OCP cluster router can be identified by it's name that should be 
- `<clusterName>-<code>-external-router`. In this example `ocp-sscpc-external-router`.
+To collect the name of the _External Network_ go to the
+ `Network > Routers` option of the RHOS console. 
+ The RHOS router for the OCP cluster can be identified by it's name 
+ that should be `<clusterName>-<code>-external-router`.
+ Once the router is identified check the `External Network` column, which in this example would be `ocp-sscpc-external-router`.
 
-The `ocp_cluster`Ansible Role as this value predefined in the installation 
+The `ocp_cluster` Ansible Role as this value predefined in the installation 
 procedure and it's `provider_net_cci_13`. It's defined 
  link:../ansible/roles/ocp_cluster/defaults/main.yml[here]. 
 
