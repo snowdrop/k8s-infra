@@ -10,9 +10,14 @@
 The Ansible commands should be executed within the ansible folder !
 ====
 
+== Other information
+
+The installation process uses the _OpenShift Container Platform installer_ 
+ obtained from https://mirror.openshift.com/.
+
 == OCP On OpenStack
 
-Playbooks to deploy and remove an OCP cluster to RHOS.
+Playbooks to deploy and remove an OCP cluster to RHOS. 
 
 .List of OCP RHOS playbooks
 [cols="2m,1m,5"]
