@@ -7,7 +7,7 @@ Antonio Costa
 :description: This document describes the installation procedure to deploy an OCP cluster on RHOS.
 ifdef::env-github[]
 :tip-caption: :bulb:
-:note-caption: :information_source:
+:note-caption: :bookmark_tabs:
 :important-caption: :heavy_exclamation_mark:
 :caution-caption: :fire:
 :warning-caption: :warning:
