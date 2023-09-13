@@ -28,7 +28,7 @@ RHOS:: RedHat OpenStack
 
 The Ansible playbook and role used to install an OCP cluster on a RHOS cloud use the link:https://docs.openshift.com/container-platform/4.12/installing/index.html[OpenShift install] procedure for OpenStack. 
 
-[IMPORTANT]
+[NOTE]
 ====
 More detailed information on the installation procedure is available in the link:https://docs.openshift.com/container-platform/4.12/installing/installing_openstack/preparing-to-install-on-openstack.html[RedHat OpenShift / Installing on OpenStack] page.
 ====
