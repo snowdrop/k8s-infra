@@ -17,7 +17,9 @@ openstack_flavor_compute: ocp4.compute
 # end::rhos_default_flavors[]
 # provider_net_cci_13
 # provider_net_shared
+# tag::rhos_default_network_provider[]
 openstack_network_provider: provider_net_cci_13
+# end::rhos_default_network_provider[]
 
 snowdrop_domain: snowdrop.dev
 project_name: snowdrop
