@@ -51,9 +51,17 @@ then
   fi
 fi
 
-IP=$(pass show ${VM_PROVIDER}/${VM_NAME}/ansible_ssh_host | awk 'NR==1{print $1}')
-PORT=$(pass show ${VM_PROVIDER}/${VM_NAME}/ansible_ssh_port | awk 'NR==1{print $1}')
+#set +e
+#pass show ${VM_PROVIDER}/${VM_NAME}/floating_ip | awk 'NR==1{print $1}'
+IP=$(pass show ${VM_PROVIDER}/${VM_NAME}/floating_ip | awk 'NR==1{print $1}')
+if [ "$IP" = "" ]; 
+#if [ ! "$?" = 0 ]; 
+then
+  IP=$(pass show ${VM_PROVIDER}/${VM_NAME}/ansible_ssh_host | awk 'NR==1{print $1}')
+fi
+#set -e
 
+PORT=$(pass show ${VM_PROVIDER}/${VM_NAME}/ansible_ssh_port | awk 'NR==1{print $1}')
 if [ "$PORT" = "" ];
 then
     PORT=22
