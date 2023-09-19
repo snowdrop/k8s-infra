@@ -121,6 +121,15 @@ a| One of:
 
 === k8s_cert_manager
 
+This role deploys the Kubernetes Certificate Management on a cluster.
+It also deploys the _GoGaddy webhook_.
+
+[NOTE]
+====
+More information about this tool on the 
+ link:../../roles/k8s_cert_manager/README.adoc[k8s_cert_manager role README].
+====
+
 [source,bash]
 ----
 ansible-playbook ansible/playbook/kubernetes/k8s_install_tools.yml \

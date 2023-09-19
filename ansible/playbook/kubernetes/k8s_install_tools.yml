@@ -41,7 +41,7 @@
       tags: [k8s_issuer_certificate]
 
   tasks:
-    - name: "Install k8s_issuer_certificate"
+    - name: "Install k8s_certificate_manager"
       ansible.builtin.import_role:
         name: k8s_cert_manager
       tags: [k8s_cert_manager]
