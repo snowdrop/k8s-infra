@@ -1,0 +1,142 @@
+= OCP Certificate Renewal
+Snowdrop Team (Antonio Costa)
+:icons: font
+:revdate: {docdate}
+:toc: left
+:toclevels: 3
+:description: Renew OCP cluster certificate
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
+
+This document describes the process to renew an OCP cluster certificates.
+
+== References
+
+* https://docs.openshift.com/container-platform/4.10/security/certificates/replacing-default-ingress-certificate.html
+
+== Obtain the Issuer certificate
+
+In this case we use Let's Encrypt so we must get the R3 intermidiate 
+ certificates.
+
+https://letsencrypt.org/certificates/#intermediate-certificates
+
+ATTOW the certificate being used is the 
+ `Let’s Encrypt R3 (RSA 2048, O = Let's Encrypt, CN = R3)`.
+
+Download the `txt` file under `Signed by ISRG Root X1` and name it
+ `apps.ocp.snowdrop.dev.issuer.crt`.
+
+== Obtain the certificate files from the Certificate Manager
+
+The renewed certificates can be obtained from the Certificate Manager
+ deployed on the `snowdrop-k8s` kubernetes cluster.
+
+To obtain the `snowdrop.dev` certificate execute the following command. 
+ It will store the certificate contents on the `apps.ocp.snowdrop.dev.crt` 
+ file.
+
+[source,bash]
+----
+kubectl -n snowdrop-site get secret www-snowdrop-dev-tls -o json | jq -r '.data["tls.crt"]' | base64 -d > apps.ocp.snowdrop.dev.crt
+----
+
+The private key associated with the previos certificate can be obtained 
+ using the following command. 
+ It will store the key contents on the `apps.ocp.snowdrop.dev.crt` file.
+
+[source,bash]
+----
+kubectl -n snowdrop-site get secret www-snowdrop-dev-tls -o json | jq -r '.data["tls.key"]' | base64 -d > apps.ocp.snowdrop.dev.key
+----
+
+== Update the certificate
+
+From the previous 2 sections 3 files are obtained:
+
+apps.ocp.snowdrop.dev.issuer.crt:: Let's Encrypt R3 Intermidiate certificate
+apps.ocp.snowdrop.dev.crt:: `snowdrop.dev` certificate
+apps.ocp.snowdrop.dev.key:: Key of the `snowdrop.dev` certificate
+
+We can now recreate the OCP cluster certificates.
+
+=== Recreate the CA certificate
+
+If the Issuer certificate has changed apply it to the cluster.
+
+Recreate the link:https://kubernetes.io/docs/concepts/configuration/configmap/[ConfigMap] file containing the CA certificate.
+
+Delete the existing `custom-ca`.
+
+[source,bash]
+----
+oc delete configmap custom-ca -n openshift-config 
+----
+
+Create the `custom-ca` ConfigMap with the root CA certificate used 
+ to sign the wildcard certificate.
+
+[source,bash]
+----
+oc create configmap custom-ca \
+  -n openshift-config \
+  --from-file=apps.ocp.snowdrop.dev.issuer.crt
+----
+
+Update the cluster configuration with the created ConfigMap.
+
+[source,bash]
+----
+oc patch proxy/cluster \
+     --type=merge \
+     --patch='{"spec":{"trustedCA":{"name":""}}}'
+----
+
+[source,bash]
+----
+oc patch proxy/cluster \
+     --type=merge \
+     --patch='{"spec":{"trustedCA":{"name":"custom-ca"}}}'
+----
+
+=== Replace the default ingress certificate
+
+Delete the existing secret for the TLS.
+
+[source,bash]
+----
+oc delete secret snowdrop-dev -n openshift-ingress
+----
+
+Create a secret containing the certificate chain and key.
+
+[source,bash]
+----
+oc create secret tls snowdrop-dev \
+  -n openshift-ingress \
+  --cert=apps.ocp.snowdrop.dev.crt \
+  --key=apps.ocp.snowdrop.dev.key
+----
+
+Update the Ingress Controller configuration with the secret.
+
+[source,bash]
+----
+oc patch ingresscontroller.operator default \
+  -n openshift-ingress-operator \
+  --type=merge -p \
+  '{"spec":{"defaultCertificate": {"name": ""}}}'
+----
+
+[source,bash]
+----
+oc patch ingresscontroller.operator default \
+  -n openshift-ingress-operator \
+  --type=merge -p \
+  '{"spec":{"defaultCertificate": {"name": "snowdrop-dev"}}}'
+----
