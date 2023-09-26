@@ -13,7 +13,28 @@ ifdef::env-github[]
 :warning-caption: :warning:
 endif::[]
 
-This document describes the process to renew an OCP cluster certificates.
+This document describes the process to renew an OCP cluster certificate.
+
+== Introduction
+
+By default, the certificate issued during the installation of the 
+ OpenShift cluster on RHOS does not include the DNS names defined to 
+ access the console, API, oauth and other services. 
+ In this case, it is required to use a Certificate authority, like 
+ Letsencrypt, to trust a certificate created for different DNS names as 
+ well as using a domain name hosted by a DNS provider (godaddy, 
+ cloudfare, etc).
+
+The process can be managed by the cert-manager. When we issue a certificate CR packaging the ACME DNS01 solver and able to contact the DNS provider to validate if the DNS names to be used are valid/exist.
+
+If this is the case, then letsencrypt will issue a Certificate for the DNS 
+ names and will include part of the certificate their CA root certificate R3.
+
+By doing that, the worker nodes will be able to access the API server 
+ running on the masters, the users will not get a certificate not valid 
+ from their browser anymore, if of course you following the instruction 
+ detailed in the 
+ link:https://docs.openshift.com/container-platform/4.12/security/certificates/replacing-default-ingress-certificate.html[OCP Documentation].
 
 == References
 
