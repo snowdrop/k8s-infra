@@ -10,7 +10,13 @@ It also installs the _Godaddy webhook_.
 
 === Requirements
 
-None
+For Kubernetes clusters:
+
+* `kubectl` installed on the target host
+
+For OpenShift clusters:
+
+* `oc` installed on the target host
 
 === Role Variables
 
