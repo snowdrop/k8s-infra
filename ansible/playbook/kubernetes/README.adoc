@@ -92,6 +92,84 @@ ansible-playbook ansible/playbook/kubernetes/k8s_remove.yml -e vm_name=${VM_NAME
 
 Several tools can be installed using the generic install tooks playbook. To deploy other k8s tools.
 
+.Common parameters
+[cols="2,5"]
+|===
+| Parameter | Description
+
+| `vm_name`
+
+[.fuchsia]#string#
+
+[.red]#required# 
+
+a| Name of the k8s host to apply the configuration
+
+| `state`
+
+[.fuchsia]#string#
+
+[.red]#required# 
+
+a| One of:
+
+* `present`: Install
+* `absent`: Uninstall
+
+|===
+
+
+=== k8s_cert_manager
+
+This role deploys the Kubernetes Certificate Management on a cluster.
+It also deploys the _GoGaddy webhook_.
+
+[NOTE]
+====
+More information about this tool on the 
+ link:../../roles/k8s_cert_manager/README.adoc[k8s_cert_manager role README].
+====
+
+[source,bash]
+----
+ansible-playbook ansible/playbook/kubernetes/k8s_install_tools.yml \
+  -e vm_name=${VM_NAME} -e state=present \
+  --tags k8s_cert_manager
+----
+
+As a result the following resources should be available.
+
+[source]
+----
+$ kubectl -n cert-manager get all
+NAME                                           READY   STATUS    RESTARTS   AGE
+pod/cert-manager-7c869867bf-jlwxj              1/1     Running   0          88s
+pod/cert-manager-cainjector-54c9d9b775-9zhrm   1/1     Running   0          88s
+pod/cert-manager-webhook-7f7469bdb7-m5b5z      1/1     Running   0          88s
+pod/godaddy-webhook-c6b5f74fd-5w7q6            1/1     Running   0          66s
+
+NAME                           TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE
+service/cert-manager           ClusterIP   10.103.153.41   <none>        9402/TCP   88s
+service/cert-manager-webhook   ClusterIP   10.111.63.241   <none>        443/TCP    88s
+service/godaddy-webhook        ClusterIP   10.107.66.226   <none>        443/TCP    66s
+
+NAME                                      READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/cert-manager              1/1     1            1           88s
+deployment.apps/cert-manager-cainjector   1/1     1            1           88s
+deployment.apps/cert-manager-webhook      1/1     1            1           88s
+deployment.apps/godaddy-webhook           1/1     1            1           66s
+
+NAME                                                 DESIRED   CURRENT   READY   AGE
+replicaset.apps/cert-manager-7c869867bf              1         1         1       88s
+replicaset.apps/cert-manager-cainjector-54c9d9b775   1         1         1       88s
+replicaset.apps/cert-manager-webhook-7f7469bdb7      1         1         1       88s
+replicaset.apps/godaddy-webhook-c6b5f74fd            1         1         1       66s
+----
+
+
+More information on the link:https://cert-manager.io/docs/installation/[cert-manager] web page.
+
+
 === k8s_issuer_certificate
 
 [source,bash]
@@ -130,3 +208,11 @@ a| Let's Encrypt environment to use.
 * `prod`: Production environment
 
 |===
+
+[source,bash]
+----
+ansible-playbook ansible/playbook/kubernetes/k8s_install_tools.yml \
+  -e vm_name=${VM_NAME} -e letsencrypt_env=prod \
+  -e api_key=$(pass show godaddy/prod/api-key) -e api_secret=$(pass show godaddy/prod/secret-key) \
+  -e state=present --tags k8s_issuer_certificate
+----

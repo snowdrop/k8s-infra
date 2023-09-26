@@ -1,0 +1,19 @@
+= Index
+Snowdrop Team (Antonio Costa)
+:icons: font
+:revdate: {docdate}
+:toc: left
+:description: OpenShift documentation
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
+
+OpenShift Container Platform documentation.
+
+OCP on RHOS:: link:ocp_on_openstack.adoc[]
+
+Renew OCP certificate:: link:certificate_renewal.adoc[]

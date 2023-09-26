@@ -1,0 +1,93 @@
+== Role: Kubernetes Certificate Manager
+
+Deploy Kubernetes Certificate Manager on kubernetes cluster
+
+=== Description
+
+This role will install the Kubernetes certificate manager on a kubernetes cluster.
+
+It also installs the _Godaddy webhook_.
+
+=== Requirements
+
+For Kubernetes clusters:
+
+* `kubectl` installed on the target host
+
+For OpenShift clusters:
+
+* `oc` installed on the target host
+
+=== Role Variables
+
+[%header,cols="25%,75%"]
+|===
+| Name | Value
+
+| api_key 
+
+[.fuchsia]#string#
+
+[.red]#required# 
+
+| GoDaddy API key
+
+| api_secret 
+
+[.fuchsia]#string#
+
+[.red]#required# 
+
+| GoDaddy API secret
+
+| state 
+
+[.fuchsia]#string#
+
+[.red]#required# 
+
+| State of the installation: [absent,present]
+
+| vm_name 
+
+[.fuchsia]#string#
+
+[.red]#required# 
+
+| Name of the host used to deploy
+
+|===
+
+=== Example Playbook
+
+```
+- name: "Install Kubernetes tools"
+  hosts: "{{ vm_name | default('masters') }}"
+  gather_facts: true
+  
+  pre_tasks:
+    - name: "Validate required variables"
+      ansible.builtin.assert:
+        that:
+          - "vm_name is defined and vm_name | length > 0"
+          - "state is defined and (state == 'present' or state == 'absent')"
+          - "api_key is defined and api_secret is defined"
+        fail_msg: 
+          - "Required parameters:"
+          - "  vm_name: VM to where the tools will be deployed"
+          - "  state: 'present' to install the tools and 'absent' to remove them"
+          - "  api_key and api_secret with the GoDaddy values"
+
+  tasks:
+    - name: "Install k8s_certificate_manager"
+      ansible.builtin.import_role:
+        name: k8s_cert_manager
+```
+
+=== License
+
+https://www.apache.org/licenses/LICENSE-2.0[Apache License 2.0]
+
+=== Author Information
+
+This role has been created by the https://github.com/orgs/snowdrop/teams[Snowdrop team].
