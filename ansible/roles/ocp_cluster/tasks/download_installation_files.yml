@@ -1,0 +1,28 @@
+---
+- name: "Download OpenShift client"
+  ansible.builtin.get_url:
+    url: "{{ ocp_mirror }}/{{ ocp_version }}/openshift-client-linux-{{ ocp_version }}.tar.gz"
+    dest: "/tmp/openshift-client-{{ ocp_version }}.tar.gz"
+    mode: '0644'
+    tmp_dest: "/tmp"
+
+- name: "Download OpenShift installer"
+  ansible.builtin.get_url:
+    url: "{{ ocp_mirror }}/{{ ocp_version }}/openshift-install-linux-{{ ocp_version }}.tar.gz"
+    dest: "/tmp/openshift-install-{{ ocp_version }}.tar.gz"
+    mode: '0644'
+    tmp_dest: "/tmp"
+
+- name: "Extract installation files."
+  ansible.builtin.unarchive:
+    src: "/tmp/{{ extract_file_item }}"
+    dest: "{{ ocp_bin_directory }}"
+  loop:
+    - openshift-client-{{ ocp_version }}.tar.gz
+    - openshift-install-{{ ocp_version }}.tar.gz
+  loop_control:
+    loop_var: extract_file_item
+  environment:
+    ANSIBLE_REMOTE_TMP: "/tmp"
+
+...

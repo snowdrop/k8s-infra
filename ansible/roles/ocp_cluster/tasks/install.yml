@@ -1,72 +1,40 @@
 ---
 - name: "Set Facts"
   ansible.builtin.set_fact:
-    shared_ssh_public_key: "{{lookup('ansible.builtin.file', ansible_env.HOME + '/.ssh/id_rsa_snowdrop_openstack.pub') }}"
+    ocp_cluster_shared_ssh_public_key: "{{ lookup('ansible.builtin.file', ansible_env.HOME + '/.ssh/id_rsa_snowdrop_openstack.pub') }}"
 
 - name: "Create installation directory"
   ansible.builtin.file:
     path: "{{ installation_dir }}"
     state: directory
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_id }}"
+    mode: '0755'
   register: create_install_dir_res
-
-# - name: "Print Create installation directory result"
-#   debug:
-#     msg: "{{ create_install_dir_res }}"
-#     verbosity: 0
+  become: true
 
 # stage('Download key to our DNS server') {
 #     // TODO --no-check-certificate shouldn't be necessary on proper slaves
 #     sh 'wget -q --no-check-certificate -O xpaasqe.dnskey https://gitlab.cee.redhat.com/quarkus-qe/raw/main/roles/dnsservers/files/named.xpaasqe.dnskey'
 # }
 
-# - name: "Template OpenStack auth"
-#   ansible.builtin.template:
-#     src: "templates/clouds.yaml.j2"
-#     dest: "{{ work_directory }}/clouds.yaml"
-#     mode: '0600'
-
-# auth:
-#   project_name: "{{ openstack_auth.openstack_project_name }}"
-#   username: "{{ openstack_auth.openstack_console_user }}"
-#   password: "{{ openstack_auth.openstack_console_password }}"
-#   user_domain_name: "{{ openstack_auth.openstack_user_domain }}"
-#   project_domain_name: "{{ openstack_auth.openstack_project_domain }}"
-#   auth_url: "{{ openstack_auth.openstack_os_auth_url }}"
-
-- name: "Download OpenShift client"
-  ansible.builtin.get_url:
-    url: "{{ ocp_mirror }}/{{ ocp_version }}/openshift-client-linux-{{ ocp_version }}.tar.gz"
-    dest: "{{ work_directory }}/openshift-client-{{ ocp_version }}.tar.gz"
-
-- name: "Download OpenShift installer"
-  ansible.builtin.get_url:
-    url: "{{ ocp_mirror }}/{{ ocp_version }}/openshift-install-linux-{{ ocp_version }}.tar.gz"
-    dest: "{{ work_directory }}/openshift-install-{{ ocp_version }}.tar.gz"
-
-- name: "Extract installation files."
-  ansible.builtin.unarchive:
-    src: "{{ work_directory }}/{{ extract_file_item }}"
-    dest: "{{ work_directory }}"
-  loop:
-    - openshift-client-{{ ocp_version }}.tar.gz
-    - openshift-install-{{ ocp_version }}.tar.gz
-  loop_control:
-    loop_var: extract_file_item
+- name: Download OCP binary files
+  ansible.builtin.include_tasks: download_installation_files.yml
 
 - name: "Create Floating IP for OpenShift API"
-  ansible.builtin.shell: 
+  ansible.builtin.shell:
     cmd: |
-      openstack --os-cloud openstack floating ip create --description "OCP API {{ ocp_cluster_name }}.{{ snowdrop_domain }}" -f value -c floating_ip_address {{ openstack_network_provider }}
+      openstack --os-cloud openstack floating ip create --description "OCP API {{ ocp_cluster_name }}.{{ snowdrop_domain }}" -f value -c floating_ip_address {{ openstack_network_provider }} --log-file {{ rhos_log_path }}/rhos_generic.log
   args:
-    chdir: "{{ work_directory }}"
+    chdir: "{{ tmp_directory }}"
   register: rhos_floating_ip_api_res
 
 - name: "Create Floating IP for OpenShift Ingress"
-  ansible.builtin.shell: 
+  ansible.builtin.shell:
     cmd: |
-      openstack --os-cloud openstack floating ip create --description "OCP Ingress {{ ocp_cluster_name }}.{{ snowdrop_domain }}" -f value -c floating_ip_address {{ openstack_network_provider }}
+      openstack --os-cloud openstack floating ip create --description "OCP Ingress {{ ocp_cluster_name }}.{{ snowdrop_domain }}" -f value -c floating_ip_address {{ openstack_network_provider }} --log-file {{ rhos_log_path }}/rhos_generic.log
   args:
-    chdir: "{{ work_directory }}"
+    chdir: "{{ tmp_directory }}"
   register: rhos_floating_ip_ingress_res
 
 - name: "Set facts for Floating IPs"
@@ -98,7 +66,7 @@
 #     cmd: |
 #       openstack floating ip create --description "API {{ ocp_cluster_name }}.{{ snowdrop_domain }}" -f value -c floating_ip_address {{ openstack_network_provider }}
 #   args:
-#     chdir: "{{ work_directory }}"
+#     chdir: "{{ ocp_bin_directory }}"
 #   register: openstack_floating_ip_res
 
 # - name: "Print OpenStack Floating IP details"
@@ -120,6 +88,8 @@
     src: "templates/install-config.yaml.j2"
     dest: "{{ installation_dir }}/install-config.yaml"
     mode: '0644'
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_id }}"
 
 # https://github.com/openshift/installer/blob/master/docs/user/customization.md#install-time-customization-for-machine-configuration
 # NOTE: Uses the clouds.yaml file to connect ot the OpenStack instance
@@ -127,7 +97,9 @@
   ansible.builtin.shell: 
     cmd: "./openshift-install create manifests --dir={{ installation_dir }} --log-level=debug"
   args:
-    chdir: "{{ work_directory }}"
+    chdir: "{{ ocp_bin_directory }}"
+  environment: 
+    OS_CLIENT_CONFIG_FILE: "{{ tmp_directory }}/clouds.yaml"
 
 - name: "Pause for 10 seconds..."
   ansible.builtin.pause:
@@ -163,7 +135,9 @@
   ansible.builtin.shell: 
     cmd: "./openshift-install create cluster --dir={{ installation_dir }} --log-level=debug"
   args:
-    chdir: "{{ work_directory }}"
+    chdir: "{{ ocp_bin_directory }}"
+  environment: 
+    OS_CLIENT_CONFIG_FILE: "{{ tmp_directory }}/clouds.yaml"
 
 - name: "Get OpenShift installation state"
   include_tasks: openshift_install_state.yml
@@ -173,68 +147,76 @@
 #    cmd: |
 #      openstack --os-cloud openstack floating ip show {{ rhos_floating_ip_ingress_address }} -f json
 #  args:
-#    chdir: "{{ work_directory }}"
+#    chdir: "{{ ocp_bin_directory }}"
 #  register: rhos_floating_ip_ingress_show_res
 
 - name: "Get Ingress Floating IP information"
   openstack.cloud.floating_ip_info:
-    auth:
-      project_name: "{{ openstack_auth.openstack_project_name }}"
-      username: "{{ openstack_auth.openstack_console_user }}"
-      password: "{{ openstack_auth.openstack_console_password }}"
-      user_domain_name: "{{ openstack_auth.openstack_user_domain }}"
-      project_domain_name: "{{ openstack_auth.openstack_project_domain }}"
-      auth_url: "{{ openstack_auth.openstack_os_auth_url }}"
+    auth: "{{ rhos_auth }}"
+    auth_type: "{{ rhos_auth_type }}"
     floating_ip_address: "{{ rhos_floating_ip_ingress_address }}"
   register: rhos_floating_ip_ingress_info_res
 
 - name: "Get Ingress port information"
   openstack.cloud.port_info:
-    auth:
-      project_name: "{{ openstack_auth.openstack_project_name }}"
-      username: "{{ openstack_auth.openstack_console_user }}"
-      password: "{{ openstack_auth.openstack_console_password }}"
-      user_domain_name: "{{ openstack_auth.openstack_user_domain }}"
-      project_domain_name: "{{ openstack_auth.openstack_project_domain }}"
-      auth_url: "{{ openstack_auth.openstack_os_auth_url }}"
+    auth: "{{ rhos_auth }}"
+    auth_type: "{{ rhos_auth_type }}"
     filters:
       name: "{{ ocp_cluster_id }}-ingress-port"
   register: rhos_ocp_cluster_ingress_port
 
-- name: "Set facts for Floating IP Set"
+- name: "Print Ingress result"
+  ansible.builtin.debug:
+    msg:
+      - "rhos_floating_ip_ingress_info_res: {{ rhos_floating_ip_ingress_info_res }}"
+      - "rhos_ocp_cluster_ingress_port: {{ rhos_ocp_cluster_ingress_port }}"
+    verbosity: 0
+
+# at this point, the OpenShift cluster is running in stock configuration
+- name: "Pause to wait for the cluster to configure"
+  ansible.builtin.pause:
+    seconds: 60
+
+- name: "Set facts for Floating IP"
   ansible.builtin.set_fact:
-    ingress_floating_ip_id: "{{ rhos_floating_ip_ingress_info_res.floating_ips[0].id }}"
-    ingress_port_ip: "{{ rhos_ocp_cluster_ingress_port.openstack_ports[0].fixed_ips[0].ip_address }}"
-    ingress_port_id: "{{ rhos_ocp_cluster_ingress_port.openstack_ports[0].id }}"
+    ocp_cluster_ingress_floating_ip_id: "{{ rhos_floating_ip_ingress_info_res.floating_ips[0].id }}"
+    ocp_cluster_ingress_port_ip: "{{ rhos_ocp_cluster_ingress_port.ports[0].fixed_ips[0].ip_address }}"
+    ocp_cluster_ingress_port_id: "{{ rhos_ocp_cluster_ingress_port.ports[0].id }}"
 
-#- name: "Set fact from ingress Floating IP"
-#  ansible.builtin.set_fact:
-#    rhos_floating_ip_ingress: "{{ rhos_floating_ip_ingress_show_res.stdout | from_json }}"
+- name: "Print Ingress information"
+  ansible.builtin.debug:
+    msg: 
+      - "ocp_cluster_ingress_floating_ip_id: {{ ocp_cluster_ingress_floating_ip_id }}"
+      - "ocp_cluster_ingress_port_ip: {{ ocp_cluster_ingress_port_ip }}"
+      - "Associate the Floating IP with the ingress server: "
+      - "  $ cd {{ tmp_directory }}"
+      - "  $ openstack --os-cloud openstack floating ip set --fixed-ip-address {{ ocp_cluster_ingress_port_ip }} --port {{ ocp_cluster_ingress_port_id }} {{ ocp_cluster_ingress_floating_ip_id }}"
 
+# floating ip set: Set floating IP Properties
 - name: "Associate the Floating IP with the ingress server"
-  ansible.builtin.shell: 
+  ansible.builtin.shell:
     cmd: |
-      openstack --os-cloud openstack floating ip set --fixed-ip-address {{ ingress_port_ip }} --port {{ ingress_port_id }} {{ ingress_floating_ip_id }}
+      openstack --os-cloud openstack floating ip set --fixed-ip-address {{ ocp_cluster_ingress_port_ip }} --port {{ ocp_cluster_ingress_port_id }} {{ ocp_cluster_ingress_floating_ip_id }}  --log-file {{ rhos_log_path }}/rhos_associate_floating_ip.log
   args:
-    chdir: "{{ work_directory }}"
+    chdir: "{{ tmp_directory }}"
 
 # and create a DNS record for it
 # https://docs.openshift.com/container-platform/4.3/installing/installing_openstack/installing-openstack-installer-custom.html#installation-osp-configuring-api-floating-ip_installing-openstack-installer-custom
 - name: "Template nsupdate ingress"
   ansible.builtin.template:
     src: "templates/nsupdate-api.txt.j2"
-    dest: "{{ work_directory }}/nsupdate-api.txt"
+    dest: "{{ tmp_directory }}/nsupdate-api.txt"
     mode: '0644'
   when: use_dns
 
 - name: "Run nsupdate"
-  ansible.builtin.shell: 
+  ansible.builtin.shell:
     cmd: |
       export OPENSTACK_PORT_INGRESS=$(openstack port list -f value -c Name | grep -x "{{ ocp_cluster_name }}-.....-ingress-port")
       export OPENSTACK_FLOATING_IP_INGRESS=$(openstack floating ip create --description "Ingress {{ ocp_cluster_name }}.{{ snowdrop_domain }}" --port {{ rhos_floating_ip_ingress_address }} -f value -c floating_ip_address {{ openstack_network_provider }})
       nsupdate -v -k xpaasqe.dnskey nsupdate-ingress.txt
   args:
-    chdir: "{{ work_directory }}"
+    chdir: "{{ tmp_directory }}"
   when: use_dns
 
 # at this point, the OpenShift cluster is running in stock configuration
@@ -256,14 +238,14 @@
       htpasswd -b users.htpasswd {{ ocp_user }} {{ ocp_user }}
       ./oc create secret generic htpass-secret --from-file=htpasswd=users.htpasswd -n openshift-config
   args:
-    chdir: "{{ work_directory }}"
+    chdir: "{{ ocp_bin_directory }}"
   environment: 
     KUBECONFIG: "{{ KUBECONFIG }}"
 
 - name: "Template htpasswd-provider"
   ansible.builtin.copy:
     src: "htpasswd-provider.yaml"
-    dest: "{{ work_directory }}/htpasswd-provider.yaml"
+    dest: "{{ tmp_directory }}/htpasswd-provider.yaml"
     mode: '0644'
 
 - name: "Create user accounts 'admin' and {{ ocp_user }}"
@@ -273,7 +255,7 @@
       ./oc adm policy add-cluster-role-to-user cluster-admin admin
       ./oc adm policy add-cluster-role-to-user basic-user {{ ocp_user }}
   args:
-    chdir: "{{ work_directory }}"
+    chdir: "{{ ocp_bin_directory }}"
   environment: 
     KUBECONFIG: "{{ KUBECONFIG }}"
 
@@ -298,7 +280,7 @@
                   --from-file=registry.stage.redhat.io=RH-IT-Root-CA.crt
                 ./oc patch image.config.openshift.io/cluster --patch '{"spec":{"additionalTrustedCA":{"name":"registry-ca"}}}' --type=merge
   args:
-    chdir: "{{ work_directory }}"
+    chdir: "{{ ocp_bin_directory }}"
   environment: 
     KUBECONFIG: "{{ KUBECONFIG }}"
 
@@ -308,7 +290,7 @@
     cmd: |
       ./oc patch configs.imageregistry.operator.openshift.io/cluster --patch '{"spec":{"defaultRoute":true}}' --type=merge
   args:
-    chdir: "{{ work_directory }}"
+    chdir: "{{ ocp_bin_directory }}"
   environment: 
     KUBECONFIG: "{{ KUBECONFIG }}"
 
@@ -320,7 +302,7 @@
       wget -q -O quarkus-logo.png https://design.jboss.org/quarkus/logo/final/PNG/quarkus_logo_horizontal_rgb_450px_reverse.png
       ./oc create configmap console-custom-logo --from-file quarkus-logo.png -n openshift-config
   args:
-    chdir: "{{ work_directory }}"
+    chdir: "{{ ocp_bin_directory }}"
   environment: 
     KUBECONFIG: "{{ KUBECONFIG }}"
   when: use_logo
@@ -328,16 +310,16 @@
 - name: "Template custom-logo.yaml"
   ansible.builtin.copy:
     src: "custom-logo.yaml"
-    dest: "{{ work_directory }}/custom-logo.yaml"
+    dest: "{{ tmp_directory }}/custom-logo.yaml"
     mode: '0644'
   when: use_logo
 
 - name: "Apply logo to OpenShift console"
-  ansible.builtin.shell: 
+  ansible.builtin.shell:
     cmd: |
       ./oc apply -f custom-logo.yaml
   args:
-    chdir: "{{ work_directory }}"
+    chdir: "{{ ocp_bin_directory }}"
   environment: 
     KUBECONFIG: "{{ KUBECONFIG }}"
   when: use_logo
@@ -348,30 +330,41 @@
 
 # this should be the last "./oc" command
 - name: "Remove kubeadmin, the admin user is a cluster admin"
-  ansible.builtin.shell: 
+  ansible.builtin.shell:
     cmd: |
       ./oc delete secrets kubeadmin -n kube-system
   args:
-    chdir: "{{ work_directory }}"
+    chdir: "{{ ocp_bin_directory }}"
   when: remove_kubeadmin
-
-- name: "Archive the installation data directory"
-  ansible.builtin.shell: 
-    cmd: |
-      tar -czf {{ ocp_cluster_name }}-data.tar.gz {{ installation_dir }}
-  args:
-    chdir: "{{ work_directory }}"
 
 - name: "Display cluster details once more"
   ansible.builtin.shell: 
     cmd: |
       ./openshift-install --dir "{{ installation_dir }}" wait-for install-complete
   args:
-    chdir: "{{ work_directory }}"
+    chdir: "{{ ocp_bin_directory }}"
+  environment: 
+    OS_CLIENT_CONFIG_FILE: "{{ tmp_directory }}/clouds.yaml"
   register: ocp_cluster_details
 
 - name: "Print OCP cluster details"
-  debug:
+  ansible.builtin.debug:
     msg: "{{ ocp_cluster_details }}"
     verbosity: 0
+
+- name: "Set output variables"
+  ansible.builtin.set_fact:
+    ocp_cluster:
+      cluster_details: "{{ ocp_cluster_details }}"
+      floating_ip_api_address: "{{ rhos_floating_ip_api_res.stdout }}"
+      floating_ip_ingress_address: "{{ rhos_floating_ip_ingress_res.stdout }}"
+      installation_dir: "{{ installation_dir }}"
+      metadata: "{{ lookup('file', installation_dir + '/metadata.json') | from_json }}"
+      masters: "{{ lookup('file', installation_dir + '/masters.tfvars.json') | from_json }}"
+      kubeadmin_password: "{{ lookup('file', installation_dir + '/auth/kubeadmin-password') }}"
+      kubeconfig: "{{ lookup('file', installation_dir + '/auth/kubeconfig') | from_yaml }}"
+      ocp_bin_directory: "{{ ocp_bin_directory }}"
+      tmp_directory: "{{ tmp_directory }}"
+      ocp_root_directory: "{{ ocp_root_directory }}"
+     
 ...

@@ -1,0 +1,190 @@
+---
+# Requires:
+# vars:
+#   tmp_directory: temporary directory =/opt/ocp/_tmp/ansible.yxam0y7mbuild 
+#   ocp_root_directory: /opt/ocp 
+#   ocp_cluster_name: ocp-sdev 
+#   vm_name: ocp-sdev-p75fs-jump-server
+- name: "Build OpenStack authentication for v3password"
+  ansible.builtin.import_playbook: "../openstack/openstack_auth_passstore_v3password.yml"
+
+- name: "Load the metadata from the OCP installation directory"
+  hosts: localhost
+  gather_facts: true
+
+  tasks:
+
+    - name: Calculate installation folder
+      ansible.builtin.set_fact:
+        installation_dir: "{{ ocp_root_directory }}/{{ ocp_cluster_name }}"
+
+    - name: "Load metadata from ansible installation folder"
+      ansible.builtin.set_fact:
+        ocp_cluster_metadata: "{{ lookup('file', installation_dir + '/metadata.json') | from_json }}"
+        
+- name: "Deploy Jump Server"
+  ansible.builtin.import_playbook: "../openstack/openstack_vm_create_passwordstore.yml"
+  vars:
+    state: present
+    openstack: 
+      vm: 
+        network: "{{ ocp_cluster_metadata.infraID }}-openshift"
+        image: "Fedora-Cloud-Base-37"
+        flavor: "m1.small"
+    vm_name: "{{ ocp_cluster_metadata.infraID }}-jump-server"
+    skip_post_installation: true
+
+- name: "Create floating IP for Jump Server"
+  hosts: localhost
+  gather_facts: true
+
+  tasks:
+
+    - name: Getting fip by associated fixed IP address.
+      openstack.cloud.floating_ip_info:
+        auth: "{{ rhos_auth }}"
+        auth_type: "{{ rhos_auth_type }}"
+        fixed_ip_address: "{{ query('passwordstore', 'openstack/' + vm_name + '/ansible_ssh_host' )[0] }}"
+      register: fip
+      ignore_errors: true
+
+    - name: "Print FIP query"
+      ansible.builtin.debug:
+        msg: 
+          - "fip: {{ fip }}"
+        verbosity: 1
+
+    - name: "Set floating ip variable is already created"
+      ansible.builtin.set_fact:
+        jump_server_floating_ip: "{{ fip.floating_ips[0].floating_ip_address }}"
+      when: not fip.failed and (fip.floating_ips | length > 0)
+
+    - name: "Create Floating IP for Jump Server"
+      openstack.cloud.floating_ip:
+        auth: "{{ rhos_auth }}"
+        auth_type: "{{ rhos_auth_type }}"
+        state: present
+        reuse: true
+        server: "{{ ocp_cluster_metadata.infraID }}-jump-server"
+        network: "{{ rhos_network | default('provider_net_cci_13') }}"
+        # fixed_address: 192.0.2.3
+        wait: true
+        timeout: 180
+      # ansible.builtin.shell: 
+      #   cmd: |
+      #     openstack --os-cloud openstack floating ip create --description "OCP API {{ ocp_cluster_name }}.{{ snowdrop_domain }}" -f value -c floating_ip_address {{ openstack_network_provider }}
+      # args:
+      #   chdir: "{{ work_directory }}"
+      register: rhos_floating_ip_jump_server_res
+      when: jump_server_floating_ip is not defined
+
+    - name: "Set floating ip variable is already created"
+      ansible.builtin.set_fact:
+        jump_server_floating_ip: "{{ rhos_floating_ip_jump_server_res.floating_ip.fixed_ip_address }}"
+      when: jump_server_floating_ip is not defined
+
+    - name: "Store Floating IP on the passwordstore"
+      ansible.builtin.set_fact:
+        ansible_installation_folder_passwordstore: "{{ query('passwordstore', 'openstack/' + vm_name + '/floating_ip create=True userpass=' + jump_server_floating_ip )[0] }}"
+
+- name:  "Wait for the VM to boot and we can ssh"
+  hosts: "{{ vm_name | default([]) }}"
+  gather_facts: no
+
+  tasks:
+
+    - name: "Wait for connection to host"
+      ansible.builtin.wait_for:
+        host: "{{ query('passwordstore', 'openstack/' + inventory_hostname + '/floating_ip')[0] }}"
+        port: "{{ query('passwordstore', 'openstack/' + inventory_hostname + '/ansible_ssh_port')[0] }}"
+        timeout: 120
+      vars:
+        ansible_connection: local
+      register: wait_for_connection_reg
+
+  post_tasks:
+
+    - name: Refresh the inventory so the newly added host is available
+      meta: refresh_inventory
+
+    - name: "DON'T FORGET TO SECURE YOUR SERVER"
+      ansible.builtin.debug:
+        msg: 
+          - "DON'T FORGET TO SECURE YOUR SERVER!!!"
+          - ""
+          - "Trying to start start server securization automatically."
+          - "For manual execution: $ ansible-playbook ansible/playbook/sec_host.yml -e vm_name={{ vm_name }} -e provider=openstack"
+
+- name: "Add to known hosts"
+  hosts: localhost
+  gather_facts: true
+
+  tasks:
+
+    - name: "Add host Floating IP to known hosts {{ hostvars[vm_name]['floating_ip'] }}"
+      ansible.builtin.known_hosts:
+        name: "{{ hostvars[vm_name]['floating_ip'] }}"
+        key: "{{ lookup('pipe', 'ssh-keyscan {{ hostvars[vm_name].floating_ip }}') }}"
+        hash_host: true
+
+- name: "Openstack VM init"
+  hosts: "{{ vm_name | default([]) }}"
+  gather_facts: yes
+
+  roles:
+    - role: "openstack/init_vm"
+
+- name: "Secure new server"
+  ansible.builtin.import_playbook: "../sec_host.yml"
+  vars:
+    provider: "openstack"
+    hosts: "{{ vm_name | default([]) }}"
+
+- name: "Extract installation dictory from passwordstore"
+  hosts: "localhost"
+  gather_facts: true
+
+  tasks:
+
+    - name: "Extract installation dictory from passwordstore"
+      ansible.builtin.copy: 
+        content: "{{ query('passwordstore', 'openstack/' + ocp_cluster_metadata.infraID + '/install_dir')[0] | b64decode }}" 
+        dest: /tmp/ocp-installation.tgz
+
+- name: "Post Jump Server OCP"
+  hosts: "{{ vm_name | default([]) }}"
+  gather_facts: true
+
+  pre_tasks:
+    - name: Set required variables
+      ansible.builtin.set_fact:
+        remote_bin_folder: /home/snowdrop/.local/bin
+
+  tasks:
+    - name: Create home .local/bin folder
+      ansible.builtin.file:
+        path: "{{ remote_bin_folder }}"
+        recurse: true
+        state: directory
+        owner: "{{ ansible_user_id }}"
+        group: "{{ ansible_user_id }}"
+        mode: '0755'
+
+    - name: Copy installation folder to remote host
+      ansible.builtin.copy:
+        src: /tmp/ocp-installation.tgz
+        dest: /tmp/ocp-installation.tgz
+
+    - name: Extract OCP installation into /home/snowdrop
+      ansible.builtin.unarchive:
+        src: /tmp/ocp-installation.tgz
+        dest: /home/snowdrop
+
+    - name: Download OCP files
+      ansible.builtin.import_role:
+        name: ocp_cluster
+        tasks_from: download_installation_files.yml
+      vars:
+        ocp_bin_directory: "{{ remote_bin_folder }}"
+...
+# ansible-playbook ansible/playbook/ocp/ocp_openstack_deploy_jump_server.yml -e tmp_directory=/opt/ocp/_tmp/ansible.yxam0y7mbuild -e ocp_root_directory=/opt/ocp -e ocp_cluster_name=ocp-sdev -e vm_name=ocp-sdev-p75fs-jump-server

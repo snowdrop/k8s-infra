@@ -4,5 +4,14 @@
     cmd: |
       ./openshift-install destroy cluster --dir={{ installation_dir }} --log-level=info
   args:
-    chdir: "{{ work_directory }}"
+    chdir: "{{ ocp_bin_directory }}"
+  environment: 
+    OS_CLIENT_CONFIG_FILE: "{{ tmp_directory }}/clouds.yaml"
+
+- name: "Delete installation directory"
+  ansible.builtin.file:
+    path: "{{ installation_dir }}"
+    state: absent
+  become: true
+
 ...

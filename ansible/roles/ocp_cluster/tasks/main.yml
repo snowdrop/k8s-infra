@@ -1,20 +1,58 @@
 ---
-- name: "Create work directory"
+- name: "Set required facts"
+  ansible.builtin.set_fact:
+    ocp_bin_directory: "{{ ocp_root_directory }}/bin"
+    installation_dir: "{{ ocp_root_directory }}/{{ ocp_cluster_name }}"
+
+- name: "Create local OCP directories"
   ansible.builtin.file:
-    path: "{{ work_directory }}"
+    path: "{{ ocp_folder_to_create }}"
     state: directory
-  register: create_work_dir_res
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_id }}"
+    mode: '0755'
+  become: true
+  loop:
+    - "{{ ocp_root_directory }}"
+    - "{{ ocp_root_directory }}/bin"
+    - "{{ ocp_root_directory }}/_tmp"
+    - "{{ rhos_log_path }}/"
+  loop_control:
+    loop_var: ocp_folder_to_create
+  # register: create_root_dir_res
+
+- name: "Create bin directory"
+  ansible.builtin.file:
+    path: "{{ ocp_bin_directory }}"
+    state: directory
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_id }}"
+    mode: '0755'
+  become: true
+  register: create_bin_dir_res
+
+- name: Create temporary work directory
+  ansible.builtin.tempfile:
+    path: "{{ ocp_root_directory }}/_tmp"
+    state: directory
+    suffix: build
+  register: tmp_directory_res
+
+- name: "Set temporary folder"
+  ansible.builtin.set_fact:
+    tmp_directory: "{{ tmp_directory_res.path }}"
+
 
 - name: "Template OpenStack auth"
   ansible.builtin.template:
     src: "templates/clouds.yaml.j2"
-    dest: "{{ work_directory }}/clouds.yaml"
-    mode: '0600'
+    dest: "{{ tmp_directory }}/clouds.yaml"
+    mode: '0640'
 
-- name: "Set default installation_dir, if not defined"
-  ansible.builtin.set_fact:
-    installation_dir: "{{ work_directory }}/{{ ocp_install_dir }}"
-  when: installation_dir is undefined
+# - name: "Set default installation_dir, if not defined"
+#   ansible.builtin.set_fact:
+#     installation_dir: "{{ work_directory }}/{{ ocp_cluster_name }}"
+#   when: installation_dir is undefined
 
 - include_tasks: install.yml
   # vars:
@@ -28,7 +66,9 @@
 
 - name: "Delete OpenStack auth file"
   ansible.builtin.file:
-    path: "templates/clouds.yaml.j2"
+    path: "{{ tmp_directory }}/clouds.yaml"
     state: absent
 ...
-# ansible-playbook -i inventory/ playbook/ocp/ocp_openstack_info.yml -e work_directory=/opt/ocp -e installation_dir=/opt/ocp/openshift-data/
+# ansible-playbook -i inventory/ ansible/playbook/ocp/ocp_openstack_install.yml -e ocp_root_directory=/opt/ocp -e ocp_cluster_name=ocp-sdev -e openshift_pull_secret=${OCP_PULL_SECRET} -K
+# ansible-playbook -i inventory/ ansible/playbook/ocp/ocp_openstack_info.yml    -e ocp_bin_directory=/opt/ocp/bin -e installation_dir=/opt/ocp/<ocp_cluster_name>/ -e ocp_cluster_name=<ocp_cluster_name> -e openshift_pull_secret=${OCP_PULL_SECRET} -K
+# ansible-playbook -i inventory/ ansible/playbook/ocp/ocp_openstack_install.yml -e ocp_bin_directory=/opt/ocp/bin -e installation_dir=/opt/ocp/ocp-sdev -e ocp_cluster_name=ocp-sdev -e openshift_pull_secret=${OCP_PULL_SECRET} -K

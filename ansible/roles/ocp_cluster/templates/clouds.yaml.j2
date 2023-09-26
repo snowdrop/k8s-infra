@@ -1,12 +1,13 @@
 clouds:
   openstack:
-    auth:
-      project_name: "{{ openstack_auth.openstack_project_name }}"
-      username: "{{ openstack_auth.openstack_console_user }}"
-      password: "{{ openstack_auth.openstack_console_password }}"
-      user_domain_name: "{{ openstack_auth.openstack_user_domain }}"
-      project_domain_name: "{{ openstack_auth.openstack_project_domain }}"
-      auth_url: "{{ openstack_auth.openstack_os_auth_url }}"
+    auth_type: "{{ rhos_auth_type }}"
+    auth: 
+      auth_url: "{{ rhos_auth.auth_url }}"
+      password: "{{ rhos_auth.password }}"
+      project_domain_name: "{{ rhos_auth.project_domain_name }}"
+      project_name: "{{ rhos_auth.project_name }}"
+      username: "{{ rhos_auth.username }}"
+      user_domain_name: "{{ rhos_auth.user_domain_name }}"
     region_name: "regionOne"
     interface: "public"
     identity_api_version: 3
