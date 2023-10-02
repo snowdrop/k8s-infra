@@ -29,17 +29,15 @@ NOTE: The list of flavors is identified on the link:../../../openstack/README.ad
 == Playbooks
 
 === Create a VM
-=== Create a VM
 
-Create OpenStack instance based on passwordstore
+Create an OpenStack instance (aka a VM) using link:../../../passwordstore/README.adoc[passwordstore] as tools to manage the credentials, information.
+
+After creating the VM this playbook also executes the VM secure host playbook. More information link:../README.adoc#secure-host[here].
 
 .openstack_vm_create_passwordstore parameters
-[cols="2,5"]
-[cols="2,5"]
+[cols="20%,80%"]
 |===
-|Field name |Mandatory |Description
-
-// a| Use an existing SSH key (value) instead of creating one for the VM.
+|Field name | Description
 
 | `vm_name`
 
@@ -51,6 +49,47 @@ a| Name of the VM being created.
 
 This name will be used both as hostname as well as Ansible Inventory name.
 
+| `openstack.vm`
+
+[.fuchsia]#map#
+
+[.red]#required# 
+
+a| Map with required attributes for RHOS.
+
+Check below for more details.
+
+|===
+
+.openstack.vm map parameter
+[cols="20%,80%"]
+|===
+|Field name | Description
+
+| `flavor`
+
+[.fuchsia]#string#
+
+[.red]#required# 
+
+a| RHOS Flavor specifying the CPU, RAM and DISK sizes.
+
+| `image`
+
+[.fuchsia]#string#
+
+[.red]#required# 
+
+a| OS Image to be used (e.g. `Fedora-Cloud-Base-37`).
+
+| `network`
+
+[.fuchsia]#string#
+
+[.red]#required# 
+
+a| Network provider in RHOS
+
 |===
 
 [source,bash]
@@ -60,7 +99,7 @@ $ VM_NAME=vm20210221-t01
 
 [source,bash]
 ----
-$ ansible-playbook playbook/openstack/openstack_vm_create_passwordstore.yml -e k8s_type=masters -e k8s_version=123 -e '{"openstack": {"vm": {"network": "provider_net_shared","image": "Fedora-Cloud-Base-35", "flavor": "m1.medium"}}}' -e key_name=test-adm-key -e vm_name=${VM_NAME} 
+$ ansible-playbook playbook/openstack/openstack_vm_create_passwordstore.yml -e '{"openstack": {"vm": {"network": "provider_net_shared","image": "Fedora-Cloud-Base-35", "flavor": "m1.medium"}}}' -e key_name=test-adm-key -e vm_name=${VM_NAME} 
 ----
 
 Although some failures might occur some might be ignored which shouldn't affect thhe process. This playbook should finish with no failed tasks.
@@ -155,4 +194,3 @@ All activity is being monitored.
 
 Welcome to vm20210221-t01..
 ======
-
