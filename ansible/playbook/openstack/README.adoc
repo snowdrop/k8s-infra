@@ -30,7 +30,9 @@ NOTE: The list of flavors is identified on the link:../../../openstack/README.ad
 
 === Create a VM
 
-Create OpenStack instance based on passwordstore.
+Create an OpenStack instance (aka a VM) using link:../../../passwordstore/README.adoc[passwordstore] as tools to manage the credentials, information.
+
+After creating the VM this playbook also executes the VM secure host playbook. More information link:../README.adoc#secure-host[here].
 
 .openstack_vm_create_passwordstore parameters
 [cols="20%,80%"]

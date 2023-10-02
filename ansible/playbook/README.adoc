@@ -71,6 +71,7 @@ Variables:
 | vm_name | | | Name that will be assigned to  the host | 
 | pass_provider | [hetzner] | hetzner | Cloud or Bare-metal provider that will host the VM |
 
+[#secure-host]
 === `sec_host`
 
 This playbook executes several tasks regarding the security of hosts.
