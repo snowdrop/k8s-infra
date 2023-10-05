@@ -13,3 +13,4 @@ plugins:
 exclude:
 - ibm-cloud/ansible/*.yml
 - snowdrop-bot/ansible/*.yml
+- ansible
