@@ -3,6 +3,8 @@ ocp_version: 4.13.9
 ocp_cluster_name: ocp
 ocp_user: snowdrop
 ocp_root_directory: /opt/ocp
+ocp_master_nodes: 3
+ocp_worker_nodes: 3
 
 # tag::rhos_default_flavors[]
 # OpenStack flavors

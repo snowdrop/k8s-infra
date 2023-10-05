@@ -8,13 +8,13 @@ compute:
   platform:
     openstack:
       type: {{ openstack_flavor_compute }}
-  replicas: 3
+  replicas: {{ ocp_worker_nodes }}
 controlPlane:
   architecture: amd64
   hyperthreading: Enabled
   name: master
   platform: {}
-  replicas: 3
+  replicas: {{ ocp_master_nodes }}
 metadata:
   creationTimestamp: null
   name: {{ ocp_cluster_name }}
