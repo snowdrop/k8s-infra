@@ -1,0 +1,14 @@
+#theme: jekyll-theme-minimal
+#title: Octocat's homepage
+#description: Bookmark this to keep an eye on my project updates!
+plugins:
+- jekyll-asciidoc
+#incremental: false
+#highlighter: rouge
+#gist:
+#  noscript: false
+#kramdown:
+#  math_engine: mathjax
+#  syntax_highlighter: rouge
+exclude:
+- ibm-cloud/ansible/*.yml
