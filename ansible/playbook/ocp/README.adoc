@@ -3,13 +3,6 @@
 :toc: left
 :description: This document describes OCP specific playbooks.
 
-== Before you start
-
-[IMPORTANT]
-====
-The Ansible commands should be executed within the ansible folder !
-====
-
 == Other information
 
 The installation process uses the _OpenShift Container Platform installer_ 
@@ -20,7 +13,7 @@ The installation process uses the _OpenShift Container Platform installer_
 Playbooks to deploy and remove an OCP cluster to RHOS. 
 
 .List of OCP RHOS playbooks
-[cols="2m,1m,5"]
+[cols="30%m,70%m"]
 |===
 |Playbook File |Description
 
@@ -38,6 +31,7 @@ Playbooks to deploy and remove an OCP cluster to RHOS.
 |===
 
 // tag::deploy_ocp_on_rhos[]
+[#deploy-ocp-on-rhos]
 === Deploy OCP Cluster on RHOS
 
 First obtain the OCP pull secret which can be obained from https://console.redhat.com/openshift/install/pull-secret.
