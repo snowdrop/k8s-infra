@@ -18,6 +18,80 @@ This role installs an OCP cluster on a RHOS cloud.
 |===
 | Parameter | Comments
 
+| `installation_dir`
+
+[.fuchsia]#string#
+a| Installation folder for the OCP files, where `ocp_install_dir` is a role variable.
+
+_Default:_ `work_directory/<ocp_install_dir>`
+
+| `ocp_cluster_name`
+
+[.fuchsia]#string#
+a| Name to be applied to the OCP cluster. It will be used as a prefix in the VM names.
+
+_Default:_ `ocp`
+
+| `ocp_master_nodes`
+
+[.fuchsia]#int#
+a| Number of master nodes in the OCP cluster.
+
+_Default:_ `3`
+
+| `ocp_root_directory`
+
+[.fuchsia]#string#
+a| Root folder for the installation. Under this folder 2 subfolders will be created:
+
+* `bin`: will store the executables for the installation which are `openshift-install`, `oc` and `kubectl`.
+* `<cluser_name>`: will store the installation data
+
+_Default:_ `/opt/ocp`
+
+| `ocp_user`
+
+[.fuchsia]#string#
+a| Admin user to be created in the OCP cluster.
+
+_Default:_ `snowdrop`
+
+| `ocp_version`
+
+[.fuchsia]#string#
+a| OCP version to install
+
+_Default:_ `4.13.9`
+
+| `ocp_worker_nodes`
+
+[.fuchsia]#int#
+a| Number of worker nodes in the OCP cluster.
+
+* Can be 0
+* *_Default:_ `3`*
+
+| `openstack_flavor_compute`
+
+[.fuchsia]#string#
+a| 
+
+_Default:_ `ocp4.compute`
+
+| `openstack_flavor_control_plane`
+
+[.fuchsia]#string#
+a| 
+
+_Default:_ `ocp4.control`
+
+| `openstack_network_provider`
+
+[.fuchsia]#string#
+a| 
+
+_Default:_ `provider_net_cci_13`
+
 | `state`
 
 [.fuchsia]#string# / [.red]#required# 
@@ -32,14 +106,7 @@ Choices:
 
 [.fuchsia]#string# / [.red]#required# | Temporary work directory 
 
-| `installation_dir`
-
-[.fuchsia]#string#
-a| Installation folder for the OCP files, where `ocp_install_dir` is a role variable.
-Default: `work_directory/<ocp_install_dir>`
-
 |===
-
 
 [NOTE]
 ======
@@ -57,9 +124,6 @@ include::defaults/main.yml[]
 ====
 
 ======
-
-The version of the cluster to be installed can be changed using the parameter `k8s_version`.
-The following versions are currently link:vars/main.yml[supported].
 
 == Example Playbook
 
