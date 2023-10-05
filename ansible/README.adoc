@@ -56,6 +56,7 @@ Since passwordstore is integrated with [git](https://git-scm.com/), all changes 
 Don't forget to `git push` and `git pull` often in order to have your local repository synchronized with other team members as well as publishing to the team your changes. 
 ====
 
+[#python-venv]
 === Python Virtual Environments
 
 This project suggests using a link:https://docs.python.org/3/library/venv.html[python virtual environment] 

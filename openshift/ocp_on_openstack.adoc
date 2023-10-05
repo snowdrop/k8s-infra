@@ -41,32 +41,53 @@ The early stages of the deployment process create an `install-config.yaml` file 
 The installation process generates an installation folder on the host machine
 (by default is the same machine executing the Ansible playbooks) that must be
 kept for maintenance purposes, e.g. removing the OCP cluster.
-
-The 
 ====
 
-== Prerequisites
+To collect information required to the process, and also store the results of the installation, passwordstore is used (check more information link:../passwordstore/README.adoc[here]).
 
-The prerequisites for using RHOS Ansible Playbooks are the following.
+== Requirements
 
-._Click to open the details_
-[%collapsible]
-====
+The prerequisites for using the OCP on RHOS Ansible Playbooks are described on the link:../requirements.txt[`requirements.txt`] and link:../collections/requirements.yml[`collections/requirements.yml`] files. 
 
-[]
-======
-include::../openstack/README.adoc[tag=rhos_prerequisites]
-======
+More information on our link:../openstack/README.adoc[OpenStack README] for this project.
 
-====
+Python virtual environment can be used to isolate all the python requirements from the host OS. For more information check the link:../ansible/README.adoc#python-venv[Python Virtual Env] section on our Ansible README.
 
-More information on the link:../openstack/README.adoc[OpenStack README] for this project.
+=== Passwordstore
 
-== Deploy OCP cluster on RHOS
+Passwordstore is used to both provide information to the playbooks as well 
+ as store the result of the installation process. 
 
-include::../ansible/playbook/ocp/README.adoc[tag=deploy_ocp_on_rhos]
+=== Sizing
+
+The sizing of the OCP cluster is done by selecting the RHOS flavor of the
+ master and worker nodes as well as the number of replicas for each.
+
+For more information on obtaining Flavor information from RHOS using the 
+ CLI check our link:../openstack/openstack-cli.adoc[RHOS CLI] document.
+
+More information on the following links:
+
+* link:https://docs.openshift.com/container-platform/4.12/installing/installing_bare_metal_ipi/ipi-install-installation-workflow.html[Setting up the environment for an OpenShift installation]
+* link:https://docs.openshift.com/container-platform/4.12/installing/installing_openstack/installing-openstack-user.html[Installing a cluster on OpenStack on your own infrastructure]
+
+== Installation process
+
+=== Deploy OCP cluster on RHOS
+
+Using the `openshift-install` tool deploy the OCP cluster on the RHOS infrastructure.
+
+Check the link:../ansible/playbook/ocp/README.adoc[OCP README] document on the link:../ansible/playbook/ocp[OCP PlayBooks] folder.
 
 === Backup the installation directory
+
+After the cluster deployment is finished let's backup the installation directory.
+
+[CAUTION]
+====
+As referred prior on this document, the installation folder must be kept for 
+ correct server maintenance. The procedure to make this backup is the following.
+====
 
 Generate the base64 codification of the `.tar.gz` file containing the backup of the `openshift-install` directory.
 

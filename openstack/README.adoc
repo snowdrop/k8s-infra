@@ -15,6 +15,10 @@ endif::[]
 == Prerequisites
 // tag::rhos_prerequisites[]
 
+The best way to solve all the requirements to using the RHOS 
+ Ansible resources from this document is to install the 
+ provided requirements files. Moreover using Python Virtual Environment can also be used. For more information check the link:../ansible/README.adoc#python-venv[Python Virtual Env] section on our Ansible README.
+
 The following python packages are needed:
 
 - https://github.com/micheles/decorator/blob/master/docs/documentation.md#usefulness-of-decorators[decorator]
@@ -58,7 +62,7 @@ Different OS images are available on Openstack.
 .OpenStack Flavor information
 [%header,cols="2m,1,1,1,1,1"]
 |===
-| Flavor | VCPUS | RAM | Total Disks | Root Disk | Ephmeral Disk
+| Flavor | VCPUS | RAM | Total Disks | Root Disk | Ephemeral Disk
 
 | m1.medium | 2 | 4 GB | 40 GB | 40 GB | 0 GB 
 | ci.m1.medium | 2 | 4 GB | 40 GB | 40 GB | 0 GB 
