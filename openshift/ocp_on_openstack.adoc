@@ -45,9 +45,9 @@ kept for maintenance purposes, e.g. removing the OCP cluster.
 
 To collect information required to the process, and also store the results of the installation, passwordstore is used (check more information link:../passwordstore/README.adoc[here]).
 
-== Requirements
+== Preparation
 
-The prerequisites for using the OCP on RHOS Ansible Playbooks are described on the link:../requirements.txt[`requirements.txt`] and link:../collections/requirements.yml[`collections/requirements.yml`] files. 
+The requirements for using the OCP on RHOS Ansible Playbooks are described on the link:../requirements.txt[`requirements.txt`] and link:../collections/requirements.yml[`collections/requirements.yml`] files. 
 
 More information on our link:../openstack/README.adoc[OpenStack README] for this project.
 
@@ -57,6 +57,8 @@ Python virtual environment can be used to isolate all the python requirements fr
 
 Passwordstore is used to both provide information to the playbooks as well 
  as store the result of the installation process. 
+
+More information on our Passwordstore implementation link:../passwordstore/README.adoc[here].
 
 === Sizing
 

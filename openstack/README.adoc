@@ -12,12 +12,15 @@ ifdef::env-github[]
 :warning-caption: :warning:
 endif::[]
 
-== Prerequisites
+== Requirements
 // tag::rhos_prerequisites[]
 
-The best way to solve all the requirements to using the RHOS 
- Ansible resources from this document is to install the 
- provided requirements files. Moreover using Python Virtual Environment can also be used. For more information check the link:../ansible/README.adoc#python-venv[Python Virtual Env] section on our Ansible README.
+The best way to solve all the requirements needed to use the RHOS 
+ Ansible resources from this document is to install the provided 
+ python requirements files. Moreover using Python Virtual Environment can also be used. For more information check the link:../ansible/README.adoc#python-venv[Python Virtual Env] section on our Ansible README. If you 
+ do so you can skip the manual installation section.
+
+=== Manual installation
 
 The following python packages are needed:
 
@@ -28,30 +31,36 @@ and can be installed using pip
 
 [source,bash]
 ----
-$ [sudo] pip3 install decorator
-$ [sudo] pip3 install openstacksdk
+sudo pip3 install -r requirements.txt
 ----
 
 like also the `openstack.cloud` Ansible collection.
 
 [source,bash]
 ----
-$ ansible-galaxy collection install openstack.cloud
+ansible-galaxy collection install openstack.cloud
 ----
 // end::rhos_prerequisites[]
 
 == VM Required Information
 
+[NOTE]
+====
+The examples provided here are photos of a specific time frame. To get 
+ updated lists of images and flavors check you RHOS cluster using either 
+ the RHOS console or the link:openstack-cli.adoc[RHOS CLI].
+====
+
 === Images
 
-Different OS images are available on Openstack.
+ATTOW different OS images are available on RHOS.
 
 .OpenStack Image information
 [%header,cols="2m,1,1,1"]
 |===
 | Name | OS | Version | FS
 
-| Fedora-Cloud-Base-35 | Fedora | 35 | BTRFS
+| Fedora-Cloud-Base-37 | Fedora | 37 | BTRFS
 | CentOS-8-x86_64-GenericCloud-released-latest | CentOS | 8 | ????
 | CentOS-7-x86_64-GenericCloud-released-latest | CentOS | 7 | ????
 
@@ -59,20 +68,136 @@ Different OS images are available on Openstack.
 
 === Flavors
 
+Reduced list of flavors obtained from our RHOS cluster.
+
 .OpenStack Flavor information
 [%header,cols="2m,1,1,1,1,1"]
 |===
 | Flavor | VCPUS | RAM | Total Disks | Root Disk | Ephemeral Disk
 
-| m1.medium | 2 | 4 GB | 40 GB | 40 GB | 0 GB 
-| ci.m1.medium | 2 | 4 GB | 40 GB | 40 GB | 0 GB 
-| ci.m1.medium.large	| 4| 4 GB | 16 GB | 16 GB | 0 GB 
-| ci.m4.xlarge	| 4| 16 GB | 40 GB | 40 GB | 0 GB 
-| g.standard.xxl | 12 | 24GB | 120GB | 120GB | 0GB 
-| ci.m5.large | 16 | 32GB | 40GB | 40GB | 0GB 
+| m1.medium           | 2  | 4 GB  | 40 GB | 40 GB | 0 GB 
+| ci.m1.medium        | 2  | 4 GB  | 40 GB | 40 GB | 0 GB 
+| ci.m1.medium.large  | 4  | 4 GB  | 16 GB | 16 GB | 0 GB 
+| ci.m4.xlarge	      | 4  | 16 GB | 40 GB | 40 GB | 0 GB 
+| ci.m5.large         | 16 | 32GB  | 40GB  | 40GB  | 0GB 
+| g.standard.xxl      | 12 | 24GB  | 120GB | 120GB | 0GB 
+| ocp4.single-node    | 24 | 48GB  | 200GB | 200GB | 0GB 
+| ocp4.control        | 4  | 16GB  | 100GB | 100GB | 0GB 
+| ocp4.compute        | 2  | 8GB   | 100GB | 100GB | 0GB 
+| ocp4.bootstrap      | 4  | 16GB  | 100GB | 100GB | 0GB 
 |===
+
+== Passwordstore
+
+Passwordstore is used on the RHOS instance deployment. In one hand it 
+ provides information for deploying process, such as RHOS authentication 
+ and also to store the results of the process and be used as Ansible 
+ inventory.
+
+[NOTE]
+====
+All RHOS information will be stored under the `/openstack` passwordstore folder.
+====
+
+=== RHOS authentication
+
+The authentication consists in collecting the authentication information 
+ and storing it in 2 Ansible facts, for later use in Ansible roles.
+
+.RHOS authentication information
+[%header,cols="20%m,80%"]
+|===
+| Variable | Meaning
+
+| rhos_auth
+a| Authentication information
+
+The fields to provide in this dictionary will depend on the selected 
+ _Authentication Type_.
+
+| rhos_auth_type
+a| Authentication type
+
+Check the `openstack` CLI man page for available types.
+
+* `v3password`
+* `v3token`
+* ...
+
+|===
+
+.Click to see an actual playbook for setting the facts to be used on RHOS authentication
+[%collapsible]
+======
+[source,yaml]
+----
+include::../ansible/playbook/openstack/openstack_auth_passstore_v3password.yml[]
+----
+======
 
 == Available Ansible Playbooks
 
 More information on the available OpenStack Ansible Playbooks on the 
 link:../ansible/playbook/openstack/README.adoc[Playbook README].
+
+== Connect to a RHOS instance
+
+All the information related to the host will be managed by our ansible passwordstore link:../../roles/passstore[roles] and link:../passstore[playbooks]. The current implementation also stores the ssh public and secret keys locally on each `~/.ssh` folder. To improve usability link:../../../tools/passstore-vm-ssh.sh[this] bash script has been created to make it easier to perform this connection. More documentation on the bash script can be found link:../../../tools/README.md[here].
+
+To SSH connect to a VM use the `tools/passstore-vm-ssh.sh` bash script.
+
+The 3 arguments to pass to the script are the following.
+
+.Script options
+[%header,cols="2,4"]
+|===
+| Command | Description
+
+| 1: `VM_PROVIDER`
+
+[.fuchsia]#string# / [.red]#required# 
+a| Cloud provider
+
+Choices: 
+
+* `openstack`
+
+| 2: `VM_NAME`
+
+[.fuchsia]#string# / [.red]#required# 
+a| Name of the VM to connect to. 
+
+This is the inventory name of the VM.
+
+| 3: `PASSWORD_STORE_DIR`
+
+[.fuchsia]#string#
+a| Folder where the PASSWORDSTORE database is located
+
+*Default*: `PASSWORD_STORE_DIR` environment variable, if set. 
+If this parameter is not provided and no `PASSWORD_STORE_DIR` env
+variable is set the script will fail as it doesn't know the location
+of the passwordstore project.
+
+|===
+
+
+.Connect to a passwordstore VM
+[source,bash]
+----
+./tools/passstore-vm-ssh.sh openstack vm20210221-t01
+----
+
+This should connect ot the newly created VM.
+
+[source,bash]
+======
+Last login: Thu Jan 1 00:00:00 1970 from x.x.x.x
+------------------
+
+This machine is property of RedHat.
+Access is forbidden to all unauthorized person.
+All activity is being monitored.
+
+Welcome to vm20210221-t01..
+======

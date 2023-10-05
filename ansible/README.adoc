@@ -283,7 +283,7 @@ Because a host can already be defined under the store, prior to execute the play
 
 [source,bash]
 ----
-$ pass hetzner
+pass hetzner
 hetzner
 ├── ...
 ├── host-1
@@ -313,7 +313,7 @@ If a host has already been created, it can be imported within the inventory usin
 
 [source,bash]
 ----
-$ ansible-playbook ansible/playbook/passstore_controller_inventory.yml -e vm_name=<VM_NAME> -e pass_provider=hetzner
+ansible-playbook ansible/playbook/passstore_controller_inventory.yml -e vm_name=<VM_NAME> -e pass_provider=hetzner
 ----
 
 where `<VM_NAME>` corresponds to the host key created under `hetzner`.
@@ -335,7 +335,7 @@ This is done using the `passstore_controller_inventory_remove` playbook. More in
 
 [source,bash]
 ----
-$ ansible-playbook ansible/playbook/passstore_controller_inventory_remove.yml -e vm_name=<vm_name> -e pass_provider=<provider>
+ansible-playbook ansible/playbook/passstore_controller_inventory_remove.yml -e vm_name=<vm_name> -e pass_provider=<provider>
 ----
 
 === Create Server
