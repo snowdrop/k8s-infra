@@ -1,0 +1,5 @@
+---
+- name: "Read metadata from installation folder"
+  ansible.builtin.set_fact:
+    ocp_cluster_metadata: "{{ lookup('file', installation_dir + '/metadata.json') | from_json }}"
+...
