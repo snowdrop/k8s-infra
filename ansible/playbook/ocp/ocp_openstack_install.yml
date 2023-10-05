@@ -38,5 +38,10 @@
   ansible.builtin.import_playbook: "ocp_openstack_create_jump_server.yml"
   vars:
     vm_name: "{{ ocp_cluster_metadata.infraID }}-jump-server"
+
+- name: "Print cluster info"
+  ansible.builtin.import_playbook: "ocp_openstack_info.yml"
+  vars:
+    vm_name: "{{ ocp_cluster_metadata.infraID }}-jump-server"
 ...
 # ansible-playbook ansible/playbook/ocp/ocp_openstack_install.yml -e ocp_root_directory=/opt/ocp -e ocp_cluster_name=ocp-sdev -e openshift_pull_secret=${OCP_PULL_SECRET} -K

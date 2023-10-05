@@ -1,5 +1,17 @@
 ---
 - name: "Read metadata from installation folder"
+  # ansible.builtin.set_fact:
+  #   ocp_cluster_metadata: "{{ lookup('file', installation_dir + '/metadata.json') | from_json }}"
+  ansible.builtin.slurp:
+    src: "{{ installation_dir + '/metadata.json' }}"
+  register: ocp_cluster_slurp_metadata
+
+- name: "Print metadata slurp"
+  ansible.builtin.debug:
+    msg: "ocp_cluster_slurp_metadata: {{ ocp_cluster_slurp_metadata }}"
+    verbosity: 2
+
+- name: "Transform metadata"
   ansible.builtin.set_fact:
-    ocp_cluster_metadata: "{{ lookup('file', installation_dir + '/metadata.json') | from_json }}"
+    ocp_cluster_metadata: "{{ ocp_cluster_slurp_metadata.content | b64decode | from_json }}"
 ...

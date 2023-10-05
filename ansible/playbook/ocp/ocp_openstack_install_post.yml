@@ -34,6 +34,7 @@
     - name: "Store the OCP information on the passwordstore"
       ansible.builtin.set_fact:
         ansible_installation_folder_passwordstore: "{{ query('passwordstore', 'openstack/' + ocp_cluster_metadata.infraID + '/install_dir create=True userpass=' + ansible_installation_folder_base64 )[0] }}"
+        kubeadmin_password_passwordstore: "{{ query('passwordstore', 'openstack/' + ocp_cluster_metadata.infraID + '/kubeadmin create=True userpass=' + kubeadmin_password )[0] }}"
 
   post_tasks:
 

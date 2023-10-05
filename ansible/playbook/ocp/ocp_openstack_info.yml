@@ -1,66 +1,182 @@
 ---
-- name: "INFO OCP"
-  hosts: localhost
+- name: "Build OpenStack authentication for v3password"
+  ansible.builtin.import_playbook: "../openstack/openstack_auth_passstore_v3password.yml"
+
+- name: "Get OCP installation information"
+  hosts: "{{ vm_name | default(['localhost']) }}"
   gather_facts: true
 
   pre_tasks:
-    - name: "Set openstack_auth facts"
-      set_fact:
-        openstack_auth: 
-          openstack_project_name: "{{ query('passwordstore', 'openstack/host/project_name')[0] }}"
-          openstack_console_user:  "{{ query('passwordstore', 'openstack/host/console_user')[0] }}"
-          openstack_console_password: "{{ query('passwordstore', 'openstack/host/console_pw')[0] }}"
-          openstack_user_domain:  "{{ query('passwordstore', 'openstack/host/console_domain')[0] }}"
-          openstack_project_domain: "{{ query('passwordstore', 'openstack/host/os_domain')[0] }}"
-          openstack_os_auth_url: "{{ query('passwordstore', 'openstack/host/os_auth_url')[0] }}"
-          
+    - name: Check required variables
+      ansible.builtin.assert:
+        that:
+          - "installation_dir is defined or (ocp_root_directory is defined and ocp_cluster_name is defined)"
+        msg: 
+          - "Either define:"
+          - "  - installation_dir"
+          - "  or"
+          - "  - ocp_root_directory and ocp_cluster_name"
+
+    - name: "Set installation_dir foler"
+      ansible.builtin.set_fact:
+        installation_dir: "{{ ocp_root_directory }}/{{ ocp_cluster_name }}"
+      when: installation_dir is undefined
+
   tasks:
     - name: "Get information from OCP cluster"
       ansible.builtin.import_role:
         name: 'ocp_cluster'
+        tasks_from: get_metadata
+      when: ocp_cluster_metadata is undefined
+
+    - name: "Print OCP information"
+      ansible.builtin.debug:
+        msg: "ocp_cluster_metadata: {{ ocp_cluster_metadata }}"
+        verbosity: 2
+
+    - name: "Get information from OCP cluster"
+      ansible.builtin.import_role:
+        name: 'ocp_cluster'
         tasks_from: openshift_install_state
+      when: openshift_install_state is undefined
 
-    - name: "Get Ingress Floating IP information"
+    - name: "Print OCP installation information"
+      ansible.builtin.debug:
+        msg: "openshift_install_state: {{ openshift_install_state }}"
+        verbosity: 2
+
+    - name: "Read kubeadmin-password"
+      ansible.builtin.slurp:
+        src: "{{ installation_dir + '/auth/kubeadmin-password' }}"
+      register: ocp_cluster_kubeadmin_pw_slurp
+
+    - name: "Set rhos_ocp_facts facts"
+      ansible.builtin.set_fact:
+        rhos_ocp_facts:
+          api_floating_ip: "{{ openshift_install_state['*installconfig.InstallConfig'].config.platform.openstack.apiFloatingIP }}"
+          cluster_name: "{{ ocp_cluster_metadata.clusterName }}"
+          ingress_fixed_ip: "{{ openshift_install_state['*installconfig.InstallConfig'].config.platform.openstack.ingressVIPs[0] }}"
+          jump_server_vm_name: "{{ ocp_cluster_metadata.infraID }}-jump-server"
+          ocp_cluster_kubeadmin_pw: "{{ ocp_cluster_kubeadmin_pw_slurp.content | b64decode }}"
+
+- name: "RHOS information"
+  hosts: localhost
+  gather_facts: true
+
+  pre_tasks:
+  
+    - name: "Recover rhos_ocp_facts from VM if required"
+      ansible.builtin.set_fact:
+        rhos_ocp_facts: "{{ hostvars[vm_name]['rhos_ocp_facts'] }}"
+      when: rhos_ocp_facts is undefined
+
+  tasks:
+    # Jump Server
+    - name: "Get information from Jump Server"
+      openstack.cloud.server_info:
+        auth_type: "{{ rhos_auth_type }}"
+        auth: "{{ rhos_auth }}"
+        name: "{{ rhos_ocp_facts.jump_server_vm_name }}"
+      register: jump_server_info
+
+    - name: "Print ump Server information"
+      ansible.builtin.debug:
+        msg: "jump_server_info: {{ jump_server_info }}"
+        verbosity: 2
+
+    - name: "Get Jump Server Floating IP information"
       openstack.cloud.floating_ip_info:
-        auth:
-          project_name: "{{ openstack_auth.openstack_project_name }}"
-          username: "{{ openstack_auth.openstack_console_user }}"
-          password: "{{ openstack_auth.openstack_console_password }}"
-          user_domain_name: "{{ openstack_auth.openstack_user_domain }}"
-          project_domain_name: "{{ openstack_auth.openstack_project_domain }}"
-          auth_url: "{{ openstack_auth.openstack_os_auth_url }}"
-        floating_ip_address: "{{ floating_ip_ingress }}"
-      register: rhos_floating_ip_ingress_info_res
-    
-    - name: "Get Ingress Floating IP information"
-      debug:
-        msg: "rhos_floating_ip_ingress_info_res: {{ rhos_floating_ip_ingress_info_res }}"
+        auth: "{{ rhos_auth }}"
+        auth_type: "{{ rhos_auth_type }}"
+        floating_ip_address: "{{ jump_server_info.servers[0].access_ipv4 }}"
+      register: rhos_jump_server_floating_ip
+
+    - name: "Print Jump Server Floating IP information"
+      ansible.builtin.debug:
+        msg: "rhos_jump_server_floating_ip: {{ rhos_jump_server_floating_ip }}"
+        verbosity: 2
+
+    # Ingress
+    - name: "Get Cluster Ingress Floating IP information"
+      openstack.cloud.floating_ip_info:
+        auth: "{{ rhos_auth }}"
+        auth_type: "{{ rhos_auth_type }}"
+        # floating_ip_address: "{{ openshift_install_state['*installconfig.InstallConfig'].config.platform.openstack.apiFloatingIP }}"
+        fixed_ip_address: "{{ rhos_ocp_facts.ingress_fixed_ip  }}"
+      register: rhos_ocp_ingress_floating_ip
+
+    - name: "Print Cluster Ingress Floating IP information"
+      ansible.builtin.debug:
+        msg: "rhos_ocp_ingress_floating_ip: {{ rhos_ocp_ingress_floating_ip }}"
+        verbosity: 2
+
+    # - name: "Get Cluster Ingress Port information"
+    #   openstack.cloud.port_info:
+    #     auth: "{{ rhos_auth }}"
+    #     auth_type: "{{ rhos_auth_type }}"
+    #     filters:
+    #       name: "{{ ocp_cluster_id }}-ingress-port"
+    #   register: rhos_ocp_cluster_ingress_port
+
+    # - name: "Print Cluster Ingress Port details"
+    #   ansible.builtin.debug:
+    #     msg: "{{ item }}"
+    #     verbosity: 2
+    #   loop:
+    #     - "rhos_ocp_cluster_ingress_port: {{ rhos_ocp_cluster_ingress_port }}"
+    #     - "rhos_ocp_cluster_ingress_port.openstack_ports[0].fixed_ips: {{ rhos_ocp_cluster_ingress_port.openstack_ports[0].fixed_ips }}"
+    #     - "rhos_ocp_cluster_ingress_port.openstack_ports[0].fixed_ips[0].ip_address: {{ rhos_ocp_cluster_ingress_port.openstack_ports[0].fixed_ips[0].ip_address }}"
+
+    # API
+    - name: "Get Cluster API Floating IP information"
+      openstack.cloud.floating_ip_info:
+        auth: "{{ rhos_auth }}"
+        auth_type: "{{ rhos_auth_type }}"
+        floating_ip_address: "{{ rhos_ocp_facts.api_floating_ip }}"
+      register: rhos_ocp_api_floating_ip
+
+    - name: "Print API Ingress Floating IP information"
+      ansible.builtin.debug:
+        msg: "rhos_ocp_api_floating_ip: {{ rhos_ocp_api_floating_ip }}"
+        verbosity: 2
+
+    # - name: "Get API Ingress Port information"
+    #   openstack.cloud.port_info:
+    #     auth: "{{ rhos_auth }}"
+    #     auth_type: "{{ rhos_auth_type }}"
+    #     filters:
+    #       name: "{{ ocp_cluster_id }}-ingress-port"
+    #   register: rhos_ocp_cluster_ingress_port
+
+    # - name: "Print API Ingress Port details"
+    #   ansible.builtin.debug:
+    #     msg: "{{ item }}"
+    #     verbosity: 2
+    #   loop:
+    #     - "rhos_ocp_cluster_ingress_port: {{ rhos_ocp_cluster_ingress_port }}"
+    #     - "rhos_ocp_cluster_ingress_port.openstack_ports[0].fixed_ips: {{ rhos_ocp_cluster_ingress_port.openstack_ports[0].fixed_ips }}"
+    #     - "rhos_ocp_cluster_ingress_port.openstack_ports[0].fixed_ips[0].ip_address: {{ rhos_ocp_cluster_ingress_port.openstack_ports[0].fixed_ips[0].ip_address }}"
+
+    # - name: "Print server details"
+    #   ansible.builtin.debug:
+    #     msg: "openstack --os-cloud openstack floating ip set --fixed-ip-address {{ rhos_ocp_cluster_ingress_port.openstack_ports[0].fixed_ips[0].ip_address }} --port {{ rhos_ocp_cluster_ingress_port.openstack_ports[0].id }} {{ rhos_floating_ip_ingress_info_res.floating_ips[0].id }}"
+    #     verbosity: 2
+
+    - name: "Installation resume"
+      ansible.builtin.debug:
+        msg: 
+          - "OCP Resources:"
+          - "  kubeadmin password: {{ rhos_ocp_facts.ocp_cluster_kubeadmin_pw }}"
+          - "  Console: https://console-openshift-console.apps.{{ rhos_ocp_facts.cluster_name }}.snowdrop.dev/"
+          - ""
+          - "Jump Server:"
+          - "  Floating IP: {{ jump_server_info.servers[0].access_ipv4 }}"
+          - ""
+          - "API:"
+          - "  Floating IP: {{ rhos_ocp_api_floating_ip.floating_ips[0].floating_ip_address  }}"
+          - ""
+          - "Ingress:"
+          - "  Floating IP: {{ rhos_ocp_ingress_floating_ip.floating_ips[0].floating_ip_address }}"
         verbosity: 0
 
-    - name: "Get Ingress Port information"
-      openstack.cloud.port_info:
-        auth:
-          project_name: "{{ openstack_auth.openstack_project_name }}"
-          username: "{{ openstack_auth.openstack_console_user }}"
-          password: "{{ openstack_auth.openstack_console_password }}"
-          user_domain_name: "{{ openstack_auth.openstack_user_domain }}"
-          project_domain_name: "{{ openstack_auth.openstack_project_domain }}"
-          auth_url: "{{ openstack_auth.openstack_os_auth_url }}"
-        filters:
-          name: "{{ ocp_cluster_id }}-ingress-port"
-      register: rhos_ocp_cluster_ingress_port
-
-    - name: "Print Ingress Port details"
-      debug:
-        msg: "{{item}}"
-        verbosity: 0
-      loop: 
-        - "rhos_ocp_cluster_ingress_port: {{ rhos_ocp_cluster_ingress_port }}"
-        - "rhos_ocp_cluster_ingress_port.openstack_ports[0].fixed_ips: {{ rhos_ocp_cluster_ingress_port.openstack_ports[0].fixed_ips }}"
-        - "rhos_ocp_cluster_ingress_port.openstack_ports[0].fixed_ips[0].ip_address: {{ rhos_ocp_cluster_ingress_port.openstack_ports[0].fixed_ips[0].ip_address }}"
-
-    - name: "Print server details"
-      debug:
-        msg: "openstack --os-cloud openstack floating ip set --fixed-ip-address {{ rhos_ocp_cluster_ingress_port.openstack_ports[0].fixed_ips[0].ip_address }} --port {{ rhos_ocp_cluster_ingress_port.openstack_ports[0].id }} {{ rhos_floating_ip_ingress_info_res.floating_ips[0].id }}"
-        verbosity: 0
 ...
