@@ -12,3 +12,4 @@ plugins:
 #  syntax_highlighter: rouge
 exclude:
 - ibm-cloud/ansible/*.yml
+- **/ansible/*.yml
