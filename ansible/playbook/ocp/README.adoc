@@ -1,9 +1,23 @@
-= OCP Ansible Playbooks
+= OCP on RHOS Ansible Playbooks
+Snowdrop Team
 :icons: font
+:revdate: {docdate}
 :toc: left
-:description: This document describes OCP specific playbooks.
+:toclevels: 3
+:description: Deploying OCP on RHOS
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
 
-== Other information
+== Introduction
+
+[.lead]
+This document describes the process to deploy an OCP cluster on a 
+ RHOS infrastructure.
 
 The installation process uses the _OpenShift Container Platform installer_ 
  obtained from https://mirror.openshift.com/.
@@ -13,7 +27,7 @@ The installation process uses the _OpenShift Container Platform installer_
 Playbooks to deploy and remove an OCP cluster to RHOS. 
 
 .List of OCP RHOS playbooks
-[cols="30%m,70%m"]
+[cols="30%m,70%"]
 |===
 |Playbook File |Description
 
@@ -24,19 +38,22 @@ Playbooks to deploy and remove an OCP cluster to RHOS.
 | Remove an OCP cluster on RHOS.
 
 | ocp_openstack_info.yml
-| Print information from the OCP cluster, for dev/testing purposes.
+a| Print information from the deployed OCP cluster.
+
+This playbook will print such as Console URL, kubeadmin password, ...
 
 | ocp_openstack_test.yml
 | Test some functionalities, for dev/testing purposes only!
 |===
 
-// tag::deploy_ocp_on_rhos[]
-[#deploy-ocp-on-rhos]
-=== Deploy OCP Cluster on RHOS
+== Preparing the deployment
 
-First obtain the OCP pull secret which can be obained from https://console.redhat.com/openshift/install/pull-secret. 
- This information will be added to the `install-config.yaml` and used in the OCP 
- installation process.
+The OCP installation process requries the use of the OCP 
+ pull secret. This secret can be obained from https://console.redhat.com/openshift/install/pull-secret.
+
+As part of the installation process this information will be added 
+ to the `install-config.yaml` and used in the OCP installation 
+ process.
 
 .Sample OCP pull secret JSON
 [source,json]
@@ -44,21 +61,66 @@ First obtain the OCP pull secret which can be obained from https://console.redha
 {
   "auths": {
     "cloud.openshift.com": {"auth": "wwwwwwwwww", "email": "antcosta@redhat.com"}
-    ,"quay.io": {"auth": "xxxxxxxxxxxxx", "email": "antcosta@redhat.com"}
+    ,"quay.io": {"auth": "xxxxxxxxxxxxx", "email": "janedoe@example.com"}
     ,"registry.connect.redhat.com": {"auth": "yyyyyyyyyyyyy", "email": "janedoe@example.com"}
     ,"registry.redhat.io": {"auth": "zzzzzzzzzzzzzzzzz", "email": "janedoe@example.com"}
   }
 }
 ----
 
-For the sake of example the `OCP_PULL_SECRET` environment variable will be used as container for this information.
+[NOTE]
+====
+The presented examples will use an environment variable with name 
+ `OCP_PULL_SECRET` as a container for the OCP pull secret contents.
+====
+
+// tag::deploy_ocp_on_rhos[]
+[#deploy-ocp-on-rhos]
+== Deploy OCP Cluster on RHOS
+
+The deployment playbook supports the follow variable entries.
+
+.Script options
+[%header,cols="25%,75%"]
+|===
+| Variable | Description
+
+| `ocp_cluster_name`
+
+[.fuchsia]#string# / [.red]#required# 
+
+a| Name to be assigned to the OCP cluster
+
+[NOTE]
+====
+Will also be applied as prefix to all the RHOS VM instances created as well 
+ as other RHOS resources.
+====
+
+| `openshift_pull_secret`
+
+[.fuchsia]#json# / [.red]#required# 
+a| OCP pull secret for the user
+
+| `ocp_root_directory`
+
+[.fuchsia]#string# / [.red]#required# 
+
+a| Root folder where for the installation. A new sub-folder with the 
+ `ocp_cluster_name` name will be created and will serve as the 
+ installation folder.
+
+|===
 
 Execute the playbook.
 
-.Command to execute the OCP deployment playbook.
+.Command to execute the OCP deployment playbook
 [source,bash]
 ----
-ansible-playbook -i inventory/ playbook/ocp/ocp_openstack_install.yml -e work_directory=/opt/ocp -e openshift_pull_secret=${OCP_PULL_SECRET} -K
+ansible-playbook -i inventory/ ansible/playbook/ocp/ocp_openstack_install.yml \
+  -e ocp_root_directory=/opt/ocp \
+  -e ocp_cluster_name=ocp-sdev \
+  -e openshift_pull_secret=${OCP_PULL_SECRET} -K
 ----
 
 The playbook will result on the deployment of several RHOS VMs for control plane and worker nodes.

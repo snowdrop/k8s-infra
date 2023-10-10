@@ -1,9 +1,10 @@
-= OpenStack
-Snowdrop Team (Antonio Costa)
+= Red Hat Open Stack
+Snowdrop Team
 :icons: font
 :revdate: {docdate}
 :toc: left
-:description: This document describes the requirements and the process to execute the provisioning of a Cloud VM on Openstack.
+:toclevels: 3
+:description: Red Hat Open Stack
 ifdef::env-github[]
 :tip-caption: :bulb:
 :note-caption: :information_source:
@@ -12,10 +13,36 @@ ifdef::env-github[]
 :warning-caption: :warning:
 endif::[]
 
+== Introduction
+
+[.lead]
+This document describes the tools implemented on this project, that help 
+ provision and maintain infrastructure on a RHOS Platform.
+
+The tools implemented are the following:
+
+* Provision VMs on RHOSP
+* Provision OCP cluster on RHOSP
+
+=== Other references
+
+The OpenStack CLI tool comes very handy to perform several checks and 
+ information collection. We've created the link:openstack-cli.adoc[RHOSP CLI] 
+ document to describe some of the most used commands.
+
+[glossary]
+== Terminology
+
+[glossary]
+FS:: Filesystem
+OCP:: OpenShift Container Platform
+RHOSP:: Red Hat OpenStack Platform
+
 == Requirements
 // tag::rhos_prerequisites[]
 
-The best way to solve all the requirements needed to use the RHOS 
+This project uses several Python libraries and Ansible Galaxy collections. 
+ The best way to solve the requirements needed to use the RHOSP 
  Ansible resources from this document is to install the provided 
  python requirements files. Moreover using Python Virtual Environment can also be used. For more information check the link:../ansible/README.adoc#python-venv[Python Virtual Env] section on our Ansible README. If you 
  do so you can skip the manual installation section.
@@ -42,69 +69,25 @@ ansible-galaxy collection install openstack.cloud
 ----
 // end::rhos_prerequisites[]
 
-== VM Required Information
+=== Passwordstore
 
-[NOTE]
-====
-The examples provided here are photos of a specific time frame. To get 
- updated lists of images and flavors check you RHOS cluster using either 
- the RHOS console or the link:openstack-cli.adoc[RHOS CLI].
-====
-
-=== Images
-
-ATTOW different OS images are available on RHOS.
-
-.OpenStack Image information
-[%header,cols="2m,1,1,1"]
-|===
-| Name | OS | Version | FS
-
-| Fedora-Cloud-Base-37 | Fedora | 37 | BTRFS
-| CentOS-8-x86_64-GenericCloud-released-latest | CentOS | 8 | ????
-| CentOS-7-x86_64-GenericCloud-released-latest | CentOS | 7 | ????
-
-|===
-
-=== Flavors
-
-Reduced list of flavors obtained from our RHOS cluster.
-
-.OpenStack Flavor information
-[%header,cols="2m,1,1,1,1,1"]
-|===
-| Flavor | VCPUS | RAM | Total Disks | Root Disk | Ephemeral Disk
-
-| m1.medium           | 2  | 4 GB  | 40 GB | 40 GB | 0 GB 
-| ci.m1.medium        | 2  | 4 GB  | 40 GB | 40 GB | 0 GB 
-| ci.m1.medium.large  | 4  | 4 GB  | 16 GB | 16 GB | 0 GB 
-| ci.m4.xlarge	      | 4  | 16 GB | 40 GB | 40 GB | 0 GB 
-| ci.m5.large         | 16 | 32GB  | 40GB  | 40GB  | 0GB 
-| g.standard.xxl      | 12 | 24GB  | 120GB | 120GB | 0GB 
-| ocp4.single-node    | 24 | 48GB  | 200GB | 200GB | 0GB 
-| ocp4.control        | 4  | 16GB  | 100GB | 100GB | 0GB 
-| ocp4.compute        | 2  | 8GB   | 100GB | 100GB | 0GB 
-| ocp4.bootstrap      | 4  | 16GB  | 100GB | 100GB | 0GB 
-|===
-
-== Passwordstore
-
-Passwordstore is used on the RHOS instance deployment. In one hand it 
- provides information for deploying process, such as RHOS authentication 
+Passwordstore is used during the execution of the ansible playbooks when RHOSP 
+ instances or OCP clusters are created/removed. In one hand it 
+ provides information for the deployment process, such as RHOSP authentication, 
  and also to store the results of the process and be used as Ansible 
  inventory.
 
 [NOTE]
 ====
-All RHOS information will be stored under the `/openstack` passwordstore folder.
+All RHOSP information will be stored under the `/openstack` passwordstore folder.
 ====
 
-=== RHOS authentication
+=== RHOSP authentication
 
 The authentication consists in collecting the authentication information 
  and storing it in 2 Ansible facts, for later use in Ansible roles.
 
-.RHOS authentication information
+.RHOSP authentication information
 [%header,cols="20%m,80%"]
 |===
 | Variable | Meaning
@@ -126,7 +109,7 @@ Check the `openstack` CLI man page for available types.
 
 |===
 
-.Click to see an actual playbook for setting the facts to be used on RHOS authentication
+.Click to see sample Ansible Playbook for setting the RHOSP authentication facts
 [%collapsible]
 ======
 [source,yaml]
@@ -135,14 +118,66 @@ include::../ansible/playbook/openstack/openstack_auth_passstore_v3password.yml[]
 ----
 ======
 
-== Available Ansible Playbooks
+== Ansible Inventory
 
-More information on the available OpenStack Ansible Playbooks on the 
-link:../ansible/playbook/openstack/README.adoc[Playbook README].
+All the information related to the host will be managed by our ansible passwordstore link:../../roles/passstore[roles] and link:../passstore[playbooks]. The current implementation also stores the SSH public and secret keys locally on each `~/.ssh` folder. 
 
-== Connect to a RHOS instance
+== Preparing the Provisioning
 
-All the information related to the host will be managed by our ansible passwordstore link:../../roles/passstore[roles] and link:../passstore[playbooks]. The current implementation also stores the ssh public and secret keys locally on each `~/.ssh` folder. To improve usability link:../../../tools/passstore-vm-ssh.sh[this] bash script has been created to make it easier to perform this connection. More documentation on the bash script can be found link:../../../tools/README.md[here].
+The main goal of the RHOSP tools is to provision VM instances and 
+ store their information on the team passwordstore inventory for 
+ later use by the team members.
+
+Prior to creating an actual VM, aspects such as the OS image and 
+ the sizing of the VM must be decided.
+
+[NOTE]
+====
+The examples provided here are photos of a specific time frame. To get 
+ updated lists of images and flavors check you RHOSP cluster using either 
+ the RHOSP console or the link:openstack-cli.adoc[RHOSP CLI].
+====
+
+=== OS Image
+
+[quote,RedHat RHOSP Documentation,The Image service (glance)]
+A virtual machine image is a file that contains a virtual disk with a bootable operating system installed.
+
+To identify available images and choose which one to use check our docs on the link:openstack-cli.adoc[RHOSP CLI tool] which describe some of the most used commands.
+
+=== Flavors
+
+[quote,RedHat RHOSP Documentation,Flavors]
+In OpenStack, flavors define the compute, memory, and storage capacity of nova computing instances. To put it simply, a flavor is an available hardware configuration for a server. It defines the size of a virtual server that can be launched.
+
+Reduced list of flavors obtained from our RHOSP cluster.
+
+.OpenStack Flavor information
+[%header,cols="2m,1,1,1,1,1"]
+|===
+| Flavor | VCPUS | RAM | Total Disks | Root Disk | Ephemeral Disk
+
+| m1.medium           | 2  | 4 GB  | 40 GB | 40 GB | 0 GB 
+| ci.m1.medium        | 2  | 4 GB  | 40 GB | 40 GB | 0 GB 
+| ci.m1.medium.large  | 4  | 4 GB  | 16 GB | 16 GB | 0 GB 
+| ci.m4.xlarge	      | 4  | 16 GB | 40 GB | 40 GB | 0 GB 
+| ci.m5.large         | 16 | 32GB  | 40GB  | 40GB  | 0GB 
+| g.standard.xxl      | 12 | 24GB  | 120GB | 120GB | 0GB 
+| ocp4.single-node    | 24 | 48GB  | 200GB | 200GB | 0GB 
+| ocp4.control        | 4  | 16GB  | 100GB | 100GB | 0GB 
+| ocp4.compute        | 2  | 8GB   | 100GB | 100GB | 0GB 
+| ocp4.bootstrap      | 4  | 16GB  | 100GB | 100GB | 0GB 
+|===
+
+== VM Provisioning
+
+Once the system configuration is identified it's time to create a VM. 
+ Execution instructions to perform the VM provision operations are available 
+ on the link:../ansible/playbook/openstack/README.adoc[OpenStack Ansible Playbooks] document.
+
+== Connect to a RHOSP instance
+
+To improve usability link:../../../tools/passstore-vm-ssh.sh[this] bash script has been created to make it easier to perform this connection. More documentation on the bash script can be found link:../../../tools/README.md[here].
 
 To SSH connect to a VM use the `tools/passstore-vm-ssh.sh` bash script.
 
@@ -181,7 +216,6 @@ of the passwordstore project.
 
 |===
 
-
 .Connect to a passwordstore VM
 [source,bash]
 ----
@@ -190,8 +224,8 @@ of the passwordstore project.
 
 This should connect ot the newly created VM.
 
-[source,bash]
-======
+====
+----------------------------
 Last login: Thu Jan 1 00:00:00 1970 from x.x.x.x
 ------------------
 
@@ -200,4 +234,15 @@ Access is forbidden to all unauthorized person.
 All activity is being monitored.
 
 Welcome to vm20210221-t01..
-======
+----------------------------
+====
+
+== Deploy OCP on RHOSP
+
+Another tool on the set of RHOSP tools allows deploying an OCP 
+ cluster on RHOSP. This set of Ansible playbooks will provision an 
+ OCP cluster, tailores to the selected size, and also provision a 
+ jump server that will allow ssh connection to each of the cluster 
+ nodes.
+
+To perform this installation check the link:../ansible/playbook/ocp/README.adoc[OCP on RHOSP Ansible Playbooks] document.

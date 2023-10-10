@@ -1,8 +1,6 @@
 = OpenStack Ansible Playbooks
 Snowdrop Team (Antonio Costa)
-Snowdrop Team (Antonio Costa)
 :icons: font
-:revdate: {docdate}
 :revdate: {docdate}
 :toc: left
 :description: This document describes OpenStack specific playbooks.

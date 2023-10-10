@@ -18,6 +18,7 @@ This project details the `prerequisites` and `steps` necessary to automate the i
 
 * Red Hat https://access.redhat.com/documentation/en-us/red_hat_openstack_platform/[OpenStack] (RHOS-PSI)
 * Red Hat https://github.com/resource-hub-dev[ResourceHub] - Work in progress
+* Red Hat link:https://www.redhat.com/en/technologies/cloud-computing/openshift/container-platform[OpenShift Container Platform] (OCP)
 * IBM Cloud
 * Hetzner
 * Kind**
@@ -45,7 +46,7 @@ all of them and the following chapters will mention which ones are needed.
 * https://www.python.org/downloads/[Python]. Version >= 3.11
 * https://www.passwordstore.org/[passwordstore]
 * https://github.com/hetznercloud/cli[hcloud] (optional)
-
+* 
 
 == Locally
 
@@ -76,7 +77,7 @@ The provisioning process towards the cloud providers relies on the following ass
 - Password store is installed/configured and needed k/v created
 - Flavor, volume, capacity (cpu/ram/volume) and OS can be mapped with the playbook of the target cloud provider
 - Permissions have been set to allow to provision a VM top of the target cloud provider
-- Ssh key exist and has been imported (or could be created during provisioning process)
+- SSH key exist and has been imported (or could be created during provisioning process)
 
 and will include the following basic steps:
 
@@ -96,7 +97,7 @@ This section details how to provision an Openshift 4 cluster using one of Red Ha
 
 _Tools: password store, ansible_
 
-The link:openstack/README.adoc[OpenStack] page explains how to create an OpenStack cloud vm using
+The link:openstack/README.adoc[OpenStack] page explains the functionality implemented for a RHOS cloud provider.
 
 ==== https://resourcehub.redhat.com/[Resource Hub]
 

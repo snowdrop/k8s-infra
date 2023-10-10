@@ -1,7 +1,17 @@
 = OpenStack CLI
+Snowdrop Team
 :icons: font
+:revdate: {docdate}
 :toc: left
-:description: This document describes Openstack CLI commands.
+:toclevels: 3
+:description: RHOS CLI
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
 
 == References
 
@@ -23,7 +33,7 @@ pip3 install python-openstackclient
 To access the OpenStack platform using the client, different `Environment Variables` must be set as described https://docs.openstack.org/newton/user-guide/common/cli-set-environment-variables-using-openstack-rc.html[here].
 
 So, connect to your RHOS instance (e.g https://rhos-d.infra.prod.upshift.rdu2.redhat.com/) and select within the menu: `Project > API Access`.
-From there, download the `OpenStack RC file` bash file by clicking on the button and store somwhere (e.g ./rhos-openrc.sh).
+From there, download the `OpenStack RC file` bash file by clicking on the button and store somewhere (e.g ./rhos-openrc.sh).
 
 Copy the file to a path directory, for instance `~/bin` (or `~/.local/bin` or `/usr/local/bin`) and give it execution permission.
 Source the bash script `source /usr/local/bin/rhos-openrc.sh` and enter your password as requested.
@@ -43,13 +53,13 @@ That's it, you're now logged in.
 ----
 $ openstack flavor list
 +--------------------------------------+------------------------------------+--------+------+-----------+-------+-----------+
-| ID                                   | Name                               |    RAM | Disk | Ephemeral | VCPUs | Is Public |
+| ID                                   | Name                               |    RAM | Disk | Ephemeral | VCPUs | Public |
 +--------------------------------------+------------------------------------+--------+------+-----------+-------+-----------+
-| 0f84ff1f-2cc8-4c99-baa2-d663577bd538 | ci.memory.xxl                      |  98304 |   60 |         0 |    12 | True      |
-| 3410bf5a-31c6-43f9-a859-a0f848552bc2 | ci.m5.xlarge                       |  49152 |   40 |         0 |    24 | True      |
-| 393bcaeb-a8bf-4a18-a893-799f01e338b8 | ci.memory.xxxl                     | 131072 |   80 |         0 |    16 | True      |
-| 52e23b17-4039-488e-9c63-543795a31bb8 | g.memory.xxxl                      | 131072 |   80 |         0 |    16 | True      |
-| 8cc169d5-184a-4392-bc27-6eac97735d62 | ocp-master-xxl                     |  49152 |   45 |         0 |    32 | True      |
+| 0f84ff1f-2cc8-4c99-baa2-d663577bd538 | ci.memory.xxl                      |  98304 |   60 |         0 |    12 | True |
+| 3410bf5a-31c6-43f9-a859-a0f848552bc2 | ci.m5.xlarge                       |  49152 |   40 |         0 |    24 | True |
+| 393bcaeb-a8bf-4a18-a893-799f01e338b8 | ci.memory.xxxl                     | 131072 |   80 |         0 |    16 | True |
+| 52e23b17-4039-488e-9c63-543795a31bb8 | g.memory.xxxl                      | 131072 |   80 |         0 |    16 | True |
+| 8cc169d5-184a-4392-bc27-6eac97735d62 | ocp-master-xxl                     |  49152 |   45 |         0 |    32 | True |
 ...
 +--------------------------------------+------------------------------------+--------+------+-----------+-------+-----------+
 ----
@@ -70,7 +80,7 @@ $ openstack flavor create g.standard.xxxl.ram --ram 40960 --disk 160 --vcpus 16
 
 === Server
 
-List servers.
+List servers
 
 [source,bash]
 ----
@@ -87,7 +97,7 @@ $ openstack server list
 ==== Resize server
 
 [source,bash]
-====
+----
 $ nova help resize
 
 usage: nova resize [--poll] <server> <flavor>
@@ -100,7 +110,7 @@ Positional arguments:
 
 Options:
   --poll    Report the server resize progress until it completes.
-====
+----
 
 [source,bash]
 ----
@@ -128,20 +138,30 @@ Positional arguments:
 $ nova resize-confirm k123-fedora35-01
 ----
 
-Typical errors.
+==== Typical errors
+
+If we try an operation that will exceed the quota an error will be returned.
 
 [source,bash]
 ----
-$ nova resize --poll k123-fedora35-01 PnTAE.CPU_20_Memory_65536_Disk_200
+nova resize --poll k123-fedora35-01 PnTAE.CPU_20_Memory_65536_Disk_200
+----
+
+Error message
+
+====
 ERROR (Forbidden): Quota exceeded for ram: Requested 32768, but already used 98304 of 122880 ram (HTTP 403) (Request-ID: xxxxxxxxxxxxxx)
-----
+====
 
 [source,bash]
 ----
-$ nova resize --poll k123-fedora35-01 ci.m5.xlarge
+nova resize --poll k123-fedora35-01 ci.m5.xlarge
+----
+
+====
 ERROR (ClientException): Unexpected API Error. Please report this at http://bugs.launchpad.net/nova/ and attach the Nova API log if possible.
 <class 'nova.exception.FlavorDiskSmallerThanMinDisk'> (HTTP 500) (Request-ID: req-774039f4-3619-4bb8-8727-31e5f99edda2)
-----
+====
 
 == Current implementation
 
@@ -150,43 +170,81 @@ ERROR (ClientException): Unexpected API Error. Please report this at http://bugs
 Different OS images are available on Openstack and can be discovered using the command `openstack image list`.
 Filter them according to the target OS that you are interested in:
 
-```
+[source,bash]
+----
 openstack image list | grep -ni "Fedora-Cloud-Base.*"
 openstack image list | grep -ni "RHEL-9.*"
-```
+----
 
 To get the detail about an image you will use the command `openstack image show`
-```
-openstack image show 8b8ab2a1-e349-4313-9a38-a800f42ffe99 -f shell
-```
 
-.OpenStack Image information
-[%header,cols="2m,1,1,1"]
-|===
-| Name | OS | Version | FS
+[source,bash]
+----
+openstack image show Fedora-Cloud-Base-37 --fit-width
+----
 
-| Fedora-Cloud-Base-35 | Fedora | 35 | BTRFS
-| CentOS-8-x86_64-GenericCloud-released-latest | CentOS | 8 | ????
-| CentOS-7-x86_64-GenericCloud-released-latest | CentOS | 7 | ????
+Should present information for that image.
 
-|===
+[source]
+----
++------------------+--------------------------------------------------+
+| Field            | Value                                            |
++------------------+--------------------------------------------------+
+| checksum         | 9d9493d443cbac882732ae65a85497b2                 |
+| container_format | bare                                             |
+| created_at       | 2022-09-07T00:21:25Z                             |
+| disk_format      | qcow2                                            |
+| id               | cbea8fed-fef0-4319-b978-f7e983e85b19             |
+| min_disk         | 0                                                |
+| min_ram          | 0                                                |
+| name             | Fedora-Cloud-Base-37                             |
+| properties       | direct_url='rbd://03e3321d-071f-4b28-a3f9-       |
+|                  | 0256f384bdca/images_d/cbea8fed-                  |
+|                  | fef0-4319-b978-f7e983e85b19/snap',               |
+|                  | locations='[{'url': 'rbd://03e3321d-071f-4b28-   |
+|                  | a3f9-0256f384bdca/images_d/cbea8fed-             |
+|                  | fef0-4319-b978-f7e983e85b19/snap', 'metadata':   |
+|                  | {'store': 'default_backend'}}]',                 |
+|                  | os_hash_algo='sha512', os_hash_value='d38a2bf524 |
+|                  | 1730a7347dd74e27518dbb82b28070b424aca824d3e53a3c |
+|                  | 812aacc7ab9a92c663e5b55a7ae63e3fe14efab71213d656 |
+|                  | 4773a0d33ee5924787a983', os_hidden='False',      |
+|                  | stores='default_backend'                         |
+| schema           | /v2/schemas/image                                |
+| size             | 490405888                                        |
+| status           | active                                           |
+| tags             |                                                  |
+| updated_at       | 2022-09-07T00:21:34Z                             |
++------------------+--------------------------------------------------+
+----
+
+
+More information on RHOS images at the link:https://docs.openstack.org/newton/user-guide/common/cli-manage-images.html[RHOS docs].
 
 === Flavors
 
-.OpenStack Flavor information
-[%header,cols="2m,1,1,1,1,1"]
-|===
-| Flavor | VCPUS | RAM | Total Disks | Root Disk | Ephemeral Disk
+List the flavors available.
 
-| m1.medium | 2 | 4 GB | 40 GB | 40 GB | 0 GB 
-| ci.m1.medium | 2 | 4 GB | 40 GB | 40 GB | 0 GB 
-| ci.m1.medium.large	| 4| 4 GB | 16 GB | 16 GB | 0 GB 
-| ci.m5.large | 16 | 32GB | 40GB | 40GB | 0GB 
-|===
+[source,bash]
+----
+openstack flavor list  | grep ocp
+----
 
-:leveloffset: +1
+The result should be similar to:
 
-include::../ansible/playbook/openstack/README.adoc[]
+[source]
+----
++---------------------+-------------------+--------+------+-----+-------+------+
+| ID                  | Name              |    RAM | Disk | Eph | VCPUs | Publ |
++---------------------+-------------------+--------+------+-----+-------+------+
+| 15c48f0d-dec4-4290- | ocp-compute       |  16384 |   45 |   0 |    16 | True |
+| 62714b74-29ed-49a7- | ocp4.control      |  16384 |  100 |   0 |     4 | True |
+| 66502c57-663a-4e51- | ocp4.compute      |   8192 |  100 |   0 |     2 | True |
+| 9f5da47b-3d98-4644- | ocp-infra         |   8192 |   40 |   0 |     4 | True |
+| bc8850d7-db24-4bef- | ocp4.single-node  |  49152 |  200 |   0 |    24 | True |
+| e658777a-4953-4b11- | ocp4.bootstrap    |  16384 |  100 |   0 |     4 | True |
+| fbcd841e-6559-49a4- | ocp-master        |  16384 |   45 |   0 |     4 | True |
++---------------------+-------------------+--------+------+-----+-------+------+
+----
 
-:leveloffset: -1
-
+More information on RHOS flavors at the link:https://docs.openstack.org/nova/pike/admin/flavors.html[RHOS docs].
