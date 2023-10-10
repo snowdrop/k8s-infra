@@ -26,16 +26,48 @@ NOTE: The list of flavors is identified on the link:../../../openstack/README.ad
 
 == Playbooks
 
-=== Create a VM
+=== Create a VM with Passwordstore
 
 Create an OpenStack instance (aka a VM) using link:../../../passwordstore/README.adoc[passwordstore] as tools to manage the credentials, information.
 
-After creating the VM this playbook also executes the VM secure host playbook. More information link:../README.adoc#secure-host[here].
+[NOTE]
+====
+The playbook also uses the variables defined in the link:https://github.com/snowdrop/ansible-collection-cloud-infra/blob/main/roles/openstack_vm/defaults/main.yml[`openstack/vm role of the Snowdrop Cloud Infra Ansible Collection`] 
+ that can also be overridden.
+====
 
-.openstack_vm_create_passwordstore parameters
+.OpenStack VM Create Passwordstore parameters
 [cols="20%,80%"]
 |===
 |Field name | Description
+
+| `default_generic_key_name`
+
+[.fuchsia]#string#
+
+a| Generic key name
+
+| `openstack.vm`
+
+[.fuchsia]#map#
+
+[.red]#required# 
+
+a| Map with required attributes for RHOS.
+
+Check the <<openstack-vm-map-param-table>> table below for more details.
+
+| `rhos_auth_type`
+
+[.fuchsia]#string#
+
+a| RHOSP Authentication type
+
+Check the `openstack` CLI man page (`man openstack`) for available types, or 
+ our link:../../../openstack/README.adoc#rhosp-authentication[Red Hat Open Stack document].
+
+* *`v3password` <= Default*
+* ...
 
 | `vm_name`
 
@@ -47,18 +79,9 @@ a| Name of the VM being created.
 
 This name will be used both as hostname as well as Ansible Inventory name.
 
-| `openstack.vm`
-
-[.fuchsia]#map#
-
-[.red]#required# 
-
-a| Map with required attributes for RHOS.
-
-Check below for more details.
-
 |===
 
+[#openstack-vm-map-param-table,reftext="`openstack.vm` parameter map"]
 .openstack.vm map parameter
 [cols="20%,80%"]
 |===
@@ -90,35 +113,45 @@ a| Network provider in RHOS
 
 |===
 
-[source,bash]
-----
-VM_NAME=vm20210221-t01
-----
+To create the RHOSP launch the `openstack_vm_create_passwordstore.yml` Ansible Playbook 
+ using the following command.
 
 [source,bash]
 ----
-ansible-playbook playbook/openstack/openstack_vm_create_passwordstore.yml -e '{"openstack": {"vm": {"network": "provider_net_shared","image": "Fedora-Cloud-Base-37", "flavor": "m1.medium"}}}' -e vm_name=${VM_NAME} 
+ansible-playbook playbook/openstack/openstack_vm_create_passwordstore.yml -e '{"openstack": {"vm": {"network": "provider_net_shared","image": "Fedora-Cloud-Base-37", "flavor": "m1.medium"}}}' -e vm_name=snowdrop_sample_vm_name
 ----
 
-Although some failures might occur some might be ignored which shouldn't affect thhe process. This playbook should finish with no failed tasks.
+[NOTE]
+====
+Some error messages might show on the installation process and be ignored by the installation process. Nevertheless the playbook should finish with no failed tasks.
+====
+
+This is a sample result of the playbook execution.
 
 [source]
-....
-PLAY RECAP **********************************************************************************************************************************************************************************************************************
+----
+PLAY RECAP *******************************************************************************************************
 localhost                  : ok=68   changed=20   unreachable=0    failed=0    skipped=13   rescued=0    ignored=1   
 vm20210221-t01             : ok=32   changed=20   unreachable=0    failed=0    skipped=1    rescued=0    ignored=0   
+----
 
-....
+After creating the VM this playbook also executes the VM secure host playbook. This is an independent playbook that can be executed against any host. More information link:../README.adoc#secure-host[here].
 
-The playbook also uses the variables defined in `roles/openstack/vm/defaults/main.yml`. Those variables can also be overridden using the syntax above.
+Besides creating the VM the playbook also performs the following operations:
 
-=== Delete a VM
+* Store the host SSH keys on the controller device.
+* Add entries to the known hosts file for this host.
+* Add several entries to the passwordstore database in order to build the Ansible Inventory
 
-To delete a VM, simply execute the `openstack_vm_remove_aggregate` playbook.
+=== Delete a VM with Passwordstore
+
+To delete a VM, simply execute the `openstack_vm_remove_aggregate` playbook. Besides 
+ removing the VM from the RHOSP it will also remove the entries from the passwordstore 
+ database as well as any VM local ssh keys and entries from known hosts.
 
 [source,bash]
 ----
-ansible-playbook ansible/playbook/openstack/openstack_vm_remove_passwordstore.yml -e vm_name=${VM_NAME}
+ansible-playbook ansible/playbook/openstack/openstack_vm_remove_passwordstore.yml -e vm_name=snowdrop_sample_vm_name
 ----
 
 Although some failures might occur some might be ignored which shouldn't affect thhe process. This playbook should finish with no failed tasks.

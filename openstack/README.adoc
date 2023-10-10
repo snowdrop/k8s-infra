@@ -82,6 +82,7 @@ Passwordstore is used during the execution of the ansible playbooks when RHOSP
 All RHOSP information will be stored under the `/openstack` passwordstore folder.
 ====
 
+[#rhosp-authentication]
 === RHOSP authentication
 
 The authentication consists in collecting the authentication information 
