@@ -1,0 +1,49 @@
+---
+- name: "Create local OCP directories"
+  ansible.builtin.file:
+    path: "{{ ocp_folder_to_create }}"
+    state: directory
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_id }}"
+    mode: '0755'
+  become: true
+  loop:
+    - "{{ ocp_root_directory }}"
+    - "{{ ocp_root_directory }}/bin"
+    - "{{ ocp_root_directory }}/_tmp"
+    - "{{ rhos_log_path }}/"
+  loop_control:
+    loop_var: ocp_folder_to_create
+  # register: create_root_dir_res
+
+- name: "Create bin directory"
+  ansible.builtin.file:
+    path: "{{ ocp_cluster_bin_directory }}"
+    state: directory
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_id }}"
+    mode: '0755'
+  become: true
+  register: create_bin_dir_res
+
+- name: "Check if OCP is installed by checking the presence of the kubeconfig file"
+
+  ansible.builtin.stat:
+    path: "{{ installation_dir }}/auth/kubeconfig"
+  register: kubeconfig_file_stat
+  when: state == 'present'
+
+- name: "Set installation complete field"
+  ansible.builtin.set_fact:
+    ocp_cluster_already_installed: "{{ kubeconfig_file_stat.stat.exists }}"
+  when: state == 'present'
+
+- name: "Print Installation result"
+  ansible.builtin.debug:
+    msg: 
+      - "ocp_cluster_already_installed: {{ ocp_cluster_already_installed }}"
+      - "when validation: {{ not ocp_cluster_already_installed }}"
+    verbosity: 0
+  when: state == 'present'
+
+...

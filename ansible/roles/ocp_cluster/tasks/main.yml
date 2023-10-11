@@ -1,35 +1,11 @@
 ---
 - name: "Set required facts"
   ansible.builtin.set_fact:
-    ocp_bin_directory: "{{ ocp_root_directory }}/bin"
+    ocp_cluster_bin_directory: "{{ ocp_root_directory }}/bin"
     installation_dir: "{{ ocp_root_directory }}/{{ ocp_cluster_name }}"
 
-- name: "Create local OCP directories"
-  ansible.builtin.file:
-    path: "{{ ocp_folder_to_create }}"
-    state: directory
-    owner: "{{ ansible_user_id }}"
-    group: "{{ ansible_user_id }}"
-    mode: '0755'
-  become: true
-  loop:
-    - "{{ ocp_root_directory }}"
-    - "{{ ocp_root_directory }}/bin"
-    - "{{ ocp_root_directory }}/_tmp"
-    - "{{ rhos_log_path }}/"
-  loop_control:
-    loop_var: ocp_folder_to_create
-  # register: create_root_dir_res
-
-- name: "Create bin directory"
-  ansible.builtin.file:
-    path: "{{ ocp_bin_directory }}"
-    state: directory
-    owner: "{{ ansible_user_id }}"
-    group: "{{ ansible_user_id }}"
-    mode: '0755'
-  become: true
-  register: create_bin_dir_res
+- include_tasks: install_prepare.yml
+  when: state == 'present'
 
 - name: Create temporary work directory
   ansible.builtin.tempfile:
@@ -41,7 +17,6 @@
 - name: "Set temporary folder"
   ansible.builtin.set_fact:
     tmp_directory: "{{ tmp_directory_res.path }}"
-
 
 - name: "Template OpenStack auth"
   ansible.builtin.template:
@@ -55,8 +30,6 @@
 #   when: installation_dir is undefined
 
 - include_tasks: install.yml
-  # vars:
-  #   installation_dir: "{{ installation_dir }}"
   when: state == 'present'
 
 - include_tasks: remove.yml
@@ -70,5 +43,5 @@
     state: absent
 ...
 # ansible-playbook -i inventory/ ansible/playbook/ocp/ocp_openstack_install.yml -e ocp_root_directory=/opt/ocp -e ocp_cluster_name=ocp-sdev -e openshift_pull_secret=${OCP_PULL_SECRET} -K
-# ansible-playbook -i inventory/ ansible/playbook/ocp/ocp_openstack_info.yml    -e ocp_bin_directory=/opt/ocp/bin -e installation_dir=/opt/ocp/<ocp_cluster_name>/ -e ocp_cluster_name=<ocp_cluster_name> -e openshift_pull_secret=${OCP_PULL_SECRET} -K
-# ansible-playbook -i inventory/ ansible/playbook/ocp/ocp_openstack_install.yml -e ocp_bin_directory=/opt/ocp/bin -e installation_dir=/opt/ocp/ocp-sdev -e ocp_cluster_name=ocp-sdev -e openshift_pull_secret=${OCP_PULL_SECRET} -K
+# ansible-playbook -i inventory/ ansible/playbook/ocp/ocp_openstack_info.yml    -e ocp_cluster_bin_directory=/opt/ocp/bin -e installation_dir=/opt/ocp/<ocp_cluster_name>/ -e ocp_cluster_name=<ocp_cluster_name> -e openshift_pull_secret=${OCP_PULL_SECRET} -K
+# ansible-playbook -i inventory/ ansible/playbook/ocp/ocp_openstack_install.yml -e ocp_cluster_bin_directory=/opt/ocp/bin -e installation_dir=/opt/ocp/ocp-sdev -e ocp_cluster_name=ocp-sdev -e openshift_pull_secret=${OCP_PULL_SECRET} -K

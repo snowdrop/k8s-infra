@@ -2,8 +2,69 @@
 - name: "Build OpenStack authentication for v3password"
   ansible.builtin.import_playbook: "../openstack/openstack_auth_passstore_v3password.yml"
 
+- name: "Get localhost user home"
+  hosts: "localhost"
+  gather_facts: true
+
+  tasks:
+
+    - name: Get localhost user home
+      ansible.builtin.set_fact:
+        localhost_user_home: "{{ ansible_env.HOME }}"
+
+- name: "Install host requirements"
+  hosts: "{{ ocp_bootstrap_host | default('localhost') }}"
+  gather_facts: true
+  vars:
+    ansible_remote_tmp: /tmp
+
+  tasks:
+
+    - name: Copy public ssh key
+      ansible.builtin.copy:
+        src: "{{ hostvars['localhost']['localhost_user_home'] }}/.ssh/id_rsa_snowdrop_openstack.pub"
+        dest: "{{ ansible_env.HOME }}/.ssh/id_rsa_snowdrop_openstack.pub"
+        mode: '0600'
+
+    - name: Copy facts from localhost if using bootstrap host
+      ansible.builtin.set_fact:
+        rhos_auth: "{{ hostvars['localhost']['rhos_auth'] }}"
+        rhos_auth_type: "{{ hostvars['localhost']['rhos_auth_type'] }}"
+      when: ocp_bootstrap_host is defined
+
+    - name: Copy requirements files to host
+      ansible.builtin.copy:
+        src: "{{ requirements_file.file_location }}/{{ requirements_file.file_name }}"
+        dest: "/tmp/{{ requirements_file.file_name }}"
+        mode: '0644'
+      loop:
+        - {file_name: "requirements.txt", file_location: "../../.."}
+        - {file_name: "requirements.yml", file_location: "../../../collections"}
+      loop_control:
+        loop_var: requirements_file
+
+    - name: Install required packages
+      ansible.builtin.package:
+        name: "{{ package_to_install }}"
+        state: present
+      become: true
+      loop:
+        - httpd-tools
+        - python3-pip
+      loop_control:
+        loop_var: package_to_install
+
+    - name: Install specified python requirements
+      ansible.builtin.pip:
+        requirements: /tmp/requirements.txt
+
+    - name: Install collections and roles together
+      community.general.ansible_galaxy_install:
+        type: both
+        requirements_file: /tmp/requirements.yml
+
 - name: "Install OCP"
-  hosts: localhost
+  hosts: "{{ ocp_bootstrap_host | default('localhost') }}"
   gather_facts: true
   vars:
     ansible_remote_tmp: /tmp
@@ -21,7 +82,7 @@
       ansible.builtin.debug:
         msg:
           - "Executing the post installation steps. If it fails these steps can be executed manually:"
-          - "$ ansible-playbook -i inventory/ ansible/playbook/ocp/ocp_openstack_install_post.yml -e tmp_directory={{ ocp_cluster.tmp_directory }} -e ocp_root_directory={{ ocp_cluster.ocp_root_directory }} -e ocp_cluster_name={{ ocp_cluster_name }}"
+          - "$ ansible-playbook ansible/playbook/ocp/ocp_openstack_install_post.yml -e tmp_directory={{ ocp_cluster.tmp_directory }} -e ocp_root_directory={{ ocp_cluster.ocp_root_directory }} -e ocp_cluster_name={{ ocp_cluster_name }} {% if ocp_bootstrap_host is defined %}-e ocp_bootstrap_host={{ ocp_bootstrap_host }}{{ dns.port }}{% endif %}"
 
   #   - name: "Base64 encode OCP installation folder"
   #     ansible.builtin.set_fact:

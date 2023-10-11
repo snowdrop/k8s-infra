@@ -3,15 +3,27 @@
   import_playbook: "../openstack/openstack_auth_passstore_v3password.yml"
 
 - name: "Remove OCP"
-  hosts: localhost
+  hosts: "{{ ocp_bootstrap_host | default('localhost') }}"
   gather_facts: true
-          
+
+  pre_tasks:
+    - name: Check required variables
+      ansible.builtin.assert:
+        that:
+          - "(ocp_root_directory is defined) and ( ocp_root_directory | length >= 1)"
+          - "(ocp_cluster_name is defined) and ( ocp_cluster_name | length >= 1)"
+        msg:
+          - "ocp_root_directory is required: Please specify the OCP cluster installation root directory"
+          - "ocp_cluster_name is required: Please specify the OCP cluster name"
+
+    - name: Copy facts from localhost if using bootstrap host
+      ansible.builtin.set_fact:
+        rhos_auth: "{{ hostvars['localhost']['rhos_auth'] }}"
+        rhos_auth_type: "{{ hostvars['localhost']['rhos_auth_type'] }}"
+      when: ocp_bootstrap_host is defined
+
   tasks:
     - name: "Remove OCP installation and work folders"
-    # import_role:
-    #   name: 'ocp_cluster'
-    # vars:
-    #   state: absent
       ansible.builtin.import_role:
         name: 'ocp_cluster'
       vars:

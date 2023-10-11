@@ -1,10 +1,35 @@
 ---
+- name: "Set required facts"
+  ansible.builtin.set_fact:
+    ocp_cluster_bin_directory: "{{ ocp_root_directory }}/bin"
+  when: ocp_cluster_bin_directory is not defined
+
+- name: "Check if oc CLI exists"
+  ansible.builtin.stat:
+    path: "{{ ocp_cluster_bin_directory }}/oc"
+  register: oc_stat
+
 - name: "Download OpenShift client"
   ansible.builtin.get_url:
     url: "{{ ocp_mirror }}/{{ ocp_version }}/openshift-client-linux-{{ ocp_version }}.tar.gz"
     dest: "/tmp/openshift-client-{{ ocp_version }}.tar.gz"
     mode: '0644'
     tmp_dest: "/tmp"
+  when: not oc_stat.stat.exists
+
+- name: "Extract oc CLI files"
+  ansible.builtin.unarchive:
+    src: "/tmp/openshift-client-{{ ocp_version }}.tar.gz"
+    dest: "{{ ocp_cluster_bin_directory }}"
+    remote_src: "{{ inventory_hostname != 'localhost' }}"
+  environment:
+    ANSIBLE_REMOTE_TMP: "/tmp"
+  when: not oc_stat.stat.exists
+
+- name: "Check if oc OpenShift installer exists"
+  ansible.builtin.stat:
+    path: "{{ ocp_cluster_bin_directory }}/openshift-install"
+  register: openshift_install_stat
 
 - name: "Download OpenShift installer"
   ansible.builtin.get_url:
@@ -12,17 +37,15 @@
     dest: "/tmp/openshift-install-{{ ocp_version }}.tar.gz"
     mode: '0644'
     tmp_dest: "/tmp"
+  when: not openshift_install_stat.stat.exists
 
 - name: "Extract installation files."
   ansible.builtin.unarchive:
-    src: "/tmp/{{ extract_file_item }}"
-    dest: "{{ ocp_bin_directory }}"
-  loop:
-    - openshift-client-{{ ocp_version }}.tar.gz
-    - openshift-install-{{ ocp_version }}.tar.gz
-  loop_control:
-    loop_var: extract_file_item
+    src: "/tmp/openshift-install-{{ ocp_version }}.tar.gz"
+    dest: "{{ ocp_cluster_bin_directory }}"
+    remote_src: "{{ inventory_hostname != 'localhost' }}"
   environment:
     ANSIBLE_REMOTE_TMP: "/tmp"
+  when: not openshift_install_stat.stat.exists
 
 ...

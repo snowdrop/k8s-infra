@@ -9,7 +9,7 @@
   ansible.builtin.import_playbook: "../openstack/openstack_auth_passstore_v3password.yml"
 
 - name: "Load the metadata from the OCP installation directory"
-  hosts: localhost
+  hosts: "{{ ocp_bootstrap_host | default('localhost') }}"
   gather_facts: true
 
   tasks:
@@ -18,10 +18,44 @@
       ansible.builtin.set_fact:
         installation_dir: "{{ ocp_root_directory }}/{{ ocp_cluster_name }}"
 
-    - name: "Load metadata from ansible installation folder"
+    # - name: "Load metadata from ansible installation folder"
+    #   ansible.builtin.set_fact:
+    #     ocp_cluster_metadata: "{{ lookup('file', installation_dir + '/metadata.json') | from_json }}"
+
+    - name: Get OCP cluster metadata
+      ansible.builtin.import_role:
+        name: ocp_cluster
+        tasks_from: get_metadata.yml
+
+    # - name: "Print facts"
+    #   ansible.builtin.debug:
+    #     msg: 
+    #       # - "ocp_cluster_metadata: {{ ocp_cluster_metadata }}"
+    #       # - "ansible_installation_folder_base64: {{ ansible_installation_folder_base64 }}"
+    #       # - "kubeadmin_password: {{ kubeadmin_password }}"
+    #       - "ocp_cluster_metadata: {{ hostvars[ocp_bootstrap_host]['ocp_cluster_metadata'] }}"
+    #       - "ansible_installation_folder_base64: {{ hostvars[ocp_bootstrap_host]['install_dir'] }}"
+    #       - "kubeadmin_password: {{ hostvars[ocp_bootstrap_host]['kubeadmin_password'] }}"
+    #     verbosity: 1
+
+    - name: "Collect bootstrap host facts into localhost"
       ansible.builtin.set_fact:
-        ocp_cluster_metadata: "{{ lookup('file', installation_dir + '/metadata.json') | from_json }}"
-        
+          ocp_cluster_metadata: "{{ hostvars[ocp_bootstrap_host]['ocp_cluster_metadata'] }}"
+          # ansible_installation_folder_base64: "{{ query('passwordstore', 'openstack/' + ocp_bootstrap_host + '/install_dir' )[0] }}"
+          ansible_installation_folder_base64: "{{ query('passwordstore', 'openstack/' + ocp_cluster_metadata.infraID + '-jump-server/install_dir' )[0] }}"
+          # kubeadmin_password: "{{ query('passwordstore', 'openstack/' + ocp_bootstrap_host + '/kubeadmin' )[0] }}"
+          kubeadmin_password: "{{ query('passwordstore', 'openstack/' + ocp_cluster_metadata.infraID + '-jump-server/kubeadmin' )[0] }}"
+      when: ocp_bootstrap_host is defined
+      delegate_facts: True
+      delegate_to: localhost
+
+    - name: "Print facts"
+      ansible.builtin.debug:
+        msg: 
+          - "ocp_cluster_metadata: {{ ocp_cluster_metadata }}"
+          - "ocp_cluster_metadata: {{ hostvars[ocp_bootstrap_host]['ocp_cluster_metadata'] }}"
+          - "ocp_cluster_metadata: {{ hostvars['localhost']['ocp_cluster_metadata'] }}"
+
 - name: "Deploy Jump Server"
   ansible.builtin.import_playbook: "../openstack/openstack_vm_create_passwordstore.yml"
   vars:
@@ -127,19 +161,6 @@
         key: "{{ lookup('pipe', 'ssh-keyscan {{ hostvars[vm_name].floating_ip }}') }}"
         hash_host: true
 
-- name: "Openstack VM init"
-  hosts: "{{ vm_name | default([]) }}"
-  gather_facts: yes
-
-  roles:
-    - role: "openstack/init_vm"
-
-- name: "Secure new server"
-  ansible.builtin.import_playbook: "../sec_host.yml"
-  vars:
-    provider: "openstack"
-    hosts: "{{ vm_name | default([]) }}"
-
 - name: "Extract installation dictory from passwordstore"
   hosts: "localhost"
   gather_facts: true
@@ -150,6 +171,13 @@
       ansible.builtin.copy: 
         content: "{{ query('passwordstore', 'openstack/' + ocp_cluster_metadata.infraID + '/install_dir')[0] | b64decode }}" 
         dest: /tmp/ocp-installation.tgz
+      when: ocp_bootstrap_host is not defined
+
+    - name: "Extract installation dictory from passwordstore"
+      ansible.builtin.copy: 
+        content: "{{ query('passwordstore', 'openstack/' + ocp_bootstrap_host + '/install_dir')[0] | b64decode }}" 
+        dest: /tmp/ocp-installation.tgz
+      when: ocp_bootstrap_host is defined
 
 - name: "Post Jump Server OCP"
   hosts: "{{ vm_name | default([]) }}"
@@ -180,11 +208,45 @@
         src: /tmp/ocp-installation.tgz
         dest: /home/snowdrop
 
+
+    # - name: Download OCP files
+    #   ansible.builtin.import_role:
+    #     name: ocp_cluster
+    #     tasks_from: install_prepare.yml
+    #   vars:
+    #     ocp_bin_directory: "{{ remote_bin_folder }}"
+
     - name: Download OCP files
       ansible.builtin.import_role:
         name: ocp_cluster
         tasks_from: download_installation_files.yml
       vars:
-        ocp_bin_directory: "{{ remote_bin_folder }}"
+        ocp_cluster_bin_directory: "{{ remote_bin_folder }}"
+
+  post_tasks:
+
+    - name: "DON'T FORGET TO SECURE YOUR SERVER"
+      ansible.builtin.debug:
+        msg: 
+          - "DON'T FORGET TO SECURE YOUR SERVER!!!"
+          - ""
+          - "Trying to start start server securization automatically."
+          - "For manual execution: $ ansible-playbook ansible/playbook/sec_host.yml -e vm_name={{ vm_name }} -e provider=openstack"
+
+- name: "Init Jump Server"
+  hosts: "{{ vm_name | default([]) }}"
+  gather_facts: yes
+
+  tasks:
+    - name: Init RHOS VM
+      ansible.builtin.include_role:
+        name: "openstack/init_vm"
+
+- name: "Secure Jump Server"
+  ansible.builtin.import_playbook: "../sec_host.yml"
+  vars:
+    provider: "openstack"
+    hosts: "{{ vm_name | default([]) }}"
+
 ...
 # ansible-playbook ansible/playbook/ocp/ocp_openstack_deploy_jump_server.yml -e tmp_directory=/opt/ocp/_tmp/ansible.yxam0y7mbuild -e ocp_root_directory=/opt/ocp -e ocp_cluster_name=ocp-sdev -e vm_name=ocp-sdev-p75fs-jump-server

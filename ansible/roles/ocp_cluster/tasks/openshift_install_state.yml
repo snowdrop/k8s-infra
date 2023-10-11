@@ -1,7 +1,5 @@
 ---
 - name: "Read server state file"
-  # ansible.builtin.set_fact:
-  #   ocp_cluster_install_state_slurp: "{{ lookup('file', installation_dir + '/.openshift_install_state.json') | from_json }}"
   ansible.builtin.slurp:
     src: "{{ installation_dir + '/.openshift_install_state.json' }}"
   register: ocp_cluster_install_state_slurp
