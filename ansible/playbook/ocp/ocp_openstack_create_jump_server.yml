@@ -161,6 +161,18 @@
         key: "{{ lookup('pipe', 'ssh-keyscan {{ hostvars[vm_name].floating_ip }}') }}"
         hash_host: true
 
+- name: "Add to known hosts"
+  hosts: "{{ vm_name | default([]) }}"
+  gather_facts: true
+
+  tasks:
+
+    - name: "Add host Floating IP to known hosts {{ hostvars[vm_name]['floating_ip'] }}"
+      ansible.builtin.known_hosts:
+        name: "{{ hostvars[vm_name]['floating_ip'] }}"
+        key: "{{ lookup('pipe', 'ssh-keyscan {{ hostvars[vm_name].floating_ip }}') }}"
+        hash_host: true
+
 - name: "Extract installation dictory from passwordstore"
   hosts: "localhost"
   gather_facts: true
