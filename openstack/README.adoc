@@ -34,6 +34,8 @@ RHOSP:: Red Hat OpenStack Platform
 
 == Requirements
 
+The following requirements must be met to fully use this project.
+
 === Passwordstore
 
 Passwordstore is used during the execution of the ansible playbooks when RHOSP 
@@ -54,8 +56,8 @@ As this project connects to a RHOSP infrastructure, authenticating
  against that platform is needed. Before using this project collect the 
  authentication information that fits your needs.
 
-In case of using `v3password` authentication plugin the following 
- information is required:
+The default authentication plugin for this project is `v3password`. In order 
+ to use this plugin the following information is required.
 
 .RHOSP authentication information
 [%header,cols="20%m,80%"]
@@ -112,8 +114,8 @@ For more detailed information on RHSOP authentication check the
 2 Ansible playbooks are already available to collect the required 
  authentication information from passwordstore.
 
-* *link:../ansible/playbooks/openstack/openstack_auth_passstore_v3password.yml[openstack_auth_passstore_v3password.yml] <= Default*
-* link:../ansible/playbooks/openstack/openstack_auth_passstore_v3applicationcredential.yml[openstack_auth_passstore_v3applicationcredential.yml]
+* *link:../ansible/playbook/openstack/openstack_auth_passstore_v3password.yml[openstack_auth_passstore_v3password.yml] <= Default*
+* link:../ansible/playbook/openstack/openstack_auth_passstore_v3applicationcredential.yml[openstack_auth_passstore_v3applicationcredential.yml]
 
 These playbooks collect the required information from the 
  `passwordstore` and fill the `rhos_auth` map and `rhos_auth_type` Ansible host variables that are later used on Playbooks and Roles.

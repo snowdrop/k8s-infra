@@ -1,20 +1,10 @@
 = Ansible
 Snowdrop Team (Antonio costa)
-Snowdrop Team (Antonio costa)
 :icons: font
-:revdate: {docdate}
 :revdate: {docdate}
 :toc: left
 :toclevels: 3
-:toclevels: 3
 :description: This document introduces some of the key concepts that you should be aware when you play with Ansible in order to configure the environment to let Ansible to access the different machines.
-ifdef::env-github[]
-:tip-caption: :bulb:
-:note-caption: :information_source:
-:important-caption: :heavy_exclamation_mark:
-:caution-caption: :fire:
-:warning-caption: :warning:
-endif::[]
 ifdef::env-github[]
 :tip-caption: :bulb:
 :note-caption: :information_source:
@@ -48,10 +38,10 @@ In order to play with the playbooks/roles of this project, it is needed to:
 
 [NOTE]
 ====
-Since passwordstore is integrated with linkhttps://git-scm.com/[git], all changes made locally to a pass repository are automatically committed to the local git repo.
+Since passwordstore is integrated with link:https://git-scm.com/[git], all changes made locally to a pass repository are automatically committed to the local git repo.
 ====
 
-[NOTE]
+[WARNING]
 ====
 Don't forget to `git push` and `git pull` often in order to have your local repository synchronized with other team members as well as publishing to the team your changes. 
 ====
