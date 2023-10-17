@@ -194,12 +194,12 @@ The host information will be stored under the `openstack` folder where a
 
 == VM Provisioning
 
-The main goal of the RHOSP tools is to provision VM instances and 
+The main goal of the RHOSP tools is to provision hosts and 
  store their information on the team passwordstore inventory for 
  later use by the team members.
 
-Prior to creating an actual VM, aspects such as the OS image and 
- the sizing of the VM must be decided.
+Prior to deploying a host aspects such as the OS image and 
+ the sizing of the host must be addressed.
 
 === Preparing the Provisioning
 
