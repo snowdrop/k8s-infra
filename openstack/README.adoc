@@ -218,6 +218,20 @@ A virtual machine image is a file that contains a virtual disk with a bootable o
 
 To identify available images and choose which one to use check our docs on the link:openstack-cli.adoc[RHOSP CLI tool] which describe some of the most used commands.
 
+.OpenStack Fedora Cloud image list
+[%header,cols="45%,45%,10%"]
+|===
+| ID | Name  | Status
+| 0b7d28c6-56ec-4d72-      | Fedora-Cloud-Base-30           | active 
+| 59ed78ec-c632-4a9d-      | Fedora-Cloud-Base-32           | active 
+| 6e6327eb-522a-4d7e-      | Fedora-Cloud-Base-33           | active 
+| e5b85cf9-6b7c-44a0-      | Fedora-Cloud-Base-34           | active 
+| 8b8ab2a1-e349-4313-      | Fedora-Cloud-Base-35           | active 
+| ca58d538-674d-40c8-      | Fedora-Cloud-Base-36           | active 
+| cbea8fed-                     | Fedora-Cloud-Base-37           | active 
+|===
+
+
 ==== Flavors
 
 [quote,RedHat RHOSP Documentation,Flavors]
