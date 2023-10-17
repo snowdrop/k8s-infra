@@ -179,8 +179,7 @@ include::../ansible/playbook/openstack/openstack_auth_passstore_v3password.yml[]
 == Ansible Inventory
 
 All the information related to the Ansible Inventory for RHOSP host will be 
- managed by our ansible passwordstore link:../../roles/passstore[roles] and 
- link:../passstore[playbooks].
+ managed by our Ansible link:../passstore[passwordstore playbooks] and link:../../roles/passstore[passwordstore roles].
  
 The host information will be stored under the `openstack` folder where a 
  folder exists for each host. It also stores the SSH public and secret keys 
