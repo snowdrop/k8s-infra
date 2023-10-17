@@ -1,6 +1,25 @@
 = Ansible Inventory
+:icons: font
+:revdate: {docdate}
 :toc: left
-:description: This document describes the Ansible inventory implementation.
+:toclevels: 3
+:description: Ansible Inventory
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
+
+== Introduction
+
+[.lead]
+This document described the implementation of the Ansible Inventory on this 
+ project.
+
+It used a mix of a passwordstode database and static files to maintain all 
+ host information and properties.
 
 == Introduction to Ansible Inventory
 
@@ -14,7 +33,7 @@ The two most important files are:
 
 **Remark**: More information on the Ansible Inventory and how to build it is defined within the [Ansible User Guide](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html).
 
-=== `hosts.yml`
+== `hosts.yml` file
 
 This file contains static information for the inventory such as:
 * Group 
@@ -24,7 +43,8 @@ This file contains static information for the inventory such as:
 
 Here is a sample of a *hosts yaml* file designed using YAML. 
 
-```yaml
+[source,yaml]
+----
 all: # keys must be unique, i.e. only one 'hosts' per group
     hosts:
         host1:
@@ -51,15 +71,17 @@ all: # keys must be unique, i.e. only one 'hosts' per group
                 host1:
             vars:
                 group_last_var: value
-```
+----
 
 More information on these documents are available:
-* [yaml – Uses a specific YAML file as an inventory source](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/yaml_inventory.html)
-* [How to build your inventory](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html)
 
-This project already includes a static inventory, at [../inventory/hosts.yml](../inventory/hosts.yml) file.
+* link:https://docs.ansible.com/ansible/latest/collections/ansible/builtin/yaml_inventory.html[yaml – Uses a specific YAML file as an inventory source]
+* link:https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html[How to build your inventory]
 
-=== Groups
+This project already includes a static inventory, at the
+ link:../inventory/hosts.yml[] file.
+
+== Groups
 
 Ansible hosts can be grouped into...well groups. This allows the execution of playbooks and the definition of variables in a common matter for different hosts.
 
@@ -68,7 +90,8 @@ values assigned to each group.
 
 Host group assignment is made in `passstore` by managing entries in the `provider/host/groups` folder being each entry a group to which the host belongs. 
 
-```text
+[source]
+----
 ├── provider
 |   ├── host_1
 │   │   ├── groups
@@ -79,19 +102,46 @@ Host group assignment is made in `passstore` by managing entries in the `provide
 │   │   ├── groups
 │   │   │   ├── group_2
 │   │   │   ├── group_3
-```
+----
 
 For instance, we wanted to define the ports that a k8s master needs to open. This has been done in the `hosts.yml` file having the following variable assigned to 
 the `masters` group, which is also inside a group structure so other variables are inherited. 
 
-```
+[source,yml]
+----
 firewalld_public_ports:
   - 6443/tcp
   - 10250/tcp
   - 10255/tcp
   - 8472/udp
   - 30000-32767/tcp
-```
+----
 
 For information regarding actually managing host-group assignment check the [`passstore_manage_host_groups` section](#passstore_manage_host_groups). 
+
+== `pass_inventory.py` Inventory Python script
+
+This Python script build the Ansible Inventory from the passwordstore database.
+
+To collect information on a host execute the following command.
+
+[source,bash]
+----
+./ansible/inventory/pass_inventory.py --host <1>
+----
+<1> Name of the host in the Ansible inventory.
+
+Example
+
+[source,bash]
+----
+./ansible/inventory/pass_inventory.py --host ocp-xyz-tmp-bootstrap-server
+----
+
+To list all the inventory simply execute with the --list attribute.
+
+[source,bash]
+----
+./ansible/inventory/pass_inventory.py --list
+----
 

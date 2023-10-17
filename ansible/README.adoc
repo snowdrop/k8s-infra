@@ -22,6 +22,11 @@ The exception goes to the playbooks that are executed against `localhost`. This 
 
 NOTE: Check the Ansible https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html#ansible-core-support-matrix[requirement] page for Python compatibility !
 
+[#ansible-inventory]
+== Ansible Inventory
+
+The Ansible Inventory is managed by 
+
 == Installation guide
 
 In order to play with the playbooks/roles of this project, it is needed to:
