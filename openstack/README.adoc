@@ -28,8 +28,11 @@ The tools implemented are the following:
 [glossary]
 == Terminology
 
+Glossary of terms used.
+
 [glossary]
 FS:: Filesystem
+Host:: Target OpenStack instance or VM
 OCP:: OpenShift Container Platform
 RHOSP:: Red Hat OpenStack Platform
 
