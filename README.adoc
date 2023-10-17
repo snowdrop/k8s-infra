@@ -38,7 +38,7 @@ installation and usage instrutions.
 == Prerequisites
 
 To use the scripts, playbooks, part of this project, some prerequisites are needed. It is not mandatory to install
-all of them and the following chapters will mention which ones are needed.
+all of them and the following chapters will mention which ones are needed. 
 
 * https://kind.sigs.k8s.io/docs/user/quick-start/#installation[kind]
 * https://docs.docker.com/engine/install/[Docker] or https://podman.io/docs/installation[podman]
@@ -47,6 +47,39 @@ all of them and the following chapters will mention which ones are needed.
 * https://www.passwordstore.org/[passwordstore]
 * https://github.com/hetznercloud/cli[hcloud] (optional)
 * 
+
+=== Python
+
+Several requirements are provided as Python libraries, including Ansible, 
+ and are identified on the link:requirements.txt[] file.
+
+Using Python Virtual Environment is recomended and can be created using 
+ the following command.
+
+[source,bash]
+----
+python3 -m venv .snowdrop-venv
+----
+
+The python requirements can be installed by executing:
+
+[source,bash]
+----
+pip install -r requirements.txt
+----
+
+For more information check the link:ansible/README.adoc#python-venv[Python Virtual Env] section on our Ansible README. 
+
+=== Ansible
+
+Several Ansible Galaxy collections are used as part of this project and 
+ are listed in the link:collections/requirements.yml[] file. 
+ To install them execute the following command.
+
+[source,bash]
+----
+ansible-galaxy install collection -r ./collections/requirements.yml --upgrade
+----
 
 == Locally
 

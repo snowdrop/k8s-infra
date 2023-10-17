@@ -48,7 +48,7 @@ In order to play with the playbooks/roles of this project, it is needed to:
 
 [NOTE]
 ====
-Since passwordstore is integrated with [git](https://git-scm.com/), all changes made locally to a pass repository are automatically committed to the local git repo.
+Since passwordstore is integrated with linkhttps://git-scm.com/[git], all changes made locally to a pass repository are automatically committed to the local git repo.
 ====
 
 [NOTE]

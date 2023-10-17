@@ -301,6 +301,20 @@ make configuration changes via `machineconfig` objects:
 
 ----
 
+=== Add domain to certificate manager
+
+The new domain associated to the has to be added to the certificate manager.
+
+[source,bash]
+----
+kc -n snowdrop-site edit certificate snowdrop-dev
+----
+
+[source,bash]
+----
+kc -n snowdrop-site edit issuer letsencrypt-prod-snowdrop-dev
+----
+
 == Remove existing OCP cluster on RHOS
 
 include::../ansible/playbook/ocp/README.adoc[tag=undeploy_ocp_on_rhos]
