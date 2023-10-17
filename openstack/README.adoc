@@ -299,7 +299,6 @@ Detailed documentation on the playbooks and execution instructions to
 To quick create a Host you can use the following command, taking care to 
  check the `network`, `image`, `flavor` and `vm_name` variables 
  that  should be filled according to your implementation.
-====
 
 .Create OpenStack Host command
 [source,bash]
