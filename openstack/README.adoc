@@ -203,10 +203,11 @@ Prior to deploying a host aspects such as the OS image and
 
 === Preparing the Provisioning
 
-[NOTE]
+[WARNING]
 ====
-The examples provided here are photos of a specific time frame. To get 
- updated lists of images and flavors check you RHOSP cluster using either 
+The examples provided here are photos of a specific time frame and 
+ RHOSP implementation. To get and updated lists of your available images 
+ and flavors check your RHOSP cluster using either 
  the RHOSP console or the link:openstack-cli.adoc[RHOSP CLI].
 ====
 
