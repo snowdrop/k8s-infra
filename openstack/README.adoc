@@ -181,8 +181,7 @@ include::../ansible/playbook/openstack/openstack_auth_passstore_v3password.yml[]
 
 == Ansible Inventory
 
-The inventory of all RHOSP hosts (aka instances or VM) is managed by Ansible by 
- using 
+The inventory of all RHOSP hosts is managed by Ansible.
 
 [NOTE]
 ====
