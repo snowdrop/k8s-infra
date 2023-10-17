@@ -296,14 +296,12 @@ Detailed documentation on the playbooks and execution instructions to
  link:../ansible/playbook/openstack/README.adoc[OpenStack Ansible Playbooks] document.
 ====
 
-To quick create a VM use the following command.
-
-[WARNING]
-====
-Check the `network`, `image`, `flavor` and `vm_name` variables that 
- should be filled according to each implementation.
+To quick create a Host you can use the following command, taking care to 
+ check the `network`, `image`, `flavor` and `vm_name` variables 
+ that  should be filled according to your implementation.
 ====
 
+.Create OpenStack Host command
 [source,bash]
 ----
 ansible-playbook playbook/openstack/openstack_vm_create_passwordstore.yml -e '{"openstack": {"vm": {"network": "provider_net_shared","image": "Fedora-Cloud-Base-37", "flavor": "m1.medium"}}}' -e vm_name=snowdrop_sample_vm_name
