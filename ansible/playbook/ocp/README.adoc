@@ -138,12 +138,6 @@ Will also be applied as prefix to all the RHOS VM instances created as well
  as other RHOS resources.
 ====
 
-| `openshift_pull_secret`
-
-[.fuchsia]#json# / [.red]#required# 
-
-a| OCP pull secret for the user
-
 | `ocp_root_directory`
 
 [.fuchsia]#string# / [.red]#required# 
@@ -151,6 +145,28 @@ a| OCP pull secret for the user
 a| Root folder where for the installation. A new sub-folder with the 
  `ocp_cluster_name` name will be created and will serve as the 
  installation folder.
+
+| `openshift_pull_secret`
+
+[.fuchsia]#json# / [.red]#required# 
+
+a| OCP pull secret for the user
+
+| `openstack_flavor_control_plane`
+
+[.fuchsia]#string#
+
+a| Flavor to be used on the Control Plane hosts.
+
+*Default => `ocp4.control`*
+
+| `openstack_flavor_compute`
+
+[.fuchsia]#string#
+
+a| Flavor to be used on the Compute hosts.
+
+*Default => `ocp4.compute`*
 
 |===
 
