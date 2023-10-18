@@ -54,7 +54,7 @@ This playbook exists for dev/testing purposes only!
 
 == Preparing the deployment
 
-The OCP installation process requries the use of the OCP 
+The OCP installation process requires the use of the OCP 
  pull secret. This secret can be obained from https://console.redhat.com/openshift/install/pull-secret.
 
 As part of the installation process this information will be added 
