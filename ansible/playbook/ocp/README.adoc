@@ -202,7 +202,7 @@ include::../../roles/ocp_cluster/defaults/main.yml[tag=rhos_default_flavors]
 ----
 
 Instructions on how to obtain the list of available flavors is described on
- our link:../../../openstack/README.adoc#Flavors[OpenStack README file].
+ our link:../../../openstack/openstack-cli.adoc#flavors[OpenStack CLI README file].
 ====
 
 The result of the deployment process is the following:
