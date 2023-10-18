@@ -322,7 +322,7 @@ ansible-playbook ansible/playbook/openstack/openstack_vm_remove_passwordstore.ym
 
 == Connect to a RHOSP instance
 
-To improve usability the link:../../../tools/passstore-vm-ssh.sh[`tools/passstore-vm-ssh.sh`] 
+To improve usability the link:../tools/passstore-vm-ssh.sh[`tools/passstore-vm-ssh.sh`] 
  bash script has been created. It makes it easier to connect to any 
  host under the project's Ansible Inventory. 
  
