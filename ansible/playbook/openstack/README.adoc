@@ -140,7 +140,7 @@ After creating the VM this playbook also executes the VM secure host playbook. T
 Besides creating the VM the playbook also performs the following operations:
 
 * Store the host SSH keys on the controller device.
-* Add entries to the known hosts file for this host.
+* Add entries to the `~/.ssh/known_hosts` file for this host.
 * Add several entries to the passwordstore database in order to build the Ansible Inventory
 
 === Delete a VM with Passwordstore
