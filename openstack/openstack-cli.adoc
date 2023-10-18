@@ -45,8 +45,8 @@ Please enter your OpenStack Password for project xxxxxxxxxx as user xxxxxxxxxxxx
 
 That's it, you're now logged in.
 
-=== Flavor
-
+[#flavors]
+=== Flavors
 
 List the flavors available.
 
@@ -94,7 +94,7 @@ $ openstack flavor create g.standard.xxxl.ram --ram 40960 --disk 160 --vcpus 16
 ----
 
 [#network]
-=== Network
+=== Networks
 
 List networks.
 
@@ -251,7 +251,8 @@ Should present information for that image.
 More information on RHOS images at the link:https://docs.openstack.org/newton/user-guide/common/cli-manage-images.html[RHOS docs].
 ====
 
-=== Server
+[#servers]
+=== Servers
 
 List existing servers.
 
