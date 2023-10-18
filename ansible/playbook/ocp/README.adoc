@@ -40,10 +40,16 @@ Playbooks to deploy and remove an OCP cluster to RHOS.
 | ocp_openstack_info.yml
 a| Print information from the deployed OCP cluster.
 
-This playbook will print such as Console URL, kubeadmin password, ...
+This playbook will print cluster information such as Console URL, kubeadmin password, ...
 
 | ocp_openstack_test.yml
-| Test some functionalities, for dev/testing purposes only!
+a| Test some functionalities.
+
+[WARNING]
+====
+This playbook exists for dev/testing purposes only!
+====
+
 |===
 
 == Preparing the deployment
@@ -70,30 +76,35 @@ As part of the installation process this information will be added
 
 [NOTE]
 ====
-The presented examples will use an environment variable with name 
- `OCP_PULL_SECRET` as a container for the OCP pull secret contents.
+The presented examples will use the `OCP_PULL_SECRET` environment variable as a 
+ holder for the OCP pull secret contents.
 ====
 
 == Using a Bootstrap host
 
 The default installation process uses the controller as the installation 
- source. This has several drawbacks amongst them is having to download and 
- upload again the OCP installer RHCOS image. Although downloading may take 
+ source. This has several drawbacks amongst them is having to download, and 
+ upload again, the OCP installer RHCOS image. Although downloading may take 
  some time, it is cached the first time it is executed, so it's the upload 
  task that takes the longest. To mitigate this problem the installation 
- process can be executed from a temporary bootstrap host.
+ process can be executed from a temporary host we call the bootstrap host.
 
-To use the temporary boostrap host first create it. The name of this VM can 
- be any name but we suggest using the name of the cluster as prefix.
+To use the temporary boostrap host you have to create it first. The name of this RHOSP 
+ Host can be any name but we suggest using the name of the cluster as prefix and 
+ adding a suffix such as `-tmp-bootstrap-server`.
 
+To create the boostrap host execute the RHOSP playbook created for that purpose.
+
+.Sample execution of creating a bootstrap host.
 [source,bash]
 ----
 ansible-playbook ansible/playbook/openstack/openstack_vm_create_passwordstore.yml -e '{"openstack": {"vm": {"network": "provider_net_shared","image": "Fedora-Cloud-Base-37", "flavor": "m1.small"}}}' -e vm_name=ocp-xyz-tmp-bootstrap-server
 ----
 
-After creating the bootstrap server execute the steps provided in the <<deploy-ocp-on-rhos>> section. 
+After creating the bootstrap host execute the steps provided in the 
+ <<deploy-ocp-on-rhos>> section. 
 
-Finally after the OCP cluster is deployed you may remove the bootstrap server.
+Once the OCP cluster is deployed you may remove the bootstrap server.
 
 // tag::deploy_ocp_on_rhos[]
 [#deploy-ocp-on-rhos]
