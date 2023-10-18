@@ -42,14 +42,6 @@ a| Print information from the deployed OCP cluster.
 
 This playbook will print cluster information such as Console URL, kubeadmin password, ...
 
-| ocp_openstack_test.yml
-a| Test some functionalities.
-
-[WARNING]
-====
-This playbook exists for dev/testing purposes only!
-====
-
 |===
 
 == Preparing the deployment
