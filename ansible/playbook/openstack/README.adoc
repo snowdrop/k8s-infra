@@ -118,7 +118,7 @@ To create the RHOSP launch the `openstack_vm_create_passwordstore.yml` Ansible P
 
 [source,bash]
 ----
-ansible-playbook playbook/openstack/openstack_vm_create_passwordstore.yml -e '{"openstack": {"vm": {"network": "provider_net_shared","image": "Fedora-Cloud-Base-37", "flavor": "m1.medium"}}}' -e vm_name=snowdrop_sample_vm_name
+ansible-playbook playbook/openstack/openstack_vm_create_passwordstore.yml -e '{"openstack": {"vm": {"network": "provider_net_shared","image": "Fedora-Cloud-Base-37", "flavor": "m1.medium"}}}' -e vm_name=snowdrop_sample_vm
 ----
 
 [NOTE]
@@ -151,7 +151,7 @@ To delete a VM, simply execute the `openstack_vm_remove_aggregate` playbook. Bes
 
 [source,bash]
 ----
-ansible-playbook ansible/playbook/openstack/openstack_vm_remove_passwordstore.yml -e vm_name=snowdrop_sample_vm_name
+ansible-playbook ansible/playbook/openstack/openstack_vm_remove_passwordstore.yml -e vm_name=snowdrop_sample_vm
 ----
 
 Although some failures might occur some might be ignored which shouldn't affect thhe process. This playbook should finish with no failed tasks.

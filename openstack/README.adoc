@@ -286,15 +286,20 @@ More information on RHOSP networks on link:openstack-cli.adoc#network[our OpenSt
 === Provision the VM
 
 [.lead]
-Once the system configuration is identified it's time to create a VM.
-
-Creating the VM is done using pre-prepared Ansible Playbooks. 
+Once the system configuration is identified it's time to create a new Host 
+ which can be done using our pre-prepared Ansible Playbooks. 
 
 [WARNING]
 ====
-Detailed documentation on the playbooks and execution instructions to 
- perform the VM provision operations can be found at our 
+Detailed documentation on Host provisioning can be found at our 
  link:../ansible/playbook/openstack/README.adoc[OpenStack Ansible Playbooks] document.
+ 
+On this document you'll find:
+
+* list of the available playbooks;
+* execution instructions to perform the VM provision operations, including 
+  all the parameters available on the playbooks
+* inormation on the outputs of each playbook 
 ====
 
 To quick create a Host you can use the following command, taking care to 
@@ -304,7 +309,15 @@ To quick create a Host you can use the following command, taking care to
 .Create OpenStack Host command
 [source,bash]
 ----
-ansible-playbook playbook/openstack/openstack_vm_create_passwordstore.yml -e '{"openstack": {"vm": {"network": "provider_net_shared","image": "Fedora-Cloud-Base-37", "flavor": "m1.medium"}}}' -e vm_name=snowdrop_sample_vm_name
+ansible-playbook playbook/openstack/openstack_vm_create_passwordstore.yml -e '{"openstack": {"vm": {"network": "provider_net_shared","image": "Fedora-Cloud-Base-37", "flavor": "m1.medium"}}}' -e vm_name=snowdrop_sample_vm
+----
+
+To delete the newly created host execute the following command.
+
+.Remove OpenStack Host command
+[source,bash]
+----
+ansible-playbook ansible/playbook/openstack/openstack_vm_remove_passwordstore.yml -e vm_name=snowdrop_sample_vm
 ----
 
 == Connect to a RHOSP instance
@@ -317,10 +330,10 @@ More documentation on the bash script can be found link:../tools/README.md[here]
 
 To SSH connect to a VM use the  bash script.
 
-.Sample execution
+.Sample connection execution
 [source,bash]
 ----
-./tools/passstore-vm-ssh.sh openstack vm20210221-t01
+./tools/passstore-vm-ssh.sh openstack snowdrop_sample_vm
 ----
 
 This should connect ot the newly created VM.
@@ -334,7 +347,7 @@ This machine is property of RedHat.
 Access is forbidden to all unauthorized person.
 All activity is being monitored.
 
-Welcome to vm20210221-t01..
+Welcome to snowdrop_sample_vm.
 ----------------------------
 ====
 
