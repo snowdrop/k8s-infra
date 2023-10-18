@@ -178,7 +178,7 @@ Execute the playbook. Please note that this playbook uses `sudo` permission
  host.
 
 .Explanation of the playbook parameter execution
-[example]
+[source]
 ----
 ansible-playbook ansible/playbook/ocp/ocp_openstack_install.yml <1>
   -e ocp_root_directory=<2>
@@ -229,7 +229,7 @@ The result of the deployment process is the following:
 * OCP authentication information stored on the passwordstore
 // end::deploy_ocp_on_rhos[]
 
-[WARNING]
+[CAUTION]
 ====
 At this point the _bootstrap server_, if used, is no longer required.
 
