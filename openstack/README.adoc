@@ -231,7 +231,7 @@ To identify available images and choose which one to use check our docs on the l
 | cbea8fed-                     | Fedora-Cloud-Base-37           | active 
 |===
 
-
+[#flavors]
 ==== Flavors
 
 [quote,RedHat RHOSP Documentation,Flavors]
