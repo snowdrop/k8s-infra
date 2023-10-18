@@ -161,6 +161,7 @@ Execute the playbook. Please note that this playbook uses `sudo` permission
  will be associated (`uid:gid``) with the Ansible user used to connect to the 
  host.
 
+.Explanation of the playbook parameter execution
 [example]
 ----
 ansible-playbook ansible/playbook/ocp/ocp_openstack_install.yml <1>
