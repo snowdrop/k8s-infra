@@ -162,15 +162,29 @@ Execute the playbook. Please note that this playbook uses `sudo` permission
  host.
 
 .Command to execute the OCP deployment playbook
+[source]
+----
+ansible-playbook ansible/playbook/ocp/ocp_openstack_install.yml <1>
+  -e ocp_root_directory=<2>
+  -e ocp_cluster_name=<3>
+  -e openshift_pull_secret=<4>
+  -K <5>
+----
+<1> Playbook that implements the OCP deployment.
+<2> Root directory for the installation.
+<3> Name to be given to the cluster.
+<4> OCP pull secret for the user.
+<5> Ask for the become password.
+
+.Command to execute the OCP deployment playbook
 [source,bash]
 ----
-ansible-playbook -i inventory/ ansible/playbook/ocp/ocp_openstack_install.yml \
+ansible-playbook ansible/playbook/ocp/ocp_openstack_install.yml \
   -e ocp_root_directory=/opt/ocp \
   -e ocp_cluster_name=ocp-sdev \
   -e openshift_pull_secret=${OCP_PULL_SECRET} \
-  -K <1>
+  -K
 ----
-<1> Ask for the become password.
 
 The playbook will result on the deployment of several RHOS VMs for control plane and worker nodes.
 
