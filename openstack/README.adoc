@@ -189,8 +189,8 @@ Please refer to our link:../ansible/README.adoc[Ansible Document] for more infor
 ====
 
 The host information will be stored under the `openstack` folder where a 
- folder exists for each host. It also stores the SSH public and secret keys 
- locally on the user's `~/.ssh` folder. 
+ sub-folder exists for each host. It also stores the SSH public and secret 
+ keys locally on the user's `~/.ssh` folder. 
 
 == VM Provisioning
 
