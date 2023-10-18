@@ -201,7 +201,8 @@ variables, having as default the values from the role defaults file.
 include::../../roles/ocp_cluster/defaults/main.yml[tag=rhos_default_flavors]
 ----
 
-The list of flavors, and how to obtain them, is identified on the link:../../../openstack/README.adoc#Flavors[OpenStack README file].
+Instructions on how to obtain the list of available flavors is described on
+ our link:../../../openstack/README.adoc#Flavors[OpenStack README file].
 ====
 
 The result of the deployment process is the following:
