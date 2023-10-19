@@ -94,7 +94,7 @@ The default installation process uses the controller (`localhost`) as the
  installation executor. This means all files are downloaded/uploaded to/from 
  the local workstation. This approach has several drawbacks such as having 
  to rely on the network infrastructure of the workstation being limited by 
- it's bandwith (:arrow_down icon:download[alt=download] and icon:upload[alt=upload]). 
+ it's bandwith (:arrow_down icon:arrow_down[alt=download] and icon:upload[alt=upload]). 
 
 To mitigate this problem the installation process can, and we suggest it is, 
  executed from a remote host, which might be a temporary host. This host will 
