@@ -22,6 +22,16 @@ This document describes the process to deploy an OCP cluster on a
 The installation process uses the _OpenShift Container Platform installer_ 
  obtained from https://mirror.openshift.com/.
 
+[glossary]
+== Terminology
+
+Glossary of terms used.
+
+[glossary]
+OCP:: OpenShift Container Platform
+RHCOS:: Red Hat Core OS
+RHOSP:: Red Hat OpenStack Platform
+
 == OCP On OpenStack
 
 Playbooks to deploy and remove an OCP cluster to RHOS. 
@@ -68,22 +78,32 @@ As part of the installation process this information will be added
 
 [NOTE]
 ====
-The presented examples will use the `OCP_PULL_SECRET` environment variable as a 
- holder for the OCP pull secret contents.
+The commands described hereafter use the `OCP_PULL_SECRET` environment 
+ variable to pass the credentials to the playbook.
 ====
 
 == Using a Bootstrap host
 
-The default installation process uses the controller as the installation 
- source. This has several drawbacks amongst them is having to download, and 
- upload again, the OCP installer RHCOS image. Although downloading may take 
- some time, it is cached the first time it is executed, so it's the upload 
- task that takes the longest. To mitigate this problem the installation 
- process can be executed from a temporary host we call the bootstrap host.
+In the installation process the several files are downloaded, amongst 
+ which is the OCP installer software and a RHCOS image. During the execution 
+ of the OCP installer the downloaded RHCOS image must be uploaded into RHOSP. 
+ Although the image is cached, locally, this part of the process takes an 
+ amount of time that cannot be disregarded.
 
-To use the temporary boostrap host you have to create it first. The name of this RHOSP 
- Host can be any name but we suggest using the name of the cluster as prefix and 
- adding a suffix such as `-tmp-bootstrap-server`.
+The default installation process uses the controller (`localhost`) as the 
+ installation executor. This means all files are downloaded/uploaded to/from 
+ the local workstation. This approach has several drawbacks such as having 
+ to rely on the network infrastructure of the workstation being limited by 
+ it's bandwith (icon:download[alt=down] and icon:upload[alt=up]). 
+
+To mitigate this problem the installation process can, and we suggest it is, 
+ executed from a remote host, which might be a temporary host. This host will 
+ be referred as the bootstrap host hereafter.
+
+To be able to use a temporary boostrap host it must be created prior to the 
+ execution of the installation process. The name of this RHOSP Host can be 
+ any name although we recomend including the name of the cluster as prefix 
+ and adding a suffix such as `-tmp-bootstrap-server`.
 
 To create the boostrap host execute the RHOSP playbook created for that purpose.
 
@@ -96,7 +116,11 @@ ansible-playbook ansible/playbook/openstack/openstack_vm_create_passwordstore.ym
 After creating the bootstrap host execute the steps provided in the 
  <<deploy-ocp-on-rhos>> section. 
 
-Once the OCP cluster is deployed you may remove the bootstrap server.
+[NOTE]
+====
+The bootstrap server could be removed once the OCP cluster has been 
+ created (optional).
+====
 
 // tag::deploy_ocp_on_rhos[]
 [#deploy-ocp-on-rhos]
