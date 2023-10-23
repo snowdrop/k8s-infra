@@ -118,7 +118,7 @@ To create the RHOSP launch the `openstack_vm_create_passwordstore.yml` Ansible P
 
 [source,bash]
 ----
-ansible-playbook playbook/openstack/openstack_vm_create_passwordstore.yml -e '{"openstack": {"vm": {"network": "provider_net_shared","image": "Fedora-Cloud-Base-37", "flavor": "m1.medium"}}}' -e vm_name=snowdrop_sample_vm
+ansible-playbook ansible/playbook/openstack/openstack_vm_create_passwordstore.yml -e '{"openstack": {"vm": {"network": "provider_net_shared","image": "Fedora-Cloud-Base-37", "flavor": "m1.medium"}}}' -e vm_name=snowdrop_sample_vm
 ----
 
 [NOTE]
