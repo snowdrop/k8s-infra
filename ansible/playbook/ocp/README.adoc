@@ -266,7 +266,7 @@ objects associated to the project.
 .Command to execute the OCP cluster removal playbook.
 [source,bash]
 ----
-ansible-playbook playbook/ocp/ocp_openstack_remove.yml \
+ansible-playbook ansible/playbook/ocp/ocp_openstack_remove.yml \
   -e ocp_root_directory=/opt/ocp \
   -e ocp_cluster_name=/opt/ocp/openshift-data/
 ----
