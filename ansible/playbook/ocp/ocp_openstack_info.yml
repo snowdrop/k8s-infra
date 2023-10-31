@@ -168,6 +168,7 @@
           - "OCP Resources:"
           - "  kubeadmin password: {{ rhos_ocp_facts.ocp_cluster_kubeadmin_pw }}"
           - "  Console: https://console-openshift-console.apps.{{ rhos_ocp_facts.cluster_name }}.snowdrop.dev/"
+          - "  oc login token at: https://oauth-openshift.apps.{{ rhos_ocp_facts.cluster_name }}.snowdrop.dev/oauth/token/request"
           - ""
           - "Jump Server:"
           - "  Floating IP: {{ jump_server_info.servers[0].access_ipv4 }}"

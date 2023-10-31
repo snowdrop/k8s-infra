@@ -53,6 +53,11 @@ Passwordstore is used during the execution of the ansible playbooks when RHOSP
 All RHOSP information will be stored under the `/openstack` passwordstore folder.
 ====
 
+=== VPN
+
+This document assumes that you have access to the RHOSP infrastructure. In 
+ the case of RHOS-PSI it is only available connected to the Red Hat VPN.
+
 [#rhosp-authentication]
 == RHOSP authentication
 
@@ -302,7 +307,7 @@ On this document you'll find:
 * inormation on the outputs of each playbook 
 ====
 
-To quick create a Host you can use the following command, taking care to 
+To quickly create a Host you can use the following command, taking care to 
  check the `network`, `image`, `flavor` and `vm_name` variables 
  that  should be filled according to your implementation.
 

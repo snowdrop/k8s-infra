@@ -19,7 +19,6 @@ This project details the `prerequisites` and `steps` necessary to automate the i
 
 * Red Hat https://access.redhat.com/documentation/en-us/red_hat_openstack_platform/[OpenStack] (RHOS-PSI)
 * Red Hat https://github.com/resource-hub-dev[ResourceHub] - Work in progress
-* Red Hat link:https://www.redhat.com/en/technologies/cloud-computing/openshift/container-platform[OpenShift Container Platform] (OCP)
 * IBM Cloud
 * Hetzner
 * Kind**
@@ -36,7 +35,7 @@ All the commands mentioned on this project are to be executed at the root folder
 == Prerequisites
 
 This project uses Ansible. Check the link:ansible/README.adoc[Ansible Document] for the
-installation and usage instrutions.
+installation and usage instructions.
 
 To use the scripts, playbooks, part of this project, some prerequisites are needed. It is not mandatory to install
 all of them and the following chapters will mention which ones are needed. 
@@ -54,22 +53,34 @@ all of them and the following chapters will mention which ones are needed.
 Several requirements are provided as Python libraries, including Ansible, 
  and are identified on the link:requirements.txt[] file.
 
-Using Python Virtual Environment is recomended and can be created using 
- the following command.
+Using a Python Virtual Environment is recommended and can be created using 
+ the following command:
 
 [source,bash]
 ----
 python3 -m venv .snowdrop-venv
 ----
 
+After creating the virtual environment start using it with the following command:
+
+[source,bash]
+----
+source .snowdrop-venv/bin/activate
+----
+
+The venv will be in use when the `(.snowdrop-venv)` prefix is shown on the bash prompt.
+
 The python requirements can be installed by executing:
 
 [source,bash]
 ----
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 ----
 
+[NOTE]
+====
 For more information check the link:ansible/README.adoc#python-venv[Python Virtual Env] section on our Ansible README. 
+====
 
 === Ansible
 
@@ -79,15 +90,8 @@ Several Ansible Galaxy collections are used as part of this project and
 
 [source,bash]
 ----
-ansible-galaxy install collection -r ./collections/requirements.yml --upgrade
+ansible-galaxy collection install -r ./collections/requirements.yml --upgrade
 ----
-
-== Locally
-
-The word `locally` should be understood as the process to run on your developer laptop, the cluster, using also a CI/CD platform
-such as GitHub Actions, etc.
-
-We recommend to use 2 tools to run locally a kubernetes cluster: kind or minikube
 
 === Kind
 
@@ -131,7 +135,8 @@ This section details how to provision an Openshift 4 cluster using one of Red Ha
 
 _Tools: password store, ansible_
 
-The link:openstack/README.adoc[OpenStack] page explains the functionality implemented for a RHOS cloud provider.
+The link:openstack/README.adoc[OpenStack] page explains the process using 
+ the RHOS cloud provider.
 
 ==== https://resourcehub.redhat.com/[Resource Hub]
 
