@@ -1,3 +1,4 @@
+# Get OCP cluster information from the installation folder.
 ---
 - name: "Build OpenStack authentication for v3password"
   ansible.builtin.import_playbook: "../openstack/openstack_auth_passstore_v3password.yml"
