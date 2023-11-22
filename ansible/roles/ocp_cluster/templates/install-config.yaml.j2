@@ -32,7 +32,7 @@ platform:
   openstack:
     apiFloatingIP: {{ rhos_floating_ip_api_address }}
 #    <TO BE CHECKED>ingressFloatingIP: {{ rhos_floating_ip_ingress_address }}
-#    <TO BE CHECKED>clusterOSimage: 
+{% if rhos_cluster_os_image is defined %}    clusterOSimage: {{ rhos_cluster_os_image }}{% endif %}
 #    apiVIPs:
 #    - 10.0.0.5
     cloud: openstack
