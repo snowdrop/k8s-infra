@@ -5,7 +5,20 @@
     installation_dir: "{{ ocp_root_directory }}/{{ ocp_cluster_name }}"
 
 - include_tasks: install_prepare.yml
-  when: state == 'present'
+  # when: state == 'present'
+
+# - name: "Create local tmp directories"
+#   ansible.builtin.file:
+#     path: "{{ ocp_root_directory }}/_tmp"
+#     state: directory
+#     owner: "{{ ansible_user_id }}"
+#     group: "{{ ansible_user_id }}"
+#     mode: '0755'
+#   become: true
+#   when: state == 'absent'
+  
+- name: Download OCP binary files
+  ansible.builtin.include_tasks: download_installation_files.yml
 
 - name: Create temporary work directory
   ansible.builtin.tempfile:

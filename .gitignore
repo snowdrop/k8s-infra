@@ -31,7 +31,10 @@ output/**
 
 # Testing purposes
 sandbox/cluster_up/test.sh
+
+# Python
 .snowdrop-venv/
+.*env
 
 #######
 # IDE #

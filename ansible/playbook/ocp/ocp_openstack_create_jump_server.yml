@@ -60,7 +60,8 @@
   ansible.builtin.import_playbook: "../openstack/openstack_vm_create_passwordstore.yml"
   vars:
     state: present
-    openstack: 
+    openstack:
+      timeout: 300
       vm: 
         network: "{{ ocp_cluster_metadata.infraID }}-openshift"
         image: "Fedora-Cloud-Base-37"

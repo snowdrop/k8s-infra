@@ -23,8 +23,8 @@
 #     sh 'wget -q --no-check-certificate -O xpaasqe.dnskey https://gitlab.cee.redhat.com/quarkus-qe/raw/main/roles/dnsservers/files/named.xpaasqe.dnskey'
 # }
 
-- name: Download OCP binary files
-  ansible.builtin.include_tasks: download_installation_files.yml
+# - name: Download OCP binary files
+#   ansible.builtin.include_tasks: download_installation_files.yml
 
 - name: "Create Floating IP for OpenShift API"
   ansible.builtin.shell:
@@ -244,8 +244,8 @@
 - name: "Configure htpasswd auth provider"
   ansible.builtin.shell: 
     cmd: |
-      htpasswd -c -B -b users.htpasswd admin admin
-      htpasswd -b users.htpasswd {{ ocp_user }} {{ ocp_user }}
+      htpasswd -c -B -b users.htpasswd {{ ocp_cluster_user_admin_name }} {{ ocp_cluster_user_admin_pw }}
+      htpasswd -b users.htpasswd {{ ocp_cluster_user_dev_name }} {{ ocp_cluster_user_dev_pw }}
       ./oc create secret generic htpass-secret --from-file=htpasswd=users.htpasswd -n openshift-config
   args:
     chdir: "{{ ocp_cluster_bin_directory }}"
@@ -258,12 +258,12 @@
     dest: "{{ tmp_directory }}/htpasswd-provider.yaml"
     mode: '0644'
 
-- name: "Create user accounts 'admin' and {{ ocp_user }}"
+- name: "Create user accounts for admin and developer"
   ansible.builtin.shell: 
     cmd: |
       ./oc apply -f htpasswd-provider.yaml
-      ./oc adm policy add-cluster-role-to-user cluster-admin admin
-      ./oc adm policy add-cluster-role-to-user basic-user {{ ocp_user }}
+      ./oc adm policy add-cluster-role-to-user cluster-admin {{ ocp_cluster_user_admin_name }}
+      ./oc adm policy add-cluster-role-to-user basic-user {{ ocp_cluster_user_dev_name }}
   args:
     chdir: "{{ ocp_cluster_bin_directory }}"
   environment: 

@@ -268,7 +268,8 @@ objects associated to the project.
 ----
 ansible-playbook ansible/playbook/ocp/ocp_openstack_remove.yml \
   -e ocp_root_directory=/opt/ocp \
-  -e ocp_cluster_name=/opt/ocp/openshift-data/
+  -e ocp_cluster_name=ocp-sdev \
+  -e ocp_bootstrap_host=ocp-sdev-xxxxx-jump-server
 ----
 // end::undeploy_ocp_on_rhos[]
 

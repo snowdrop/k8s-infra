@@ -23,7 +23,7 @@
       when: installation_dir is undefined
 
   tasks:
-    - name: "Get information from OCP cluster"
+    - name: "Get OCP cluster metadata"
       ansible.builtin.import_role:
         name: 'ocp_cluster'
         tasks_from: get_metadata

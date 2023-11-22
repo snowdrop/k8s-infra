@@ -25,6 +25,7 @@
     mode: '0755'
   become: true
   register: create_bin_dir_res
+  when: ocp_cluster_bin_directory is defined
 
 - name: "Check if OCP is installed by checking the presence of the kubeconfig file"
 

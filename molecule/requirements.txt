@@ -1,0 +1,6 @@
+#molecule[docker,lint]
+molecule-plugins[docker,lint]
+yq
+ansible-lint
+molecule-docker
+lint

@@ -23,7 +23,7 @@ This role installs an OCP cluster on a RHOS cloud.
 [.fuchsia]#string#
 a| Installation folder for the OCP files, where `ocp_install_dir` is a role variable.
 
-_Default:_ `work_directory/<ocp_install_dir>`
+_Default:_ `<ocp_root_directory>/<ocp_cluster_name>`
 
 | `ocp_cluster_name`
 
@@ -31,6 +31,34 @@ _Default:_ `work_directory/<ocp_install_dir>`
 a| Name to be applied to the OCP cluster. It will be used as a prefix in the VM names.
 
 _Default:_ `ocp`
+
+| `ocp_cluster_user_admin_name`
+
+[.fuchsia]#string#
+a| Admin user to be created in the OCP cluster.
+
+_Default:_ `admin`
+
+| `ocp_cluster_user_admin_pw`
+
+[.fuchsia]#string#
+a| Password for the admin user.
+
+_Default:_ `admin`
+
+| `ocp_cluster_user_dev_name`
+
+[.fuchsia]#string#
+a| Developer user to be created in the OCP cluster.
+
+_Default:_ `snowdrop`
+
+| `ocp_cluster_user_dev_pw`
+
+[.fuchsia]#string#
+a| Password for the developer user.
+
+_Default:_ `snowdrop`
 
 | `ocp_master_nodes`
 
@@ -48,13 +76,6 @@ a| Root folder for the installation. Under this folder 2 subfolders will be crea
 * `<cluser_name>`: will store the installation data
 
 _Default:_ `/opt/ocp`
-
-| `ocp_user`
-
-[.fuchsia]#string#
-a| Admin user to be created in the OCP cluster.
-
-_Default:_ `snowdrop`
 
 | `ocp_version`
 
@@ -101,10 +122,6 @@ Choices:
 
 * `present` to install the cluster
 * `absent` to remove the cluster
-
-| `work_directory`
-
-[.fuchsia]#string# / [.red]#required# | Temporary work directory 
 
 |===
 

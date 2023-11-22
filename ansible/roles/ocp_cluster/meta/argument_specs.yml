@@ -1,0 +1,73 @@
+argument_specs:
+  main:
+    short_description: Options for the ocp_cluster role.
+    options:
+      installation_dir:
+        type: "str"
+        required: false
+        default: "{{ ocp_root_directory }}/{{ ocp_cluster_name }}"
+        description: "Installation folder for the OCP files"
+      ocp_cluster_name:
+        type: "str"
+        required: false
+        default: "ocp"
+        description: "Name to be applied to the OCP cluster. It will be used as a prefix in the VM names."
+      ocp_cluster_user_admin_name:
+        type: "str"
+        required: false
+        default: "admin"
+        description: "Admin user to be created in the OCP cluster."
+      ocp_cluster_user_admin_pw:
+        type: "str"
+        required: false
+        default: "admin"
+        description: "Password for the admin user."
+      ocp_cluster_user_dev_name:
+        type: "str"
+        required: false
+        default: "snowdrop"
+        description: "Developer user to be created in the OCP cluster."
+      ocp_cluster_user_dev_pw:
+        type: "str"
+        required: false
+        default: "ocp"
+        description: "Password for the developer user."
+      ocp_master_nodes:
+        type: "int"
+        required: false
+        default: 3
+        description: "Number of master nodes in the OCP cluster."
+      ocp_root_directory:
+        type: "str"
+        required: false
+        default: "/opt/ocp"
+        description: "Root folder for the installation."
+      ocp_version:
+        type: "str"
+        required: false
+        default: "4.13.9"
+        description: "OCP version to install"
+      ocp_worker_nodes:
+        type: "int"
+        required: false
+        default: 3
+        description: "Number of worker nodes in the OCP cluster."
+      openstack_flavor_compute:
+        type: "str"
+        required: false
+        default: "ocp4.compute"
+        description: "Flavor to be used on the compute nodes."
+      openstack_flavor_control_plane:
+        type: "str"
+        required: false
+        default: "ocp4.control"
+        description: "Flavor to be used on the control plane nodes."
+      openstack_network_provider:
+        type: "str"
+        required: false
+        default: "provider_net_cci_13"
+        description: "Network provider"
+      state:
+        type: "str"
+        required: true
+        description: "State of the cluster."

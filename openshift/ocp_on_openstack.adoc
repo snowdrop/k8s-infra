@@ -95,7 +95,7 @@ Generate the base64 codification of the `.tar.gz` file containing the backup of 
 
 [source,bash]
 ----
-base64  ocp-sscpc-data.tar.gz > ocp-sscpc-data.tar.gz.base64
+base64 ocp-sscpc-data.tar.gz > ocp-sscpc-data.tar.gz.base64
 ----
 
 Copy the contents of the file to the clipboard.
@@ -263,7 +263,7 @@ Copy to the _jump server_ the ssh key used in the deployment of the OCP cluster.
 
 [source,bash]
 ----
-scp -i ${HOME}/.ssh/id_rsa_snowdrop_openstack id_rsa_snowdrop_openstack snowdrop@$(pass show ${VM_PROVIDER}/${VM_NAME}/floating_ip | awk 'NR==1{print $1}'):/home/snowdrop/.ssh/
+scp -i ${HOME}/.ssh/id_rsa_snowdrop_openstack ${HOME}/.ssh/id_rsa_snowdrop_openstack snowdrop@$(pass show ${VM_PROVIDER}/${VM_NAME}/floating_ip | awk 'NR==1{print $1}'):/home/snowdrop/.ssh/
 ----
 
 Connect to the _jump server_.
