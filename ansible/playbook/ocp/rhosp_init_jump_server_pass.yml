@@ -1,0 +1,97 @@
+---
+# Requires:
+# vars:
+#   tmp_directory: temporary directory =/opt/ocp/_tmp/ansible.yxam0y7mbuild 
+#   ocp_root_directory: /opt/ocp 
+#   ocp_cluster_name: ocp-sdev 
+#   vm_name: ocp-sdev-p75fs-jump-server
+- name: "Build OpenStack authentication for v3password"
+  ansible.builtin.import_playbook: "../openstack/openstack_auth_passstore_v3password.yml"
+
+- name: "Create directory structure"
+  hosts: "{{ vm_name | default([]) }}"
+  gather_facts: true
+  vars: 
+    remote_bin_folder: /home/snowdrop/.local/bin
+
+  tasks:
+    # - name: Create home .local/bin folder
+    #   ansible.builtin.file:
+    #     path: "{{ remote_bin_folder }}"
+    #     recurse: true
+    #     state: directory
+    #     owner: "{{ ansible_user_id }}"
+    #     group: "{{ ansible_user_id }}"
+    #     mode: '0755'
+
+    # - name: Copy installation folder to remote host
+    #   ansible.builtin.copy:
+    #     src: /tmp/ocp-installation.tgz
+    #     dest: /tmp/ocp-installation.tgz
+
+    # - name: Extract OCP installation into /home/snowdrop
+    #   ansible.builtin.unarchive:
+    #     src: /tmp/ocp-installation.tgz
+    #     dest: /home/snowdrop
+
+    - name: Download OCP files
+      ansible.builtin.import_role:
+        name: ocp_cluster
+        tasks_from: install_prepare.yml
+      vars:
+        state: absent
+      #   ocp_bin_directory: "{{ remote_bin_folder }}"
+
+    - name: Download OCP files
+      ansible.builtin.import_role:
+        name: ocp_cluster
+        tasks_from: download_installation_files.yml
+      # vars:
+      #   ocp_cluster_bin_directory: "{{ remote_bin_folder }}"
+
+- name: "Extract installation directory from passwordstore"
+  hosts: "localhost"
+  gather_facts: false
+
+  tasks:
+
+    - name: "Extract installation directory from passwordstore"
+      ansible.builtin.copy: 
+        content: "{{ query('passwordstore', 'openstack/' + ocp_cluster_name + '/install_dir')[0] | b64decode }}" 
+        dest: /tmp/ocp-installation-{{ ocp_cluster_name }}.tgz
+      when: ocp_bootstrap_host is not defined
+
+    - name: "Extract installation directory from passwordstore"
+      ansible.builtin.copy: 
+        content: "{{ query('passwordstore', 'openstack/' + ocp_bootstrap_host + '/install_dir')[0] | b64decode }}" 
+        dest: /tmp/ocp-installation-{{ ocp_cluster_name }}.tgz
+      when: ocp_bootstrap_host is defined
+
+- name: "Expand installation directory on Jump Server"
+  hosts: "{{ vm_name | default([]) }}"
+  gather_facts: true
+  vars: 
+    remote_bin_folder: /home/snowdrop/.local/bin
+
+  tasks:
+
+    - name: Copy installation folder to remote host
+      ansible.builtin.copy:
+        src: /tmp/ocp-installation-{{ ocp_cluster_name }}.tgz
+        dest: /tmp/ocp-installation-{{ ocp_cluster_name }}.tgz
+
+    - name: "Create OCP cluster directory"
+      ansible.builtin.file:
+        path: "{{ ocp_root_directory }}/{{ ocp_cluster_name }}"
+        state: directory
+        owner: "{{ ansible_user_id }}"
+        group: "{{ ansible_user_id }}"
+        mode: '0755'
+
+    - name: Extract OCP installation into /home/snowdrop
+      ansible.builtin.unarchive:
+        src: /tmp/ocp-installation-{{ ocp_cluster_name }}.tgz
+        dest: "{{ ocp_root_directory }}/{{ ocp_cluster_name }}"
+
+...
+

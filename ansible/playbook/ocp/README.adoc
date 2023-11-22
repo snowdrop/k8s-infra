@@ -281,7 +281,6 @@ To collect information on the OCP cluster execute the
  `ocp_openstack_info` playbook located at the `ansible/playbook/ocp/` 
  folder.
 
-
 .Playbook parameters
 [%header,cols="25%,75%"]
 |===
@@ -333,3 +332,61 @@ ansible-playbook ansible/playbook/ocp/ocp_openstack_info.yml \
   -e vm_name=ocp-sdev-zzzzz-jump-server -vv
 ----
 
+=== Init jump server
+
+This playbook init's a jump server by performing the following tasks:
+
+* Downloads the OCP and k8s CLI binaries into the jump server
+* Copy the OCP cluster installation folder from passwordstore
+ into the jump server.
+
+.Playbook parameters
+[%header,cols="25%,75%"]
+|===
+| Variable | Description
+
+| `ocp_root_directory`
+
+[.fuchsia]#string# / [.red]#required# 
+
+a| Root folder for the OCP installation.
+
+Either define the `ocp_root_directory` and `ocp_cluster_name` variables 
+ or the `installation_dir` one.
+
+| `ocp_cluster_name`
+
+[.fuchsia]#string# / [.red]#required# 
+
+a| Name of the OCP cluster
+
+Either define the `ocp_root_directory` and `ocp_cluster_name` variables 
+ or the `installation_dir` one.
+
+| `ocp_cluster_bin_directory`
+
+[.fuchsia]#string#
+
+a| Folder that will contain the OCP and k8s CLI binaries
+
+*Default => `<ocp_root_directory>/bin`*
+
+| `vm_name`
+
+[.fuchsia]#string# / [.red]#required# 
+
+a| Root folder where for the installation. A new sub-folder with the 
+ `ocp_cluster_name` name will be created and will serve as the 
+ installation folder.
+
+|===
+
+[source,bash]
+----
+ansible-playbook ansible/playbook/ocp/rhosp_init_jump_server_pass.yml \
+  -e ocp_root_directory=/home/snowdrop/ocp \
+  -e ocp_cluster_name=ocp-sdev \
+  -e vm_name=ocp-jump-server \
+  -e ocp_cluster_bin_directory=/home/snowdrop/.local/bin \
+  -vv
+----
