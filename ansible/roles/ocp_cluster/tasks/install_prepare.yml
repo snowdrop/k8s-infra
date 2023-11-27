@@ -6,7 +6,7 @@
     owner: "{{ ansible_user_id }}"
     group: "{{ ansible_user_id }}"
     mode: '0755'
-  become: true
+  # become: true
   loop:
     - "{{ ocp_root_directory }}"
     - "{{ ocp_root_directory }}/bin"
@@ -23,7 +23,7 @@
     owner: "{{ ansible_user_id }}"
     group: "{{ ansible_user_id }}"
     mode: '0755'
-  become: true
+  # become: true
   register: create_bin_dir_res
   when: ocp_cluster_bin_directory is defined
 
