@@ -43,16 +43,17 @@
       loop_control:
         loop_var: requirements_file
 
-    - name: Install required packages
-      ansible.builtin.package:
-        name: "{{ package_to_install }}"
-        state: present
-      become: true
-      loop:
-        - httpd-tools
-        - python3-pip
-      loop_control:
-        loop_var: package_to_install
+    # - name: Install required packages
+    #   ansible.builtin.package:
+    #     name: "{{ package_to_install }}"
+    #     state: present
+    #   become: true
+    #   loop:
+    #     - httpd-tools
+    #     - python3-pip
+    #   loop_control:
+    #     loop_var: package_to_install
+    #   when: ocp_bootstrap_host is defined
 
     - name: Install specified python requirements
       ansible.builtin.pip:
