@@ -16,7 +16,7 @@
     group: "{{ ansible_user_id }}"
     mode: '0755'
   register: create_install_dir_res
-  become: true
+  # become: true
 
 # stage('Download key to our DNS server') {
 #     // TODO --no-check-certificate shouldn't be necessary on proper slaves
