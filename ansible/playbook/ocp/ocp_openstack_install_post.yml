@@ -95,7 +95,7 @@
           - "$ ansible-playbook ansible/playbook/ocp/ocp_openstack_create_jump_server.yml -e tmp_directory={{ tmp_directory }} -e ocp_root_directory={{ ocp_root_directory }} -e ocp_cluster_name={{ ocp_cluster_name }} -e vm_name={{ ocp_cluster_metadata.infraID }}-jump-server {% if ocp_bootstrap_host is defined %}-e ocp_bootstrap_host={{ ocp_bootstrap_host }}{% endif %}"
 
 - name: "Publish cluster Console DNS records"
-  ansible.builtin.import_playbook: "../godady/godaddy_dns_create_passwordstore.yml"
+  ansible.builtin.import_playbook: "../godaddy/godaddy_dns_create_passwordstore.yml"
   vars:
     api_environment: prod
     dns:
@@ -105,7 +105,7 @@
     record_type: A
 
 - name: "Publish cluster API DNS records"
-  ansible.builtin.import_playbook: "../godady/godaddy_dns_create_passwordstore.yml"
+  ansible.builtin.import_playbook: "../godaddy/godaddy_dns_create_passwordstore.yml"
   vars:
     api_environment: prod
     dns:
