@@ -1,0 +1,4 @@
+---
+- name: "Openstack VM init"
+  ansible.builtin.import_playbook: "openstack_vm_init.yml"
+...
