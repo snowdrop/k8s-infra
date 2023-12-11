@@ -2,7 +2,7 @@ ocp_mirror: https://mirror.openshift.com/pub/openshift-v4/clients/ocp
 ocp_version: 4.13.9
 ocp_cluster_name: ocp
 ocp_user: snowdrop
-ocp_root_directory: /opt/ocp
+ocp_root_directory: "{{ ansible_env.HOME }}/ocp"
 ocp_master_nodes: 3
 ocp_worker_nodes: 3
 ocp_cluster_user_admin_name: admin
@@ -38,4 +38,4 @@ use_dns: false
 # Values: godaddy, local
 dns_provider: godaddy
 
-rhos_log_path: /opt/log
+rhos_log_path: "{{ ansible_env.HOME }}/ocp/log"

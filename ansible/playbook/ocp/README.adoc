@@ -166,7 +166,7 @@ a| Root folder where for the installation. A new sub-folder with the
 
 [.fuchsia]#json# / [.red]#required# 
 
-a| OCP pull secret for the user
+a| String of the OCP pull secret for the user.
 
 | `openstack_flavor_control_plane`
 
@@ -262,6 +262,41 @@ For the removal process to be successfull the OCP installation directory
 (`installation_dir`) must be provided as it store information on the RHOS
 objects associated to the project.
 ====
+
+[#deploy-ocp-on-rhos]
+== Deploy OCP Cluster on RHOS
+
+The deployment playbook supports the follow variable entries.
+
+.Script options
+[%header,cols="25%,75%"]
+|===
+| Variable | Description
+
+| `ocp_bootstrap_host`
+
+[.fuchsia]#string#
+
+a| VM name for the host that contains the OCP installation folder.
+
+If defined the installation process will be performed not on the 
+ `localhost` controller but on the identified VM.
+
+| `ocp_cluster_name`
+
+[.fuchsia]#string# / [.red]#required# 
+
+a| Name of the OCP cluster
+
+| `ocp_root_directory`
+
+[.fuchsia]#string# / [.red]#required# 
+
+a| Root folder where for the installation. 
+
+*TODO: must be added as part of the ansible inventory*
+
+|===
 
 .Command to execute the OCP cluster removal playbook.
 [source,bash]

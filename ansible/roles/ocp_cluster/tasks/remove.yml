@@ -8,6 +8,8 @@
   environment: 
     OS_CLIENT_CONFIG_FILE: "{{ tmp_directory }}/clouds.yaml"
 
+# TODO: When removing the
+
 - name: "Delete installation directory"
   ansible.builtin.file:
     path: "{{ installation_dir }}"

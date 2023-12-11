@@ -2,6 +2,10 @@
 - name: "Build OpenStack authentication for v3password"
   ansible.builtin.import_playbook: "../openstack/openstack_auth_passstore_v3password.yml"
 
+- name: "Build GoDaddy authentication, if not provided"
+  import_playbook: "../godaddy/godaddy_auth_passwordstore.yml"
+  when: use_dns and dns_provider == 'godaddy'
+
 - name: "Get localhost user home"
   hosts: "localhost"
   gather_facts: true
