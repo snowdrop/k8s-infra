@@ -2,7 +2,7 @@
 
 - name: "Openstack VM init"
   hosts: "{{ vm_name | default([]) }}"
-  gather_facts: "{{ vm_name is defined and (not skip_post_installation is defined or not skip_post_installation) }}"
+  gather_facts: "{{ vm_name is defined and (not skip_post_installation is defined or not skip_post_installation | bool) }}"
   module_defaults:
     ansible.builtin.setup:
       gather_timeout: 45000
