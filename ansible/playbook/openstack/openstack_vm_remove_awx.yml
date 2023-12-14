@@ -50,7 +50,7 @@
         fail_msg: "IaaS Provider is either undefined or not 'openstack'"
 
 - name: "Delete Server on Openstack"
-  import_playbook: "openstack_vm_delete.yml"
+  import_playbook: "openstack_vm_remove.yml"
   when: "iaas_provider is not defined or iaas_provider == 'openstack'"
 
 - name: "Remove credentials from AWX"

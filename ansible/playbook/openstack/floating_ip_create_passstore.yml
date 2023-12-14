@@ -1,0 +1,123 @@
+---
+# Requires:
+# vars:
+#   tmp_directory: temporary directory =/opt/ocp/_tmp/ansible.yxam0y7mbuild 
+#   ocp_root_directory: /opt/ocp 
+#   ocp_cluster_name: ocp-sdev 
+#   vm_name: ocp-sdev-p75fs-jump-server
+- name: "Build OpenStack authentication for v3password"
+  ansible.builtin.import_playbook: "../openstack/openstack_auth_passstore_v3password.yml"
+
+- name: "Create floating IP for Jump Server"
+  hosts: localhost
+  gather_facts: true
+
+  tasks:
+
+    - name: Getting fip by associated fixed IP address.
+      openstack.cloud.floating_ip_info:
+        auth: "{{ rhos_auth }}"
+        auth_type: "{{ rhos_auth_type }}"
+        fixed_ip_address: "{{ query('passwordstore', 'openstack/' + vm_name + '/ansible_ssh_host' )[0] }}"
+      register: fip
+      ignore_errors: true
+
+    - name: "Print FIP query"
+      ansible.builtin.debug:
+        msg: 
+          - "fip: {{ fip }}"
+        verbosity: 1
+
+    - name: "Set floating ip variable is already created"
+      ansible.builtin.set_fact:
+        jump_server_floating_ip: "{{ fip.floating_ips[0].floating_ip_address }}"
+      when: not fip.failed and (fip.floating_ips | length > 0)
+
+    - name: "Create Floating IP for Jump Server"
+      openstack.cloud.floating_ip:
+        auth: "{{ rhos_auth }}"
+        auth_type: "{{ rhos_auth_type }}"
+        state: present
+        reuse: true
+        server: "{{ vm_name }}"
+        network: "{{ rhos_network | default('provider_net_cci_13') }}"
+        wait: true
+        timeout: 180
+      register: rhos_floating_ip_jump_server_res
+      when: jump_server_floating_ip is not defined
+
+    - name: "Print rhos_floating_ip_jump_server_res"
+      ansible.builtin.debug:
+        msg: 
+          - "rhos_floating_ip_jump_server_res: {{ rhos_floating_ip_jump_server_res }}"
+        verbosity: 1
+
+    - name: "Set floating ip variable is already created"
+      ansible.builtin.set_fact:
+        jump_server_floating_ip: "{{ rhos_floating_ip_jump_server_res.floating_ip.fixed_ip_address }}"
+      when: jump_server_floating_ip is not defined
+
+    - name: "Print jump_server_floating_ip"
+      ansible.builtin.debug:
+        msg: 
+          - "jump_server_floating_ip: {{ jump_server_floating_ip }}"
+        verbosity: 1
+
+    - name: "Store Floating IP on the passwordstore"
+      ansible.builtin.set_fact:
+        ansible_installation_folder_passwordstore: "{{ query('passwordstore', 'openstack/' + vm_name + '/floating_ip create=True userpass=' + jump_server_floating_ip )[0] }}"
+
+- name:  "Wait for the VM to boot and we can ssh"
+  hosts: "{{ vm_name | default([]) }}"
+  gather_facts: no
+
+  tasks:
+
+    - name: "Wait for connection to host"
+      ansible.builtin.wait_for:
+        host: "{{ query('passwordstore', 'openstack/' + inventory_hostname + '/floating_ip')[0] }}"
+        port: "{{ query('passwordstore', 'openstack/' + inventory_hostname + '/ansible_ssh_port')[0] }}"
+        timeout: 120
+      vars:
+        ansible_connection: local
+      register: wait_for_connection_reg
+
+  post_tasks:
+
+    - name: Refresh the inventory so the newly added host is available
+      meta: refresh_inventory
+
+    - name: "DON'T FORGET TO SECURE YOUR SERVER"
+      ansible.builtin.debug:
+        msg: 
+          - "DON'T FORGET TO SECURE YOUR SERVER!!!"
+          - ""
+          - "Trying to start start server securization automatically."
+          - "For manual execution: $ ansible-playbook ansible/playbook/sec_host.yml -e vm_name={{ vm_name }} -e provider=openstack"
+
+- name: "Add to known hosts"
+  hosts: localhost
+  gather_facts: true
+
+  tasks:
+
+    - name: "Add host Floating IP to known hosts {{ hostvars[vm_name]['floating_ip'] }}"
+      ansible.builtin.known_hosts:
+        name: "{{ hostvars[vm_name]['floating_ip'] }}"
+        key: "{{ lookup('pipe', 'ssh-keyscan {{ hostvars[vm_name].floating_ip }}') }}"
+        hash_host: true
+
+- name: "Add to known hosts"
+  hosts: "{{ vm_name | default([]) }}"
+  gather_facts: true
+
+  tasks:
+
+    - name: "Add host Floating IP to known hosts {{ hostvars[vm_name]['floating_ip'] }}"
+      ansible.builtin.known_hosts:
+        name: "{{ hostvars[vm_name]['floating_ip'] }}"
+        key: "{{ lookup('pipe', 'ssh-keyscan {{ hostvars[vm_name].floating_ip }}') }}"
+        hash_host: true
+
+...
+# ansible-playbook ansible/playbook/openstack/floating_ip_create_passstore.yml -e rhos_network=provider_net_cci_13 -e vm_name=ocp-jump-server

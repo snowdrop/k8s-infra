@@ -1,9 +1,11 @@
-= OpenStack
-Snowdrop Team (Antonio Costa)
+= Red Hat Open Stack
+Snowdrop Team
 :icons: font
 :revdate: {docdate}
 :toc: left
-:description: This document describes the requirements and the process to execute the provisioning of a Cloud VM on Openstack.
+:toclevels: 3
+:description: Red Hat Open Stack tools
+:sectnums:
 ifdef::env-github[]
 :tip-caption: :bulb:
 :note-caption: :information_source:
@@ -12,63 +14,361 @@ ifdef::env-github[]
 :warning-caption: :warning:
 endif::[]
 
-== Prerequisites
-// tag::rhos_prerequisites[]
+== Introduction
 
-The following python packages are needed:
+[.lead]
+This document describes the tools that help provision and maintain 
+ infrastructure on a Red Hat Openstack Platform.
 
-- https://github.com/micheles/decorator/blob/master/docs/documentation.md#usefulness-of-decorators[decorator]
-- https://pypi.org/project/openstacksdk/[openstacksdk] (Version: 1.2.0)
+The tools implemented are the following:
 
-and can be installed using pip
+* Provision VMs on RHOSP
+* Provision OCP cluster on RHOSP
 
-[source,bash]
-----
-$ [sudo] pip3 install decorator
-$ [sudo] pip3 install openstacksdk
-----
+[glossary]
+== Terminology
 
-like also the `openstack.cloud` Ansible collection.
+Glossary of terms used.
 
-[source,bash]
-----
-$ ansible-galaxy collection install openstack.cloud
-----
-// end::rhos_prerequisites[]
+[glossary]
+FS:: Filesystem
+Host:: Target OpenStack instance or VM
+OCP:: OpenShift Container Platform
+RHOSP:: Red Hat OpenStack Platform
 
-== VM Required Information
+== Requirements
 
-=== Images
+The following requirements must be met to fully use this project.
 
-Different OS images are available on Openstack.
+=== Passwordstore
 
-.OpenStack Image information
-[%header,cols="2m,1,1,1"]
+Passwordstore is used during the execution of the ansible playbooks when RHOSP 
+ instances or OCP clusters are created/removed. In one hand it 
+ provides information for the deployment process, such as RHOSP authentication, 
+ and also to store the results of the process and be used as Ansible 
+ inventory.
+
+[NOTE]
+====
+All RHOSP information will be stored under the `/openstack` passwordstore folder.
+====
+
+=== VPN
+
+This document assumes that you have access to the RHOSP infrastructure. In 
+ the case of RHOS-PSI it is only available connected to the Red Hat VPN.
+
+[#rhosp-authentication]
+== RHOSP authentication
+
+As this project connects to a RHOSP infrastructure, authenticating 
+ against that platform is needed. Before using this project collect the 
+ authentication information that fits your needs.
+
+The default authentication plugin for this project is `v3password`. In order 
+ to use this plugin the following information is required.
+
+.RHOSP authentication information
+[%header,cols="20%m,80%"]
 |===
-| Name | OS | Version | FS
+| Variable | Meaning
 
-| Fedora-Cloud-Base-35 | Fedora | 35 | BTRFS
-| CentOS-8-x86_64-GenericCloud-released-latest | CentOS | 8 | ????
-| CentOS-7-x86_64-GenericCloud-released-latest | CentOS | 7 | ????
+| auth_type
+
+a| Authentication plugin that will be used to handle the authentication process. In this scenario the value will be `v3password`.
+
+[TIP]
+====
+Other values can be selected such as `v3token`.
+
+Check the `openstack` CLI man page or the 
+ link:https://docs.openstack.org/python-openstackclient/latest/cli/man/openstack.html[OpenStack CLI web man] for a list of possible plugins.
+====
+
+| auth_url
+
+a| Authentication URL
+
+| password
+
+a| Authentication password
+
+| project_domain_name
+
+a| Domain name or ID containing project
+
+| project_name
+
+a| Project-level authentication scope (name or ID)
+
+| username
+
+a| Authentication username
+
+| user_domain_name
+
+a| Domain name or ID containing user
 
 |===
 
-=== Flavors
+[TIP]
+====
+For more detailed information on RHSOP authentication check the 
+ link:https://docs.openstack.org/python-openstackclient/latest/cli/authentication.html[OpenStack CLI Authentication] 
+ document.
+====
 
-.OpenStack Flavor information
+=== Ansible playbooks
+
+2 Ansible playbooks are already available to collect the required 
+ authentication information from passwordstore.
+
+* *link:../ansible/playbook/openstack/openstack_auth_passstore_v3password.yml[openstack_auth_passstore_v3password.yml] <= Default*
+* link:../ansible/playbook/openstack/openstack_auth_passstore_v3applicationcredential.yml[openstack_auth_passstore_v3applicationcredential.yml]
+
+These playbooks collect the required information from the 
+ `passwordstore` and fill the `rhos_auth` map and `rhos_auth_type` Ansible host variables that are later used on Playbooks and Roles.
+
+==== openstack_auth_passstore_v3password
+
+The default authentication playbook is `openstack_auth_passstore_v3password.yml` 
+ and uses the *v3password* authentication plugin. It collects the 
+ required information from the passwordstore. 
+
+.Source for `v3password` authentication
+[%header,cols="5%,15%,80%"]
+|===
+2+| Variable | Passwordstore source
+
+2+| `rhos_auth` | 
+
+| {nbsp}
+| `auth_url`
+| `openstack/host/os_auth_url`
+
+| {nbsp}
+| `password`
+| `openstack/host/console_pw`
+
+| {nbsp}
+| `password`
+| `openstack/host/console_pw`
+
+| {nbsp}
+| `project_domain_name`
+| `openstack/host/os_domain`
+
+| {nbsp}
+| `project_name`
+| `openstack/host/project_name`
+
+| {nbsp}
+| `username`
+| `openstack/host/console_user`
+
+| {nbsp}
+| `user_domain_name`
+| `openstack/host/console_domain`
+
+2+| `rhos_auth_type`
+a| Authentication plugin used, with is `v3password` in this case.
+
+|===
+
+.Click to show sample Ansible Playbook for setting the RHOSP authentication facts
+[%collapsible]
+======
+[source,yaml]
+----
+include::../ansible/playbook/openstack/openstack_auth_passstore_v3password.yml[]
+----
+======
+
+== Ansible Inventory
+
+The inventory of all RHOSP hosts is managed by Ansible.
+
+[NOTE]
+====
+Please refer to our link:../ansible/README.adoc[Ansible Document] for more information on the project Ansible Inventory.
+====
+
+The host information will be stored under the `openstack` folder where a 
+ sub-folder exists for each host. It also stores the SSH public and secret 
+ keys locally on the user's `~/.ssh` folder. 
+
+== VM Provisioning
+
+The main goal of the RHOSP tools is to provision hosts and 
+ store their information on the team passwordstore inventory for 
+ later use by the team members.
+
+Prior to deploying a host aspects such as the OS image and 
+ the sizing of the host must be addressed.
+
+=== Preparing the Provisioning
+
+[WARNING]
+====
+The examples provided here are photos of a specific time frame and 
+ RHOSP implementation. To get and updated lists of your available images 
+ and flavors check your RHOSP cluster using either 
+ the RHOSP console or the link:openstack-cli.adoc[RHOSP CLI].
+====
+
+==== OS Image
+
+[quote,RedHat RHOSP Documentation,The Image service (glance)]
+A virtual machine image is a file that contains a virtual disk with a bootable operating system installed.
+
+To identify available images and choose which one to use check our docs on the link:openstack-cli.adoc[RHOSP CLI tool] which describe some of the most used commands.
+
+.Sample OpenStack Cloud image list
+[%header,cols="45%,45%,10%"]
+|===
+| ID | Name  | Status
+| 0b7d28c6-56ec-4d72-      | Fedora-Cloud-Base-30           | active 
+| 59ed78ec-c632-4a9d-      | Fedora-Cloud-Base-32           | active 
+| 6e6327eb-522a-4d7e-      | Fedora-Cloud-Base-33           | active 
+| e5b85cf9-6b7c-44a0-      | Fedora-Cloud-Base-34           | active 
+| 8b8ab2a1-e349-4313-      | Fedora-Cloud-Base-35           | active 
+| ca58d538-674d-40c8-      | Fedora-Cloud-Base-36           | active 
+| cbea8fed-                     | Fedora-Cloud-Base-37           | active 
+|===
+
+[#flavors]
+==== Flavors
+
+[quote,RedHat RHOSP Documentation,Flavors]
+In OpenStack, flavors define the compute, memory, and storage capacity of nova computing instances. To put it simply, a flavor is an available hardware configuration for a server. It defines the size of a virtual server that can be launched.
+
+Reduced list of flavors obtained from our RHOSP cluster.
+
+.Sample OpenStack Flavor information
 [%header,cols="2m,1,1,1,1,1"]
 |===
-| Flavor | VCPUS | RAM | Total Disks | Root Disk | Ephmeral Disk
+| Flavor | VCPUS | RAM | Total Disks | Root Disk | Ephemeral Disk
 
-| m1.medium | 2 | 4 GB | 40 GB | 40 GB | 0 GB 
-| ci.m1.medium | 2 | 4 GB | 40 GB | 40 GB | 0 GB 
-| ci.m1.medium.large	| 4| 4 GB | 16 GB | 16 GB | 0 GB 
-| ci.m4.xlarge	| 4| 16 GB | 40 GB | 40 GB | 0 GB 
-| g.standard.xxl | 12 | 24GB | 120GB | 120GB | 0GB 
-| ci.m5.large | 16 | 32GB | 40GB | 40GB | 0GB 
+| m1.medium           | 2  | 4 GB  | 40 GB | 40 GB | 0 GB 
+| ci.m1.medium        | 2  | 4 GB  | 40 GB | 40 GB | 0 GB 
+| ci.m1.medium.large  | 4  | 4 GB  | 16 GB | 16 GB | 0 GB 
+| ci.m4.xlarge	      | 4  | 16 GB | 40 GB | 40 GB | 0 GB 
+| ci.m5.large         | 16 | 32GB  | 40GB  | 40GB  | 0GB 
+| g.standard.xxl      | 12 | 24GB  | 120GB | 120GB | 0GB 
+| ocp4.single-node    | 24 | 48GB  | 200GB | 200GB | 0GB 
+| ocp4.control        | 4  | 16GB  | 100GB | 100GB | 0GB 
+| ocp4.compute        | 2  | 8GB   | 100GB | 100GB | 0GB 
+| ocp4.bootstrap      | 4  | 16GB  | 100GB | 100GB | 0GB 
 |===
 
-== Available Ansible Playbooks
+==== Networks
 
-More information on the available OpenStack Ansible Playbooks on the 
-link:../ansible/playbook/openstack/README.adoc[Playbook README].
+[quote,RedHat RHOSP Documentation,Network]
+A network is an isolated Layer 2 networking segment.
+
+`provider_net_shared` is the default network to be used.
+
+.Sample network list
+[source]
+----
++-------------------------+-------------------------+--------------------------+
+| ID                      | Name                    | Subnets                  |
++-------------------------+-------------------------+--------------------------+
+| 0e212597-e475-4c4a-     | provider_net_cci_13     | d3b1c702-bb71-4547-8cf0- |
+| a4fa-db71f84ec04c       |                         | 2ff5f9802595             |
+| 5058fef2-f89f-4e70-     | provider_net_cci_7      | eb8db9f4-a76f-4fe2-a0bd- |
+| 9e01-66af2847ddc4       |                         | f932bc20dfa1             |
+| 68a8220a-20f4-4940-     | provider_net_cci_4      | 10a8b6b3-7ff5-4933-9e31- |
+| 99b4-45b6f98bce6b       |                         | 9be0f25d745e             |
+| 6a32627e-d98d-40d8-     | provider_net_shared     | b7e7d2b5-efc1-462a-96ec- |
+| 9324-5da7cf1452fc       |                         | eda940820520             |
++-------------------------+-------------------------+--------------------------+
+----
+
+More information on RHOSP networks on link:openstack-cli.adoc#network[our OpenStack CLI document] 
+ and in the link:https://docs.openstack.org/python-openstackclient/latest/cli/command-objects/network.html[OpenStack CLI official documentation].
+
+=== Provision the VM
+
+[.lead]
+Once the system configuration is identified it's time to create a new Host 
+ which can be done using our pre-prepared Ansible Playbooks. 
+
+[WARNING]
+====
+Detailed documentation on Host provisioning can be found at our 
+ link:../ansible/playbook/openstack/README.adoc[OpenStack Ansible Playbooks] document.
+ 
+On this document you'll find:
+
+* list of the available playbooks;
+* execution instructions to perform the VM provision operations, including 
+  all the parameters available on the playbooks
+* inormation on the outputs of each playbook 
+====
+
+To quickly create a Host you can use the following command, taking care to 
+ check the `network`, `image`, `flavor` and `vm_name` variables 
+ that  should be filled according to your implementation.
+
+.Create OpenStack Host command
+[source,bash]
+----
+ansible-playbook ansible/playbook/openstack/openstack_vm_create_passwordstore.yml -e '{"openstack": {"vm": {"network": "provider_net_shared","image": "Fedora-Cloud-Base-37", "flavor": "m1.medium"}}}' -e vm_name=snowdrop_sample_vm
+----
+
+To delete the newly created host execute the following command.
+
+.Remove OpenStack Host command
+[source,bash]
+----
+ansible-playbook ansible/playbook/openstack/openstack_vm_remove_passwordstore.yml -e vm_name=snowdrop_sample_vm
+----
+
+== Connect to a RHOSP instance
+
+To improve usability the link:../tools/passstore-vm-ssh.sh[`tools/passstore-vm-ssh.sh`] 
+ bash script has been created. It makes it easier to connect to any 
+ host under the project's Ansible Inventory. 
+ 
+More documentation on the bash script can be found link:../tools/README.md[here].
+
+To SSH connect to a VM use the  bash script.
+
+.Sample connection execution
+[source,bash]
+----
+./tools/passstore-vm-ssh.sh openstack snowdrop_sample_vm
+----
+
+This should connect ot the newly created VM.
+
+====
+----------------------------
+Last login: Thu Jan 1 00:00:00 1970 from x.x.x.x
+------------------
+
+This machine is property of RedHat.
+Access is forbidden to all unauthorized person.
+All activity is being monitored.
+
+Welcome to snowdrop_sample_vm.
+----------------------------
+====
+
+== Deploy OCP on RHOSP
+
+[.lead]
+Set of Ansible Playbooks and Roles that deploy an OCP cluster on RHOSP.
+
+This set of Ansible playbooks will provision an OCP cluster, tailored 
+ to the selected size. It will also provision a jump server that will 
+ allow ssh connections to the cluster nodes.
+
+To perform this installation check the link:../ansible/playbook/ocp/README.adoc[OCP on RHOSP Ansible Playbooks] document.
+
+== OpenStack CLI
+
+The OpenStack CLI tool comes very handy to perform several checks and 
+ information collection. We've created the link:openstack-cli.adoc[RHOSP CLI] 
+ document to describe some of the most used commands.

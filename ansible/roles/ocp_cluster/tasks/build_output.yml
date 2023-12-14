@@ -1,0 +1,34 @@
+---
+- name: Download OCP binary files
+  ansible.builtin.include_tasks: get_metadata.yml
+
+- name: "Read masters from installation folder"
+  ansible.builtin.slurp:
+    src: "{{ installation_dir + '/masters.tfvars.json' }}"
+  register: ocp_cluster_slurp_masters
+
+- name: "Read kubeadmin password from installation folder"
+  ansible.builtin.slurp:
+    src: "{{ installation_dir + '/auth/kubeadmin-password' }}"
+  register: ocp_cluster_slurp_kubeadminpw
+
+- name: "Read kubeconfig from installation folder"
+  ansible.builtin.slurp:
+    src: "{{ installation_dir + '/auth/kubeconfig' }}"
+  register: ocp_cluster_slurp_kubeconfig
+
+- name: "Set output variables"
+  ansible.builtin.set_fact:
+    ocp_cluster:
+      cluster_details: "{{ ocp_cluster_details }}"
+      floating_ip_api_address: "{{ rhos_floating_ip_api_res.stdout }}"
+      floating_ip_ingress_address: "{{ rhos_floating_ip_ingress_res.stdout }}"
+      installation_dir: "{{ installation_dir }}"
+      kubeadmin_password: "{{ ocp_cluster_slurp_kubeadminpw.content | b64decode }}"
+      kubeconfig: "{{ ocp_cluster_slurp_kubeconfig.content | b64decode| from_yaml }}"
+      masters: "{{ ocp_cluster_slurp_masters.content | b64decode | from_json }}"
+      metadata: "{{ ocp_cluster_metadata }}"
+      ocp_bin_directory: "{{ ocp_cluster_bin_directory }}"
+      ocp_root_directory: "{{ ocp_root_directory }}"
+      tmp_directory: "{{ tmp_directory }}"
+...

@@ -1,20 +1,10 @@
 = Ansible
 Snowdrop Team (Antonio costa)
-Snowdrop Team (Antonio costa)
 :icons: font
-:revdate: {docdate}
 :revdate: {docdate}
 :toc: left
 :toclevels: 3
-:toclevels: 3
 :description: This document introduces some of the key concepts that you should be aware when you play with Ansible in order to configure the environment to let Ansible to access the different machines.
-ifdef::env-github[]
-:tip-caption: :bulb:
-:note-caption: :information_source:
-:important-caption: :heavy_exclamation_mark:
-:caution-caption: :fire:
-:warning-caption: :warning:
-endif::[]
 ifdef::env-github[]
 :tip-caption: :bulb:
 :note-caption: :information_source:
@@ -32,6 +22,11 @@ The exception goes to the playbooks that are executed against `localhost`. This 
 
 NOTE: Check the Ansible https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html#ansible-core-support-matrix[requirement] page for Python compatibility !
 
+[#ansible-inventory]
+== Ansible Inventory
+
+The Ansible Inventory is managed by 
+
 == Installation guide
 
 In order to play with the playbooks/roles of this project, it is needed to:
@@ -48,14 +43,15 @@ In order to play with the playbooks/roles of this project, it is needed to:
 
 [NOTE]
 ====
-Since passwordstore is integrated with [git](https://git-scm.com/), all changes made locally to a pass repository are automatically committed to the local git repo.
+Since passwordstore is integrated with link:https://git-scm.com/[git], all changes made locally to a pass repository are automatically committed to the local git repo.
 ====
 
-[NOTE]
+[WARNING]
 ====
 Don't forget to `git push` and `git pull` often in order to have your local repository synchronized with other team members as well as publishing to the team your changes. 
 ====
 
+[#python-venv]
 === Python Virtual Environments
 
 This project suggests using a link:https://docs.python.org/3/library/venv.html[python virtual environment] 
@@ -282,7 +278,7 @@ Because a host can already be defined under the store, prior to execute the play
 
 [source,bash]
 ----
-$ pass hetzner
+pass hetzner
 hetzner
 ├── ...
 ├── host-1
@@ -312,7 +308,7 @@ If a host has already been created, it can be imported within the inventory usin
 
 [source,bash]
 ----
-$ ansible-playbook ansible/playbook/passstore_controller_inventory.yml -e vm_name=<VM_NAME> -e pass_provider=hetzner
+ansible-playbook ansible/playbook/passstore_controller_inventory.yml -e vm_name=<VM_NAME> -e pass_provider=hetzner
 ----
 
 where `<VM_NAME>` corresponds to the host key created under `hetzner`.
@@ -334,7 +330,7 @@ This is done using the `passstore_controller_inventory_remove` playbook. More in
 
 [source,bash]
 ----
-$ ansible-playbook ansible/playbook/passstore_controller_inventory_remove.yml -e vm_name=<vm_name> -e pass_provider=<provider>
+ansible-playbook ansible/playbook/passstore_controller_inventory_remove.yml -e vm_name=<vm_name> -e pass_provider=<provider>
 ----
 
 === Create Server

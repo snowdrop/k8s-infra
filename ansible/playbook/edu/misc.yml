@@ -1,0 +1,19 @@
+---
+- name: "Print stuff"
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: "Print ansible_python_interpreter dictionary"
+      debug:
+        var: ansible_python_interpreter
+    
+    - name: "Print hostvars[inventory_hostname] dictionary"
+      debug:
+        var: hostvars[inventory_hostname]
+
+    - name: "Print hostvars['charles-vm'] dictionary"
+      debug:
+        var: hostvars['charles-vm']
+
+...

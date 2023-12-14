@@ -28,7 +28,7 @@ This playbook will create a passwordstore folder structure that will be the base
 An example:
 
 ```bash
-$ ansible-playbook ansible/playbook/passstore_controller_inventory.yml -e vm_name=my-host -e pass_provider=hetzner -e k8s_type=masters -e k8s_version=115 --tags create
+ansible-playbook ansible/playbook/passstore_controller_inventory.yml -e vm_name=my-host -e pass_provider=hetzner -e k8s_type=masters -e k8s_version=115 --tags create
 ```
 
 This execution would generate the following `pass` structure:
@@ -61,7 +61,7 @@ $ ls -l ~/.ssh/
 This playbook will remove the records and files created by the [`passstore_controller_inventory`](#passstore_controller_inventory) playbook.
 
 ```bash
-$ ansible-playbook ansible/playbook/passstore_controller_inventory_remove.yml -e vm_name=my-host -e pass_provider=hetzner
+ansible-playbook ansible/playbook/passstore_controller_inventory_remove.yml -e vm_name=my-host -e pass_provider=hetzner
 ```
 
 Variables:
@@ -126,25 +126,25 @@ This playbook allows to easily add and remove hosts from an ansible group manage
 **WARNING**: No entries will be added or removed using this playbook within the `hosts.yaml` file !
 
 ```bash
-$ ansible-playbook ansible/playbook/passstore_manage_host_groups.yml -e operation=add -e group_name=<my_group> -e vm_name=<my_host>
+ansible-playbook ansible/playbook/passstore_manage_host_groups.yml -e operation=add -e group_name=<my_group> -e vm_name=<my_host>
 ```
 
 For instance, adding a host named `n01-k115` to the `k8s_115` group would be done the following way:
 
 ```bash
-$ ansible-playbook ansible/playbook/passstore_manage_host_groups.yml -e operation=add -e group_name=k8s_115 -e vm_name=n01-k115
+ansible-playbook ansible/playbook/passstore_manage_host_groups.yml -e operation=add -e group_name=k8s_115 -e vm_name=n01-k115
 ```
 
 To remove the host from the group just remove the entry from the group folder as following...
 
 ```bash
-$ ansible-playbook ansible/playbook/passstore_manage_host_groups.yml -e operation=remove -e group_name=<my_group> -e vm_name=<my_host>
+ansible-playbook ansible/playbook/passstore_manage_host_groups.yml -e operation=remove -e group_name=<my_group> -e vm_name=<my_host>
 ```
 
 For instance, to undo the previous host operation:
 
 ```bash
-$ ansible-playbook ansible/playbook/passstore_manage_host_groups.yml -e operation=remove -e group_name=k8s_115 -e vm_name=n01-k115
+ansible-playbook ansible/playbook/passstore_manage_host_groups.yml -e operation=remove -e group_name=k8s_115 -e vm_name=n01-k115
 ```
 
 == Modules

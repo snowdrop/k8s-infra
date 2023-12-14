@@ -77,9 +77,20 @@ for (dirpath, dirnames, filenames) in walk(password_store_dir):
                                     passLines = pipe.stdout.readlines()
                                     passEntry = passLines[0].replace('\n', '')
                                     if ('os_user' == passEntryName):
+                                        host_vars.update({passEntryName:passEntry})
                                         host_vars.update({'ansible_user':passEntry})
                                     elif ('ip_address' == passEntryName):
+                                        host_vars.update({passEntryName:passEntry})
+                                        if (not 'floating_ip' in host_vars):
+                                          host_vars.update({'ansible_ssh_host':passEntry})
+                                    elif ('floating_ip' == passEntryName):
+                                        host_vars.update({passEntryName:passEntry})
+                                        # floating_ip overrides any other host variable
                                         host_vars.update({'ansible_ssh_host':passEntry})
+                                        host_vars.update({'floating_ip':passEntry})
+                                    elif ('ansible_ssh_host' == passEntryName):
+                                        if (not 'ansible_ssh_host' in host_vars):
+                                          host_vars.update({'ansible_ssh_host':passEntry})
                                     # elif ('ssh_port' == passEntryName):
                                     #     host_vars.update({'ansible_ssh_port':passEntry})
                                     else:

@@ -27,11 +27,11 @@
     
 
   pre_tasks:
-    - name: "Validate OpenStack required variables"
-      assert:
-        that:
-          - "openstack_security_group is defined"
-        fail_msg: "Missing mandatory variables: openstack_security_group"
+    # - name: "Validate OpenStack required variables"
+    #   assert:
+    #     that:
+    #       - "openstack_security_group is defined"
+    #     fail_msg: "Missing mandatory variables: openstack_security_group"
 
   #   - name: "Confirm the Config File exists"
   #     stat: path="{{ config_file }}"
@@ -44,7 +44,7 @@
   #   - name: "Print variables"
   #     debug:
   #       msg: "{{ item }}"
-  #     with_items: 
+  #     with_items:
   #       - "hostvars[inventory_hostname]: {{ hostvars[inventory_hostname] }}"
   #       - "ansible_env: {{ ansible_env }}"
 
@@ -52,7 +52,7 @@
 
     # - name: "Set openstack_auth facts"
     #   set_fact:
-    #     openstack_auth: 
+    #     openstack_auth:
     #       openstack_project_name: "{{ clouds.devstack.auth.project_name }}"
     #       openstack_console_user:  "{{ clouds.devstack.auth.username }}"
     #       openstack_console_password: "{{ clouds.devstack.auth.password }}"
@@ -60,48 +60,35 @@
     #       openstack_project_domain: "{{ clouds.devstack.auth.project_domain_name }}"
     #       openstack_os_auth_url: "{{ clouds.devstack.auth.auth_url }}"
 
+    # - name: "Execute create inventory, if tagged as so"
+    #   include_role:
+    #     name: "openstack/vm"
+    #     apply:
+    #       tags:
+    #         - always
+    #   vars:
+    #     state: "present"
+
     - name: "Execute create inventory, if tagged as so"
-      include_role:
-        name: "openstack/vm"
+      ansible.builtin.include_role:
+        name: "snowdrop.cloud_infra.openstack_vm"
         apply:
           tags:
             - always
-      vars: 
+      vars:
         state: "present"
-
-
-  post_tasks:
-    - name: Refresh the inventory so the newly added host is available
-      meta: refresh_inventory
-
-- name:  "Wait for the VM to boot and we can ssh"
-  hosts: "{{ vm_name }}"
-  gather_facts: no
-
-  tasks:
-    - name: "Show 'Wait for connection to host' output"
-      debug:
-        msg: 
-          - "ip : {{ query('passwordstore', 'openstack/' + vm_name + '/ansible_ssh_host')[0] }}"
-          - "port : {{ query('passwordstore', 'openstack/' + vm_name + '/ansible_ssh_port')[0] }}"
-
-    - name: "Wait for connection to host"
-      ansible.builtin.wait_for:
-        host: "{{ query('passwordstore', 'openstack/' + vm_name + '/ansible_ssh_host')[0] }}"
-        port: "{{ query('passwordstore', 'openstack/' + vm_name + '/ansible_ssh_port')[0] }}"
-        timeout: 120
-      register: wait_for_connection_reg
 
   post_tasks:
     - name: "DON'T FORGET TO SECURE YOUR SERVER"
-      debug:
-        msg: "Trying to start start server securization automatically For manual execution: $ ansible-playbook ansible/playbook/sec_host.yml -e vm_name={{ vm_name }} -e provider=openstack"
+      ansible.builtin.debug:
+        msg:
+          - "Trying to start start server securization automatically For manual execution: "
+          - "$ ansible-playbook ansible/playbook/sec_host.yml -e vm_name={{ vm_name }} -e provider=openstack"
 
-- name: "Openstack VM init"
-  hosts: "{{ vm_name }}"
-  gather_facts: yes
-
-  roles:
-    - role: "openstack/init_vm"
+    - name: "Print VM IP address"
+      ansible.builtin.debug:
+        msg: 
+          - "openstack_output: {{ openstack_output }}"
+          - "openstack_output.server: {{ openstack_output.server }}"
 
 ...

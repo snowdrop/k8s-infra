@@ -1,8 +1,14 @@
 ocp_mirror: https://mirror.openshift.com/pub/openshift-v4/clients/ocp
-ocp_version: 4.12.8
+ocp_version: 4.13.9
 ocp_cluster_name: ocp
 ocp_user: snowdrop
-ocp_install_dir: openshift-data
+ocp_root_directory: "{{ ansible_env.HOME }}/ocp"
+ocp_master_nodes: 3
+ocp_worker_nodes: 3
+ocp_cluster_user_admin_name: admin
+ocp_cluster_user_admin_pw: admin
+ocp_cluster_user_dev_name: snowdrop
+ocp_cluster_user_dev_pw: snowdrop
 
 # tag::rhos_default_flavors[]
 # OpenStack flavors
@@ -31,3 +37,5 @@ remove_kubeadmin: false
 use_dns: false
 # Values: godaddy, local
 dns_provider: godaddy
+
+rhos_log_path: "{{ ansible_env.HOME }}/ocp/log"

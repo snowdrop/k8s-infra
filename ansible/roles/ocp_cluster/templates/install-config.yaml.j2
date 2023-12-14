@@ -8,13 +8,13 @@ compute:
   platform:
     openstack:
       type: {{ openstack_flavor_compute }}
-  replicas: 3
+  replicas: {{ ocp_worker_nodes }}
 controlPlane:
   architecture: amd64
   hyperthreading: Enabled
   name: master
   platform: {}
-  replicas: 3
+  replicas: {{ ocp_master_nodes }}
 metadata:
   creationTimestamp: null
   name: {{ ocp_cluster_name }}
@@ -31,6 +31,8 @@ networking:
 platform:
   openstack:
     apiFloatingIP: {{ rhos_floating_ip_api_address }}
+#    <TO BE CHECKED>ingressFloatingIP: {{ rhos_floating_ip_ingress_address }}
+{% if rhos_cluster_os_image is defined %}    clusterOSimage: {{ rhos_cluster_os_image }}{% endif %}
 #    apiVIPs:
 #    - 10.0.0.5
     cloud: openstack
@@ -43,4 +45,4 @@ platform:
 #    - 10.0.0.7
 publish: External
 pullSecret: '{{ openshift_pull_secret }}'
-sshKey: '{{ shared_ssh_public_key }}'
+sshKey: '{{ ocp_cluster_shared_ssh_public_key }}'

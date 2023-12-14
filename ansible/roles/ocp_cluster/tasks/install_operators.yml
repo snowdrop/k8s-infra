@@ -10,7 +10,7 @@
   ansible.builtin.shell: 
     cmd: |
                 ./oc apply -f install-operators-role.yaml
-                ./oc adm policy add-cluster-role-to-user install-operators-role {{ ocp_user }}
+                ./oc adm policy add-cluster-role-to-user install-operators-role {{ ocp_cluster_user_dev_name }}
   args:
     chdir: "{{ work_directory }}"
   environment: 
@@ -96,7 +96,7 @@
                     done
 
                     echo Adding rights to qe user for using Datagrid cluster namespace
-                    ./oc policy add-role-to-user admin {{ ocp_user }} --rolebinding-name=admin -n $WATCH_NAMESPACE
+                    ./oc policy add-role-to-user admin {{ ocp_cluster_user_dev_name }} --rolebinding-name=admin -n $WATCH_NAMESPACE
   args:
     chdir: "{{ work_directory }}"
   environment: 
@@ -119,7 +119,7 @@
                   verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
                 EOF
                 ./oc apply -f monitor-crd-edit-role.yaml
-                ./oc adm policy add-cluster-role-to-user monitor-crd-edit {{ ocp_user }}
+                ./oc adm policy add-cluster-role-to-user monitor-crd-edit {{ ocp_cluster_user_dev_name }}
 
                 echo "Configure cluster monitoring"
                 cat <<EOF > ./cluster-monitoring-config.yaml
@@ -142,7 +142,7 @@
                 echo "Wait for the $PROMETHEUS_NAMESPACE namespace"
                 timeout 240s bash -c "until ./oc get namespace/$PROMETHEUS_NAMESPACE; do echo 'Waiting for namespace '$PROMETHEUS_NAMESPACE; sleep 2; done"
                 
-                ./oc adm policy add-role-to-user edit {{ ocp_user }} -n openshift-user-workload-monitoring
+                ./oc adm policy add-role-to-user edit {{ ocp_cluster_user_dev_name }} -n openshift-user-workload-monitoring
   args:
     chdir: "{{ work_directory }}"
   environment: 

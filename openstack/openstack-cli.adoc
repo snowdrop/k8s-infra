@@ -1,7 +1,17 @@
 = OpenStack CLI
+Snowdrop Team
 :icons: font
+:revdate: {docdate}
 :toc: left
-:description: This document describes Openstack CLI commands.
+:toclevels: 3
+:description: RHOS CLI
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
 
 == References
 
@@ -23,7 +33,7 @@ pip3 install python-openstackclient
 To access the OpenStack platform using the client, different `Environment Variables` must be set as described https://docs.openstack.org/newton/user-guide/common/cli-set-environment-variables-using-openstack-rc.html[here].
 
 So, connect to your RHOS instance (e.g https://rhos-d.infra.prod.upshift.rdu2.redhat.com/) and select within the menu: `Project > API Access`.
-From there, download the `OpenStack RC file` bash file by clicking on the button and store somwhere (e.g ./rhos-openrc.sh).
+From there, download the `OpenStack RC file` bash file by clicking on the button and store somewhere (e.g ./rhos-openrc.sh).
 
 Copy the file to a path directory, for instance `~/bin` (or `~/.local/bin` or `/usr/local/bin`) and give it execution permission.
 Source the bash script `source /usr/local/bin/rhos-openrc.sh` and enter your password as requested.
@@ -35,23 +45,31 @@ Please enter your OpenStack Password for project xxxxxxxxxx as user xxxxxxxxxxxx
 
 That's it, you're now logged in.
 
-=== Flavor
+[#flavors]
+=== Flavors
 
-.Get the list of the flavors
+List the flavors available.
 
 [source,bash]
 ----
-$ openstack flavor list
-+--------------------------------------+------------------------------------+--------+------+-----------+-------+-----------+
-| ID                                   | Name                               |    RAM | Disk | Ephemeral | VCPUs | Is Public |
-+--------------------------------------+------------------------------------+--------+------+-----------+-------+-----------+
-| 0f84ff1f-2cc8-4c99-baa2-d663577bd538 | ci.memory.xxl                      |  98304 |   60 |         0 |    12 | True      |
-| 3410bf5a-31c6-43f9-a859-a0f848552bc2 | ci.m5.xlarge                       |  49152 |   40 |         0 |    24 | True      |
-| 393bcaeb-a8bf-4a18-a893-799f01e338b8 | ci.memory.xxxl                     | 131072 |   80 |         0 |    16 | True      |
-| 52e23b17-4039-488e-9c63-543795a31bb8 | g.memory.xxxl                      | 131072 |   80 |         0 |    16 | True      |
-| 8cc169d5-184a-4392-bc27-6eac97735d62 | ocp-master-xxl                     |  49152 |   45 |         0 |    32 | True      |
-...
-+--------------------------------------+------------------------------------+--------+------+-----------+-------+-----------+
+openstack flavor list  | grep ocp
+----
+
+The result should be similar to:
+
+[source]
+----
++---------------------+-------------------+--------+------+-----+-------+------+
+| ID                  | Name              |    RAM | Disk | Eph | VCPUs | Publ |
++---------------------+-------------------+--------+------+-----+-------+------+
+| 15c48f0d-dec4-4290- | ocp-compute       |  16384 |   45 |   0 |    16 | True |
+| 62714b74-29ed-49a7- | ocp4.control      |  16384 |  100 |   0 |     4 | True |
+| 66502c57-663a-4e51- | ocp4.compute      |   8192 |  100 |   0 |     2 | True |
+| 9f5da47b-3d98-4644- | ocp-infra         |   8192 |   40 |   0 |     4 | True |
+| bc8850d7-db24-4bef- | ocp4.single-node  |  49152 |  200 |   0 |    24 | True |
+| e658777a-4953-4b11- | ocp4.bootstrap    |  16384 |  100 |   0 |     4 | True |
+| fbcd841e-6559-49a4- | ocp-master        |  16384 |   45 |   0 |     4 | True |
++---------------------+-------------------+--------+------+-----+-------+------+
 ----
 
 .Filter list by RAM
@@ -59,6 +77,13 @@ $ openstack flavor list
 ----
 openstack flavor list --min-ram 33000
 ----
+
+[TIP]
+====
+More information on RHOS flavors at the link:https://docs.openstack.org/nova/pike/admin/flavors.html[RHOS docs].
+====
+
+==== Create flavor
 
 Create a new flavor.
 
@@ -68,26 +93,198 @@ Create a new flavor.
 $ openstack flavor create g.standard.xxxl.ram --ram 40960 --disk 160 --vcpus 16
 ----
 
-=== Server
+[#network]
+=== Networks
 
-List servers.
+List networks.
 
 [source,bash]
 ----
-$ openstack server list
-+--------------------------------------+----------------------------+---------+---------------------------------+----------------------------------------------+-----------------+
-| ID                                   | Name                       | Status  | Networks                        | Image                                        | Flavor          |
-+--------------------------------------+----------------------------+---------+---------------------------------+----------------------------------------------+-----------------+
-| xxxxxx-xxxx-xxxx-xxxx-xxxxxx | k123-fedora35-01           | SHUTOFF | provider_net_shared=x.x.x.x | Fedora-Cloud-Base-35                         | g.standard.xxxl |
-| xxxxxx-xxxx-xxxx-xxxx-xxxxxx | 20220425-k121-centos8-test | ACTIVE  | provider_net_shared=x.x.x.x  | CentOS-8-x86_64-GenericCloud-released-latest | ci.m5.large     |
-| xxxxxx-xxxx-xxxx-xxxx-xxxxxx | n119-test                  | ACTIVE  | provider_net_shared=x.x.x.x  | CentOS-7-x86_64-GenericCloud-released-latest | ci.m5.large     |
-+--------------------------------------+----------------------------+---------+---------------------------------+----------------------------------------------+-----------------+
+openstack --os-cloud openstack network list --max-width 80
+----
+
+[source]
+----
++-------------------------+-------------------------+--------------------------+
+| ID                      | Name                    | Subnets                  |
++-------------------------+-------------------------+--------------------------+
+| 0e212597-e475-4c4a-     | provider_net_cci_13     | d3b1c702-bb71-4547-8cf0- |
+| a4fa-db71f84ec04c       |                         | 2ff5f9802595             |
+| 10e45d6d-5924-48ee-     | provider_net_ipv6_only  | 95214fb1-550b-4274-92a2- |
+| 9f5a-9713f5facc36       |                         | fae39a144a70             |
+| 14c15d33-175c-424e-     | provider_net_shared_2   | 17eca5aa-75c5-411c-a1cd- |
+| 88ba-361a875e0c5c       |                         | ae1d2cc8cf3d             |
+| 1cf0a81b-6786-4052-     | provider_net_ocp_osbs   | 14264d65-9a4e-46bf-950f- |
+| a1bc-904e05ae410d       |                         | 1f3f277ff64d             |
+| 25ec4907-36fc-4035-     | provider_net_cci_5      | 6159e87c-06a1-4f56-aa5a- |
+| b8d5-b797246330f2       |                         | aabad1298be5             |
+| 271db5de-8bf4-4f99-     | ocp-                    | 7cc7d0ee-f36b-46db-      |
+| a32d-002e7aea388a       | sdev-9gv8d-openshift    | ab57-ad4a8a653854        |
+| 27671b90-c2bc-483f-     | manila_net              | 6ccbef33-7962-4214-a992- |
+| b783-cc856f20ee5d       |                         | 02f9e83a235d             |
+| 316eeb47-1498-46b4-     | provider_net_shared_3   | 1447a1b3-c28f-4026-9edb- |
+| b39e-00ddf73bd2a5       |                         | 98af355c29c9             |
+| 333dadbb-3a26-4b66-     | provider_net_lab        | 289297e5-0fd1-45f8-b2a5- |
+| ad1b-547196d92e88       |                         | 248f5c2abc18             |
+| 36e46f70-99ff-48f5-     | provider_net_cci_12     | e9fa371f-2b3e-4a4f-a33b- |
+| aa9d-7bbd22b6218a       |                         | 9e39f869aea3             |
+| 3fdeb18a-2ad4-4536-     | provider_net_dualstack_ | 489315d5-1d84-4b7f-9349- |
+| bc23-c3c488a382ad       | 1                       | f5a14faff452, e4dba1d2-  |
+|                         |                         | f211-4d19-96f9-          |
+|                         |                         | 367eb281a41d             |
+| 3feeb1e1-132d-41a0-     | provider_net_istio      | df9fdb4f-1fd7-4581-ac7c- |
+| 8fb9-55f69d11f7c6       |                         | 27146c4c1df0             |
+| 49a185f9-83b0-4b2d-     | provider_net_ocp_prodse | 3ea8f7b7-281f-4899-8c8d- |
+| 811b-4f3cfbc3d30c       | c_psi                   | edd0d78623dd             |
+| 4bc90704-dd9e-412f-     | provider_net_ocp_stage  | 17d2ed9d-790d-45d9-8f0b- |
+| b89a-07267113fbfd       |                         | e00fbfa45226             |
+| 5058fef2-f89f-4e70-     | provider_net_cci_7      | eb8db9f4-a76f-4fe2-a0bd- |
+| 9e01-66af2847ddc4       |                         | f932bc20dfa1             |
+| 52f90b15-4773-4b00-     | provider_net_ocp4_prod_ | ebe0285b-4cca-4fba-85b9- |
+| 84c4-ba27916c118a       | psi                     | ea73f178d39e             |
+| 5cd089f9-8ed2-46bc-     | provider_net_quicklab   | 1199e331-bc4e-42de-b681- |
+| 8ea7-4e1cdb5262ba       |                         | c60f87319cd7             |
+| 5f00bb1a-0e38-43f9-     | provider_net_ocp_prod_p | e2206e0c-da84-4175-82c5- |
+| b48d-fc424bfd6cab       | si                      | d3d38e00cca1             |
+| 60cacaff-86a6-4f88-     | provider_net_cci_8      | 456329df-36f5-452a-bae2- |
+| 82a4-ed3023724df1       |                         | 404003910f09             |
+| 68a8220a-20f4-4940-     | provider_net_cci_4      | 10a8b6b3-7ff5-4933-9e31- |
+| 99b4-45b6f98bce6b       |                         | 9be0f25d745e             |
+| 6a32627e-d98d-40d8-     | provider_net_shared     | b7e7d2b5-efc1-462a-96ec- |
+| 9324-5da7cf1452fc       |                         | eda940820520             |
+| 6c256a91-7b1b-427d-     | provider_net_ocp_stage_ | 42d62dda-5ce7-4ccf-9998- |
+| bcb8-2495a7401f6a       | psi                     | a14799fbf962             |
+| 74e8faa7-87ba-41b2-     | provider_net_cci_2      | 11b95215-522d-4730-97d5- |
+| a000-438013194814       |                         | a76bdc66d6fa, 63b2d4a6-  |
+|                         |                         | 6df2-417c-8ee8-          |
+|                         |                         | d0e01bc523c8             |
+| 90341629-df19-4196-     | ocp-xyz-rhzhf-openshift | ea8e54be-523d-44ac-92eb- |
+| 9002-d4a8d9fbf5b9       |                         | ab870cbe669c             |
+| 9b37aaba-874c-4ef4-     | provider_net_ocp4_sdbx_ | 32b67ebf-6aa1-4964-83c2- |
+| b45a-1efd6d21b928       | psi                     | c526d33359a3             |
+| a0578760-3460-4f0d-     | ocp-sdev-p75fs-         | 63fa9393-3d64-43fa-b39f- |
+| 827b-75edc1609cec       | openshift               | f36d2fde9c87             |
+| b71d614c-b0b0-4f2d-     | provider_net_cci_11     | af342799-3d03-4b51-b252- |
+| b141-e78129212b98       |                         | f56bed4e0997             |
+| b8426041-7cf9-4f36-     | provider_net_ocp_dev    | 58a82433-493b-41cb-966a- |
+| 9732-e5d582469d3f       |                         | 00d9b6e61772             |
+| cd8cbb14-ec50-4417-     | provider_net_ocp_osbs_p | 261d4685-edb6-4779-8ac8- |
+| a5e6-34c3f2ccec3b       | si                      | 495ab4882c0c             |
+| d284bcff-d1ed-452d-     | provider_net_cci_1      | 1a14746d-8e7d-4dbe-a361- |
+| b7e3-af979b9582a3       |                         | dfcc01b0bc5c, 3efe14a9-  |
+|                         |                         | 3d70-47a1-a7f8-          |
+|                         |                         | 5d373539c399             |
+| d655dcd0-b593-439c-     | provider_net_cci_9      | 46c0f9b7-0028-4780-97c9- |
+| 997b-aa5bc8c03a3a       |                         | 25b2e93f05d7             |
+| de061265-0353-4b38-     | ocp-sscpc-openshift     | f050f0d2-3daa-4a63-9053- |
+| a78e-5d0627797ea1       |                         | a07228068855             |
+| eb3e8289-ce41-4825-     | provider_net_cci_3      | 02a8825d-e5f7-4e91-b502- |
+| a48a-8f8e11feaec7       |                         | fc8361051e44, 62a381e5-  |
+|                         |                         | 9313-43fa-a515-          |
+|                         |                         | cd0d7560907b             |
+| eceac180-5a4d-4b1d-     | provider_net_cci_14     | b360d82a-1375-4549-a665- |
+| b916-1d4e8f19b873       |                         | 1f505aae2663             |
+| ee7dcdfe-2b6e-4b7e-     | provider_net_cci_6      | 3abbd7bc-6027-49de-      |
+| bbe9-3dabc0972bb5       |                         | ba44-96e4a6268d45        |
+| f27262a7-1304-4e45-     | assisted-lab-net        | 11eb1393-6040-4635-99af- |
+| a7cf-6b8e0ba0c103       |                         | 7f3ae340523d             |
+| ff415208-8322-43c4-     | provider_net_sysops     | b40cec0a-1e14-43d5-9451- |
+| af20-b764740aa3f4       |                         | 89eb8b48e323             |
++-------------------------+-------------------------+--------------------------+
+----
+
+=== Images
+
+Different OS images are available on Openstack and can be discovered using the command `openstack image list`.
+Filter them according to the target OS that you are interested in:
+
+[source,bash]
+----
+openstack image list | grep -ni "Fedora-Cloud-Base.*"
+openstack image list | grep -ni "RHEL-9.*"
+----
+
+To get the detail about an image you will use the command `openstack image show`
+
+[source,bash]
+----
+openstack image show Fedora-Cloud-Base-37 --fit-width
+----
+
+Should present information for that image.
+
+[source]
+----
++------------------+--------------------------------------------------+
+| Field            | Value                                            |
++------------------+--------------------------------------------------+
+| checksum         | 9d9493d443cbac882732ae65a85497b2                 |
+| container_format | bare                                             |
+| created_at       | 2022-09-07T00:21:25Z                             |
+| disk_format      | qcow2                                            |
+| id               | cbea8fed-fef0-4319-b978-f7e983e85b19             |
+| min_disk         | 0                                                |
+| min_ram          | 0                                                |
+| name             | Fedora-Cloud-Base-37                             |
+| properties       | direct_url='rbd://03e3321d-071f-4b28-a3f9-       |
+|                  | 0256f384bdca/images_d/cbea8fed-                  |
+|                  | fef0-4319-b978-f7e983e85b19/snap',               |
+|                  | locations='[{'url': 'rbd://03e3321d-071f-4b28-   |
+|                  | a3f9-0256f384bdca/images_d/cbea8fed-             |
+|                  | fef0-4319-b978-f7e983e85b19/snap', 'metadata':   |
+|                  | {'store': 'default_backend'}}]',                 |
+|                  | os_hash_algo='sha512', os_hash_value='d38a2bf524 |
+|                  | 1730a7347dd74e27518dbb82b28070b424aca824d3e53a3c |
+|                  | 812aacc7ab9a92c663e5b55a7ae63e3fe14efab71213d656 |
+|                  | 4773a0d33ee5924787a983', os_hidden='False',      |
+|                  | stores='default_backend'                         |
+| schema           | /v2/schemas/image                                |
+| size             | 490405888                                        |
+| status           | active                                           |
+| tags             |                                                  |
+| updated_at       | 2022-09-07T00:21:34Z                             |
++------------------+--------------------------------------------------+
+----
+
+[TIP]
+====
+More information on RHOS images at the link:https://docs.openstack.org/newton/user-guide/common/cli-manage-images.html[RHOS docs].
+====
+
+[#servers]
+=== Servers
+
+List existing servers.
+
+[source,bash]
+----
+openstack server list --max-width 80
+----
+
+The resulting list.
+
+[source]
+----
++-------------+-------------+--------+-------------+-------------+-------------+
+| ID          | Name        | Status | Networks    | Image       | Flavor      |
++-------------+-------------+--------+-------------+-------------+-------------+
+| a0e54723-   | snowdrop-   | ACTIVE | provider_ne | Fedora-     | ci.m4.xlarg |
+| 7374-430b-  | k8s         |        | t_shared=x  | Cloud-      | e           |
+| bcb7-       |             |        | .x.x.x      | Base-37     |             |
+| c144c583651 |             |        |             |             |             |
+| b           |             |        |             |             |             |
+| a0923a85-   | tap15       | ACTIVE | provider_ne | Fedora-     | g.standard. |
+| e5b1-4d03-  |             |        | t_shared=x  | Cloud-      | xxl         |
+| 943d-       |             |        | .x.x.x      | Base-35     |             |
+| c7760a16563 |             |        |             |             |             |
+| 9           |             |        |             |             |             |
++-------------+-------------+--------+-------------+-------------+-------------+
 ----
 
 ==== Resize server
 
 [source,bash]
-====
+----
 $ nova help resize
 
 usage: nova resize [--poll] <server> <flavor>
@@ -100,7 +297,7 @@ Positional arguments:
 
 Options:
   --poll    Report the server resize progress until it completes.
-====
+----
 
 [source,bash]
 ----
@@ -128,65 +325,28 @@ Positional arguments:
 $ nova resize-confirm k123-fedora35-01
 ----
 
-Typical errors.
+==== Typical errors
+
+If we try an operation that will exceed the quota an error will be returned.
 
 [source,bash]
 ----
-$ nova resize --poll k123-fedora35-01 PnTAE.CPU_20_Memory_65536_Disk_200
+nova resize --poll k123-fedora35-01 PnTAE.CPU_20_Memory_65536_Disk_200
+----
+
+Error message
+
+====
 ERROR (Forbidden): Quota exceeded for ram: Requested 32768, but already used 98304 of 122880 ram (HTTP 403) (Request-ID: xxxxxxxxxxxxxx)
-----
+====
 
 [source,bash]
 ----
-$ nova resize --poll k123-fedora35-01 ci.m5.xlarge
+nova resize --poll k123-fedora35-01 ci.m5.xlarge
+----
+
+====
 ERROR (ClientException): Unexpected API Error. Please report this at http://bugs.launchpad.net/nova/ and attach the Nova API log if possible.
 <class 'nova.exception.FlavorDiskSmallerThanMinDisk'> (HTTP 500) (Request-ID: req-774039f4-3619-4bb8-8727-31e5f99edda2)
-----
-
-== Current implementation
-
-=== Images
-
-Different OS images are available on Openstack and can be discovered using the command `openstack image list`.
-Filter them according to the target OS that you are interested in:
-
-```
-openstack image list | grep -ni "Fedora-Cloud-Base.*"
-openstack image list | grep -ni "RHEL-9.*"
-```
-
-To get the detail about an image you will use the command `openstack image show`
-```
-openstack image show 8b8ab2a1-e349-4313-9a38-a800f42ffe99 -f shell
-```
-
-.OpenStack Image information
-[%header,cols="2m,1,1,1"]
-|===
-| Name | OS | Version | FS
-
-| Fedora-Cloud-Base-35 | Fedora | 35 | BTRFS
-| CentOS-8-x86_64-GenericCloud-released-latest | CentOS | 8 | ????
-| CentOS-7-x86_64-GenericCloud-released-latest | CentOS | 7 | ????
-
-|===
-
-=== Flavors
-
-.OpenStack Flavor information
-[%header,cols="2m,1,1,1,1,1"]
-|===
-| Flavor | VCPUS | RAM | Total Disks | Root Disk | Ephemeral Disk
-
-| m1.medium | 2 | 4 GB | 40 GB | 40 GB | 0 GB 
-| ci.m1.medium | 2 | 4 GB | 40 GB | 40 GB | 0 GB 
-| ci.m1.medium.large	| 4| 4 GB | 16 GB | 16 GB | 0 GB 
-| ci.m5.large | 16 | 32GB | 40GB | 40GB | 0GB 
-|===
-
-:leveloffset: +1
-
-include::../ansible/playbook/openstack/README.adoc[]
-
-:leveloffset: -1
+====
 

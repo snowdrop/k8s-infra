@@ -1,26 +1,43 @@
-= OCP Ansible Playbooks
+= OCP on RHOS Ansible Playbooks
+Snowdrop Team
 :icons: font
+:revdate: {docdate}
 :toc: left
-:description: This document describes OCP specific playbooks.
+:toclevels: 3
+:description: Deploying OCP on RHOS
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
 
-== Before you start
+== Introduction
 
-[IMPORTANT]
-====
-The Ansible commands should be executed within the ansible folder !
-====
-
-== Other information
+[.lead]
+This document describes the process to deploy an OCP cluster on a 
+ RHOS infrastructure.
 
 The installation process uses the _OpenShift Container Platform installer_ 
  obtained from https://mirror.openshift.com/.
+
+[glossary]
+== Terminology
+
+Glossary of terms used.
+
+[glossary]
+OCP:: OpenShift Container Platform
+RHCOS:: Red Hat Core OS
+RHOSP:: Red Hat OpenStack Platform
 
 == OCP On OpenStack
 
 Playbooks to deploy and remove an OCP cluster to RHOS. 
 
 .List of OCP RHOS playbooks
-[cols="2m,1m,5"]
+[cols="30%m,70%"]
 |===
 |Playbook File |Description
 
@@ -31,23 +48,174 @@ Playbooks to deploy and remove an OCP cluster to RHOS.
 | Remove an OCP cluster on RHOS.
 
 | ocp_openstack_info.yml
-| Print information from the OCP cluster, for dev/testing purposes.
+a| Print information from the deployed OCP cluster.
 
-| ocp_openstack_test.yml
-| Test some functionalities, for dev/testing purposes only!
+This playbook will print cluster information such as Console URL, kubeadmin password, ...
+
 |===
 
-// tag::deploy_ocp_on_rhos[]
-=== Deploy OCP Cluster on RHOS
+== Preparing the deployment
 
-First obtain the OCP pull secret which can be obained from https://console.redhat.com/openshift/install/pull-secret.
+The OCP installation process requires the use of the OCP 
+ pull secret. This secret can be obained from https://console.redhat.com/openshift/install/pull-secret.
 
-Execute the playbook.
+As part of the installation process this information will be added 
+ to the `install-config.yaml` and used in the OCP installation 
+ process.
 
-.Command to execute the OCP deployment playbook.
+.Sample OCP pull secret JSON
+[source,json]
+----
+{
+  "auths": {
+    "cloud.openshift.com": {"auth": "wwwwwwwwww", "email": "antcosta@redhat.com"}
+    ,"quay.io": {"auth": "xxxxxxxxxxxxx", "email": "janedoe@example.com"}
+    ,"registry.connect.redhat.com": {"auth": "yyyyyyyyyyyyy", "email": "janedoe@example.com"}
+    ,"registry.redhat.io": {"auth": "zzzzzzzzzzzzzzzzz", "email": "janedoe@example.com"}
+  }
+}
+----
+
+[NOTE]
+====
+The commands described hereafter use the `OCP_PULL_SECRET` environment 
+ variable to pass the credentials to the playbook.
+====
+
+== Using a Bootstrap host
+
+In the installation process the several files are downloaded, amongst 
+ which is the OCP installer software and a RHCOS image. During the execution 
+ of the OCP installer the downloaded RHCOS image must be uploaded into RHOSP. 
+ Although the image is cached, locally, this part of the process takes an 
+ amount of time that cannot be disregarded.
+
+The default installation process uses the controller (`localhost`) as the 
+ installation executor. This means all files are downloaded/uploaded to/from 
+ the local workstation. This approach has several drawbacks such as having 
+ to rely on the network infrastructure of the workstation being limited by 
+ it's bandwith (icon:download[alt=download] and icon:upload[alt=upload]). 
+
+To mitigate this problem the installation process can, and we suggest it is, 
+ executed from a remote host, which might be a temporary host. This host will 
+ be referred as the bootstrap host hereafter.
+
+To be able to use a temporary boostrap host it must be created prior to the 
+ execution of the installation process. The name of this RHOSP Host can be 
+ any name although we recomend including the name of the cluster as prefix 
+ and adding a suffix such as `-tmp-bootstrap-server`.
+
+To create the boostrap host execute the RHOSP playbook created for that purpose.
+
+.Sample execution of creating a bootstrap host.
 [source,bash]
 ----
-ansible-playbook -i inventory/ playbook/ocp/ocp_openstack_install.yml -e work_directory=/opt/ocp -e openshift_pull_secret=${OCP_PULL_SECRET} -K
+ansible-playbook ansible/playbook/openstack/openstack_vm_create_passwordstore.yml -e '{"openstack": {"vm": {"network": "provider_net_shared","image": "Fedora-Cloud-Base-37", "flavor": "m1.small"}}}' -e vm_name=ocp-xyz-tmp-bootstrap-server
+----
+
+After creating the bootstrap host execute the steps provided in the 
+ <<deploy-ocp-on-rhos>> section. 
+
+[NOTE]
+====
+The bootstrap server could be removed once the OCP cluster has been 
+ created (optional).
+====
+
+// tag::deploy_ocp_on_rhos[]
+[#deploy-ocp-on-rhos]
+== Deploy OCP Cluster on RHOS
+
+The deployment playbook supports the follow variable entries.
+
+.Script options
+[%header,cols="25%,75%"]
+|===
+| Variable | Description
+
+| `ocp_bootstrap_host`
+
+[.fuchsia]#string#
+
+a| VM name for the bootstrap host. 
+
+If defined the installation process will be performed not on the 
+ `localhost` controller but on the identified VM.
+
+| `ocp_cluster_name`
+
+[.fuchsia]#string# / [.red]#required# 
+
+a| Name to be assigned to the OCP cluster
+
+[NOTE]
+====
+Will also be applied as prefix to all the RHOS VM instances created as well 
+ as other RHOS resources.
+====
+
+| `ocp_root_directory`
+
+[.fuchsia]#string# / [.red]#required# 
+
+a| Root folder where for the installation. A new sub-folder with the 
+ `ocp_cluster_name` name will be created and will serve as the 
+ installation folder.
+
+| `openshift_pull_secret`
+
+[.fuchsia]#json# / [.red]#required# 
+
+a| String of the OCP pull secret for the user.
+
+| `openstack_flavor_control_plane`
+
+[.fuchsia]#string#
+
+a| Flavor to be used on the Control Plane hosts.
+
+*Default => `ocp4.control`*
+
+| `openstack_flavor_compute`
+
+[.fuchsia]#string#
+
+a| Flavor to be used on the Compute hosts.
+
+*Default => `ocp4.compute`*
+
+|===
+
+Execute the playbook. Please note that this playbook uses `sudo` permission 
+ to create several folders so the Ansible user must have `sudo` permission. 
+ We're using the `-K` switch to ask for the `become` password which is only 
+ required if the user as sudo permission with password. The folders created 
+ will be associated (`uid:gid``) with the Ansible user used to connect to the 
+ host.
+
+.Explanation of the playbook parameter execution
+[source]
+----
+ansible-playbook ansible/playbook/ocp/ocp_openstack_install.yml <1>
+  -e ocp_root_directory=<2>
+  -e ocp_cluster_name=<3>
+  -e openshift_pull_secret=<4>
+  -K <5>
+----
+<1> Playbook that implements the OCP deployment.
+<2> Root directory for the installation.
+<3> Name to be given to the cluster.
+<4> OCP pull secret for the user.
+<5> Ask for the become password.
+
+.Command to execute the OCP deployment playbook
+[source,bash]
+----
+ansible-playbook ansible/playbook/ocp/ocp_openstack_install.yml \
+  -e ocp_root_directory=/opt/ocp \
+  -e ocp_cluster_name=ocp-sdev \
+  -e openshift_pull_secret=${OCP_PULL_SECRET} \
+  -K
 ----
 
 The playbook will result on the deployment of several RHOS VMs for control plane and worker nodes.
@@ -65,12 +233,28 @@ variables, having as default the values from the role defaults file.
 include::../../roles/ocp_cluster/defaults/main.yml[tag=rhos_default_flavors]
 ----
 
-The list of flavors is identified on the link:../../../openstack/README.adoc#Flavors[OpenStack README file].
+Instructions on how to obtain the list of available flavors is described on
+ our link:../../../openstack/openstack-cli.adoc#flavors[OpenStack CLI README file].
 ====
+
+The result of the deployment process is the following:
+
+* OCP cluster deployed on RHOS instances as defined in the number and flavor of main and worker nodes
+* RHOS instance that will serve as jump server to the OCP cluster
+* Installation directory stored on the passwordstore and copied to the jump server
+* OCP authentication information stored on the passwordstore
 // end::deploy_ocp_on_rhos[]
 
+[CAUTION]
+====
+At this point the _bootstrap server_, if used, is no longer required.
+
+[.lead]
+Check that the installation folder is safely stored both on the jump server as well as on the local passwordstore before removing it.
+====
+
 // tag::undeploy_ocp_on_rhos[]
-=== Undeploy OCP Cluster on RHOS
+== Undeploy OCP Cluster on RHOS
 
 [WARNING]
 ====
@@ -79,166 +263,165 @@ For the removal process to be successfull the OCP installation directory
 objects associated to the project.
 ====
 
+[#deploy-ocp-on-rhos]
+== Deploy OCP Cluster on RHOS
+
+The deployment playbook supports the follow variable entries.
+
+.Script options
+[%header,cols="25%,75%"]
+|===
+| Variable | Description
+
+| `ocp_bootstrap_host`
+
+[.fuchsia]#string#
+
+a| VM name for the host that contains the OCP installation folder.
+
+If defined the installation process will be performed not on the 
+ `localhost` controller but on the identified VM.
+
+| `ocp_cluster_name`
+
+[.fuchsia]#string# / [.red]#required# 
+
+a| Name of the OCP cluster
+
+| `ocp_root_directory`
+
+[.fuchsia]#string# / [.red]#required# 
+
+a| Root folder where for the installation. 
+
+*TODO: must be added as part of the ansible inventory*
+
+|===
+
 .Command to execute the OCP cluster removal playbook.
 [source,bash]
 ----
-ansible-playbook -i inventory/ playbook/ocp/ocp_openstack_remove.yml \
-  -e work_directory=/opt/ocp \
-  -e installation_dir=/opt/ocp/openshift-data/
+ansible-playbook ansible/playbook/ocp/ocp_openstack_remove.yml \
+  -e ocp_root_directory=/opt/ocp \
+  -e ocp_cluster_name=ocp-sdev \
+  -e ocp_bootstrap_host=ocp-sdev-xxxxx-jump-server
 ----
 // end::undeploy_ocp_on_rhos[]
 
-=== Other OCP RHOS Playbooks
+== Other OCP RHOS Playbooks
 
-[source,bash]
-----
-ansible-playbook playbook/ocp/ocp_openstack_info.yml -e work_directory=/opt/ocp -e installation_dir=/opt/ocp/openshift-data/ -e ocp_cluster_name=ocp -e snowdrop_domain="snowdrop.dev"  -vv
-----
+=== Get information from the OCP cluster
 
-== Playbooks
+To collect information on the OCP cluster execute the 
+ `ocp_openstack_info` playbook located at the `ansible/playbook/ocp/` 
+ folder.
 
-=== PasswordStore
-
-Create OpenStack instance based on passwordstore
-
-.openstack_vm_create_paswordstore parameters
-[cols="2m,1m,5"]
+.Playbook parameters
+[%header,cols="25%,75%"]
 |===
-|Field name |Mandatory |Description
+| Variable | Description
 
-| vm_name
-| x
-| Name of the VM being created. Will be used both as hostname as well as Ansible Inventory name.
+| `ocp_root_directory`
 
-| openstack.vm.network
-| x
-| Value for the OpenStack provider network. `provider_net_shared`
+[.fuchsia]#string# / [.red]#required# 
 
-| openstack.vm.image
-| x
-| OpenStack VM image, e.g. `Fedora-Cloud-Base-35`.
+a| Root folder for the OCP installation.
 
-| openstack.vm.flavor"
-| x
-| OpenStack VM flavor (size), e.g. `m1.medium`.
+Either define the `ocp_root_directory` and `ocp_cluster_name` variables 
+ or the `installation_dir` one.
 
-| key_name
-| -
-| Use an existing SSH key (value) instead of creating one for the VM.
+| `ocp_cluster_name`
 
-| k8s_type
-| *for k8s hosts.*
-| Kubernetes host type [master,worker].
+[.fuchsia]#string# / [.red]#required# 
 
-| k8s_version
-| *for k8s hosts.*
-| Kubernetes version to be associated with the host, e.g. for version `1.23` use `123`. This is actually an Ansible Inventory group having definitions associated with each of the Kubernetes version.
+a| Name of the OCP cluster
+
+Either define the `ocp_root_directory` and `ocp_cluster_name` variables 
+ or the `installation_dir` one.
+
+| `installation_dir`
+
+[.fuchsia]#string#
+
+a| Location of the installation directory.
+
+Either define the `ocp_root_directory` and `ocp_cluster_name` variables 
+ or the `installation_dir` one.
+
+
+| `vm_name`
+
+[.fuchsia]#string# / [.red]#required# 
+
+a| Root folder where for the installation. A new sub-folder with the 
+ `ocp_cluster_name` name will be created and will serve as the 
+ installation folder.
+
 |===
 
 [source,bash]
 ----
-$ VM_NAME=vm20210221-t01
+ansible-playbook ansible/playbook/ocp/ocp_openstack_info.yml \
+  -e ocp_root_directory=/opt/ocp \
+  -e ocp_cluster_name=ocp-sdev \
+  -e vm_name=ocp-sdev-zzzzz-jump-server -vv
 ----
+
+=== Init jump server
+
+This playbook init's a jump server by performing the following tasks:
+
+* Downloads the OCP and k8s CLI binaries into the jump server
+* Copy the OCP cluster installation folder from passwordstore
+ into the jump server.
+
+.Playbook parameters
+[%header,cols="25%,75%"]
+|===
+| Variable | Description
+
+| `ocp_root_directory`
+
+[.fuchsia]#string# / [.red]#required# 
+
+a| Root folder for the OCP installation.
+
+Either define the `ocp_root_directory` and `ocp_cluster_name` variables 
+ or the `installation_dir` one.
+
+| `ocp_cluster_name`
+
+[.fuchsia]#string# / [.red]#required# 
+
+a| Name of the OCP cluster
+
+Either define the `ocp_root_directory` and `ocp_cluster_name` variables 
+ or the `installation_dir` one.
+
+| `ocp_cluster_bin_directory`
+
+[.fuchsia]#string#
+
+a| Folder that will contain the OCP and k8s CLI binaries
+
+*Default => `<ocp_root_directory>/bin`*
+
+| `vm_name`
+
+[.fuchsia]#string# / [.red]#required# 
+
+a| Root folder where for the installation. A new sub-folder with the 
+ `ocp_cluster_name` name will be created and will serve as the 
+ installation folder.
+
+|===
 
 [source,bash]
 ----
-$ ansible-playbook playbook/openstack/openstack_vm_create_paswordstore.yml -e k8s_type=masters -e k8s_version=123 -e '{"openstack": {"vm": {"network": "provider_net_shared","image": "Fedora-Cloud-Base-35", "flavor": "m1.medium"}}}' -e key_name=snowdrop-adm-key -e vm_name=${VM_NAME} 
+ansible-playbook ansible/playbook/ocp/rhosp_init_jump_server_pass.yml \
+  -e ocp_root_directory=/home/snowdrop/ocp \
+  -e ocp_cluster_name=ocp-sdev \
+  -e vm_name=ocp-jump-server \
+  -e ocp_cluster_bin_directory=/home/snowdrop/.local/bin \
+  -vv
 ----
-
-This playbook should finish with something like:
-
-[source]
-....
-PLAY RECAP **********************************************************************************************************************************************************************************************************************
-localhost                  : ok=68   changed=20   unreachable=0    failed=0    skipped=13   rescued=0    ignored=1   
-vm20210221-t01             : ok=32   changed=20   unreachable=0    failed=0    skipped=1    rescued=0    ignored=0   
-
-Monday 21 February 2022  13:01:53 +0100 (0:00:05.011)       0:12:51.042 ******* 
-=============================================================================== 
-openstack/init_vm : Upgrade all packages ------------------------------------------------- 305.39s
-openstack/vm : Create VM instance -------------------------------------------------------- 121.94s
-sec/firewalld : Install firewalld --------------------------------------------------------- 47.60s
-openstack/init_vm : Install packages ------------------------------------------------------ 47.22s
-openstack/init_vm : Reboot instance ------------------------------------------------------- 32.76s
-Refresh the inventory so the newly added host is available -------------------------------- 21.10s
-sec/sshd_port : Change SELINUX settings to allow connections to the new port --------------- 9.14s
-sec/motd : Config | Install custom `/etc/motd` file ---------------------------------------- 8.24s
-sec/audit : Apply auditd configuration ----------------------------------------------------- 8.06s
-openstack/vm : Gather information about a previously created image with same name ---------- 7.85s
-Wait for connection to host ---------------------------------------------------------------- 7.02s
-openstack/vm : Wait for boot --------------------------------------------------------------- 6.55s
-Gathering Facts ---------------------------------------------------------------------------- 5.77s
-sec/firewalld : Enable and start firewalld ------------------------------------------------- 5.53s
-Gathering Facts ---------------------------------------------------------------------------- 5.08s
-sec/update : Update all packages ----------------------------------------------------------- 5.01s
-sec/firewalld : firewalld - Manage firewall ports ------------------------------------------ 4.96s
-sec/sshd_port : Change the ssh port number ------------------------------------------------- 4.60s
-sec/firewalld : firewalld - Manage firewall services --------------------------------------- 4.58s
-sec/firewalld : Restart firewalld ---------------------------------------------------------- 4.51s
-....
-
-The playbook also uses the variables defined in `roles/openstack/vm/defaults/main.yml`. Those variables can also be overridden using the syntax above.
-
-[source,yaml]
-----
-include::../../roles/openstack/vm/defaults/main.yml[]
-----
-
-=== Delete a VM
-
-To delete a VM, simply execute the `openstack_vm_remove_aggregate` playbook.
-
-[source,bash]
-----
-ansible-playbook -i inventory/ playbook/ocp/ocp_openstack_install.yml -e target_dir=/home/ajc102/docs/redhat/_tmp/ocp
-----
-
-[source]
-....
-PLAY RECAP **********************************************************************************************************************************************************************************************************************
-localhost                  : ok=17   changed=5    unreachable=0    failed=0    skipped=1    rescued=0    ignored=2   
-
-Monday 21 February 2022  13:07:58 +0100 (0:00:02.485)       0:00:30.900 ******* 
-=============================================================================== 
-openstack/vm : Gather information about a previously created image named  ------------------ 8.16s
-openstack/vm : Delete  --------------------------------------------------------------------- 3.91s
-openstack/vm : Delete VM volume ------------------------------------------------------------ 3.41s
-openstack/vm : Delete key  from server ----------------------------------------------------- 2.93s
-Push changes to the pass git database ------------------------------------------------------ 2.49s
-Pull pass git database --------------------------------------------------------------------- 2.16s
-openstack/vm : Set pass facts from passwordstore ------------------------------------------- 1.70s
-openstack/vm : Remove existing SSH key to use with instance -------------------------------- 1.55s
-openstack/vm : Find admin user home folder ------------------------------------------------- 0.98s
-openstack/vm : Remove the host from the known_hosts file ----------------------------------- 0.95s
-openstack/vm : stat ------------------------------------------------------------------------ 0.88s
-Remove passstore entries ------------------------------------------------------------------- 0.74s
-Remove local ssh keys ---------------------------------------------------------------------- 0.57s
-openstack/vm : include_tasks --------------------------------------------------------------- 0.14s
-Validate required variables ---------------------------------------------------------------- 0.08s
-openstack/vm : Print Openstack output ------------------------------------------------------ 0.07s
-openstack/vm : include_tasks --------------------------------------------------------------- 0.07s
-....
-
-=== Connect to the new instance
-
-Since all the information related to the host will be managed by our ansible passwordstore roles, which also stores the ssh public and secret keys locally on the `~/.ssh` folder, to login to the newly created VM is as simple as launching the following command.
-
-[source,bash]
-----
-$ ssh -i ~/.ssh/id_rsa_snowdrop_openstack_${VM_NAME} `pass show openstack/${VM_NAME}/os_user | head -n 1`@`pass show openstack/${VM_NAME}/ansible_ssh_host | head -n 1` -p `pass show openstack/${VM_NAME}/ansible_ssh_port | head -n 1`
-----
-
-This should connect ot the newly created VM.
-
-[source]
-====
-Last login: Thu Jan 1 00:00:00 1970 from x.x.x.x
-------------------
-
-This machine is property of RedHat.
-Access is forbidden to all unauthorized person.
-All activity is being monitored.
-
-Welcome to vm20210221-t01..
-====
-

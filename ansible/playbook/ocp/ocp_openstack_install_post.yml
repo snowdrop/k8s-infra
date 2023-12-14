@@ -1,0 +1,122 @@
+---
+- name: "Build OpenStack authentication for v3password"
+  ansible.builtin.import_playbook: "../openstack/openstack_auth_passstore_v3password.yml"
+
+- name: "Load the metadata from the OCP installation directory"
+  hosts: "{{ ocp_bootstrap_host | default('localhost') }}"
+  gather_facts: true
+
+  tasks:
+
+    - name: "Archive the installation data directory"
+      ansible.builtin.shell:
+        cmd: |
+          tar -czf {{ tmp_directory }}/{{ ocp_cluster_name }}-data.tar.gz {{ ocp_cluster_name }}/
+      args:
+        chdir: "{{ ocp_root_directory }}"
+
+    - name: Calculate installation folder
+      ansible.builtin.set_fact:
+        installation_dir: "{{ ocp_root_directory }}/{{ ocp_cluster_name }}"
+
+    - name: Get OCP cluster metadata
+      ansible.builtin.import_role:
+        name: ocp_cluster
+        tasks_from: get_metadata.yml
+
+    - name: "Slurp kubeadmin password"
+      ansible.builtin.slurp:
+        src: "{{ installation_dir }}/auth/kubeadmin-password"
+      register: kubeadmin_password_slurp
+
+    - name: "Transform kubeadmin password slurp"
+      ansible.builtin.set_fact:
+        kubeadmin_password: "{{ kubeadmin_password_slurp.content | b64decode }}"
+
+    - name: "Slurp OCP installation folder"
+      ansible.builtin.slurp:
+        src: "{{ tmp_directory }}/{{ ocp_cluster_name }}-data.tar.gz"
+      register: ansible_installation_folder_base64_slurp
+
+    - name: "Base64 encode OCP installation folder"
+      ansible.builtin.set_fact:
+        ansible_installation_folder_base64: "{{ ansible_installation_folder_base64_slurp.content }}"
+
+- name: "Get OCP installation information"
+  ansible.builtin.import_playbook: "ocp_openstack_info.yml"
+  vars:
+    # ocp_cluster_name: "{{ ocp_cluster_name }}"
+    # ocp_root_directory: "{{ ocp_root_directory }}"
+    vm_name: "{{ ocp_bootstrap_host | default(['localhost']) }}"
+
+- name: "Store the OCP information on the passwordstore"
+  hosts: "localhost"
+  gather_facts: true
+
+  tasks:
+
+    - name: "Print installation variables remote"
+      ansible.builtin.debug:
+        msg:
+          - "ocp_cluster_metadata.infraID: {{ hostvars[ocp_bootstrap_host]['ocp_cluster_metadata']['infraID'] }}"
+          - "ansible_installation_folder_base64: {{ hostvars[ocp_bootstrap_host]['ansible_installation_folder_base64'] }}"
+          - "kubeadmin_password: {{ hostvars[ocp_bootstrap_host]['kubeadmin_password'] }}"
+      when: ocp_bootstrap_host is defined
+
+    - name: "Set localhost facts"
+      ansible.builtin.set_fact:
+          ocp_cluster_metadata: "{{ hostvars[ocp_bootstrap_host]['ocp_cluster_metadata'] }}"
+          ansible_installation_folder_base64: "{{ hostvars[ocp_bootstrap_host]['ansible_installation_folder_base64'] }}"
+          kubeadmin_password: "{{ hostvars[ocp_bootstrap_host]['kubeadmin_password'] }}"
+      when: ocp_bootstrap_host is defined
+
+    - name: "Store the OCP information on the bootstrap host passwordstore"
+      ansible.builtin.set_fact:
+        ansible_installation_folder_passwordstore: "{{ query('passwordstore', 'openstack/' + ocp_cluster_metadata.infraID + '-jump-server/install_dir create=True userpass=' + ansible_installation_folder_base64 )[0] }}"
+        console_user: "{{ query('passwordstore', 'openstack/' + ocp_cluster_metadata.infraID + '-jump-server/console_user create=True userpass=kubeadmin' )[0] }}"
+        console_pwd: "{{ query('passwordstore', 'openstack/' + ocp_cluster_metadata.infraID + '-jump-server/console_pwd create=True userpass=' + kubeadmin_password )[0] }}"
+        console_url: "{{ query('passwordstore', 'openstack/' + ocp_cluster_metadata.infraID + '-jump-server/console_url create=True userpass=http://console-openshift-console.apps.' + ocp_cluster_name + '.snowdrop.dev/' )[0] }}"
+        api_url: "{{ query('passwordstore', 'openstack/' + ocp_cluster_metadata.infraID + '-jump-server/api_url create=True userpass=api.' + ocp_cluster_name + '.snowdrop.dev' )[0] }}"
+
+    - name: "Store the OCP API user information on the bootstrap host passwordstore"
+      ansible.builtin.set_fact:
+        admin_user: "{{ query('passwordstore', 'openstack/' + ocp_cluster_metadata.infraID + '-jump-server/admin_user create=True userpass=' + ocp_cluster_user_admin_name )[0] }}"
+        admin_pwd: "{{ query('passwordstore', 'openstack/' + ocp_cluster_metadata.infraID + '-jump-server/admin_pwd create=True userpass=' + ocp_cluster_user_admin_pw )[0] }}"
+        dev_user: "{{ query('passwordstore', 'openstack/' + ocp_cluster_metadata.infraID + '-jump-server/dev_user create=True userpass=' + ocp_cluster_user_dev_name )[0] }}"
+        dev_pw: "{{ query('passwordstore', 'openstack/' + ocp_cluster_metadata.infraID + '-jump-server/dev_pw create=True userpass=' + ocp_cluster_user_dev_pw )[0] }}"
+      when: admin_user is defined and admin_pwd is defined and dev_user is defined and dev_pw is defined
+
+  post_tasks:
+
+    - name: "Deploying jump server"
+      ansible.builtin.debug:
+        msg:
+          - "Deploying the jump server. If it fails these steps can be executed manually:"
+          - "$ ansible-playbook ansible/playbook/ocp/ocp_openstack_create_jump_server.yml -e tmp_directory={{ tmp_directory }} -e ocp_root_directory={{ ocp_root_directory }} -e ocp_cluster_name={{ ocp_cluster_name }} -e vm_name={{ ocp_cluster_metadata.infraID }}-jump-server {% if ocp_bootstrap_host is defined %}-e ocp_bootstrap_host={{ ocp_bootstrap_host }}{% endif %}"
+
+- name: "Publish cluster Console DNS records"
+  ansible.builtin.import_playbook: "../godaddy/godaddy_dns_create_passwordstore.yml"
+  vars:
+    api_environment: prod
+    dns:
+      data: "{{ ocp_cluster.floating_ip_ingress_address }}"
+    domain_name: snowdrop.dev
+    record_name: "*.apps.{{ ocp_cluster_name }}"
+    record_type: A
+
+- name: "Publish cluster API DNS records"
+  ansible.builtin.import_playbook: "../godaddy/godaddy_dns_create_passwordstore.yml"
+  vars:
+    api_environment: prod
+    dns:
+      data: "{{ ocp_cluster.floating_ip_api_address }}"
+    domain_name: snowdrop.dev
+    record_name: "api.{{ ocp_cluster_name }}"
+    record_type: A
+
+- name: "Deploy Jump Server"
+  ansible.builtin.import_playbook: "ocp_openstack_create_jump_server.yml"
+  vars:
+    vm_name: "{{ ocp_cluster_metadata.infraID }}-jump-server"
+...
+# ansible-playbook ansible/playbook/ocp/ocp_openstack_install_post.yml -e tmp_directory=/opt/ocp/_tmp/ansible.yxam0y7mbuild -e ocp_root_directory=/opt/ocp -e ocp_cluster_name=ocp-sdev
