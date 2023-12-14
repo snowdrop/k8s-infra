@@ -1,0 +1,51 @@
+---
+- name: "Parse json"
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: "Print ansible_python_interpreter dictionary"
+      ansible.builtin.set_fact:
+        json_contents: "{{ lookup('ansible.builtin.file', 'parse_json.json') }}"
+
+    - name: "Show json_contents"
+      ansible.builtin.debug:
+        msg:
+          - "json_contents: {{ json_contents }}"
+          - "json_contents private: {{ json_contents | community.general.json_query('servers[0].addresses.private') }}"
+
+    - name: "Show IPV4"
+      ansible.builtin.debug:
+        msg:
+          - "server_name_query: {{ json_contents | community.general.json_query(server_name_query) }}"
+          - "server_name_query_2: {{ json_contents | community.general.json_query(server_name_query_2) }}"
+          - "type_n_version_query: {{ json_contents | community.general.json_query(type_n_version_query) }}"
+          - "type_n_version_query 2 : {{ json_contents.servers[0].addresses.private | community.general.json_query(type_n_version_query_2) }}"
+      vars:
+        server_name_query: "servers[0].addresses.private[?\"OS-EXT-IPS:type\" == 'fixed']"
+        server_name_query_2: "servers[0].addresses.private[?version == `4`]"
+        type_n_version_query: "servers[0].addresses.private[?\"OS-EXT-IPS:type\" == 'fixed' && version == `4`]"
+        type_n_version_query_2: "[?\"OS-EXT-IPS:type\" == 'fixed' && version == `4`]"
+
+    - name: "Collect host fixed IP v4"
+      ansible.builtin.set_fact:
+        openstack_vm_ipv4_address: "{{ json_contents.servers[0].addresses.private | community.general.json_query(ipv4_fixed_address) }}"
+      vars:
+        ipv4_fixed_address: "[?\"OS-EXT-IPS:type\" == 'fixed' && version == `4`]"
+
+    - name: "Show openstack_vm_ipv4_address"
+      ansible.builtin.debug:
+        msg:
+          - "openstack_vm_ipv4_address: {{ openstack_vm_ipv4_address }}"
+
+    - name: "Collect host fixed IP v4"
+      ansible.builtin.set_fact:
+        openstack_vm_ipv4: "{{ openstack_vm_ipv4_address[0].addr }}"
+
+    - name: "Show openstack_vm_ipv4"
+      ansible.builtin.debug:
+        msg:
+          - "openstack_vm_ipv4: {{ openstack_vm_ipv4 }}"
+
+...
+# ansible-playbook ansible/playbook/edu/parse_json.yml

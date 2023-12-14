@@ -1,0 +1,184 @@
+{
+  "servers": [
+      {
+          "access_ipv4": "192.168.99.111",
+          "access_ipv6": "aaaa:000:aaaa:0:aaaa:aaaa:aaaa:aaaa",
+          "addresses": {
+              "private": [
+                  {
+                      "OS-EXT-IPS-MAC:mac_addr": "aa:aa:aa:aa:aa:aa",
+                      "OS-EXT-IPS:type": "fixed",
+                      "addr": "aaaa:000:aaaa:0:aaaa:aaaa:aaaa:aaaa",
+                      "version": 6
+                  },
+                  {
+                      "OS-EXT-IPS-MAC:mac_addr": "aa:aa:aa:aa:aa:aa",
+                      "OS-EXT-IPS:type": "fixed",
+                      "addr": "10.0.0.10",
+                      "version": 4
+                  },
+                  {
+                      "OS-EXT-IPS-MAC:mac_addr": "aa:aa:aa:aa:aa:aa",
+                      "OS-EXT-IPS:type": "floating",
+                      "addr": "192.168.99.111",
+                      "version": 4
+                  }
+              ]
+          },
+          "admin_password": null,
+          "attached_volumes": [],
+          "availability_zone": "nova",
+          "block_device_mapping": null,
+          "compute_host": "fv-az1493-571",
+          "config_drive": "",
+          "created_at": "2023-12-12T11:48:56Z",
+          "description": null,
+          "disk_config": "MANUAL",
+          "fault": null,
+          "flavor": {
+              "description": null,
+              "disk": 20,
+              "ephemeral": 0,
+              "extra_specs": {
+                  "hw_rng:allowed": "True"
+              },
+              "id": "m1.small",
+              "is_disabled": null,
+              "is_public": true,
+              "location": null,
+              "name": "m1.small",
+              "original_name": "m1.small",
+              "ram": 2048,
+              "rxtx_factor": null,
+              "swap": 0,
+              "vcpus": 1
+          },
+          "flavor_id": null,
+          "has_config_drive": "",
+          "host_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "host_status": "UP",
+          "hostname": "ansible-molecule-snowdrop-openstack-test",
+          "hypervisor_hostname": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.localdomain",
+          "id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+          "image": {
+              "architecture": null,
+              "checksum": null,
+              "container_format": null,
+              "created_at": null,
+              "direct_url": null,
+              "disk_format": null,
+              "file": null,
+              "has_auto_disk_config": null,
+              "hash_algo": null,
+              "hash_value": null,
+              "hw_cpu_cores": null,
+              "hw_cpu_policy": null,
+              "hw_cpu_sockets": null,
+              "hw_cpu_thread_policy": null,
+              "hw_cpu_threads": null,
+              "hw_disk_bus": null,
+              "hw_machine_type": null,
+              "hw_qemu_guest_agent": null,
+              "hw_rng_model": null,
+              "hw_scsi_model": null,
+              "hw_serial_port_count": null,
+              "hw_video_model": null,
+              "hw_video_ram": null,
+              "hw_vif_model": null,
+              "hw_watchdog_action": null,
+              "hypervisor_type": null,
+              "id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+              "instance_type_rxtx_factor": null,
+              "instance_uuid": null,
+              "is_hidden": null,
+              "is_hw_boot_menu_enabled": null,
+              "is_hw_vif_multiqueue_enabled": null,
+              "is_protected": null,
+              "kernel_id": null,
+              "location": null,
+              "locations": null,
+              "metadata": null,
+              "min_disk": null,
+              "min_ram": null,
+              "name": null,
+              "needs_config_drive": null,
+              "needs_secure_boot": null,
+              "os_admin_user": null,
+              "os_command_line": null,
+              "os_distro": null,
+              "os_require_quiesce": null,
+              "os_shutdown_timeout": null,
+              "os_type": null,
+              "os_version": null,
+              "owner": null,
+              "owner_id": null,
+              "properties": {
+                  "links": [
+                      {
+                          "href": "http://10.1.0.5/compute/images/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+                          "rel": "bookmark"
+                      }
+                  ]
+              },
+              "ramdisk_id": null,
+              "schema": null,
+              "size": null,
+              "status": null,
+              "store": null,
+              "tags": [],
+              "updated_at": null,
+              "url": null,
+              "virtual_size": null,
+              "visibility": null,
+              "vm_mode": null,
+              "vmware_adaptertype": null,
+              "vmware_ostype": null
+          },
+          "image_id": null,
+          "instance_name": "instance-00000001",
+          "is_locked": false,
+          "kernel_id": "",
+          "key_name": "ansible_molecule_snowdrop_openstack_test",
+          "launch_index": 0,
+          "launched_at": "2023-12-12T11:49:01.000000",
+          "links": [
+              {
+                  "href": "http://10.1.0.5/compute/v2.1/servers/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+                  "rel": "self"
+              },
+              {
+                  "href": "http://10.1.0.5/compute/servers/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+                  "rel": "bookmark"
+              }
+          ],
+          "max_count": null,
+          "metadata": {},
+          "min_count": null,
+          "name": "ansible_molecule_snowdrop_openstack_test",
+          "networks": null,
+          "power_state": 1,
+          "progress": 0,
+          "project_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "ramdisk_id": "",
+          "reservation_id": "r-aaaaaa",
+          "root_device_name": "/dev/vda",
+          "scheduler_hints": null,
+          "security_groups": [
+              {
+                  "name": "VALUE_SPECIFIED_IN_NO_LOG_PARAMETER"
+              }
+          ],
+          "server_groups": null,
+          "status": "ACTIVE",
+          "tags": [],
+          "task_state": null,
+          "terminated_at": null,
+          "trusted_image_certificates": null,
+          "updated_at": "2023-12-12T11:49:01Z",
+          "user_data": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "user_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "vm_state": "active",
+          "volumes": []
+      }
+  ]
+}
