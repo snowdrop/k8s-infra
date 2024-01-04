@@ -1,0 +1,39 @@
+---
+name: CI
+on:
+  push:
+
+jobs:
+
+  install-requirements:
+    name: Test installation of the project requirements
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: [ 3.11 ]
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v3
+
+      - name: Install Python
+        uses: actions/setup-python@v4 
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+
+      - name: Install python requirements
+        run: |
+          pip install -r requirements.txt
+          pip install -r molecule/requirements.txt
+          ansible-galaxy collection install -r requirements.yml --upgrade
+
+      - name: Print configuration versions
+        run: |
+          pip freeze
+          ansible-galaxy collection list
+
+      # - name: Run role tests
+      #   run: |
+      #     molecule test --scenario-name github
+
+...
