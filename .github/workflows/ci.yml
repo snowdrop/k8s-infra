@@ -25,7 +25,7 @@ jobs:
         run: |
           pip install -r requirements.txt
           pip install -r molecule/requirements.txt
-          ansible-galaxy collection install -r requirements.yml --upgrade
+          ansible-galaxy collection install -r collections/requirements.yml --upgrade
 
       - name: Print configuration versions
         run: |
