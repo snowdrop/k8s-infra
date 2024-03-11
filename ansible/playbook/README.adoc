@@ -157,6 +157,34 @@ ansible-playbook ansible/playbook/passstore_manage_host_groups.yml -e operation=
 [.lead]
 Updates the certificates for the openshift ingress console.
 
+[CAUTION]
+====
+This playbook assumes that the prefix added to the secret updated by the 
+ _Certificate Manager_ is the same name of the OpenShift cluster.
+
+For the sake of the examples the name used is `qshift`.
+
+[source,bash]
+----
+$ kc --kubeconfig=${HOME}/.kube/snowdrop-k8s-config --namespace snowdrop-site get secret
+NAME                            TYPE                DATA   AGE
+...
+qshift-snowdrop-dev-tls         kubernetes.io/tls   2      96d
+...
+----
+
+On the target OpenShift cluster the namespace and secret will be named 
+ `openshift-ingress` and `` accordingly.
+
+[source,bash]
+----
+$ kc -n openshift-ingress get secret
+NAME               TYPE               DATA   AGE
+qshift-console     kubernetes.io/tls  2      20d
+----
+
+====
+
 .Playbook parameters
 [%header,cols="25%,75%"]
 |===
