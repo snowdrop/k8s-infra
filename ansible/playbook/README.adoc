@@ -219,14 +219,13 @@ Sample execution of the `update_letsencrypt_certificate.yml` playbook.
 [source,bash]
 ----
 ansible-playbook ansible/playbook/update_letsencrypt_certificate.yml \
-  -e source_kubeconfig=${HOME}/.kube/snowdrop-rhosp-snowdrop-k8s-config \ <1>
-  -e target_kubeconfig=${HOME}/.kube/rh-ocp-qshift-drp2b-config \ <2>
+  -e source_kubeconfig=${HOME}/.kube/snowdrop-k8s-config \ <1>
+  -e target_kubeconfig=${HOME}/.kube/qshift-ocp-cluster-config \ <2>
   -e site_name=qshift <3>
 ----
-<1> `kubeconfig` file for the cluster running the certificate renewal.
-<2> `kubeconfig` file for the cluster that requires the update.
+<1> `kubeconfig` file for the cluster running the certificate renewal. Can be obtained from the passwordstore using `pass show -c openstack/snowdrop-k8s/kubeconfig`.
+<2> `kubeconfig` file for the cluster that requires the update. In the example we're using the `qshift` cluster which `kubeconfig` can also be obtained from the passwordstore using `pass show -c openstack/ocp-qshift-drp2b/kubeconfig`.
 <3> Name of the Openshift cluster
-
 
 
 == Modules
