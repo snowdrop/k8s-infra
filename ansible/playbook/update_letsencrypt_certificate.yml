@@ -1,0 +1,108 @@
+---
+- name: "Get TLS information"
+  hosts: "{{ source_host | default(['localhost']) }}"
+  gather_facts: yes
+
+  pre_tasks:
+    - name: "Check site_name variables"
+      assert:
+        that: lookup('varnames', 'site_name') | length > 0
+        fail_msg: "site_name is not defined."
+        quiet: true
+
+    - name: "Check cluster_type variables"
+      assert:
+        that: cluster_type is undefined or cluster_type == 'kubernetes' or cluster_type == 'openshift'
+        fail_msg: "cluster_type must either be kubernetes or openshift (default: openshift)"
+        quiet: true
+
+    - name: Define Kubeconfig
+      ansible.builtin.set_fact:
+        kubeconfig_source: "{{ source_kubeconfig | default('~/.kube/config') }}"
+        target_cluster_type: "{{ cluster_type | default('openshift') }}"
+
+    - name: Source kubeconfig file
+      ansible.builtin.debug:
+        var: kubeconfig_source
+
+  tasks:
+
+# kubectl -n snowdrop-site get secret www-snowdrop-dev-tls -o json | jq -r '.data["^Cs.key"]'
+# k get secret/qshift-snowdrop-dev-tls -n snowdrop-site -ojson | jq -r '.data."tls.crt"' | base64 -d > tls.crt
+# k get secret/qshift-snowdrop-dev-tls -n snowdrop-site -ojson | jq -r '.data."tls.key"' | base64 -d > tls.key
+    - name: Get TLS secret
+      kubernetes.core.k8s_info:
+        kubeconfig: "{{ kubeconfig_source }}"
+        kind: Secret
+        name: "{{ site_name }}-snowdrop-dev-tls"
+        namespace: snowdrop-site
+      register: tls_info
+
+    - name: Print TLS secret
+      ansible.builtin.debug:
+        var: tls_info
+
+    - name: Get TLS certificate and key
+      ansible.builtin.set_fact:
+        tls_certificate: "{{ tls_info.resources[0].data['tls.crt'] | b64decode }}"
+        tls_key: "{{ tls_info.resources[0].data['tls.key'] | b64decode }}"
+
+    - name: Print TLS data
+      ansible.builtin.debug:
+        msg: 
+          - "{{ tls_certificate }}"
+          - "{{ tls_key }}"
+
+- name: "Update certificate on target"
+  hosts: "{{ target_host | default(['localhost']) }}"
+  gather_facts: yes
+
+  pre_tasks:
+    - name: Define Kubeconfig
+      ansible.builtin.set_fact:
+        kubeconfig_target: "{{ target_kubeconfig | default('~/.kube/config') }}"
+
+  tasks:
+    - name: Define target variables for OpenShift
+      ansible.builtin.set_fact:
+        target_namespace: openshift-ingress
+        target_secret_name: "{{ site_name }}-console"
+      when: target_cluster_type == 'openshift'
+
+    - name: Define target variables for Kubernetes (TBD)
+      ansible.builtin.set_fact:
+        target_namespace: ingress-nginx
+        target_secret_name: "{{ site_name }}-console"
+      when: target_cluster_type == 'kubernetes'
+
+# k -n openshift-ingress delete secret/qshift-console
+    - name: Remove the ingress console secret
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kubeconfig_target }}"
+        state: absent
+        api_version: v1
+        kind: Secret
+        namespace: openshift-ingress
+        name: "{{ target_secret_name }}"
+
+# k -n openshift-ingress create secret tls qshift-console --cert=pki/tls.crt --key=pki/tls.key # --dry-run="client" -oyaml
+    - name: Create the ingress console secret
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kubeconfig_target }}"
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: "{{ target_secret_name }}"
+            namespace: openshift-ingress
+            # labels:
+            #   app: galaxy
+            #   service: web
+          type: kubernetes.io/tls
+          data:
+            tls.crt: "{{ tls_certificate | b64encode }}"
+            tls.key: "{{ tls_key | b64encode }}"
+
+...
+# ansible-playbook ansible/playbook/update_letsencrypt_certificate.yml -e source_kubeconfig=${HOME}/.kube/snowdrop-rhosp-snowdrop-k8s-config  --check

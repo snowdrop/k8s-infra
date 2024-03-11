@@ -1,6 +1,18 @@
 = Ansible Playbooks
+Antonio C. <antcosta at redhat dot com>
+:revdate: {docdate}
+:icons: font
+:icon-set: fas
 :toc: left
+:toclevels: 3
 :description: This document describes the implemented playbooks.
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
 
 == Playbooks
 
@@ -146,6 +158,110 @@ For instance, to undo the previous host operation:
 ```bash
 ansible-playbook ansible/playbook/passstore_manage_host_groups.yml -e operation=remove -e group_name=k8s_115 -e vm_name=n01-k115
 ```
+
+=== update_letsencrypt_certificate
+
+[.lead]
+Updates the certificates for the openshift ingress console.
+
+[CAUTION]
+====
+This playbook assumes that the prefix added to the secret updated by the 
+ _Certificate Manager_ is the same name of the OpenShift cluster.
+
+For the sake of the examples the name used is `qshift`.
+
+[source,bash]
+----
+$ kc --kubeconfig=${HOME}/.kube/snowdrop-k8s-config --namespace snowdrop-site get secret
+NAME                            TYPE                DATA   AGE
+...
+qshift-snowdrop-dev-tls         kubernetes.io/tls   2      96d
+...
+----
+
+On the target OpenShift cluster the namespace and secret will be named 
+ `openshift-ingress` and `` accordingly.
+
+[source,bash]
+----
+$ kc -n openshift-ingress get secret
+NAME               TYPE               DATA   AGE
+qshift-console     kubernetes.io/tls  2      20d
+----
+
+====
+
+.Playbook parameters
+[%header,cols="25%,75%"]
+|===
+| Variable | Description
+
+| `cluster_type`
+
+[.fuchsia]#string#
+
+a| Type of cluster where the certificate will be deployed into (target).
+
+* *kubernetes*
+* *openshift => Default*
+
+| `site_name`
+
+[.fuchsia]#string# / [.red]#required# 
+
+a| Name of the site that will be used to fetch the certificates from.
+
+The name of the site will be used to fetch the certificate from the 
+ `snowdrop-site` namespace under the format of `<site_name>-snowdrop-dev-tls`.
+
+| `source_host`
+
+[.fuchsia]#string#
+
+a| Name of the host that will be used to connect to the source cluster.
+
+*Default => `localhost`*
+
+| `source_kubeconfig`
+
+[.fuchsia]#string#
+
+a| `kubeconfig` file for the cluster running the license update feature.
+
+*Default => `${HOME}/.kube/config`*
+
+| `target_host`
+
+[.fuchsia]#string#
+
+a| Name of the host that will be used to connect to the source cluster.
+
+*Default => `localhost`*
+
+| `target_kubeconfig`
+
+[.fuchsia]#string#
+
+a| `kubeconfig` file for the cluster running the license update feature.
+
+*Default => `${HOME}/.kube/config`*
+
+|===
+
+Sample execution of the `update_letsencrypt_certificate.yml` playbook.
+
+[source,bash]
+----
+ansible-playbook ansible/playbook/update_letsencrypt_certificate.yml \
+  -e source_kubeconfig=${HOME}/.kube/snowdrop-k8s-config \ <1>
+  -e target_kubeconfig=${HOME}/.kube/qshift-ocp-cluster-config \ <2>
+  -e site_name=qshift <3>
+----
+<1> `kubeconfig` file for the cluster running the certificate renewal. Can be obtained from the passwordstore using `pass show -c openstack/snowdrop-k8s/kubeconfig`.
+<2> `kubeconfig` file for the cluster that requires the update. In the example we're using the `qshift` cluster which `kubeconfig` can also be obtained from the passwordstore using `pass show -c openstack/ocp-qshift-drp2b/kubeconfig`.
+<3> Name of the Openshift cluster
+
 
 == Modules
 
