@@ -6,6 +6,13 @@ Antonio C. <antcosta at redhat dot com>
 :toc: left
 :toclevels: 3
 :description: This document describes the implemented playbooks.
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
 
 == Playbooks
 
