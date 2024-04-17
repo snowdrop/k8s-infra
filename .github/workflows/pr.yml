@@ -1,5 +1,5 @@
 ---
-name: Pull Request Test
+name: PR generic test
 on:
   push:
   workflow_dispatch:
@@ -37,20 +37,4 @@ jobs:
       # - name: Run role tests
       #   run: |
       #     molecule test --scenario-name github
-
-  kind-test:
-    name: Test Kind Deployment
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        kind_version: [v0.20.0]
-    steps:
-      - name: Checkout project
-        uses: actions/checkout@v3
-      - name: Deploy kind
-        run: |
-          curl -Lo ./kind/kind https://kind.sigs.k8s.io/dl/${{ matrix.kind_version }}/kind-linux-amd64
-          chmod 755 kind
-          ./kind/registry.sh install --registry-name kind-registry.local
-          ./kind/kind.sh install --registry-name kind-registry.local
 ...

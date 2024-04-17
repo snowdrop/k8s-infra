@@ -149,6 +149,7 @@ show_usage() {
     log_message "0" "\t--registry-password <password>\t\tRegistry user password. Default: snowdrop"
     log_message "0" "\t--registry-port <port>\t\t\tPort of the registry. Default: 5000"
     log_message "0" "\t--registry-user <user>\t\t\tRegistry user. Default: admin"
+    log_message "0" "\t--rootless \t\t\t\tRun rootless containers (only supported for Podman). Default: no"
     log_message "0" "\t--secure-registry\t\t\tSecure the docker registry. Default: No"
     log_message "0" "\t-v, --verbosity <value>\t\t\tLogging verbosity (0..9). Default: 1"
     log_message "0" "\t\t\t\t\t\tA verbosity setting of 0 logs only critical events."
@@ -270,6 +271,11 @@ function remove_container_registry() {
 # INSTALL
 
 function install_container_registry() {
+    set +e
+    note_start_task "2" "Create kind network..."
+    ${CRI_COMMAND} network create kind
+    succeeded "2" "Create kind network..."
+    set -e
     if [ "${SECURE_REGISTRY}" == 'y' ]; then
         note "1" "Securing registry..."
         note "2" "==== Create the htpasswd file where user: ${REGISTRY_USER} and password: ${REGISTRY_PASSWORD}"
@@ -329,6 +335,7 @@ function install_container_registry() {
         mkdir -p $HOME/.docker/certs.d/${REGISTRY_NAME}:${REGISTRY_PORT}
         cp $certfile $HOME/.docker/certs.d/${REGISTRY_NAME}:${REGISTRY_PORT}/client.crt
         cp $HOME/.registry/certs/${REGISTRY_NAME}/client.key $HOME/.docker/certs.d/${REGISTRY_NAME}:${REGISTRY_PORT}/client.key
+        log_message "0" "Must restart docker service which requries sudo."
         eval ${DOCKER_RESTART_COMMAND}
 
         SCRIPT_RESULT_MESSAGE+="\n"
@@ -388,38 +395,46 @@ function install_container_registry() {
     fi
 }
 
-function validate_cri() {
+function define_runtime_commands() {
     note "2" "CRI Provider: ${CRI_PROVIDER}"
-    if [ "${CRI_PROVIDER}" == 'docker' ]; then
-        CRI_COMMAND="docker"
-        HOST_80_PORT=80
-        HOST_443_PORT=443
-    elif [ "${CRI_PROVIDER}" == 'podman' ]; then
-        CRI_COMMAND="sudo podman"
-        # WARN: NO SUPPORT FOR ROOTLESS PODMAN CONTAINERS YET
-        HOST_80_PORT=30080
-        HOST_443_PORT=30443
-    else
-        error "Invalid CRI provider ${CRI_PROVIDER}."
-        show_usage
-        exit 1  
-    fi
-}
-
-function check_os() {
+    note "2" "Rootless: ${ROOTLESS_CONTAINERS}"
+    note "2" "OS Type: ${OSTYPE}"
+    KIND_COMMAND=kind
     case "$OSTYPE" in
         "linux-gnu"*) 
             DOCKER_RESTART_COMMAND="sudo systemctl restart docker" 
-            NETWORK_RM_CMD="${CRI_COMMAND} network rm -f kind"
+            if [ "${CRI_PROVIDER}" == 'podman' ]; then
+                if [ "${ROOTLESS_CONTAINERS}" == 'y' ]; then
+                    CRI_COMMAND="podman"
+                    export KIND_EXPERIMENTAL_PROVIDER=podman
+                else
+                    CRI_COMMAND="sudo podman"
+                    KIND_COMMAND="sudo --preserve-env kind"
+                fi
+            elif [ "${CRI_PROVIDER}" == 'docker' ]; then
+                CRI_COMMAND="docker"
+            fi
         ;;
         "darwin"*) 
             # DOCKER_RESTART_COMMAND='echo -e "${YELLOW}\xE2\x9A\xA0 : Script paused to Restart the Docker service manually. ${NC}" ; read -n1 -s -r -p $"Press any key to continue..." key' 
             DOCKER_RESTART_COMMAND='echo ""' 
-            NETWORK_RM_CMD="${CRI_COMMAND} network rm kind"
+            if [ "${CRI_PROVIDER}" == 'docker' ]; then
+                if [ "${ROOTLESS_CONTAINERS}" == 'y' ]; then
+                    error "Rootless containers is not supported in Docker ."
+                    show_usage
+                    exit 1  
+                fi
+                CRI_COMMAND="docker"
+            elif [ "${CRI_PROVIDER}" == 'podman' ]; then
+                CRI_COMMAND="podman"
+            fi
         ;;
-        *) error "Unknown OS"; exit 1 ;;
+        *) 
+            error "Invalid CRI provider ${CRI_PROVIDER}."
+            show_usage
+            exit 1 
+        ;;
     esac;
-    note "5" "${DOCKER_RESTART_COMMAND}"
     # if [ "$OSTYPE" == "linux-gnu"* ]; then
     #     # DOCKER_RESTART_COMMAND="sudo systemctl restart docker"
     #     DOCKER_RESTART_COMMAND="read -n1 -s -r -p $'${YELLOW}\xE2\x9A\xA0: script paused to Restart the Docker service manually, press any key to continue...!${NC}' key"
@@ -437,6 +452,30 @@ function check_os() {
     # else
     #         # Unknown.
     # fi
+    if [ "${ROOTLESS_CONTAINERS}" == 'y' ]; then
+        HOST_80_PORT=30080
+        HOST_443_PORT=30443
+    else
+        unset KIND_EXPERIMENTAL_PROVIDER
+        HOST_80_PORT=80
+        HOST_443_PORT=443
+    fi
+}
+
+function check_os() {
+    case "$OSTYPE" in
+        "linux-gnu"*) 
+            note "5" "$OSTYPE is supported."
+        ;;
+        "darwin"*) 
+            note "5" "$OSTYPE is supported."
+        ;;
+        *) 
+            error "Invalid OS type $OSTYPE."
+            show_usage
+            exit 1 
+        ;;
+    esac;
 }
 ##### /Functions
 
@@ -453,6 +492,7 @@ SCRIPT_REQUIRED_STEPS=""
 SECURE_REGISTRY="n"
 SHOW_HELP="n"
 USE_EXISTING_CLUSTER="n"
+ROOTLESS_CONTAINERS="n"
 
 set +e
 while [ $# -gt 0 ]; do
@@ -467,6 +507,7 @@ while [ $# -gt 0 ]; do
         --registry-password) REGISTRY_PASSWORD="$2"; shift ;;
         --registry-port) REGISTRY_PORT="$2"; shift ;;
         --registry-user) REGISTRY_USER="$2"; shift ;;
+        --rootless) ROOTLESS_CONTAINERS="y" ;;
         --secure-registry) SECURE_REGISTRY="y" ;;
         --verbosity) LOGGING_VERBOSITY="$2"; shift ;;
         *) INVALID_SWITCH="${INVALID_SWITCH} $1" ; break 2 ;;
@@ -523,7 +564,7 @@ print_logo
 
 check_pre_requisites
 
-validate_cri
+define_runtime_commands
 
 kindCfgExtraMounts=""
 temp_cert_dir="_tmp"

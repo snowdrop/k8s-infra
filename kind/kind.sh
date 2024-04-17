@@ -152,10 +152,13 @@ show_usage() {
     log_message "0" "\t--cluster-name <name>\t\t\tName of the cluster. Default: kind"
     log_message "0" "\t--delete-kind-cluster\t\t\tDeletes the Kind cluster prior to creating a new one. Default: No"
     log_message "0" "\t--ingress [nginx,kourier]\t\tIngress to be deployed. One of nginx,kourier. Default: nginx"
-    log_message "0" "\t--ingress-ports httpPort:httpsPort\tIngress ports to be mapped.  e.g. 'HttpPort:HttpsPort '"
+    log_message "0" "\t--ingress-ports httpPort:httpsPort\tIngress ports to be mapped in the form of HTTP:HTTPS, e.g. '20080:20443 '"
+    log_message "0" ""
     log_message "0" "\t\t\t\t\t\tngninx default: 80:443."
     log_message "0" "\t\t\t\t\t\tkourier default: 31080:31443."
     log_message "0" "\t--knative-version <version>\t\tKNative version to be used. Default: 1.9.0"
+    log_message "0" "\t--kubeconfig-gen\t\t\tGenerates the config file on the ~/.kube folder. Default: No"
+    log_message "0" "\t--kubeconfig-tgt <folder>\t\tFolder where the config file will be generated. Default: No"
     log_message "0" "\t--kubernetes-version <version>\t\tKubernetes version to be install. Default: latest"
     log_message "0" "\t--provider <provider>\t\t\tContainer Runtime [docker,podman]. Default: docker"
     log_message "0" "\t--port-map <port map list>\t\tList of ports to map on kind config. e.g. 'ContainerPort1:HostPort1,ContainerPort2:HostPort2,...'"
@@ -164,12 +167,15 @@ show_usage() {
     log_message "0" "\t--registry-password <password>\t\tRegistry user password. Default: snowdrop"
     log_message "0" "\t--registry-port <port>\t\t\tPort of the registry. Default: 5000"
     log_message "0" "\t--registry-user <user>\t\t\tRegistry user. Default: admin"
-    log_message "0" "\t--secure-registry\t\t\tSecure the docker registry. Default: No"
+    log_message "0" "\t--rootless \t\t\t\tRun rootless containers (only supported for Podman). Default: no"
+    log_message "0" ""
+    log_message "0" "\t\t\t\t\t\tNOTE: Rootless podman on macos requires setting the podman vm with --rootfull=false (e.g. podman machine set --rootful=false)."
+    log_message "0" "\t--secure-registry\t\t\tSecure the container registry. Default: No"
     log_message "0" "\t--server-ip <ip-address>\t\tIP address to be used. Default: 127.0.0.1"
     log_message "0" "\t--skip-ingress-installation \t\tSkip the installation of an ingress. Default: No"
     log_message "0" "\t--use-existing-cluster\t\t\tUses existing kind cluster if it already exists. Default: No"
     log_message "0" "\t-v, --verbosity <value>\t\t\tLogging verbosity (0..9). Default: 1"
-    log_message "0" "\t\t\t\t\t\tA verbosity setting of 0 logs only critical events."
+    log_message "0" "\t\t\t\t\t\t\tA verbosity setting of 0 logs only critical events."
 }
 
 check_pre_requisites() {
@@ -318,7 +324,7 @@ delete_kind_cluster() {
     SCRIPT_RESULT_MESSAGE+="\n"
     SCRIPT_RESULT_MESSAGE+="  * Kind cluster has been deleted \n"
 
-    if [ "${CRI_COMMAND}" == 'podman' ]; then
+    if [ "${CRI_PROVIDER}" == 'podman' ]; then
         note_start_task "1" "Delete Podman Control Plane container..."
         podman_cp_container_name="${CLUSTER_NAME}-control-plane"
         podman_cp_container_id=$(${CRI_COMMAND} container ls --filter name=^${podman_cp_container_name}$ --all --quiet)
@@ -335,15 +341,15 @@ delete_kind_cluster() {
 }
 
 function delete_cri_resources(){
-    note_start_task "1" "Removing ${CRI_COMMAND} network..."
+    note_start_task "1" "Removing ${CRI_PROVIDER} network..."
     docker_network_id=$(${CRI_COMMAND} network ls --filter name=^kind$ --quiet)
     if [ ! ${docker_network_id} == "" ]; then
         set +e
         NETWORK_RM_RES=eval ${NETWORK_RM_CMD} 1> /dev/null
-        succeeded "1" "Removing ${CRI_COMMAND} network..."
+        succeeded "1" "Removing ${CRI_PROVIDER} network..."
         set -e
     else 
-        warn "Removing ${CRI_COMMAND} network... nothing to be done!"
+        warn "Removing ${CRI_PROVIDER} network... nothing to be done!"
     fi
 }
 
@@ -353,42 +359,42 @@ function delete_cri_resources(){
 deploy_ingress_kourier() {
     note "1" "Deploying KNative Ingress"
     echo "Install the required custom resources of knative"
-    kubectl apply -f https://github.com/knative/serving/releases/download/knative-v${KNATIVE_VERSION}/serving-crds.yaml
+    ${KC_CMD} apply -f https://github.com/knative/serving/releases/download/knative-v${KNATIVE_VERSION}/serving-crds.yaml
 
     note "1" "Install the core components of Knative Serving"
-    kubectl apply -f https://github.com/knative/serving/releases/download/knative-v${KNATIVE_VERSION}/serving-core.yaml
-    kubectl -n knative-serving rollout status deployment activator
-    kubectl -n knative-serving rollout status deployment autoscaler
-    kubectl -n knative-serving rollout status deployment controller
-    kubectl -n knative-serving rollout status deployment domain-mapping
-    kubectl -n knative-serving rollout status deployment domainmapping-webhook
-    kubectl -n knative-serving rollout status deployment webhook
+    ${KC_CMD} apply -f https://github.com/knative/serving/releases/download/knative-v${KNATIVE_VERSION}/serving-core.yaml
+    ${KC_CMD} -n knative-serving rollout status deployment activator
+    ${KC_CMD} -n knative-serving rollout status deployment autoscaler
+    ${KC_CMD} -n knative-serving rollout status deployment controller
+    ${KC_CMD} -n knative-serving rollout status deployment domain-mapping
+    ${KC_CMD} -n knative-serving rollout status deployment domainmapping-webhook
+    ${KC_CMD} -n knative-serving rollout status deployment webhook
 
     note "1" "Install the Knative Kourier controller"
-    kubectl apply -f https://github.com/knative/net-kourier/releases/download/knative-v${KNATIVE_VERSION}/kourier.yaml
-    kubectl -n knative-serving rollout status deployment net-kourier-controller
-    kubectl -n kourier-system rollout status deployment 3scale-kourier-gateway
+    ${KC_CMD} apply -f https://github.com/knative/net-kourier/releases/download/knative-v${KNATIVE_VERSION}/kourier.yaml
+    ${KC_CMD} -n knative-serving rollout status deployment net-kourier-controller
+    ${KC_CMD} -n kourier-system rollout status deployment 3scale-kourier-gateway
 
     note "1" "Configure Knative Serving to use Kourier by default"
-    kubectl patch configmap/config-network \
+    ${KC_CMD} patch configmap/config-network \
         -n knative-serving \
         --type merge \
         -p '{"data":{"ingress-class":"kourier.ingress.networking.knative.dev"}}'
 
     note "1" "Configure the Knative domain to: $SERVER_IP.nip.io"
     KNATIVE_DOMAIN="${SERVER_IP}.nip.io"
-    kubectl patch configmap/config-domain \
+    ${KC_CMD} patch configmap/config-domain \
         -n knative-serving \
         -p "{\"data\": {\"$KNATIVE_DOMAIN\": \"\"}}"
 
     note "1" "Patching the kourier service to use the nodePort 31080 and type nodePort"
-    kubectl patch -n kourier-system svc kourier --type='json' -p="[{\"op\": \"replace\", \"path\": \"/spec/ports/0/nodePort\", \"value\": ${INGRESS_80_CONTAINER_PORT}}]"
-    kubectl patch -n kourier-system svc kourier --type='json' -p="[{\"op\": \"replace\", \"path\": \"/spec/ports/1/nodePort\", \"value\": ${INGRESS_443_CONTAINER_PORT}}]"
-    kubectl patch -n kourier-system svc kourier --type='json' -p='[{"op": "replace", "path": "/spec/type", "value": "NodePort"}]'
+    ${KC_CMD} patch -n kourier-system svc kourier --type='json' -p="[{\"op\": \"replace\", \"path\": \"/spec/ports/0/nodePort\", \"value\": ${INGRESS_80_CONTAINER_PORT}}]"
+    ${KC_CMD} patch -n kourier-system svc kourier --type='json' -p="[{\"op\": \"replace\", \"path\": \"/spec/ports/1/nodePort\", \"value\": ${INGRESS_443_CONTAINER_PORT}}]"
+    ${KC_CMD} patch -n kourier-system svc kourier --type='json' -p='[{"op": "replace", "path": "/spec/type", "value": "NodePort"}]'
 
     note "0" "####### TO TEST ########"
     note "0" "Execute the following commands: "
-    knCmd="cat <<-EOF | kubectl apply -f -
+    knCmd="cat <<-EOF | ${KC_CMD} apply -f -
   apiVersion: serving.knative.dev/v1
   kind: Service
   metadata:
@@ -418,7 +424,7 @@ deploy_ingress_nginx() {
     # Install the ingress nginx controller using helm
     # Set the Service type as: NodePort (needed for kind)
     #
-    helm upgrade --install ingress-nginx ingress-nginx \
+    ${HELM_CMD} upgrade --install ingress-nginx ingress-nginx \
         --repo https://kubernetes.github.io/ingress-nginx \
         --namespace ingress --create-namespace \
         --set controller.service.type=NodePort \
@@ -431,9 +437,11 @@ deploy_ingress_nginx() {
 }
 
 function configure_registry_on_kind() {
+    note "5" "#configure_registry_on_kind..."
+    note "5" "KC_CMD: ${KC_CMD}"
     # Document the local registry
     # https://github.com/kubernetes/enhancements/tree/master/keps/sig-cluster-lifecycle/generic/1755-communicating-a-local-registry
-    cat <<EOF | kubectl apply -f -
+    cat <<EOF | ${KC_CMD} apply -f -
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -444,8 +452,7 @@ data:
     host: "localhost:${REGISTRY_PORT}"
     help: "https://kind.sigs.k8s.io/docs/user/local-registry/"
 EOF
-
-
+    note "5" "#configure_registry_on_kind."
 }
 
 get_kind_cluster() {
@@ -503,11 +510,11 @@ EOF
     kindCmd="${KIND_COMMAND} -v ${LOGGING_VERBOSITY} create cluster  -n ${CLUSTER_NAME}"
     kindExtraPortMappings=$(cat <<EOF
   - containerPort: ${INGRESS_80_CONTAINER_PORT}
-    hostPort: ${INGRESS_80_CONTAINER_PORT}
+    hostPort: ${HOST_80_PORT}
     protocol: TCP
     listenAddress: "0.0.0.0"
   - containerPort: ${INGRESS_443_CONTAINER_PORT}
-    hostPort: ${INGRESS_443_CONTAINER_PORT}
+    hostPort: ${HOST_443_PORT}
     protocol: TCP
     listenAddress: "0.0.0.0"
 EOF
@@ -560,12 +567,12 @@ EOF
     kind_get_clusters=$(${KIND_COMMAND} get clusters | { grep "${CLUSTER_NAME}" || test $? = 1; }) 
     if [ ! "${kind_get_clusters}" == "" ]; then
         note "1" "Cluster already exists..."
-        if [ "$USE_EXISTING_CLUSTER" == "y" ]; then
-            note "1" "...using existing cluster. Exporting cluster kubeconfig..."
-            note "5" "CMD: kind export kubeconfig -n ${CLUSTER_NAME}"
-            ${KIND_COMMAND} export kubeconfig -n ${CLUSTER_NAME}
-            succeeded "1" "...done!"
-        else
+        if [ ! "$USE_EXISTING_CLUSTER" == "y" ]; then
+            # note "1" "...using existing cluster. Exporting cluster kubeconfig..."
+            # note "5" "CMD: kind export kubeconfig -n ${CLUSTER_NAME}"
+            # ${KIND_COMMAND} export kubeconfig -n ${CLUSTER_NAME}
+            # succeeded "1" "...done!"
+        # else
             error "Cluster already exists. Either use the existing cluster (--use-existing-cluster) or delete the cluster (--delete-kind-cluster)."
             exit 1
         fi
@@ -580,23 +587,52 @@ EOF
         fi
         note "5" "Creating a Kind cluster using kindest/node: ${KUBERNETES_VERSION} and logging verbosity: ${LOGGING_VERBOSITY}"
         echo "${kindCfg}" | ${kindCmd} --config=-
-
-        if [ "${CRI_PROVIDER}" == 'podman' ]; then
-            sudo -E kind get kubeconfig > ${HOME}/.kube/config
-        fi
-        
+        note "5" "Cluster created."
+        note "5" "CRI_PROVIDER: ${CRI_PROVIDER}"
+        note "5" "ROOTLESS_CONTAINERS: ${ROOTLESS_CONTAINERS}"
+        # ${KIND_COMMAND} get kubeconfig
+        # if [ "${KUBECONFIG_GEN}" == 'y' ]; then
+        #     KIND_GET_KC_CMD='kind get kubeconfig'
+        #     # if [ "${CLUSTER_NAME}" == 'y' ]; then
+        #     if [ -n "$CLUSTER_NAME" ]; then
+        #         KIND_GET_KC_CMD+=" --name ${CLUSTER_NAME}"
+        #     # else
+        #     #     echo "empty"
+        #     fi
+        #     if [ "${ROOTLESS_CONTAINERS}" == 'n' ]; then
+        #         # kind get kubeconfig > ${HOME}/.kube/config
+        #     # else
+        #         # sudo -E kind get kubeconfig > ${HOME}/.kube/config
+        #         KIND_GET_KC_CMD="sudo -E ${KIND_GET_KC_CMD}"
+        #     fi
+        #     note "5" "KIND_GET_KC_CMD: ${KIND_GET_KC_CMD}"
+        #     note_start_task "2" "Refreshing kube configuration..."
+        #     ${KIND_GET_KC_CMD} > ${KUBECONFIG_TGT}
+        #     succeeded "2" "Refreshing kube configuration..."
+        # fi
     fi
-    
+    KIND_EXPORT_KC_CMD="${KIND_COMMAND} export kubeconfig -n ${CLUSTER_NAME} --verbosity ${LOGGING_VERBOSITY} "
+    if [ ${KUBECONFIG_GEN} == "y" ]; then
+        KIND_EXPORT_KC_CMD+=" --kubeconfig ${KUBECONFIG_TGT}  "
+    fi
+    note "5" "KIND_EXPORT_KC_CMD: ${KIND_EXPORT_KC_CMD}"
+    note_start_task "2" "Export kubeconfig..."
+    ${KIND_EXPORT_KC_CMD}
+    succeeded "2" "Export kubeconfig..."
+    if [ ${KUBECONFIG_GEN} == "y" ] && [ "${ROOTLESS_CONTAINERS}" == 'n' ]; then
+        sudo chown $(whoami):$(whoami) ${KUBECONFIG_TGT}
+        #sudo chmod 644 ${KUBECONFIG_TGT}
+    fi
     set +e
     note_start_task "2" "Connect the container registry to the kind network..."
-     ${CRI_COMMAND} network connect "kind" ${REGISTRY_NAME}
+    ${CRI_COMMAND} network connect "kind" ${REGISTRY_NAME}
     succeeded "2" "Connect the container registry to the kind network... done."
     set -e
     
     SCRIPT_RESULT_MESSAGE+="\n"
     SCRIPT_RESULT_MESSAGE+="  * ${CLUSTER_NAME} kind cluster has been deployed\n"
     SCRIPT_RESULT_MESSAGE+="\n"
-    SCRIPT_RESULT_MESSAGE+="  * Cluster configuration has been copied to ${HOME}/.kube/config\n"
+    SCRIPT_RESULT_MESSAGE+="  * Cluster configuration has been copied to ${KUBECONFIG_TGT}\n"
     SCRIPT_RESULT_MESSAGE+="\n"
     SCRIPT_RESULT_MESSAGE+="  * Execute 'kind get kubeconfig --name ${CLUSTER_NAME}' to obtain the cluster configuration\n"
 }
@@ -622,6 +658,8 @@ function remove() {
 }
 
 function validate_ingress() {
+    note "5" "INGRESS: ${INGRESS}"
+    note "5" "Rootless: ${ROOTLESS_CONTAINERS}"
     if [ "${INGRESS}" == 'kourier' ]; then
         INGRESS_80_CONTAINER_PORT=31080
         INGRESS_443_CONTAINER_PORT=31443
@@ -636,11 +674,31 @@ function validate_ingress() {
     note "5" "INGRESS_80_CONTAINER_PORT: ${INGRESS_80_CONTAINER_PORT}"
     note "5" "INGRESS_443_CONTAINER_PORT: ${INGRESS_443_CONTAINER_PORT}"
     note "5" "Ingress ports: ${INGRESS_PORTS}"
+    if [ "${ROOTLESS_CONTAINERS}" == 'y' ]; then
+        note "5" "Rootless ports"
+        HOST_80_PORT=30080
+        HOST_443_PORT=30443
+    else
+        note "5" "Rootful ports"
+        HOST_80_PORT=80
+        HOST_443_PORT=443
+    fi
     if [ "${INGRESS_PORTS}" == "" ]; then
+        note "5" "Ingress ports empty"
         if [ "${INGRESS}" == 'kourier' ]; then
             INGRESS_80_CONTAINER_PORT=31080
             INGRESS_443_CONTAINER_PORT=31443
         elif [ "${INGRESS}" == 'nginx' ]; then
+            if [ "${ROOTLESS_CONTAINERS}" == 'y' ]; then
+                note "5" "Rootless ports"
+                HOST_80_PORT=30080
+                HOST_443_PORT=30443
+            else
+                note "5" "Rootful ports"
+                HOST_80_PORT=80
+                HOST_443_PORT=443
+            fi
+        else
             INGRESS_80_CONTAINER_PORT=80
             INGRESS_443_CONTAINER_PORT=443
         fi
@@ -652,42 +710,49 @@ function validate_ingress() {
     note "5" "Ingress ports: ${INGRESS_80_CONTAINER_PORT}:${INGRESS_443_CONTAINER_PORT}"
 }
 
-function validate_cri() {
+function define_runtime_commands() {
+    note "2" "#define_runtime_commands()..."
     note "2" "CRI Provider: ${CRI_PROVIDER}"
-    if [ "${CRI_PROVIDER}" == 'docker' ]; then
-        CRI_COMMAND="docker"
-        KIND_COMMAND=kind
-        unset KIND_EXPERIMENTAL_PROVIDER
-        HOST_80_PORT=80
-        HOST_443_PORT=443
-    elif [ "${CRI_PROVIDER}" == 'podman' ]; then
-        CRI_COMMAND="sudo podman"
-        # WARN: NO SUPPORT FOR ROOTLESS PODMAN CONTAINERS YET
-        KIND_COMMAND="sudo --preserve-env kind"
-        export KIND_EXPERIMENTAL_PROVIDER=podman
-        HOST_80_PORT=30080
-        HOST_443_PORT=30443
-    else
-        error "Invalid CRI provider ${CRI_PROVIDER}."
-        show_usage
-        exit 1  
-    fi
-}
-
-function check_os() {
+    note "2" "Rootless: ${ROOTLESS_CONTAINERS}"
+    note "2" "OS Type: ${OSTYPE}"
+    KIND_COMMAND=kind
     case "$OSTYPE" in
         "linux-gnu"*) 
-            DOCKER_RESTART_COMMAND="sudo systemctl restart docker" 
+            # DOCKER_RESTART_COMMAND="sudo systemctl restart docker" 
             NETWORK_RM_CMD="${CRI_COMMAND} network rm -f kind"
+            if [ "${CRI_PROVIDER}" == 'podman' ]; then
+                if [ "${ROOTLESS_CONTAINERS}" == 'y' ]; then
+                    CRI_COMMAND="podman"
+                    export KIND_EXPERIMENTAL_PROVIDER=podman
+                else
+                    CRI_COMMAND="sudo podman"
+                    KIND_COMMAND="sudo --preserve-env kind"
+                fi
+            elif [ "${CRI_PROVIDER}" == 'docker' ]; then
+                CRI_COMMAND="docker"
+            fi
         ;;
         "darwin"*) 
             # DOCKER_RESTART_COMMAND='echo -e "${YELLOW}\xE2\x9A\xA0 : Script paused to Restart the Docker service manually. ${NC}" ; read -n1 -s -r -p $"Press any key to continue..." key' 
-            DOCKER_RESTART_COMMAND='echo ""' 
+            # DOCKER_RESTART_COMMAND='echo ""' 
             NETWORK_RM_CMD="${CRI_COMMAND} network rm kind"
+            if [ "${CRI_PROVIDER}" == 'docker' ]; then
+                if [ "${ROOTLESS_CONTAINERS}" == 'y' ]; then
+                    error "Rootless containers is not supported in Docker ."
+                    show_usage
+                    exit 1  
+                fi
+                CRI_COMMAND="docker"
+            elif [ "${CRI_PROVIDER}" == 'podman' ]; then
+                CRI_COMMAND="podman"
+            fi
         ;;
-        *) error "Unknown OS"; exit 1 ;;
+        *) 
+            error "Invalid CRI provider ${CRI_PROVIDER}."
+            show_usage
+            exit 1 
+        ;;
     esac;
-    note "5" "${DOCKER_RESTART_COMMAND}"
     # if [ "$OSTYPE" == "linux-gnu"* ]; then
     #     # DOCKER_RESTART_COMMAND="sudo systemctl restart docker"
     #     DOCKER_RESTART_COMMAND="read -n1 -s -r -p $'${YELLOW}\xE2\x9A\xA0: script paused to Restart the Docker service manually, press any key to continue...!${NC}' key"
@@ -705,6 +770,40 @@ function check_os() {
     # else
     #         # Unknown.
     # fi
+    if [ "${ROOTLESS_CONTAINERS}" == 'y' ]; then
+        HOST_80_PORT=30080
+        HOST_443_PORT=30443
+    else
+        unset KIND_EXPERIMENTAL_PROVIDER
+        HOST_80_PORT=80
+        HOST_443_PORT=443
+    fi
+    KC_CMD="kubectl "
+    HELM_CMD="helm "
+    if [ ${KUBECONFIG_GEN} == "y" ]; then
+        KC_CMD+=" --kubeconfig ${KUBECONFIG_TGT} "
+        HELM_CMD+=" --kubeconfig ${KUBECONFIG_TGT} "
+    fi
+    note "2" "CRI_COMMAND: ${CRI_COMMAND}"
+    note "2" "KIND_COMMAND: ${KIND_COMMAND}"
+    note "2" "KC_CMD: ${KC_CMD}"
+    note "2" "HELM_CMD: ${HELM_CMD}"
+}
+
+function check_os() {
+    case "$OSTYPE" in
+        "linux-gnu"*) 
+            note "5" "$OSTYPE is supported."
+        ;;
+        "darwin"*) 
+            note "5" "$OSTYPE is supported."
+        ;;
+        *) 
+            error "Invalid OS type $OSTYPE."
+            show_usage
+            exit 1 
+        ;;
+    esac;
 }
 ##### /Functions
 
@@ -716,6 +815,8 @@ DELETE_KIND_CLUSTER="n"
 INGRESS="nginx"
 KIND_COMMAND=kind
 KNATIVE_VERSION="1.9.0"
+KUBECONFIG_GEN="n"
+KUBECONFIG_TGT="${HOME}/.kube/config"
 KUBERNETES_VERSION="latest"
 LOGGING_VERBOSITY="1"
 REGISTRY_PORT="5000"
@@ -727,6 +828,7 @@ SERVER_IP="127.0.0.1"
 SHOW_HELP="n"
 USE_EXISTING_CLUSTER="n"
 PORT_MAP=""
+ROOTLESS_CONTAINERS="n"
 
 set +e
 while [ $# -gt 0 ]; do
@@ -740,11 +842,14 @@ while [ $# -gt 0 ]; do
         --ingress) INGRESS="$2"; shift ;;
         --ingress-ports) INGRESS_PORTS="$2"; shift ;;
         --knative-version) KNATIVE_VERSION="$2"; shift ;;
+        --kubeconfig-gen) KUBECONFIG_GEN="y" ;;
+        --kubeconfig-tgt) KUBECONFIG_TGT="$2" ; shift ;;
         --kubernetes-version) KUBERNETES_VERSION="$2"; shift ;;
         --provider) CRI_PROVIDER="$2"; shift ;;
         --port-map) PORT_MAP="$2"; shift ;;
         --registry-name) REGISTRY_NAME="$2"; shift ;;
         --registry-port) REGISTRY_PORT="$2"; shift ;;
+        --rootless) ROOTLESS_CONTAINERS="y" ;;
         --secure-registry) SECURE_REGISTRY="y" ;;
         --skip-ingress-installation) SKIP_INGRESS_INSTALLATION="y" ;;
         --server-ip) SERVER_IP="$2"; shift ;;
@@ -813,7 +918,7 @@ print_logo
 
 check_pre_requisites
 
-validate_cri
+define_runtime_commands
 
 kindCfgExtraMounts=""
 temp_cert_dir="_tmp"

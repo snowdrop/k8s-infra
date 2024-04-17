@@ -1,0 +1,315 @@
+---
+name: PR Kind Test
+on:
+  push:
+  workflow_dispatch:
+  pull_request:
+
+env:
+  MACOS_TOOLS: kind kubectl helm
+
+jobs:
+  check-if-kind-changed:
+    name: Check if kind is changed.
+    runs-on: ubuntu-latest
+    outputs:
+      kind_grep_result: ${{ steps.pr_contains_kind.outputs.grep_result }}
+      output2: ${{ steps.step2.outputs.test }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v44
+      - name: List all changed files
+        env:
+          ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
+        run: |
+          for file in ${ALL_CHANGED_FILES}; do
+            echo "$file was changed"
+          done
+      - name: Check if the changes contain and file from kind
+        id: pr_contains_kind
+        env:
+          ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
+        continue-on-error: true
+        run: |
+          set +e
+          echo ${ALL_CHANGED_FILES} | grep -c 'kind/'
+          echo "grep_result=$(echo ${ALL_CHANGED_FILES} | grep -c 'kind/')" >> $GITHUB_OUTPUT
+
+
+  kind-test-docker-linux:
+    name: Deploy Docker Linux
+    if: needs.check-if-kind-changed.outputs.kind_grep_result > 0
+    needs: check-if-kind-changed
+    runs-on: ${{ matrix.os }}
+    env:
+      IngressHTTPPort: 80
+    strategy:
+      matrix:
+        kind_version: [v0.22.0]
+        os: [ubuntu-latest]
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v3
+      - name: Deploy kind
+        run: |
+          curl -Lo ./kind/kind https://kind.sigs.k8s.io/dl/${{ matrix.kind_version }}/kind-linux-amd64
+          chmod 755 kind
+          ./kind/registry.sh install --registry-name kind-registry.local --verbosity 5
+          ./kind/kind.sh install --registry-name kind-registry.local --verbosity 5
+      - name: Wait before checking if ingress available
+        uses: GuillaumeFalourd/wait-sleep-action@v1
+        with:
+          time: '30'
+      # - name: Wait for ingress to be available
+      #   uses: iFaxity/wait-on-action@v1
+      #   with:
+      #     resource: http://localhost:$IngressHTTPPort
+      #     timeout: 300000
+      - name: Check that ingress is available
+        run: |
+          set +e
+          CURL_EXIT_CODE=$(curl -o /dev/null -s -w "%{exitcode}\n" http://localhost:$IngressHTTPPort)
+          if [ ! "${CURL_EXIT_CODE}" == '0' ]; then
+            echo "Exit code should have been 0 but it was ${CURL_EXIT_CODE}."
+            curl -o /dev/null -s -w "%{http_code}\n" http://localhost:$IngressHTTPPort
+            curl -o /dev/null -s -w "%{exitcode}\n" http://localhost:$IngressHTTPPort
+            exit 1
+          fi
+
+  kind-test-docker-macos:
+    name: Deploy Docker MacOS
+    if: needs.check-if-kind-changed.outputs.kind_grep_result > 0
+    needs: check-if-kind-changed
+    runs-on: ${{ matrix.os }}
+    env:
+      IngressHTTPPort: 80
+    strategy:
+      matrix:
+        kind_version: [v0.22.0]
+        os: [macos-13]
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v3
+      # - name: Setup Docker
+      #   run: |
+      #     brew install docker-machine
+      #     brew install --cask virtualbox
+      #     # brew install --cask docker
+      #     docker-machine create --driver virtualbox default
+      - name: Set up Docker
+        uses: crazy-max/ghaction-setup-docker@v3
+        env:
+          LIMA_START_ARGS: --cpus 4 --memory 8
+      - name: Setup tools
+        run: |
+          brew install $MACOS_TOOLS
+          # brew install kind
+          # brew install kubectl
+          # brew install helm
+      - name: Deploy kind
+        run: |
+          curl -Lo ./kind/kind https://kind.sigs.k8s.io/dl/${{ matrix.kind_version }}/kind-linux-amd64
+          chmod 755 kind
+          ./kind/registry.sh install --registry-name kind-registry.local --verbosity 5
+          ./kind/kind.sh install --registry-name kind-registry.local --verbosity 5
+      - name: Wait before checking if ingress available
+        uses: GuillaumeFalourd/wait-sleep-action@v1
+        with:
+          time: '60'
+      # - name: Wait for ingress to be available
+      #   uses: iFaxity/wait-on-action@v1
+      #   with:
+      #     resource: http://localhost:$IngressHTTPPort
+      #     timeout: 60000
+      - name: Check that ingress is available
+        run: |
+          set +e
+          CURL_EXIT_CODE=$(curl -o /dev/null -s -w "%{exitcode}\n" http://localhost:$IngressHTTPPort)
+          if [ ! "${CURL_EXIT_CODE}" == '0' ]; then
+            echo "Exit code should have been 0 but it was ${CURL_EXIT_CODE}."
+            curl -o /dev/null -s -w "%{http_code}\n" http://localhost:$IngressHTTPPort
+            curl -o /dev/null -s -w "%{exitcode}\n" http://localhost:$IngressHTTPPort
+            exit 1
+          fi
+
+  # Rootless Podman doesn't work on Linux due to:
+  # warning: "Error validating CNI config file /home/runner/.config/cni/net.d/kind.conflist: 
+  #   [plugin bridge does not support config version \"1.0.0\" plugin portmap does not support config version \"1.0.0\" plugin firewall does not support config version \"1.0.0\" plugin tuning does not support config version \"1.0.0\"]"
+  kind-test-podman-rootless-linux:
+    name: Deploy Podman Rootless Linux
+    if: false
+    # if: needs.check-if-kind-changed.outputs.kind_grep_result > 0
+    needs: check-if-kind-changed
+    runs-on: ${{ matrix.os }}
+    env:
+      IngressHTTPPort: 30080
+      IngressHTTPSPort: 30443
+    strategy:
+      matrix:
+        kind_version: [v0.22.0]
+        os: [ubuntu-latest]
+    steps:
+      - name: Setup Podman
+        run: |
+          sudo apt update
+          sudo apt-get -y install podman
+      - name: Checkout project
+        uses: actions/checkout@v3
+      - name: Deploy kind
+        run: |
+          curl -Lo ./kind/kind https://kind.sigs.k8s.io/dl/${{ matrix.kind_version }}/kind-linux-amd64
+          chmod 755 kind
+          ./kind/registry.sh install --registry-name kind-registry.local --provider podman --rootless --verbosity 5
+          ./kind/kind.sh install --registry-name kind-registry.local --provider podman --rootless --kubeconfig-tgt ./kube_config --kubeconfig-gen --verbosity 5
+      - name: Wait before checking if ingress available
+        uses: GuillaumeFalourd/wait-sleep-action@v1
+        with:
+          time: '60'
+      - name: Check that ingress is available
+        run: |
+          set +e
+          CURL_EXIT_CODE=$(curl --insecure -o /dev/null -s -w "%{exitcode}\n" https://localhost:$IngressHTTPSPort) 
+          if [ ! "${CURL_EXIT_CODE}" == '0' ]; then
+            echo "Exit code should have been 0 but it was ${CURL_EXIT_CODE}."
+            curl -o /dev/null -s -w "%{http_code}\n" http://localhost:$IngressHTTPPort
+            curl -o /dev/null -s -w "%{exitcode}\n" http://localhost:$IngressHTTPPort
+            exit 1
+          fi
+
+  # Disabling this workflow for now as GitHub action freezes in the middle of the process.
+  kind-test-podman-rootless-macos:
+    name: Deploy Podman Rootless MacOS
+    if: false
+    # if: needs.check-if-kind-changed.outputs.kind_grep_result > 0
+    needs: check-if-kind-changed
+    runs-on: ${{ matrix.os }}
+    env:
+      IngressHTTPPort: 30080
+      IngressHTTPSPort: 30443
+    strategy:
+      matrix:
+        kind_version: [v0.22.0]
+        os: [macos-13]
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v3
+      - name: Setup podman
+        run: |
+          brew install podman
+          podman machine init
+          podman machine set --rootful=false
+          podman machine start
+          podman info
+      - name: Setup tools
+        run: |
+          brew install $MACOS_TOOLS
+      - name: Deploy kind
+        run: |
+          curl -Lo ./kind/kind https://kind.sigs.k8s.io/dl/${{ matrix.kind_version }}/kind-linux-amd64
+          chmod 755 kind
+          ./kind/registry.sh install --registry-name kind-registry.local --provider podman --rootless
+          ./kind/kind.sh install --registry-name kind-registry.local --provider podman --rootless --kubeconfig-tgt ./kube_config --kubeconfig-gen
+      - name: Wait before checking if ingress available
+        uses: GuillaumeFalourd/wait-sleep-action@v1
+        with:
+          time: '30'
+      - name: Check that ingress is available
+        run: |
+          set +e
+          CURL_EXIT_CODE=$(curl -o /dev/null -s -w "%{exitcode}\n" http://localhost:$IngressHTTPPort)
+          if [ ! "${CURL_EXIT_CODE}" == '0' ]; then
+            echo "Exit code should have been 0 but it was ${CURL_EXIT_CODE}."
+            curl -o /dev/null -s -w "%{http_code}\n" http://localhost:$IngressHTTPPort
+            curl -o /dev/null -s -w "%{exitcode}\n" http://localhost:$IngressHTTPPort
+            exit 1
+          fi
+
+  kind-test-podman-rootful-linux:
+    name: Deploy Podman Rootful Linux
+    if: needs.check-if-kind-changed.outputs.kind_grep_result > 0
+    needs: check-if-kind-changed
+    runs-on: ${{ matrix.os }}
+    env:
+      IngressHTTPPort: 80
+    strategy:
+      matrix:
+        kind_version: [v0.22.0]
+        os: [ubuntu-latest]
+    steps:
+      - name: Setup Podman
+        run: |
+          sudo apt update
+          sudo apt-get -y install podman
+      - name: Checkout project
+        uses: actions/checkout@v3
+      - name: Deploy kind
+        run: |
+          curl -Lo ./kind/kind https://kind.sigs.k8s.io/dl/${{ matrix.kind_version }}/kind-linux-amd64
+          chmod 755 kind
+          ./kind/registry.sh install --registry-name kind-registry.local --provider podman --verbosity 5
+          ./kind/kind.sh install --registry-name kind-registry.local --provider podman --kubeconfig-tgt ./kube_config --kubeconfig-gen --verbosity 5
+      - name: Wait before checking if ingress available
+        uses: GuillaumeFalourd/wait-sleep-action@v1
+        with:
+          time: '30'
+      - name: Check that ingress is available
+        run: |
+          set +e
+          CURL_EXIT_CODE=$(curl -o /dev/null -s -w "%{exitcode}\n" http://localhost:$IngressHTTPPort)
+          if [ ! "${CURL_EXIT_CODE}" == '0' ]; then
+            echo "Exit code should have been 0 but it was ${CURL_EXIT_CODE}."
+            curl -o /dev/null -s -w "%{http_code}\n" http://localhost:$IngressHTTPPort
+            curl -o /dev/null -s -w "%{exitcode}\n" http://localhost:$IngressHTTPPort
+            exit 1
+          fi
+
+  # Disabling this workflow for now as GitHub action freezes in the middle of the process.
+  kind-test-podman-rootful-macos:
+    name: Deploy Podman Rootful MacOS
+    if: false
+    # if: needs.check-if-kind-changed.outputs.kind_grep_result > 0
+    needs: check-if-kind-changed
+    runs-on: ${{ matrix.os }}
+    env:
+      IngressHTTPPort: 80
+    strategy:
+      matrix:
+        kind_version: [v0.22.0]
+        os: [macos-13]
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v3
+      - name: Setup podman
+        run: |
+          brew install podman
+          podman machine init
+          podman machine set --rootful=true
+          podman machine start
+          podman info
+      - name: Setup tools
+        run: |
+          brew install $MACOS_TOOLS
+      - name: Deploy kind
+        run: |
+          curl -Lo ./kind/kind https://kind.sigs.k8s.io/dl/${{ matrix.kind_version }}/kind-linux-amd64
+          chmod 755 kind
+          ./kind/registry.sh install --registry-name kind-registry.local --provider podman
+          ./kind/kind.sh install --registry-name kind-registry.local --provider podman --kubeconfig-tgt ./kube_config --kubeconfig-gen
+      - name: Wait before checking if ingress available
+        uses: GuillaumeFalourd/wait-sleep-action@v1
+        with:
+          time: '30'
+      - name: Check that ingress is available
+        run: |
+          set +e
+          CURL_EXIT_CODE=$(curl -o /dev/null -s -w "%{exitcode}\n" http://localhost:$IngressHTTPPort)
+          if [ ! "${CURL_EXIT_CODE}" == '0' ]; then
+            echo "Exit code should have been 0 but it was ${CURL_EXIT_CODE}."
+            curl -o /dev/null -s -w "%{http_code}\n" http://localhost:$IngressHTTPPort
+            curl -o /dev/null -s -w "%{exitcode}\n" http://localhost:$IngressHTTPPort
+            exit 1
+          fi
+...
