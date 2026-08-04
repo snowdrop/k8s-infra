@@ -395,7 +395,7 @@ function validate_cri() {
         HOST_80_PORT=80
         HOST_443_PORT=443
     elif [ "${CRI_PROVIDER}" == 'podman' ]; then
-        CRI_COMMAND="sudo podman"
+        CRI_COMMAND="podman"
         # WARN: NO SUPPORT FOR ROOTLESS PODMAN CONTAINERS YET
         HOST_80_PORT=30080
         HOST_443_PORT=30443
