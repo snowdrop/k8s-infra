@@ -503,11 +503,11 @@ EOF
     kindCmd="${KIND_COMMAND} -v ${LOGGING_VERBOSITY} create cluster  -n ${CLUSTER_NAME}"
     kindExtraPortMappings=$(cat <<EOF
   - containerPort: ${INGRESS_80_CONTAINER_PORT}
-    hostPort: ${INGRESS_80_CONTAINER_PORT}
+    hostPort: ${HOST_80_PORT}
     protocol: TCP
     listenAddress: "0.0.0.0"
   - containerPort: ${INGRESS_443_CONTAINER_PORT}
-    hostPort: ${INGRESS_443_CONTAINER_PORT}
+    hostPort: ${HOST_443_PORT}
     protocol: TCP
     listenAddress: "0.0.0.0"
 EOF
@@ -582,7 +582,7 @@ EOF
         echo "${kindCfg}" | ${kindCmd} --config=-
 
         if [ "${CRI_PROVIDER}" == 'podman' ]; then
-            sudo -E kind get kubeconfig > ${HOME}/.kube/config
+            ${KIND_COMMAND} get kubeconfig --name ${CLUSTER_NAME} > ${HOME}/.kube/config
         fi
         
     fi
@@ -661,9 +661,9 @@ function validate_cri() {
         HOST_80_PORT=80
         HOST_443_PORT=443
     elif [ "${CRI_PROVIDER}" == 'podman' ]; then
-        CRI_COMMAND="sudo podman"
-        # WARN: NO SUPPORT FOR ROOTLESS PODMAN CONTAINERS YET
-        KIND_COMMAND="sudo --preserve-env kind"
+        CRI_COMMAND="podman"
+        #KIND_COMMAND="sudo --preserve-env kind"
+        KIND_COMMAND=kind
         export KIND_EXPERIMENTAL_PROVIDER=podman
         HOST_80_PORT=30080
         HOST_443_PORT=30443
